@@ -3,10 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useEditorStore } from '@/store/editor';
 import { BlockType, ColumnLayout } from '@/types/editor';
-import { PlusCircle, Layout, Type, Image, ImagePlus, FileText, List, HelpCircle, BarChart } from 'lucide-react';
+import { PlusCircle, Layout, Type, Image, ImagePlus, FileText, List, HelpCircle, BarChart, MessageSquare, Target } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { v4 as uuidv4 } from 'uuid';
 
 const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactNode; description: string }> = {
   hero: {
@@ -56,12 +57,12 @@ const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactNode; de
   },
   faq: {
     name: 'Perguntas Frequentes',
-    icon: <HelpCircle className="h-5 w-5" />,
+    icon: <MessageSquare className="h-5 w-5" />,
     description: 'Lista de perguntas e respostas comuns'
   },
   cta: {
     name: 'Chamada para Ação',
-    icon: <PlusCircle className="h-5 w-5" />,
+    icon: <Target className="h-5 w-5" />,
     description: 'Bloco de conversão com botão de destaque'
   }
 };
@@ -98,9 +99,169 @@ const AddBlock: React.FC = () => {
           content: '<p>Digite seu texto aqui. Este é um bloco de texto que você pode personalizar com conteúdo sobre seu produto.</p>'
         });
         break;
-      // Implemente outros tipos conforme necessário
+      case 'features':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          heading: 'Recursos do Produto',
+          features: [
+            {
+              id: uuidv4(),
+              title: 'Recurso 1',
+              description: 'Descrição do recurso 1',
+              icon: 'zap'
+            },
+            {
+              id: uuidv4(),
+              title: 'Recurso 2',
+              description: 'Descrição do recurso 2',
+              icon: 'shield'
+            }
+          ]
+        });
+        break;
+      case 'benefits':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          heading: 'Benefícios',
+          benefits: [
+            {
+              id: uuidv4(),
+              title: 'Benefício 1',
+              description: 'Descrição do benefício 1',
+              icon: 'check'
+            },
+            {
+              id: uuidv4(),
+              title: 'Benefício 2',
+              description: 'Descrição do benefício 2',
+              icon: 'heart'
+            }
+          ]
+        });
+        break;
+      case 'specifications':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          heading: 'Especificações Técnicas',
+          specs: [
+            {
+              id: uuidv4(),
+              name: 'Material',
+              value: 'Valor do material'
+            },
+            {
+              id: uuidv4(),
+              name: 'Dimensões',
+              value: 'Valor das dimensões'
+            }
+          ]
+        });
+        break;
+      case 'image':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          src: '',
+          alt: 'Imagem do produto',
+          caption: 'Legenda da imagem'
+        });
+        break;
+      case 'gallery':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          images: [
+            {
+              id: uuidv4(),
+              src: '',
+              alt: 'Imagem 1',
+              caption: 'Legenda da imagem 1'
+            },
+            {
+              id: uuidv4(),
+              src: '',
+              alt: 'Imagem 2',
+              caption: 'Legenda da imagem 2'
+            }
+          ]
+        });
+        break;
+      case 'imageText':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          image: {
+            src: '',
+            alt: 'Imagem do produto'
+          },
+          heading: 'Título da Seção',
+          content: '<p>Texto com descrição detalhada do produto ou características.</p>'
+        });
+        break;
+      case 'textImage':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          image: {
+            src: '',
+            alt: 'Imagem do produto'
+          },
+          heading: 'Título da Seção',
+          content: '<p>Texto com descrição detalhada do produto ou características.</p>'
+        });
+        break;
+      case 'faq':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          heading: 'Perguntas Frequentes',
+          questions: [
+            {
+              id: uuidv4(),
+              question: 'Pergunta 1?',
+              answer: 'Resposta para a pergunta 1.'
+            },
+            {
+              id: uuidv4(),
+              question: 'Pergunta 2?',
+              answer: 'Resposta para a pergunta 2.'
+            }
+          ]
+        });
+        break;
+      case 'cta':
+        addBlock({
+          type,
+          title: blockTypeInfo[type].name,
+          columns,
+          visible: true,
+          heading: 'Gostou do Produto?',
+          content: '<p>Aproveite as condições especiais e garanta já o seu.</p>',
+          buttonText: 'Comprar Agora',
+          buttonUrl: '#'
+        });
+        break;
       default:
-        // Bloco temporário/genérico para tipos ainda não implementados
+        // Bloco genérico para tipos ainda não implementados
         addBlock({
           type,
           title: blockTypeInfo[type].name,
