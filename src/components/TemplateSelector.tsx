@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTemplateStore } from '@/store/templateStore';
-import { useEditorStore } from '@/store/editorStore';
+import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
