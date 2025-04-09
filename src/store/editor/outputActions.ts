@@ -11,9 +11,106 @@ import {
   TextImageBlock,
   FAQBlock,
   CTABlock,
-  Block
+  Block,
+  BlockStyle,
+  SpacingSize
 } from '@/types/editor';
 import { EditorState } from './types';
+
+// Função para converter os estilos definidos para inline CSS
+const getStylesFromBlock = (block: Block): string => {
+  if (!block.style) return '';
+  
+  const style = block.style;
+  const styles: Record<string, string> = {};
+  
+  // Cores
+  if (style.backgroundColor) styles.backgroundColor = style.backgroundColor;
+  if (style.textColor) styles.color = style.textColor;
+  
+  // Tipografia
+  if (style.fontFamily) {
+    switch (style.fontFamily) {
+      case 'sans':
+        styles.fontFamily = "'Inter', system-ui, sans-serif";
+        break;
+      case 'serif':
+        styles.fontFamily = "'Georgia', serif";
+        break;
+      case 'mono':
+        styles.fontFamily = "'Consolas', monospace";
+        break;
+    }
+  }
+  
+  // Tamanho da fonte
+  if (style.fontSize) {
+    const fontSizeMap: Record<string, string> = {
+      'xs': '0.75rem',
+      'sm': '0.875rem',
+      'base': '1rem',
+      'lg': '1.125rem',
+      'xl': '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem'
+    };
+    styles.fontSize = fontSizeMap[style.fontSize];
+  }
+  
+  // Alinhamento
+  if (style.textAlign) styles.textAlign = style.textAlign;
+  
+  // Espaçamento
+  if (style.padding) {
+    const paddingMap: Record<SpacingSize, string> = {
+      'xs': '0.5rem',
+      'sm': '1rem',
+      'md': '1.5rem',
+      'lg': '2rem',
+      'xl': '3rem'
+    };
+    styles.padding = paddingMap[style.padding];
+  }
+  
+  if (style.margin) {
+    const marginMap: Record<SpacingSize, string> = {
+      'xs': '0.5rem',
+      'sm': '1rem',
+      'md': '1.5rem',
+      'lg': '2rem',
+      'xl': '3rem'
+    };
+    styles.margin = marginMap[style.margin];
+  }
+  
+  // Borda
+  if (style.hasBorder) {
+    styles.border = `1px solid ${style.borderColor || '#e5e7eb'}`;
+  }
+  
+  // Border radius
+  if (style.borderRadius) {
+    const radiusMap: Record<SpacingSize, string> = {
+      'xs': '0.125rem',
+      'sm': '0.25rem',
+      'md': '0.375rem',
+      'lg': '0.5rem',
+      'xl': '0.75rem'
+    };
+    styles.borderRadius = radiusMap[style.borderRadius];
+  }
+  
+  // Sombra
+  if (style.hasShadow) {
+    styles.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+  }
+  
+  // Converte para string de estilo inline
+  return Object.entries(styles)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(';');
+};
 
 export const createOutputActions = (get: () => EditorState) => ({
   getHtmlOutput: () => {
@@ -37,13 +134,15 @@ export const createOutputActions = (get: () => EditorState) => ({
         }
         
         const blockType = block.type;
+        const blockStyles = getStylesFromBlock(block);
+        const blockStyleAttr = blockStyles ? ` style="${blockStyles}"` : '';
         
         switch(blockType) {
           case 'hero':
             const heroBlock = block as HeroBlock;
             return `
-              <div style="width:100%;padding:30px;text-align:center;background-color:#f5f5f5;margin-bottom:20px;">
-                <h1 style="font-size:28px;font-weight:bold;margin-bottom:10px;">${heroBlock.heading}</h1>
+              <div${blockStyleAttr} class="hero-block">
+                <h1 style="${heroBlock.style?.headingColor ? `color:${heroBlock.style.headingColor};` : ''}font-size:28px;font-weight:bold;margin-bottom:10px;">${heroBlock.heading}</h1>
                 <p style="font-size:16px;margin-bottom:20px;">${heroBlock.subheading}</p>
                 ${heroBlock.buttonText ? `<a href="${heroBlock.buttonUrl || '#'}" style="display:inline-block;padding:10px 20px;background-color:#2563EB;color:white;text-decoration:none;border-radius:4px;">${heroBlock.buttonText}</a>` : ''}
               </div>
@@ -52,8 +151,8 @@ export const createOutputActions = (get: () => EditorState) => ({
           case 'text':
             const textBlock = block as TextBlock;
             return `
-              <div style="width:100%;padding:20px;margin-bottom:20px;">
-                <div style="font-size:16px;line-height:1.6;">${textBlock.content}</div>
+              <div${blockStyleAttr} class="text-block">
+                <div style="line-height:1.6;">${textBlock.content}</div>
               </div>
             `;
             
@@ -62,15 +161,15 @@ export const createOutputActions = (get: () => EditorState) => ({
             const featuresHtml = featuresBlock.features && featuresBlock.features.length > 0 
               ? featuresBlock.features.map(feature => `
                 <div style="flex:1;padding:15px;min-width:${100/block.columns}%;">
-                  <h3 style="font-size:18px;font-weight:bold;margin-bottom:10px;">${feature.title}</h3>
+                  <h3 style="${block.style?.headingColor ? `color:${block.style.headingColor};` : ''}font-size:18px;font-weight:bold;margin-bottom:10px;">${feature.title}</h3>
                   <p style="font-size:14px;">${feature.description}</p>
                 </div>
               `).join('')
               : '';
             
             return `
-              <div style="width:100%;padding:20px;margin-bottom:20px;">
-                <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px;text-align:center;">${featuresBlock.heading}</h2>
+              <div${blockStyleAttr} class="features-block">
+                <h2 style="${block.style?.headingColor ? `color:${block.style.headingColor};` : ''}font-size:24px;font-weight:bold;margin-bottom:20px;text-align:center;">${featuresBlock.heading}</h2>
                 <div style="display:flex;flex-wrap:wrap;">${featuresHtml}</div>
               </div>
             `;
@@ -216,7 +315,7 @@ export const createOutputActions = (get: () => EditorState) => ({
             `;
             
           default:
-            return `<div style="padding:20px;margin-bottom:20px;border:1px dashed #ccc;">Bloco do tipo ${(block as any).type}</div>`;
+            return `<div${blockStyleAttr} class="unknown-block" style="padding:20px;margin-bottom:20px;border:1px dashed #ccc;">Bloco do tipo ${(block as any).type}</div>`;
         }
       }).join('');
 

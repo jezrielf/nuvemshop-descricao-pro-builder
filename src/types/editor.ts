@@ -1,4 +1,3 @@
-
 export type BlockType = 
   | 'hero' 
   | 'features' 
@@ -14,12 +13,32 @@ export type BlockType =
 
 export type ColumnLayout = 1 | 2 | 3 | 4;
 
+export type TextAlign = 'left' | 'center' | 'right' | 'justify';
+export type SpacingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+
+export interface BlockStyle {
+  backgroundColor?: string;
+  textColor?: string;
+  headingColor?: string;
+  fontFamily?: 'sans' | 'serif' | 'mono';
+  fontSize?: FontSize;
+  textAlign?: TextAlign;
+  padding?: SpacingSize;
+  margin?: SpacingSize;
+  borderRadius?: SpacingSize;
+  borderColor?: string;
+  hasBorder?: boolean;
+  hasShadow?: boolean;
+}
+
 export interface BlockBase {
   id: string;
   type: BlockType;
   title: string;
   columns: ColumnLayout;
   visible: boolean;
+  style?: BlockStyle;
 }
 
 export interface HeroBlock extends BlockBase {
