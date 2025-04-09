@@ -60,14 +60,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return newBlock;
     });
     
-    // Use type assertion and include the entire state to avoid type errors
-    set((state) => ({
+    set(state => ({
       ...state,
-      description: {
-        ...state.description!,
+      description: state.description ? {
+        ...state.description,
         blocks: updatedBlocks as Block[],
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
       selectedBlockId: null,
     }));
   },
@@ -75,16 +74,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   addBlock: (blockData) => {
     if (!get().description) return;
     
-    // Using type assertion to ensure the block is correctly typed
     const block = { ...blockData, id: uuidv4() } as Block;
     
-    set((state) => ({
+    set(state => ({
       ...state,
-      description: {
-        ...state.description!,
-        blocks: [...state.description!.blocks, block],
+      description: state.description ? {
+        ...state.description,
+        blocks: [...state.description.blocks, block],
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
       selectedBlockId: block.id,
     }));
   },
@@ -92,32 +90,33 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   updateBlock: (id, updates) => {
     if (!get().description) return;
     
-    set((state) => ({
+    set(state => ({
       ...state,
-      description: {
-        ...state.description!,
-        blocks: state.description!.blocks.map((block) =>
+      description: state.description ? {
+        ...state.description,
+        blocks: state.description.blocks.map((block) =>
           block.id === id ? { ...block, ...updates } : block
         ),
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
     }));
   },
 
   duplicateBlock: (id) => {
     if (!get().description) return;
     
-    const blockToDuplicate = get().description!.blocks.find((block) => block.id === id);
+    const blockToDuplicate = get().description.blocks.find((block) => block.id === id);
     if (!blockToDuplicate) return;
     
     const newBlock = { ...blockToDuplicate, id: uuidv4() };
     
-    set((state) => ({
-      description: {
-        ...state.description!,
-        blocks: [...state.description!.blocks, newBlock],
+    set(state => ({
+      ...state,
+      description: state.description ? {
+        ...state.description,
+        blocks: [...state.description.blocks, newBlock],
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
       selectedBlockId: newBlock.id,
     }));
   },
@@ -125,12 +124,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   removeBlock: (id) => {
     if (!get().description) return;
     
-    set((state) => ({
-      description: {
-        ...state.description!,
-        blocks: state.description!.blocks.filter((block) => block.id !== id),
+    set(state => ({
+      ...state,
+      description: state.description ? {
+        ...state.description,
+        blocks: state.description.blocks.filter((block) => block.id !== id),
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
       selectedBlockId: state.selectedBlockId === id ? null : state.selectedBlockId,
     }));
   },
@@ -138,7 +138,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   moveBlockUp: (id) => {
     if (!get().description) return;
     
-    const blocks = [...get().description!.blocks];
+    const blocks = [...get().description.blocks];
     const index = blocks.findIndex((block) => block.id === id);
     if (index <= 0) return;
     
@@ -146,19 +146,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index] = blocks[index - 1];
     blocks[index - 1] = temp;
     
-    set((state) => ({
-      description: {
-        ...state.description!,
+    set(state => ({
+      ...state,
+      description: state.description ? {
+        ...state.description,
         blocks,
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
     }));
   },
 
   moveBlockDown: (id) => {
     if (!get().description) return;
     
-    const blocks = [...get().description!.blocks];
+    const blocks = [...get().description.blocks];
     const index = blocks.findIndex((block) => block.id === id);
     if (index === -1 || index === blocks.length - 1) return;
     
@@ -166,28 +167,30 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index] = blocks[index + 1];
     blocks[index + 1] = temp;
     
-    set((state) => ({
-      description: {
-        ...state.description!,
+    set(state => ({
+      ...state,
+      description: state.description ? {
+        ...state.description,
         blocks,
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
     }));
   },
 
   reorderBlocks: (fromIndex, toIndex) => {
     if (!get().description) return;
     
-    const blocks = [...get().description!.blocks];
+    const blocks = [...get().description.blocks];
     const [removed] = blocks.splice(fromIndex, 1);
     blocks.splice(toIndex, 0, removed);
     
-    set((state) => ({
-      description: {
-        ...state.description!,
+    set(state => ({
+      ...state,
+      description: state.description ? {
+        ...state.description,
         blocks,
         updatedAt: new Date().toISOString(),
-      },
+      } : null,
     }));
   },
 
