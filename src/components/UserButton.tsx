@@ -11,11 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { LogOut, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const UserButton: React.FC = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, isAdmin } = useAuth();
 
   if (!user) {
     return (
@@ -40,7 +41,14 @@ export const UserButton: React.FC = () => {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{profile?.nome || 'Usuário'}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium leading-none">{profile?.nome || 'Usuário'}</p>
+              {profile?.role && (
+                <Badge variant={profile.role === 'admin' ? 'default' : 'secondary'} className="ml-2">
+                  {profile.role}
+                </Badge>
+              )}
+            </div>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>

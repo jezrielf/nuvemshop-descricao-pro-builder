@@ -14,6 +14,8 @@ interface AuthContextProps {
   signUp: (email: string, password: string, nome: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
+  hasRole: (role: string) => boolean;
+  isAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -73,6 +75,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
     }
+  };
+
+  // Função para verificar se o usuário possui determinada role
+  const hasRole = (role: string): boolean => {
+    if (!profile) return false;
+    return profile.role === role;
+  };
+
+  // Função para verificar se o usuário é admin
+  const isAdmin = (): boolean => {
+    return hasRole('admin');
   };
 
   const signIn = async (email: string, password: string) => {
@@ -168,6 +181,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signOut,
         loading,
+        hasRole,
+        isAdmin,
       }}
     >
       {children}
