@@ -36,7 +36,9 @@ export const createOutputActions = (get: () => EditorState) => ({
           return '';
         }
         
-        switch(block.type) {
+        const blockType = block.type;
+        
+        switch(blockType) {
           case 'hero':
             const heroBlock = block as HeroBlock;
             return `
@@ -214,7 +216,7 @@ export const createOutputActions = (get: () => EditorState) => ({
             `;
             
           default:
-            return `<div style="padding:20px;margin-bottom:20px;border:1px dashed #ccc;">Bloco do tipo ${block.type}</div>`;
+            return `<div style="padding:20px;margin-bottom:20px;border:1px dashed #ccc;">Bloco do tipo ${(block as any).type}</div>`;
         }
       }).join('');
 

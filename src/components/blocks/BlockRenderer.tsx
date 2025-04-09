@@ -28,6 +28,15 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
     );
   }
 
+  // Ensure the block has a type property before we try to use it
+  if (!('type' in block)) {
+    return (
+      <div className="p-4 border rounded-md bg-gray-100">
+        <p className="text-gray-500">Bloco sem tipo definido</p>
+      </div>
+    );
+  }
+
   switch (block.type) {
     case 'hero':
       return <HeroBlock block={block} isPreview={isPreview} />;
@@ -54,7 +63,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
     default:
       return (
         <div className="p-4 border rounded-md bg-gray-100">
-          <p className="text-gray-500">Bloco do tipo "{block.type}" não implementado ainda.</p>
+          <p className="text-gray-500">Bloco do tipo "{(block as any).type}" não implementado ainda.</p>
         </div>
       );
   }
