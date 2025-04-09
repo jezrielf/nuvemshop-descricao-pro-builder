@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, FileText, Plus } from 'lucide-react';
+import UserButton from './UserButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
   const { description, createNewDescription, getHtmlOutput } = useEditorStore();
@@ -15,6 +17,7 @@ const Header: React.FC = () => {
   const [showHtmlDialog, setShowHtmlDialog] = React.useState(false);
   const [showNewDialog, setShowNewDialog] = React.useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const handleCreateNew = () => {
     if (!newDescriptionName.trim()) {
@@ -126,6 +129,8 @@ const Header: React.FC = () => {
               </DialogContent>
             </Dialog>
           )}
+          
+          <UserButton />
         </div>
       </div>
     </header>
