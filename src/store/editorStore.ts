@@ -1,6 +1,5 @@
-
 import { create } from 'zustand';
-import { Block, ProductDescription, Template } from '@/types/editor';
+import { Block, ProductDescription, Template, HeroBlock, TextBlock } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
 interface EditorState {
@@ -12,7 +11,7 @@ interface EditorState {
   createNewDescription: (name: string) => void;
   loadDescription: (description: ProductDescription) => void;
   loadTemplate: (template: Template) => void;
-  addBlock: (block: Omit<Block, 'id'>) => void;
+  addBlock: (block: Partial<Block> & { type: Block['type'], title: string, columns: number, visible: boolean }) => void;
   updateBlock: (id: string, updates: Partial<Block>) => void;
   duplicateBlock: (id: string) => void;
   removeBlock: (id: string) => void;
@@ -51,19 +50,23 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   loadTemplate: (template) => {
     if (!get().description) return;
     
-    set((state) => ({
-      description: {
-        ...state.description!,
-        blocks: [...template.blocks.map(block => ({ ...block, id: uuidv4() }))],
-        updatedAt: new Date().toISOString(),
-      },
-      selectedBlockId: null,
-    }));
+    set((state) => {
+      const updatedBlocks = template.blocks.map(block => ({ ...block, id: uuidv4() }));
+      return {
+        description: {
+          ...state.description!,
+          blocks: updatedBlocks,
+          updatedAt: new Date().toISOString(),
+        },
+        selectedBlockId: null,
+      };
+    });
   },
 
   addBlock: (blockData) => {
     if (!get().description) return;
     
+    // Using type assertion to ensure the block is correctly typed
     const block = { ...blockData, id: uuidv4() } as Block;
     
     set((state) => ({
@@ -186,24 +189,26 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return '';
     }
 
-    // Esta é uma versão simplificada da conversão para HTML
-    // Em uma versão mais completa, cada tipo de bloco teria seu próprio renderizador
+    // This is a simplified version of HTML conversion
+    // In a more complete version, each block type would have its own renderer
     const blocksHtml = get().description.blocks
       .filter(block => block.visible)
       .map(block => {
         switch(block.type) {
           case 'hero':
+            const heroBlock = block as HeroBlock;
             return `
               <div style="width:100%;padding:30px;text-align:center;background-color:#f5f5f5;margin-bottom:20px;">
-                <h1 style="font-size:28px;font-weight:bold;margin-bottom:10px;">${block.heading}</h1>
-                <p style="font-size:16px;margin-bottom:20px;">${block.subheading}</p>
-                ${block.buttonText ? `<a href="${block.buttonUrl || '#'}" style="display:inline-block;padding:10px 20px;background-color:#2563EB;color:white;text-decoration:none;border-radius:4px;">${block.buttonText}</a>` : ''}
+                <h1 style="font-size:28px;font-weight:bold;margin-bottom:10px;">${heroBlock.heading}</h1>
+                <p style="font-size:16px;margin-bottom:20px;">${heroBlock.subheading}</p>
+                ${heroBlock.buttonText ? `<a href="${heroBlock.buttonUrl || '#'}" style="display:inline-block;padding:10px 20px;background-color:#2563EB;color:white;text-decoration:none;border-radius:4px;">${heroBlock.buttonText}</a>` : ''}
               </div>
             `;
           case 'text':
+            const textBlock = block as TextBlock;
             return `
               <div style="width:100%;padding:20px;margin-bottom:20px;">
-                <div style="font-size:16px;line-height:1.6;">${block.content}</div>
+                <div style="font-size:16px;line-height:1.6;">${textBlock.content}</div>
               </div>
             `;
           case 'features':

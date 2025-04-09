@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTemplateStore } from '@/store/templateStore';
 import { useEditorStore } from '@/store/editorStore';
@@ -7,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Template } from '@/types/editor';
 
 const TemplateSelector: React.FC = () => {
   const { templates, categories, selectCategory, getTemplatesByCategory, selectedCategory } = useTemplateStore();
