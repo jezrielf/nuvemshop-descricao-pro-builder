@@ -51,25 +51,30 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   loadTemplate: (template) => {
     if (!get().description) return;
     
-    // Create deep copies of blocks with new IDs and ensure they're typed correctly
-    const updatedBlocks = template.blocks.map(templateBlock => {
+    // Create a new array to store the properly typed blocks
+    const updatedBlocks: Block[] = template.blocks.map(templateBlock => {
       // Create a deep copy with a new ID
       const blockCopy = JSON.parse(JSON.stringify(templateBlock));
       blockCopy.id = uuidv4();
       
-      // Ensure the type is preserved and correctly typed
+      // Ensure the type is correctly maintained and the block is properly typed
       return blockCopy as Block;
     });
     
-    set(state => ({
-      ...state,
-      selectedBlockId: null,
-      description: state.description ? {
-        ...state.description,
-        blocks: updatedBlocks,
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    // Update the state with properly typed blocks
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        selectedBlockId: null,
+        description: {
+          ...state.description,
+          blocks: updatedBlocks,
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   addBlock: (blockData) => {
@@ -77,30 +82,38 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     
     const block = { ...blockData, id: uuidv4() } as Block;
     
-    set(state => ({
-      ...state,
-      selectedBlockId: block.id,
-      description: state.description ? {
-        ...state.description,
-        blocks: [...state.description.blocks, block],
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        selectedBlockId: block.id,
+        description: {
+          ...state.description,
+          blocks: [...state.description.blocks, block],
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   updateBlock: (id, updates) => {
     if (!get().description) return;
     
-    set(state => ({
-      ...state,
-      description: state.description ? {
-        ...state.description,
-        blocks: state.description.blocks.map((block) =>
-          block.id === id ? { ...block, ...updates } : block
-        ),
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        description: {
+          ...state.description,
+          blocks: state.description.blocks.map((block) =>
+            block.id === id ? { ...block, ...updates } : block
+          ),
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   duplicateBlock: (id) => {
@@ -113,32 +126,40 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const blockCopy = JSON.parse(JSON.stringify(blockToDuplicate));
     blockCopy.id = uuidv4();
     
-    // Ensure the blockCopy is typed correctly
+    // Ensure the blockCopy is typed correctly as Block
     const typedBlockCopy = blockCopy as Block;
     
-    set(state => ({
-      ...state,
-      selectedBlockId: typedBlockCopy.id,
-      description: state.description ? {
-        ...state.description,
-        blocks: [...state.description.blocks, typedBlockCopy],
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        selectedBlockId: typedBlockCopy.id,
+        description: {
+          ...state.description,
+          blocks: [...state.description.blocks, typedBlockCopy],
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   removeBlock: (id) => {
     if (!get().description) return;
     
-    set(state => ({
-      ...state,
-      selectedBlockId: state.selectedBlockId === id ? null : state.selectedBlockId,
-      description: state.description ? {
-        ...state.description,
-        blocks: state.description.blocks.filter((block) => block.id !== id),
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        selectedBlockId: state.selectedBlockId === id ? null : state.selectedBlockId,
+        description: {
+          ...state.description,
+          blocks: state.description.blocks.filter((block) => block.id !== id),
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   moveBlockUp: (id) => {
@@ -152,14 +173,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index] = blocks[index - 1];
     blocks[index - 1] = temp;
     
-    set(state => ({
-      ...state,
-      description: state.description ? {
-        ...state.description,
-        blocks,
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        description: {
+          ...state.description,
+          blocks,
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   moveBlockDown: (id) => {
@@ -173,14 +198,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index] = blocks[index + 1];
     blocks[index + 1] = temp;
     
-    set(state => ({
-      ...state,
-      description: state.description ? {
-        ...state.description,
-        blocks,
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        description: {
+          ...state.description,
+          blocks,
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   reorderBlocks: (fromIndex, toIndex) => {
@@ -190,14 +219,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const [removed] = blocks.splice(fromIndex, 1);
     blocks.splice(toIndex, 0, removed);
     
-    set(state => ({
-      ...state,
-      description: state.description ? {
-        ...state.description,
-        blocks,
-        updatedAt: new Date().toISOString(),
-      } : null,
-    }));
+    set(state => {
+      if (!state.description) return state;
+      
+      return {
+        ...state,
+        description: {
+          ...state.description,
+          blocks,
+          updatedAt: new Date().toISOString(),
+        }
+      };
+    });
   },
 
   selectBlock: (id) => {
@@ -232,7 +265,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
               </div>
             `;
           case 'features':
-            const featuresHtml = block.features.map(feature => `
+            const featuresBlock = block as FeaturesBlock;
+            const featuresHtml = featuresBlock.features.map(feature => `
               <div style="flex:1;padding:15px;min-width:${100/block.columns}%;">
                 <h3 style="font-size:18px;font-weight:bold;margin-bottom:10px;">${feature.title}</h3>
                 <p style="font-size:14px;">${feature.description}</p>
@@ -241,7 +275,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
             
             return `
               <div style="width:100%;padding:20px;margin-bottom:20px;">
-                <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px;text-align:center;">${block.heading}</h2>
+                <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px;text-align:center;">${featuresBlock.heading}</h2>
                 <div style="display:flex;flex-wrap:wrap;">${featuresHtml}</div>
               </div>
             `;
