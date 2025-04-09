@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useEditorStore } from '@/store/editorStore';
+import { useEditorStore } from '@/store/editor';
 import { BlockType, ColumnLayout } from '@/types/editor';
 import { PlusCircle, Layout, Type, Image, ImagePlus, FileText, List, HelpCircle, BarChart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';

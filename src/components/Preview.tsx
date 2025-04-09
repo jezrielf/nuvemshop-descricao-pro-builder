@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useEditorStore } from '@/store/editorStore';
+import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';

@@ -2,7 +2,7 @@
 import React from 'react';
 import { HeroBlock as HeroBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
-import { useEditorStore } from '@/store/editorStore';
+import { useEditorStore } from '@/store/editor';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';

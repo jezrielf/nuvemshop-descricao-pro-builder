@@ -2,7 +2,7 @@
 import React from 'react';
 import { TextBlock as TextBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
-import { useEditorStore } from '@/store/editorStore';
+import { useEditorStore } from '@/store/editor';
 import { Textarea } from '@/components/ui/textarea';
 
 interface TextBlockProps {

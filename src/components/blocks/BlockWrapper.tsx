@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useEditorStore } from '@/store/editorStore';
+import { useEditorStore } from '@/store/editor';
 import { ChevronDown, ChevronUp, Copy, Grip, Settings, Trash2, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BlockBase } from '@/types/editor';
