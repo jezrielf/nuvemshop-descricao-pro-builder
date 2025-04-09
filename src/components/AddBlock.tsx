@@ -77,18 +77,20 @@ const AddBlock: React.FC = () => {
   const handleAddBlock = (type: BlockType) => {
     if (!type) return;
     
-    // Make sure we have valid type information before proceeding
-    const typeInfo = blockTypeInfo[type];
-    if (!typeInfo) {
+    // Make sure type is a valid BlockType before proceeding
+    if (!Object.keys(blockTypeInfo).includes(type)) {
       console.error(`Invalid block type: ${type}`);
       return;
     }
+    
+    // Now that we've validated the type, TypeScript knows it's a valid key
+    const info = blockTypeInfo[type];
     
     switch (type) {
       case 'hero':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           heading: 'Título Principal',
@@ -100,7 +102,7 @@ const AddBlock: React.FC = () => {
       case 'text':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           content: '<p>Digite seu texto aqui. Este é um bloco de texto que você pode personalizar com conteúdo sobre seu produto.</p>'
@@ -109,7 +111,7 @@ const AddBlock: React.FC = () => {
       case 'features':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           heading: 'Recursos do Produto',
@@ -132,7 +134,7 @@ const AddBlock: React.FC = () => {
       case 'benefits':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           heading: 'Benefícios',
@@ -155,7 +157,7 @@ const AddBlock: React.FC = () => {
       case 'specifications':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           heading: 'Especificações Técnicas',
@@ -176,7 +178,7 @@ const AddBlock: React.FC = () => {
       case 'image':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           src: '',
@@ -187,7 +189,7 @@ const AddBlock: React.FC = () => {
       case 'gallery':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           images: [
@@ -209,7 +211,7 @@ const AddBlock: React.FC = () => {
       case 'imageText':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           image: {
@@ -223,7 +225,7 @@ const AddBlock: React.FC = () => {
       case 'textImage':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           image: {
@@ -237,7 +239,7 @@ const AddBlock: React.FC = () => {
       case 'faq':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           heading: 'Perguntas Frequentes',
@@ -258,7 +260,7 @@ const AddBlock: React.FC = () => {
       case 'cta':
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true,
           heading: 'Gostou do Produto?',
@@ -268,10 +270,10 @@ const AddBlock: React.FC = () => {
         });
         break;
       default:
-        // Bloco genérico para tipos ainda não implementados
+        // Ensure type safety by adding generic block
         addBlock({
           type,
-          title: blockTypeInfo[type].name,
+          title: info.name,
           columns,
           visible: true
         });
@@ -279,7 +281,7 @@ const AddBlock: React.FC = () => {
     
     toast({
       title: "Bloco adicionado",
-      description: `${typeInfo.name} foi adicionado à sua descrição.`,
+      description: `${info.name} foi adicionado à sua descrição.`,
     });
     
     setSelectedType(null);
