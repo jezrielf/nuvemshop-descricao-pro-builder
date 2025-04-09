@@ -86,7 +86,7 @@ const AddBlock: React.FC = () => {
           subheading: 'Subtítulo com descrição do produto',
           buttonText: 'Saiba Mais',
           buttonUrl: '#'
-        } as any); // Using type assertion to bypass strict typing temporarily
+        });
         break;
       case 'text':
         addBlock({
@@ -95,7 +95,7 @@ const AddBlock: React.FC = () => {
           columns,
           visible: true,
           content: '<p>Digite seu texto aqui. Este é um bloco de texto que você pode personalizar com conteúdo sobre seu produto.</p>'
-        } as any); // Using type assertion to bypass strict typing temporarily
+        });
         break;
       // Implemente outros tipos conforme necessário
       default:

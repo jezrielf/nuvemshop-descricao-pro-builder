@@ -1,5 +1,6 @@
+
 import { create } from 'zustand';
-import { Block, ProductDescription, Template, HeroBlock, TextBlock } from '@/types/editor';
+import { Block, ProductDescription, Template, HeroBlock, TextBlock, BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
 interface EditorState {
@@ -11,7 +12,7 @@ interface EditorState {
   createNewDescription: (name: string) => void;
   loadDescription: (description: ProductDescription) => void;
   loadTemplate: (template: Template) => void;
-  addBlock: (block: Partial<Block> & { type: Block['type'], title: string, columns: number, visible: boolean }) => void;
+  addBlock: (block: Partial<Block> & { type: BlockType, title: string, columns: number, visible: boolean }) => void;
   updateBlock: (id: string, updates: Partial<Block>) => void;
   duplicateBlock: (id: string) => void;
   removeBlock: (id: string) => void;
@@ -51,7 +52,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!get().description) return;
     
     set((state) => {
-      const updatedBlocks = template.blocks.map(block => ({ ...block, id: uuidv4() }));
+      // Create new blocks from template blocks, ensuring proper typing
+      const updatedBlocks = template.blocks.map(block => ({
+        ...block,
+        id: uuidv4()
+      })) as Block[];
+      
       return {
         description: {
           ...state.description!,
