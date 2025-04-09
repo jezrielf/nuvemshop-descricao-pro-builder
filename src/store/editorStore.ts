@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Block, ProductDescription, Template, HeroBlock, TextBlock, BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
@@ -53,21 +52,21 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     
     // Create deep copies of blocks with new IDs
     const updatedBlocks = template.blocks.map(templateBlock => {
+      // Create a deep copy with a new ID
       const newBlock = {
         ...JSON.parse(JSON.stringify(templateBlock)),
         id: uuidv4()
       };
-      return newBlock;
+      return newBlock as Block; // Explicit cast to Block
     });
     
     set(state => ({
-      ...state,
+      selectedBlockId: null,
       description: state.description ? {
         ...state.description,
-        blocks: updatedBlocks as Block[],
+        blocks: updatedBlocks,
         updatedAt: new Date().toISOString(),
       } : null,
-      selectedBlockId: null,
     }));
   },
 
@@ -77,13 +76,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const block = { ...blockData, id: uuidv4() } as Block;
     
     set(state => ({
-      ...state,
+      selectedBlockId: block.id,
       description: state.description ? {
         ...state.description,
         blocks: [...state.description.blocks, block],
         updatedAt: new Date().toISOString(),
       } : null,
-      selectedBlockId: block.id,
     }));
   },
 
@@ -91,7 +89,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!get().description) return;
     
     set(state => ({
-      ...state,
       description: state.description ? {
         ...state.description,
         blocks: state.description.blocks.map((block) =>
@@ -108,16 +105,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const blockToDuplicate = get().description.blocks.find((block) => block.id === id);
     if (!blockToDuplicate) return;
     
-    const newBlock = { ...blockToDuplicate, id: uuidv4() };
+    const newBlock = { ...JSON.parse(JSON.stringify(blockToDuplicate)), id: uuidv4() } as Block;
     
     set(state => ({
-      ...state,
+      selectedBlockId: newBlock.id,
       description: state.description ? {
         ...state.description,
         blocks: [...state.description.blocks, newBlock],
         updatedAt: new Date().toISOString(),
       } : null,
-      selectedBlockId: newBlock.id,
     }));
   },
 
@@ -125,13 +121,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!get().description) return;
     
     set(state => ({
-      ...state,
+      selectedBlockId: state.selectedBlockId === id ? null : state.selectedBlockId,
       description: state.description ? {
         ...state.description,
         blocks: state.description.blocks.filter((block) => block.id !== id),
         updatedAt: new Date().toISOString(),
       } : null,
-      selectedBlockId: state.selectedBlockId === id ? null : state.selectedBlockId,
     }));
   },
 
@@ -147,7 +142,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index - 1] = temp;
     
     set(state => ({
-      ...state,
       description: state.description ? {
         ...state.description,
         blocks,
@@ -168,7 +162,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index + 1] = temp;
     
     set(state => ({
-      ...state,
       description: state.description ? {
         ...state.description,
         blocks,
@@ -185,7 +178,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks.splice(toIndex, 0, removed);
     
     set(state => ({
-      ...state,
       description: state.description ? {
         ...state.description,
         blocks,
