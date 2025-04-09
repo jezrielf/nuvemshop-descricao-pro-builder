@@ -19,6 +19,15 @@ interface BlockRendererProps {
 }
 
 const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false }) => {
+  // Safely check if block is valid before accessing its properties
+  if (!block || typeof block !== 'object') {
+    return (
+      <div className="p-4 border rounded-md bg-gray-100">
+        <p className="text-gray-500">Bloco inválido</p>
+      </div>
+    );
+  }
+
   switch (block.type) {
     case 'hero':
       return <HeroBlock block={block} isPreview={isPreview} />;

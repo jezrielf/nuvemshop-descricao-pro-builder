@@ -10,7 +10,8 @@ import {
   ImageTextBlock,
   TextImageBlock,
   FAQBlock,
-  CTABlock
+  CTABlock,
+  Block
 } from '@/types/editor';
 import { EditorState } from './types';
 
@@ -25,8 +26,16 @@ export const createOutputActions = (get: () => EditorState) => ({
 
     // Generate HTML for each block type
     const blocksHtml = description.blocks
-      .filter(block => block.visible)
+      .filter(block => {
+        // Make sure the block is valid and has the visible property
+        return block && typeof block === 'object' && 'visible' in block && block.visible;
+      })
       .map(block => {
+        // Ensure block has a valid type before we try to access it
+        if (!block || typeof block !== 'object' || !('type' in block)) {
+          return '';
+        }
+        
         switch(block.type) {
           case 'hero':
             const heroBlock = block as HeroBlock;

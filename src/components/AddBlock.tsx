@@ -77,6 +77,13 @@ const AddBlock: React.FC = () => {
   const handleAddBlock = (type: BlockType) => {
     if (!type) return;
     
+    // Make sure we have valid type information before proceeding
+    const typeInfo = blockTypeInfo[type];
+    if (!typeInfo) {
+      console.error(`Invalid block type: ${type}`);
+      return;
+    }
+    
     switch (type) {
       case 'hero':
         addBlock({
@@ -272,7 +279,7 @@ const AddBlock: React.FC = () => {
     
     toast({
       title: "Bloco adicionado",
-      description: `${blockTypeInfo[type].name} foi adicionado à sua descrição.`,
+      description: `${typeInfo.name} foi adicionado à sua descrição.`,
     });
     
     setSelectedType(null);
@@ -294,17 +301,21 @@ const AddBlock: React.FC = () => {
             <div className="space-y-2">
               <h3 className="font-medium mb-2">Escolha um tipo de bloco</h3>
               <div className="grid grid-cols-2 gap-2">
-                {Object.keys(blockTypeInfo).map((type) => (
-                  <Button
-                    key={type}
-                    variant="outline"
-                    className="flex flex-col items-center justify-center h-20 text-center p-1"
-                    onClick={() => setSelectedType(type as BlockType)}
-                  >
-                    <div className="mb-1">{blockTypeInfo[type as BlockType].icon}</div>
-                    <span className="text-xs">{blockTypeInfo[type as BlockType].name}</span>
-                  </Button>
-                ))}
+                {Object.keys(blockTypeInfo).map((type) => {
+                  const blockType = type as BlockType;
+                  const info = blockTypeInfo[blockType];
+                  return (
+                    <Button
+                      key={type}
+                      variant="outline"
+                      className="flex flex-col items-center justify-center h-20 text-center p-1"
+                      onClick={() => setSelectedType(blockType)}
+                    >
+                      <div className="mb-1">{info.icon}</div>
+                      <span className="text-xs">{info.name}</span>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           ) : (
