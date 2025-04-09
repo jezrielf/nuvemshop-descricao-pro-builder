@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { Block, ProductDescription, Template, HeroBlock, TextBlock, BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
@@ -52,7 +53,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     
     // Create deep copies of blocks with new IDs
     const updatedBlocks = template.blocks.map(templateBlock => {
-      // Create a new object with a new ID
       const newBlock = {
         ...JSON.parse(JSON.stringify(templateBlock)),
         id: uuidv4()
@@ -60,7 +60,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return newBlock;
     });
     
+    // Use type assertion and include the entire state to avoid type errors
     set((state) => ({
+      ...state,
       description: {
         ...state.description!,
         blocks: updatedBlocks as Block[],
@@ -77,6 +79,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const block = { ...blockData, id: uuidv4() } as Block;
     
     set((state) => ({
+      ...state,
       description: {
         ...state.description!,
         blocks: [...state.description!.blocks, block],
@@ -90,6 +93,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!get().description) return;
     
     set((state) => ({
+      ...state,
       description: {
         ...state.description!,
         blocks: state.description!.blocks.map((block) =>
