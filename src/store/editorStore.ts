@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Block, ProductDescription, Template, HeroBlock, TextBlock, BlockType, FeaturesBlock } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
@@ -245,13 +244,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   getHtmlOutput: () => {
-    if (!get().description || !get().description.blocks.length) {
+    const description = get().description;
+    
+    // Check if description exists and has blocks before trying to map over them
+    if (!description || !description.blocks || description.blocks.length === 0) {
       return '';
     }
 
     // This is a simplified version of HTML conversion
     // In a more complete version, each block type would have its own renderer
-    const blocksHtml = get().description.blocks
+    const blocksHtml = description.blocks
       .filter(block => block.visible)
       .map(block => {
         switch(block.type) {
@@ -273,12 +275,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
             `;
           case 'features':
             const featuresBlock = block as FeaturesBlock;
-            const featuresHtml = featuresBlock.features.map(feature => `
-              <div style="flex:1;padding:15px;min-width:${100/block.columns}%;">
-                <h3 style="font-size:18px;font-weight:bold;margin-bottom:10px;">${feature.title}</h3>
-                <p style="font-size:14px;">${feature.description}</p>
-              </div>
-            `).join('');
+            const featuresHtml = featuresBlock.features && featuresBlock.features.length > 0 
+              ? featuresBlock.features.map(feature => `
+                <div style="flex:1;padding:15px;min-width:${100/block.columns}%;">
+                  <h3 style="font-size:18px;font-weight:bold;margin-bottom:10px;">${feature.title}</h3>
+                  <p style="font-size:14px;">${feature.description}</p>
+                </div>
+              `).join('')
+              : '';
             
             return `
               <div style="width:100%;padding:20px;margin-bottom:20px;">
@@ -286,7 +290,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
                 <div style="display:flex;flex-wrap:wrap;">${featuresHtml}</div>
               </div>
             `;
-          // Adicione mais casos para outros tipos de blocos conforme necessário
+          // Add more cases for other block types as needed
           default:
             return `<div style="padding:20px;margin-bottom:20px;border:1px dashed #ccc;">Bloco do tipo ${block.type}</div>`;
         }
