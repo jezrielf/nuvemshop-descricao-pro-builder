@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { Block, ProductDescription, Template, HeroBlock, TextBlock, BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
@@ -50,24 +51,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   loadTemplate: (template) => {
     if (!get().description) return;
     
-    // Create deep copies of blocks with new IDs
+    // Create deep copies of blocks with new IDs and ensure they're typed correctly
     const updatedBlocks = template.blocks.map(templateBlock => {
       // Create a deep copy with a new ID
-      const newBlock = {
-        ...JSON.parse(JSON.stringify(templateBlock)),
-        id: uuidv4()
-      };
-      return newBlock as Block; // Explicit cast to Block
+      const blockCopy = JSON.parse(JSON.stringify(templateBlock)) as Block;
+      blockCopy.id = uuidv4();
+      return blockCopy;
     });
     
-    set(state => ({
+    set({
       selectedBlockId: null,
-      description: state.description ? {
-        ...state.description,
+      description: get().description ? {
+        ...get().description,
         blocks: updatedBlocks,
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   addBlock: (blockData) => {
@@ -75,28 +74,28 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     
     const block = { ...blockData, id: uuidv4() } as Block;
     
-    set(state => ({
+    set({
       selectedBlockId: block.id,
-      description: state.description ? {
-        ...state.description,
-        blocks: [...state.description.blocks, block],
+      description: get().description ? {
+        ...get().description,
+        blocks: [...get().description.blocks, block],
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   updateBlock: (id, updates) => {
     if (!get().description) return;
     
-    set(state => ({
-      description: state.description ? {
-        ...state.description,
-        blocks: state.description.blocks.map((block) =>
+    set({
+      description: get().description ? {
+        ...get().description,
+        blocks: get().description.blocks.map((block) =>
           block.id === id ? { ...block, ...updates } : block
         ),
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   duplicateBlock: (id) => {
@@ -105,29 +104,31 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const blockToDuplicate = get().description.blocks.find((block) => block.id === id);
     if (!blockToDuplicate) return;
     
-    const newBlock = { ...JSON.parse(JSON.stringify(blockToDuplicate)), id: uuidv4() } as Block;
+    // Create a deep copy to prevent reference issues
+    const blockCopy = JSON.parse(JSON.stringify(blockToDuplicate)) as Block;
+    blockCopy.id = uuidv4();
     
-    set(state => ({
-      selectedBlockId: newBlock.id,
-      description: state.description ? {
-        ...state.description,
-        blocks: [...state.description.blocks, newBlock],
+    set({
+      selectedBlockId: blockCopy.id,
+      description: get().description ? {
+        ...get().description,
+        blocks: [...get().description.blocks, blockCopy],
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   removeBlock: (id) => {
     if (!get().description) return;
     
-    set(state => ({
-      selectedBlockId: state.selectedBlockId === id ? null : state.selectedBlockId,
-      description: state.description ? {
-        ...state.description,
-        blocks: state.description.blocks.filter((block) => block.id !== id),
+    set({
+      selectedBlockId: get().selectedBlockId === id ? null : get().selectedBlockId,
+      description: get().description ? {
+        ...get().description,
+        blocks: get().description.blocks.filter((block) => block.id !== id),
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   moveBlockUp: (id) => {
@@ -141,13 +142,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index] = blocks[index - 1];
     blocks[index - 1] = temp;
     
-    set(state => ({
-      description: state.description ? {
-        ...state.description,
+    set({
+      description: get().description ? {
+        ...get().description,
         blocks,
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   moveBlockDown: (id) => {
@@ -161,13 +162,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     blocks[index] = blocks[index + 1];
     blocks[index + 1] = temp;
     
-    set(state => ({
-      description: state.description ? {
-        ...state.description,
+    set({
+      description: get().description ? {
+        ...get().description,
         blocks,
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   reorderBlocks: (fromIndex, toIndex) => {
@@ -177,13 +178,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const [removed] = blocks.splice(fromIndex, 1);
     blocks.splice(toIndex, 0, removed);
     
-    set(state => ({
-      description: state.description ? {
-        ...state.description,
+    set({
+      description: get().description ? {
+        ...get().description,
         blocks,
         updatedAt: new Date().toISOString(),
       } : null,
-    }));
+    });
   },
 
   selectBlock: (id) => {
