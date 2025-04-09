@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { Block, ProductDescription, Template, HeroBlock, TextBlock, BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
@@ -51,22 +50,24 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   loadTemplate: (template) => {
     if (!get().description) return;
     
-    set((state) => {
-      // Create new blocks from template blocks, ensuring proper typing
-      const updatedBlocks = template.blocks.map(block => ({
-        ...block,
+    // Create deep copies of blocks with new IDs
+    const updatedBlocks = template.blocks.map(templateBlock => {
+      // Create a new object with a new ID
+      const newBlock = {
+        ...JSON.parse(JSON.stringify(templateBlock)),
         id: uuidv4()
-      })) as Block[];
-      
-      return {
-        description: {
-          ...state.description!,
-          blocks: updatedBlocks,
-          updatedAt: new Date().toISOString(),
-        },
-        selectedBlockId: null,
       };
+      return newBlock;
     });
+    
+    set((state) => ({
+      description: {
+        ...state.description!,
+        blocks: updatedBlocks as Block[],
+        updatedAt: new Date().toISOString(),
+      },
+      selectedBlockId: null,
+    }));
   },
 
   addBlock: (blockData) => {
