@@ -5,7 +5,7 @@ import { useEditorStore } from '@/store/editorStore';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Template } from '@/lucide-react';
+import { FileTemplate } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const TemplateSelector: React.FC = () => {
@@ -40,7 +40,7 @@ const TemplateSelector: React.FC = () => {
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full flex items-center justify-center">
-          <Template className="mr-2 h-5 w-5" />
+          <FileTemplate className="mr-2 h-5 w-5" />
           Usar Template
         </Button>
       </DialogTrigger>
