@@ -51,13 +51,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   loadTemplate: (template) => {
     if (!get().description) return;
     
-    // Create a new array to store the properly typed blocks
+    // Create a proper typed copy of each block
     const updatedBlocks: Block[] = template.blocks.map(templateBlock => {
       // Create a deep copy with a new ID
       const blockCopy = JSON.parse(JSON.stringify(templateBlock));
       blockCopy.id = uuidv4();
       
-      // Ensure the type is correctly maintained and the block is properly typed
+      // Ensure the block is properly typed based on its type property
       return blockCopy as Block;
     });
     
@@ -80,6 +80,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   addBlock: (blockData) => {
     if (!get().description) return;
     
+    // Ensure the block is properly typed
     const block = { ...blockData, id: uuidv4() } as Block;
     
     set(state => {
@@ -103,13 +104,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set(state => {
       if (!state.description) return state;
       
+      // Create a new array with the updated block
+      const updatedBlocks = state.description.blocks.map((block) => {
+        if (block.id === id) {
+          return { ...block, ...updates } as Block;
+        }
+        return block;
+      });
+      
       return {
         ...state,
         description: {
           ...state.description,
-          blocks: state.description.blocks.map((block) =>
-            block.id === id ? { ...block, ...updates } : block
-          ),
+          blocks: updatedBlocks,
           updatedAt: new Date().toISOString(),
         }
       };
@@ -126,7 +133,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const blockCopy = JSON.parse(JSON.stringify(blockToDuplicate));
     blockCopy.id = uuidv4();
     
-    // Ensure the blockCopy is typed correctly as Block
+    // Ensure the blockCopy is properly typed as Block
     const typedBlockCopy = blockCopy as Block;
     
     set(state => {
@@ -165,16 +172,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   moveBlockUp: (id) => {
     if (!get().description) return;
     
-    const blocks = [...get().description.blocks];
-    const index = blocks.findIndex((block) => block.id === id);
-    if (index <= 0) return;
-    
-    const temp = blocks[index];
-    blocks[index] = blocks[index - 1];
-    blocks[index - 1] = temp;
-    
     set(state => {
       if (!state.description) return state;
+      
+      const blocks = [...state.description.blocks];
+      const index = blocks.findIndex((block) => block.id === id);
+      if (index <= 0) return state;
+      
+      const temp = blocks[index];
+      blocks[index] = blocks[index - 1];
+      blocks[index - 1] = temp;
       
       return {
         ...state,
@@ -190,16 +197,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   moveBlockDown: (id) => {
     if (!get().description) return;
     
-    const blocks = [...get().description.blocks];
-    const index = blocks.findIndex((block) => block.id === id);
-    if (index === -1 || index === blocks.length - 1) return;
-    
-    const temp = blocks[index];
-    blocks[index] = blocks[index + 1];
-    blocks[index + 1] = temp;
-    
     set(state => {
       if (!state.description) return state;
+      
+      const blocks = [...state.description.blocks];
+      const index = blocks.findIndex((block) => block.id === id);
+      if (index === -1 || index === blocks.length - 1) return state;
+      
+      const temp = blocks[index];
+      blocks[index] = blocks[index + 1];
+      blocks[index + 1] = temp;
       
       return {
         ...state,
@@ -215,12 +222,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   reorderBlocks: (fromIndex, toIndex) => {
     if (!get().description) return;
     
-    const blocks = [...get().description.blocks];
-    const [removed] = blocks.splice(fromIndex, 1);
-    blocks.splice(toIndex, 0, removed);
-    
     set(state => {
       if (!state.description) return state;
+      
+      const blocks = [...state.description.blocks];
+      const [removed] = blocks.splice(fromIndex, 1);
+      blocks.splice(toIndex, 0, removed);
       
       return {
         ...state,
