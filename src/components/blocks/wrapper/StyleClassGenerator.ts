@@ -73,5 +73,8 @@ export const getStyleClasses = (block: BlockBase): string => {
     classes.push('shadow-md');
   }
   
+  // Log the generated classes for debugging
+  console.log(`Style classes for block ${block.id}:`, classes.join(' '));
+  
   return classes.join(' ');
 };

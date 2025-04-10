@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,8 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Eye, Smartphone, Monitor } from 'lucide-react';
 
 const Preview: React.FC = () => {
-  const { description } = useEditorStore();
+  const { description, getHtmlOutput } = useEditorStore();
   const [deviceView, setDeviceView] = React.useState<'desktop' | 'mobile'>('desktop');
+  const [htmlOutput, setHtmlOutput] = useState<string>('');
+  
+  // Update HTML output whenever description changes
+  useEffect(() => {
+    if (description) {
+      // Generate fresh HTML output
+      try {
+        const output = getHtmlOutput();
+        console.log('Generated HTML output:', output.substring(0, 100) + '...');
+        setHtmlOutput(output);
+      } catch (error) {
+        console.error('Error generating HTML output:', error);
+      }
+    }
+  }, [description, getHtmlOutput]);
   
   if (!description) {
     return (
@@ -63,6 +78,11 @@ const Preview: React.FC = () => {
           )}
         </div>
       </ScrollArea>
+      
+      {/* Debug section for checking raw HTML output */}
+      <div className="hidden">
+        <pre>{htmlOutput}</pre>
+      </div>
     </div>
   );
 };

@@ -90,6 +90,9 @@ export const getStylesFromBlock = (block: Block): string => {
     styles.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
   }
   
+  // Log the styles being applied
+  console.log(`Style conversion for block ${block.id}:`, styles);
+  
   // Converte para string de estilo inline
   return Object.entries(styles)
     .map(([key, value]) => `${key}:${value}`)
