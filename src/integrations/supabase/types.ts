@@ -16,6 +16,7 @@ export type Database = {
           criado_em: string
           id: string
           nome: string | null
+          role: string | null
         }
         Insert: {
           atualizado_em?: string
@@ -23,6 +24,7 @@ export type Database = {
           criado_em?: string
           id: string
           nome?: string | null
+          role?: string | null
         }
         Update: {
           atualizado_em?: string
@@ -30,6 +32,7 @@ export type Database = {
           criado_em?: string
           id?: string
           nome?: string | null
+          role?: string | null
         }
         Relationships: []
       }

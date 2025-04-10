@@ -5,5 +5,5 @@ export type Profile = {
   avatar_url: string | null;
   criado_em: string;
   atualizado_em: string;
-  role?: string; // Roles can be 'admin', 'premium', 'user', etc.
+  role: string | null; // Add role field to match our database schema
 };
