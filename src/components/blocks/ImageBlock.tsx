@@ -6,6 +6,7 @@ import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Image } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ImageBlockProps {
   block: ImageBlockType;
@@ -28,6 +29,19 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
     updateBlock(block.id, { caption });
   };
   
+  const handleImageFitChange = (value: string) => {
+    const currentStyle = block.style || {};
+    updateBlock(block.id, { 
+      style: {
+        ...currentStyle, 
+        imageFit: value as 'contain' | 'cover'
+      }
+    });
+  };
+  
+  const imageFitValue = block.style?.imageFit || 'contain';
+  const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
+  
   // Preview mode
   if (isPreview) {
     return (
@@ -37,7 +51,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
             <img
               src={block.src}
               alt={block.alt || "Imagem do produto"}
-              className="mx-auto max-w-full h-auto object-contain rounded-md"
+              className={`mx-auto max-w-full h-auto ${imageObjectFit} rounded-md`}
             />
           ) : (
             <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md">
@@ -61,7 +75,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
             <img
               src={block.src}
               alt={block.alt || "Imagem do produto"}
-              className="mx-auto max-w-full h-auto object-contain rounded-md mb-4"
+              className={`mx-auto max-w-full h-auto ${imageObjectFit} rounded-md mb-4`}
             />
           ) : (
             <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md mb-4">
@@ -95,6 +109,22 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
                 onChange={(e) => handleUpdateCaption(e.target.value)}
                 placeholder="Legenda da imagem"
               />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">Preenchimento da Imagem</label>
+              <Select value={imageFitValue} onValueChange={handleImageFitChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Escolha o tipo de preenchimento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="contain">Conter (mostrar imagem inteira)</SelectItem>
+                  <SelectItem value="cover">Cobrir (preencher todo o espaço)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-xs text-gray-500">
+                "Cobrir" preencherá todo o espaço, possivelmente cortando partes da imagem.
+              </p>
             </div>
           </div>
         </div>

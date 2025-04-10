@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Image } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface TextImageBlockProps {
   block: TextImageBlockType;
@@ -33,6 +34,19 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
     updateBlock(block.id, { content });
   };
   
+  const handleImageFitChange = (value: string) => {
+    const currentStyle = block.style || {};
+    updateBlock(block.id, { 
+      style: {
+        ...currentStyle, 
+        imageFit: value as 'contain' | 'cover'
+      }
+    });
+  };
+  
+  const imageFitValue = block.style?.imageFit || 'contain';
+  const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
+  
   // Preview mode
   if (isPreview) {
     return (
@@ -47,7 +61,7 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
               <img
                 src={block.image.src}
                 alt={block.image.alt || "Imagem do produto"}
-                className="w-full h-auto object-cover rounded-md"
+                className={`w-full h-auto ${imageObjectFit} rounded-md`}
               />
             ) : (
               <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md">
@@ -93,12 +107,26 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
           </div>
           
           <div>
-            <h3 className="text-sm font-medium mb-2">Imagem</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-medium">Imagem</h3>
+              <div>
+                <Select value={imageFitValue} onValueChange={handleImageFitChange}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Escolha o tipo de preenchimento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="contain">Conter (mostrar imagem inteira)</SelectItem>
+                    <SelectItem value="cover">Cobrir (preencher todo o espaço)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
             {block.image.src ? (
               <img
                 src={block.image.src}
                 alt={block.image.alt || "Imagem do produto"}
-                className="w-full h-auto max-h-48 object-contain rounded-md mb-2"
+                className={`w-full h-auto max-h-48 ${imageObjectFit} rounded-md mb-2`}
               />
             ) : (
               <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md mb-2">

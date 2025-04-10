@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, PlusCircle, Image, MoveLeft, MoveRight } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface GalleryBlockProps {
   block: GalleryBlockType;
@@ -65,6 +66,19 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
     updateBlock(block.id, { images: newImages });
   };
   
+  const handleImageFitChange = (value: string) => {
+    const currentStyle = block.style || {};
+    updateBlock(block.id, { 
+      style: {
+        ...currentStyle, 
+        imageFit: value as 'contain' | 'cover'
+      }
+    });
+  };
+  
+  const imageFitValue = block.style?.imageFit || 'contain';
+  const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
+  
   // Preview mode
   if (isPreview) {
     return (
@@ -76,7 +90,7 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="w-full h-auto object-cover rounded-md"
+                  className={`w-full h-auto ${imageObjectFit} rounded-md`}
                 />
               ) : (
                 <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md">
@@ -98,7 +112,21 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">
         <div className="space-y-4">
-          <h3 className="text-sm font-medium">Imagens da Galeria</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium">Imagens da Galeria</h3>
+            <div>
+              <label className="text-xs mr-2">Preenchimento da Imagem:</label>
+              <Select value={imageFitValue} onValueChange={handleImageFitChange}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Escolha o tipo de preenchimento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="contain">Conter (mostrar imagem inteira)</SelectItem>
+                  <SelectItem value="cover">Cobrir (preencher todo o espaço)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           
           {block.images && block.images.map((image, index) => (
             <div key={image.id} className="p-3 border rounded-md bg-gray-50">
@@ -135,7 +163,7 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="w-full h-32 object-cover mb-3 rounded-md"
+                  className={`w-full h-32 ${imageObjectFit} mb-3 rounded-md`}
                 />
               ) : (
                 <div className="w-full h-32 bg-gray-100 flex items-center justify-center mb-3 rounded-md">

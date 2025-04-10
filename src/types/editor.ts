@@ -1,4 +1,3 @@
-
 export type BlockType = 
   | 'hero' 
   | 'features' 
@@ -21,6 +20,7 @@ export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FontWeight = 'normal' | 'medium' | 'semibold' | 'bold';
 export type FontStyle = 'normal' | 'italic';
 export type TextDecoration = 'none' | 'underline';
+export type ImageFit = 'contain' | 'cover';
 
 export interface BlockStyle {
   backgroundColor?: string;
@@ -40,6 +40,7 @@ export interface BlockStyle {
   borderColor?: string;
   hasBorder?: boolean;
   hasShadow?: boolean;
+  imageFit?: ImageFit;
 }
 
 export interface BlockBase {
