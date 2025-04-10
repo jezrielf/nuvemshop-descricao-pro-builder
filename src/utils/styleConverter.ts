@@ -39,7 +39,7 @@ export const getStylesFromBlock = (block: Block): string => {
       '3xl': '1.875rem',
       '4xl': '2.25rem'
     };
-    styles.fontSize = fontSizeMap[style.fontSize];
+    styles.fontSize = fontSizeMap[style.fontSize] || '1rem';
   }
   
   // Alinhamento
@@ -71,18 +71,18 @@ export const getStylesFromBlock = (block: Block): string => {
   // Borda
   if (style.hasBorder) {
     styles.border = `1px solid ${style.borderColor || '#e5e7eb'}`;
-  }
-  
-  // Border radius
-  if (style.borderRadius) {
-    const radiusMap: Record<SpacingSize, string> = {
-      'xs': '0.125rem',
-      'sm': '0.25rem',
-      'md': '0.375rem',
-      'lg': '0.5rem',
-      'xl': '0.75rem'
-    };
-    styles.borderRadius = radiusMap[style.borderRadius];
+    
+    // Border radius
+    if (style.borderRadius) {
+      const radiusMap: Record<SpacingSize, string> = {
+        'xs': '0.125rem',
+        'sm': '0.25rem',
+        'md': '0.375rem',
+        'lg': '0.5rem',
+        'xl': '0.75rem'
+      };
+      styles.borderRadius = radiusMap[style.borderRadius];
+    }
   }
   
   // Sombra

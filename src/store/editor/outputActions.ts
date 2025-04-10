@@ -20,6 +20,12 @@ export const createOutputActions = (get: () => EditorState) => ({
       })
       .map(block => {
         console.log(`Generating HTML for block ${block.id} of type ${block.type}`);
+        
+        // Log the style for debugging
+        if (block.style) {
+          console.log(`Block style:`, block.style);
+        }
+        
         // Generate HTML with styles applied
         const html = generateBlockHtml(block);
         console.log(`Generated HTML: ${html.substring(0, 100)}...`);

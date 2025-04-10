@@ -18,6 +18,7 @@ export const getStyleClasses = (block: BlockBase): string => {
   
   // Background
   if (block.style.backgroundColor) {
+    // Use formato específico para cores hex no Tailwind
     classes.push(`bg-[${block.style.backgroundColor}]`);
   }
   
@@ -60,7 +61,7 @@ export const getStyleClasses = (block: BlockBase): string => {
   }
   
   // Border radius
-  if (block.style.borderRadius) {
+  if (block.style.borderRadius && block.style.hasBorder) {
     classes.push(`rounded-${block.style.borderRadius === 'xs' ? 'sm' : 
                           block.style.borderRadius === 'sm' ? 'md' : 
                           block.style.borderRadius === 'md' ? 'lg' : 

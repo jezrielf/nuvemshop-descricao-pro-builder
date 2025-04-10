@@ -24,15 +24,19 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
     selectBlock(block.id);
   };
   
+  // Gerar classes de estilo
+  const styleClasses = getStyleClasses(block);
+  
   return (
     <div 
       className={cn(
         "relative group mb-4 block-panel transition-all",
         isSelected && "block-selected",
         !block.visible && "opacity-50",
-        getStyleClasses(block)
+        styleClasses
       )}
       onClick={handleSelectBlock}
+      data-block-id={block.id}
     >
       <BlockHeader block={block} />
       
