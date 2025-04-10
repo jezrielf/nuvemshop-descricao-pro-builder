@@ -11,6 +11,7 @@ export interface EditorState {
   description: ProductDescription | null;
   selectedBlockId: string | null;
   availableTemplates: Template[];
+  savedDescriptions: ProductDescription[];
   
   // Actions
   createNewDescription: (name: string) => void;
@@ -25,4 +26,7 @@ export interface EditorState {
   reorderBlocks: (fromIndex: number, toIndex: number) => void;
   selectBlock: (id: string | null) => void;
   getHtmlOutput: () => string;
+  saveCurrentDescription: () => boolean;
+  loadSavedDescriptions: () => void;
+  getSavedDescriptions: () => ProductDescription[];
 }

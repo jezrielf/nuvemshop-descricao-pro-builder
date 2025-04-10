@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +15,10 @@ interface AuthContextProps {
   loading: boolean;
   hasRole: (role: string) => boolean;
   isAdmin: () => boolean;
+  isPremium: () => boolean;
+  descriptionCount: number;
+  incrementDescriptionCount: () => void;
+  canCreateMoreDescriptions: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -25,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [descriptionCount, setDescriptionCount] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -36,8 +40,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         if (session?.user) {
           setTimeout(() => fetchProfile(session.user.id), 0);
+          // Load description count from localStorage for this user
+          const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
+          if (storedCount) {
+            setDescriptionCount(parseInt(storedCount, 10));
+          }
         } else {
           setProfile(null);
+          // For anonymous users, use a generic key
+          const storedCount = localStorage.getItem('descriptionCount_anonymous');
+          if (storedCount) {
+            setDescriptionCount(parseInt(storedCount, 10));
+          }
         }
       }
     );
@@ -49,6 +63,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         fetchProfile(session.user.id);
+        // Load description count for logged in user
+        const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
+        if (storedCount) {
+          setDescriptionCount(parseInt(storedCount, 10));
+        }
+      } else {
+        // Load description count for anonymous user
+        const storedCount = localStorage.getItem('descriptionCount_anonymous');
+        if (storedCount) {
+          setDescriptionCount(parseInt(storedCount, 10));
+        }
       }
       
       setLoading(false);
@@ -86,6 +111,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Função para verificar se o usuário é admin
   const isAdmin = (): boolean => {
     return hasRole('admin');
+  };
+
+  // Função para verificar se o usuário é premium
+  const isPremium = (): boolean => {
+    if (isAdmin()) return true; // Admins are always premium
+    return hasRole('premium');
+  };
+
+  // Função para incrementar o contador de descrições criadas
+  const incrementDescriptionCount = () => {
+    const newCount = descriptionCount + 1;
+    setDescriptionCount(newCount);
+    
+    // Save to localStorage
+    if (user) {
+      localStorage.setItem(`descriptionCount_${user.id}`, newCount.toString());
+    } else {
+      localStorage.setItem('descriptionCount_anonymous', newCount.toString());
+    }
+  };
+
+  // Função para verificar se o usuário pode criar mais descrições
+  const canCreateMoreDescriptions = () => {
+    if (isPremium()) return true; // Premium users have unlimited descriptions
+    return descriptionCount < 3; // Free users can create up to 3 descriptions
   };
 
   const signIn = async (email: string, password: string) => {
@@ -183,6 +233,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         hasRole,
         isAdmin,
+        isPremium,
+        descriptionCount,
+        incrementDescriptionCount,
+        canCreateMoreDescriptions,
       }}
     >
       {children}
