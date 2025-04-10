@@ -1,5 +1,4 @@
 
-
 export type Profile = {
   id: string;
   nome: string | null;
@@ -8,4 +7,3 @@ export type Profile = {
   atualizado_em: string;
   role: string | null; // Add role field to match our database schema
 };
-

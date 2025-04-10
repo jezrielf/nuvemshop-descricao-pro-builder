@@ -12,21 +12,21 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
   requiredRole, 
-  requireAuth = false // Alterado para false por padrão
+  requireAuth = false // Set to false by default
 }) => {
   const { user, profile, loading, hasRole } = useAuth();
   
-  // Aguarda o carregamento da autenticação
+  // Wait for authentication loading
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;
   }
   
-  // Verifica se o usuário está autenticado
+  // Check if user is authenticated
   if (requireAuth && !user) {
     return <Navigate to="/auth" replace />;
   }
   
-  // Verifica se o usuário tem a role necessária
+  // Check if user has the required role
   if (requiredRole && !hasRole(requiredRole)) {
     return <Navigate to="/" replace />;
   }
