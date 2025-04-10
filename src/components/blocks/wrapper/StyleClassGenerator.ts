@@ -62,6 +62,13 @@ export const getStyleClasses = (block: BlockBase): string => {
     classes.push(`m-${spacingMap[block.style.margin]}`);
   }
   
+  // Block spacing
+  if (block.style.blockSpacing && block.style.blockSpacing !== 'none') {
+    classes.push(`mb-${spacingMap[block.style.blockSpacing]}`);
+  } else if (block.style.blockSpacing === 'none') {
+    classes.push('mb-0');
+  }
+  
   // Border
   if (block.style.hasBorder) {
     classes.push('border');

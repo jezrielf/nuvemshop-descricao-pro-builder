@@ -51,6 +51,27 @@ const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle })
           </Select>
         </div>
       </div>
+      
+      {/* Novo controle para espaçamento entre blocos */}
+      <div className="mt-3">
+        <Label htmlFor="blockSpacing">Espaçamento entre blocos</Label>
+        <Select 
+          value={block.style?.blockSpacing || 'md'} 
+          onValueChange={(value: any) => updateStyle({ blockSpacing: value })}
+        >
+          <SelectTrigger id="blockSpacing">
+            <SelectValue placeholder="Espaçamento entre blocos" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Nenhum (conectados)</SelectItem>
+            <SelectItem value="xs">Muito pequeno</SelectItem>
+            <SelectItem value="sm">Pequeno</SelectItem>
+            <SelectItem value="md">Médio</SelectItem>
+            <SelectItem value="lg">Grande</SelectItem>
+            <SelectItem value="xl">Muito grande</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import { Block, BlockStyle, SpacingSize } from '@/types/editor';
+import { Block, BlockStyle, SpacingSize, BlockSpacing } from '@/types/editor';
 
 // Function to convert the styles defined to proper inline CSS
 export const getStylesFromBlock = (block: Block): string => {
@@ -67,6 +67,19 @@ export const getStylesFromBlock = (block: Block): string => {
       'xl': '3rem'
     };
     styles['margin'] = marginMap[style.margin];
+  }
+  
+  // Block spacing - applies to margin-bottom for blocks
+  if (style.blockSpacing) {
+    const blockSpacingMap: Record<BlockSpacing, string> = {
+      'none': '0',
+      'xs': '0.5rem',
+      'sm': '1rem',
+      'md': '1.5rem',
+      'lg': '2rem',
+      'xl': '3rem'
+    };
+    styles['margin-bottom'] = blockSpacingMap[style.blockSpacing];
   }
   
   // Border

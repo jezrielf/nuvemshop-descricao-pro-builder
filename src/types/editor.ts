@@ -1,3 +1,4 @@
+
 export type BlockType = 
   | 'hero' 
   | 'features' 
@@ -16,6 +17,7 @@ export type ColumnLayout = 1 | 2 | 3 | 4;
 export type TextAlign = 'left' | 'center' | 'right' | 'justify';
 export type SpacingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface BlockStyle {
   backgroundColor?: string;
@@ -26,6 +28,7 @@ export interface BlockStyle {
   textAlign?: TextAlign;
   padding?: SpacingSize;
   margin?: SpacingSize;
+  blockSpacing?: BlockSpacing; // Nova propriedade para espaçamento entre blocos
   borderRadius?: SpacingSize;
   borderColor?: string;
   hasBorder?: boolean;

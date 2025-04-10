@@ -96,8 +96,14 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
 
   // If it's in preview mode, apply the styles directly to the wrapper
   if (isPreview) {
+    // Determine the block spacing class
+    const blockSpacingClass = block.style?.blockSpacing === 'none' ? 'mb-0' : '';
+    
     return (
-      <div style={previewStyles} className="block-preview-container">
+      <div 
+        style={previewStyles} 
+        className={`block-preview-container ${blockSpacingClass}`}
+      >
         {renderBlock()}
       </div>
     );

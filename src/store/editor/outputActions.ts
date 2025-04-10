@@ -18,7 +18,7 @@ export const createOutputActions = (get: () => EditorState) => ({
         // Filter only visible blocks
         return block && typeof block === 'object' && 'visible' in block && block.visible;
       })
-      .map(block => {
+      .map((block, index, visibleBlocks) => {
         try {
           console.log(`Generating HTML for block ${block.id} of type ${block.type}`);
           
@@ -30,14 +30,34 @@ export const createOutputActions = (get: () => EditorState) => ({
           // Generate block HTML with styles applied
           const html = generateBlockHtml(block);
           
+          // Apply block spacing - wrap in a div with appropriate margin
+          let blockSpacingStyle = '';
+          if (block.style?.blockSpacing === 'none') {
+            blockSpacingStyle = 'margin-bottom: 0;';
+          } else if (block.style?.blockSpacing) {
+            const spacingMap = {
+              'xs': '0.5rem',
+              'sm': '1rem',
+              'md': '1.5rem',
+              'lg': '2rem',
+              'xl': '3rem'
+            };
+            blockSpacingStyle = `margin-bottom: ${spacingMap[block.style.blockSpacing]};`;
+          } else if (index < visibleBlocks.length - 1) {
+            // Default spacing for blocks without explicit setting
+            blockSpacingStyle = 'margin-bottom: 1.5rem;';
+          }
+          
+          const wrappedHtml = `<div class="product-description-block" style="${blockSpacingStyle}">${html}</div>`;
+          
           // Log generated HTML for debugging (first 100 chars)
-          if (html) {
-            console.log(`Generated HTML preview: ${html.substring(0, 100)}...`);
+          if (wrappedHtml) {
+            console.log(`Generated HTML preview: ${wrappedHtml.substring(0, 100)}...`);
           } else {
             console.warn(`No HTML generated for block ${block.id}`);
           }
           
-          return html;
+          return wrappedHtml;
         } catch (error) {
           console.error(`Error generating HTML for block ${block.id}:`, error);
           return `<div style="padding: 20px; border: 1px solid #f00; color: #f00;">Erro ao gerar HTML para o bloco ${block.id}</div>`;

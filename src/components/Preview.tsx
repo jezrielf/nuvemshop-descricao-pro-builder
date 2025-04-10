@@ -65,11 +65,16 @@ const Preview: React.FC = () => {
       <ScrollArea className="flex-1">
         <div className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}>
           {visibleBlocks.length > 0 ? (
-            visibleBlocks.map((block) => (
-              <div key={block.id} className="mb-6">
-                <BlockRenderer block={block} isPreview />
-              </div>
-            ))
+            <div className="preview-container">
+              {visibleBlocks.map((block) => (
+                <div 
+                  key={block.id} 
+                  className={block.style?.blockSpacing === 'none' ? 'mb-0' : 'mb-6'}
+                >
+                  <BlockRenderer block={block} isPreview />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="text-center p-8 text-gray-500">
               <p>Nenhum bloco visível para exibir.</p>
