@@ -1,5 +1,5 @@
 
-import { Block, BlockStyle, SpacingSize, BlockSpacing } from '@/types/editor';
+import { Block, BlockStyle, SpacingSize, BlockSpacing, FontWeight } from '@/types/editor';
 
 // Function to convert the styles defined to proper inline CSS
 export const getStylesFromBlock = (block: Block): string => {
@@ -41,6 +41,25 @@ export const getStylesFromBlock = (block: Block): string => {
       '4xl': '2.25rem'
     };
     styles['font-size'] = fontSizeMap[style.fontSize] || '1rem';
+  }
+  
+  // Text formatting options
+  if (style.fontWeight) {
+    const fontWeightMap: Record<FontWeight, string> = {
+      'normal': '400',
+      'medium': '500',
+      'semibold': '600',
+      'bold': '700'
+    };
+    styles['font-weight'] = fontWeightMap[style.fontWeight];
+  }
+  
+  if (style.fontStyle === 'italic') {
+    styles['font-style'] = 'italic';
+  }
+  
+  if (style.textDecoration === 'underline') {
+    styles['text-decoration'] = 'underline';
   }
   
   // Text alignment

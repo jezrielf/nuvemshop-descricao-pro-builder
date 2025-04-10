@@ -3,6 +3,8 @@ import React from 'react';
 import { BlockBase, BlockStyle } from '@/types/editor';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Bold, Italic, Underline } from 'lucide-react';
 
 interface TypographyControlsProps {
   block: BlockBase;
@@ -65,6 +67,59 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
             <SelectItem value="center">Centro</SelectItem>
             <SelectItem value="right">Direita</SelectItem>
             <SelectItem value="justify">Justificado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="fontWeight">Estilo do texto</Label>
+        <div className="flex space-x-2 mt-1">
+          <ToggleGroup type="single" value={block.style?.fontWeight || 'normal'} onValueChange={(value) => updateStyle({ fontWeight: value as any })}>
+            <ToggleGroupItem value="normal" aria-label="Normal">Normal</ToggleGroupItem>
+            <ToggleGroupItem value="medium" aria-label="Médio">Médio</ToggleGroupItem>
+            <ToggleGroupItem value="semibold" aria-label="Semi-negrito">Semi</ToggleGroupItem>
+            <ToggleGroupItem value="bold" aria-label="Negrito">Negrito</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      </div>
+
+      <div>
+        <Label>Formatação</Label>
+        <div className="flex items-center space-x-2 mt-1">
+          <ToggleGroup type="single" value={block.style?.fontStyle || 'normal'} onValueChange={(value) => updateStyle({ fontStyle: value as any })}>
+            <ToggleGroupItem value="normal" aria-label="Normal">
+              <span className="mr-2">Aa</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="Itálico">
+              <Italic className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+          
+          <ToggleGroup type="single" value={block.style?.textDecoration || 'none'} onValueChange={(value) => updateStyle({ textDecoration: value as any })}>
+            <ToggleGroupItem value="none" aria-label="Sem decoração">
+              <span className="mr-2">Aa</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="Sublinhado">
+              <Underline className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="headingWeight">Estilo dos títulos</Label>
+        <Select 
+          value={block.style?.headingWeight || 'bold'} 
+          onValueChange={(value: any) => updateStyle({ headingWeight: value })}
+        >
+          <SelectTrigger id="headingWeight">
+            <SelectValue placeholder="Estilo dos títulos" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="normal">Normal</SelectItem>
+            <SelectItem value="medium">Médio</SelectItem>
+            <SelectItem value="semibold">Semi-negrito</SelectItem>
+            <SelectItem value="bold">Negrito</SelectItem>
           </SelectContent>
         </Select>
       </div>

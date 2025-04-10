@@ -18,6 +18,9 @@ export type TextAlign = 'left' | 'center' | 'right' | 'justify';
 export type SpacingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
 export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontWeight = 'normal' | 'medium' | 'semibold' | 'bold';
+export type FontStyle = 'normal' | 'italic';
+export type TextDecoration = 'none' | 'underline';
 
 export interface BlockStyle {
   backgroundColor?: string;
@@ -26,9 +29,13 @@ export interface BlockStyle {
   fontFamily?: 'sans' | 'serif' | 'mono';
   fontSize?: FontSize;
   textAlign?: TextAlign;
+  fontWeight?: FontWeight;
+  fontStyle?: FontStyle;
+  textDecoration?: TextDecoration;
+  headingWeight?: FontWeight;
   padding?: SpacingSize;
   margin?: SpacingSize;
-  blockSpacing?: BlockSpacing; // Nova propriedade para espaçamento entre blocos
+  blockSpacing?: BlockSpacing;
   borderRadius?: SpacingSize;
   borderColor?: string;
   hasBorder?: boolean;

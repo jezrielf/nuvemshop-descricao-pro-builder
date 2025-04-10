@@ -47,6 +47,25 @@ export const getStyleClasses = (block: BlockBase): string => {
     classes.push(`text-${block.style.fontSize}`);
   }
   
+  // Text formatting options
+  if (block.style.fontWeight) {
+    const fontWeightMap = {
+      'normal': 'font-normal',
+      'medium': 'font-medium',
+      'semibold': 'font-semibold',
+      'bold': 'font-bold'
+    };
+    classes.push(fontWeightMap[block.style.fontWeight]);
+  }
+  
+  if (block.style.fontStyle === 'italic') {
+    classes.push('italic');
+  }
+  
+  if (block.style.textDecoration === 'underline') {
+    classes.push('underline');
+  }
+  
   // Text alignment
   if (block.style.textAlign) {
     classes.push(`text-${block.style.textAlign}`);
