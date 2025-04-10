@@ -49,25 +49,49 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
     updateBlock(block.id, { specs: updatedSpecs });
   };
   
+  // Create responsive column classes for two-column layout on desktop
+  const getColumnsClass = () => {
+    if (block.columns <= 1) return '';
+    return 'md:grid-cols-2';
+  };
+  
   // Preview mode
   if (isPreview) {
-    return (
-      <div className="w-full p-4">
-        <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
-        <div className="border rounded-md overflow-hidden">
-          <table className="w-full">
-            <tbody>
-              {block.specs && block.specs.map((spec, index) => (
-                <tr key={spec.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                  <td className="p-3 border-b font-medium">{spec.name}</td>
-                  <td className="p-3 border-b">{spec.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    if (block.columns > 1) {
+      // Two-column layout for specifications
+      return (
+        <div className="w-full p-4">
+          <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
+          <div className={`grid grid-cols-1 ${getColumnsClass()} gap-4`}>
+            {block.specs && block.specs.map((spec) => (
+              <div key={spec.id} className="border rounded-md p-3">
+                <div className="font-medium">{spec.name}</div>
+                <div>{spec.value}</div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      // Traditional table layout for single column
+      return (
+        <div className="w-full p-4">
+          <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
+          <div className="border rounded-md overflow-hidden">
+            <table className="w-full">
+              <tbody>
+                {block.specs && block.specs.map((spec, index) => (
+                  <tr key={spec.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                    <td className="p-3 border-b font-medium">{spec.name}</td>
+                    <td className="p-3 border-b">{spec.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
   }
   
   // Edit mode

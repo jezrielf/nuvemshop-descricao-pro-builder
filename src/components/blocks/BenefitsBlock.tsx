@@ -51,12 +51,22 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
     updateBlock(block.id, { benefits: updatedBenefits });
   };
   
+  // Create responsive column classes
+  const getColumnsClass = () => {
+    switch (block.columns) {
+      case 2: return 'md:grid-cols-2';
+      case 3: return 'md:grid-cols-3';
+      case 4: return 'md:grid-cols-4';
+      default: return '';
+    }
+  };
+  
   // Preview mode
   if (isPreview) {
     return (
       <div className="w-full p-4">
         <h2 className="text-2xl font-bold mb-4 text-center">{block.heading}</h2>
-        <div className={`grid grid-cols-1 gap-6 ${block.columns > 1 ? `md:grid-cols-${block.columns}` : ''}`}>
+        <div className={`grid grid-cols-1 ${getColumnsClass()} gap-6`}>
           {block.benefits && block.benefits.map(benefit => (
             <div key={benefit.id} className="p-4 border rounded-md">
               <h3 className="text-lg font-medium mb-2">{benefit.title}</h3>

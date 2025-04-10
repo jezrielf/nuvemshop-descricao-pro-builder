@@ -5,9 +5,12 @@ import { getStylesFromBlock } from '../styleConverter';
 export const generateGalleryHtml = (block: GalleryBlock): string => {
   const blockStyleAttr = getStylesFromBlock(block) ? ` style="${getStylesFromBlock(block)}"` : '';
   
+  // Generate responsive column classes based on the number of columns
+  const columnClass = block.columns > 1 ? `md:grid-cols-${block.columns}` : '';
+  
   const galleryHtml = block.images && block.images.length > 0 
     ? block.images.map(image => `
-      <div style="flex:1;padding:10px;min-width:${100/block.columns}%;">
+      <div class="gallery-item w-full p-2">
         ${image.src ? 
           `<img src="${image.src}" alt="${image.alt || ''}" style="width:100%;height:auto;object-fit:cover;border-radius:4px;" />` :
           `<div style="background-color:#f3f4f6;height:150px;display:flex;align-items:center;justify-content:center;border-radius:4px;"><span style="color:#9ca3af;">Imagem</span></div>`
@@ -18,8 +21,8 @@ export const generateGalleryHtml = (block: GalleryBlock): string => {
     : '';
   
   return `
-    <div${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;">
-      <div style="display:flex;flex-wrap:wrap;margin:-10px;">${galleryHtml}</div>
+    <div${blockStyleAttr} class="gallery-block w-full p-4">
+      <div class="grid grid-cols-1 ${columnClass} gap-4">${galleryHtml}</div>
     </div>
   `;
 };

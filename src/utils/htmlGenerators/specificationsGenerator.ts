@@ -3,25 +3,55 @@ import { SpecificationsBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateSpecificationsHtml = (block: SpecificationsBlock): string => {
-  const blockStyleAttr = getStylesFromBlock(block) ? ` style="${getStylesFromBlock(block)}"` : '';
+  const blockStyles = getStylesFromBlock(block);
   
+  // Extract heading color from block styles or use default
+  const headingColor = block.style?.headingColor || 'inherit';
+  const headingWeight = block.style?.headingWeight || 'bold';
+  
+  // Two-column layout for specifications when columns > 1
+  if (block.columns > 1) {
+    const columnClass = block.columns > 2 ? `md:grid-cols-${block.columns}` : 'md:grid-cols-2';
+    
+    const specsHtml = block.specs && block.specs.length > 0 
+      ? block.specs.map(spec => `
+        <div class="spec-item border p-3 rounded">
+          <div style="font-weight: 600;">${spec.name}</div>
+          <div>${spec.value}</div>
+        </div>
+      `).join('')
+      : '';
+    
+    return `
+      <div class="specifications-block" style="${blockStyles}">
+        <h2 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 24px; margin-bottom: 20px;">${block.heading}</h2>
+        <div class="grid grid-cols-1 ${columnClass} gap-4">
+          ${specsHtml}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Traditional table layout for single column
   const specsHtml = block.specs && block.specs.length > 0 
     ? block.specs.map((spec, index) => `
-      <tr style="background-color:${index % 2 === 0 ? '#f9fafb' : '#ffffff'}">
-        <td style="padding:10px;border-bottom:1px solid #e5e7eb;font-weight:500;">${spec.name}</td>
-        <td style="padding:10px;border-bottom:1px solid #e5e7eb;">${spec.value}</td>
+      <tr style="${index % 2 === 0 ? 'background-color: #f9fafb;' : ''}">
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${spec.name}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${spec.value}</td>
       </tr>
     `).join('')
     : '';
   
   return `
-    <div${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;">
-      <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px;">${block.heading}</h2>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;">
-        <tbody>
-          ${specsHtml}
-        </tbody>
-      </table>
+    <div class="specifications-block" style="${blockStyles}">
+      <h2 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 24px; margin-bottom: 20px;">${block.heading}</h2>
+      <div style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tbody>
+            ${specsHtml}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 };
