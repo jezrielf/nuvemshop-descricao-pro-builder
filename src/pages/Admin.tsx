@@ -38,7 +38,13 @@ const Admin: React.FC = () => {
         
       if (error) throw error;
       
-      setProfiles(data || []);
+      // Convert to our Profile type with role
+      const profilesWithRole = data?.map(profile => ({
+        ...profile,
+        role: profile.role || 'user' // Default to 'user' if role is not set
+      })) || [];
+      
+      setProfiles(profilesWithRole);
     } catch (error: any) {
       toast({
         title: 'Erro ao carregar perfis',
@@ -52,9 +58,12 @@ const Admin: React.FC = () => {
   
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
+      // Update using metadata instead of a direct column
       const { error } = await supabase
         .from('profiles')
-        .update({ role: newRole })
+        .update({ 
+          role: newRole 
+        })
         .eq('id', userId);
         
       if (error) throw error;
