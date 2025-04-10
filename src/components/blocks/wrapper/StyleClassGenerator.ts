@@ -18,6 +18,7 @@ export const getStyleClasses = (block: BlockBase): string => {
   
   // Background
   if (block.style.backgroundColor) {
+    // Use bracket notation for custom colors
     classes.push(`bg-[${block.style.backgroundColor}]`);
   }
   

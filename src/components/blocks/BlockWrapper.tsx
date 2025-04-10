@@ -26,7 +26,20 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
   
   // Generate style classes for the block
   const styleClasses = getStyleClasses(block);
+  
+  // Create inline styles for the preview
+  const inlineStyles: React.CSSProperties = {};
+  
+  if (block.style) {
+    if (block.style.backgroundColor) inlineStyles.backgroundColor = block.style.backgroundColor;
+    if (block.style.textColor) inlineStyles.color = block.style.textColor;
+    
+    // Add other styles as needed
+    if (block.style.textAlign) inlineStyles.textAlign = block.style.textAlign as any;
+  }
+  
   console.log(`Applied style classes to block ${block.id}:`, styleClasses);
+  console.log(`Applied inline styles to block ${block.id}:`, inlineStyles);
   
   return (
     <div 
@@ -36,6 +49,7 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
         !block.visible && "opacity-50",
         styleClasses
       )}
+      style={inlineStyles}
       onClick={handleSelectBlock}
       data-block-id={block.id}
       data-has-custom-style={!!block.style}

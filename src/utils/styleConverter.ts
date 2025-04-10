@@ -9,20 +9,21 @@ export const getStylesFromBlock = (block: Block): string => {
   const styles: Record<string, string> = {};
   
   // Colors
-  if (style.backgroundColor) styles.backgroundColor = style.backgroundColor;
-  if (style.textColor) styles.color = style.textColor;
+  if (style.backgroundColor) styles['background-color'] = style.backgroundColor;
+  if (style.textColor) styles['color'] = style.textColor;
+  if (style.headingColor) styles['--heading-color'] = style.headingColor;
   
   // Typography
   if (style.fontFamily) {
     switch (style.fontFamily) {
       case 'sans':
-        styles.fontFamily = "'Inter', system-ui, sans-serif";
+        styles['font-family'] = "'Inter', system-ui, sans-serif";
         break;
       case 'serif':
-        styles.fontFamily = "'Georgia', serif";
+        styles['font-family'] = "'Georgia', serif";
         break;
       case 'mono':
-        styles.fontFamily = "'Consolas', monospace";
+        styles['font-family'] = "'Consolas', monospace";
         break;
     }
   }
@@ -39,11 +40,11 @@ export const getStylesFromBlock = (block: Block): string => {
       '3xl': '1.875rem',
       '4xl': '2.25rem'
     };
-    styles.fontSize = fontSizeMap[style.fontSize] || '1rem';
+    styles['font-size'] = fontSizeMap[style.fontSize] || '1rem';
   }
   
   // Text alignment
-  if (style.textAlign) styles.textAlign = style.textAlign;
+  if (style.textAlign) styles['text-align'] = style.textAlign;
   
   // Spacing
   if (style.padding) {
@@ -54,7 +55,7 @@ export const getStylesFromBlock = (block: Block): string => {
       'lg': '2rem',
       'xl': '3rem'
     };
-    styles.padding = paddingMap[style.padding];
+    styles['padding'] = paddingMap[style.padding];
   }
   
   if (style.margin) {
@@ -65,12 +66,12 @@ export const getStylesFromBlock = (block: Block): string => {
       'lg': '2rem',
       'xl': '3rem'
     };
-    styles.margin = marginMap[style.margin];
+    styles['margin'] = marginMap[style.margin];
   }
   
   // Border
   if (style.hasBorder) {
-    styles.border = `1px solid ${style.borderColor || '#e5e7eb'}`;
+    styles['border'] = `1px solid ${style.borderColor || '#e5e7eb'}`;
     
     // Border radius
     if (style.borderRadius) {
@@ -81,13 +82,13 @@ export const getStylesFromBlock = (block: Block): string => {
         'lg': '0.5rem',
         'xl': '0.75rem'
       };
-      styles.borderRadius = radiusMap[style.borderRadius];
+      styles['border-radius'] = radiusMap[style.borderRadius];
     }
   }
   
   // Shadow
   if (style.hasShadow) {
-    styles.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+    styles['box-shadow'] = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
   }
   
   // Log the styles being applied
