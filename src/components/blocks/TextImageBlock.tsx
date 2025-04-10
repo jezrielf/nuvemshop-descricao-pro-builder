@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Image } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TextImageBlockProps {
   block: TextImageBlockType;
@@ -17,6 +18,7 @@ interface TextImageBlockProps {
 const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = false }) => {
   const { updateBlock, selectedBlockId } = useEditorStore();
   const isEditing = selectedBlockId === block.id && !isPreview;
+  const isMobile = useIsMobile();
   
   const handleUpdateImageSrc = (src: string) => {
     updateBlock(block.id, { image: { ...block.image, src } });
@@ -52,11 +54,11 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
     return (
       <div className="w-full p-4">
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-1/2">
+          <div className="w-full md:w-1/2">
             <h2 className="text-2xl font-bold mb-3">{block.heading}</h2>
             <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: block.content }} />
           </div>
-          <div className="md:w-1/2">
+          <div className="w-full md:w-1/2">
             {block.image.src ? (
               <img
                 src={block.image.src}
