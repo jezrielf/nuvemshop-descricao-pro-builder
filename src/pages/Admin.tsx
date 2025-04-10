@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import UsersPanel from '@/components/admin/UsersPanel';
 import SettingsPanel from '@/components/admin/SettingsPanel';
@@ -11,10 +11,27 @@ import DashboardPanel from '@/components/admin/DashboardPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
 
 const Admin: React.FC = () => {
-  const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings'>('dashboard');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   
-  if (!isAdmin()) {
+  useEffect(() => {
+    // Check if admin is authenticated
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (adminAuth !== 'true') {
+      navigate('/admin-auth');
+    } else {
+      setIsAuthenticated(true);
+    }
+    setLoading(false);
+  }, [navigate]);
+  
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Carregando...</div>;
+  }
+  
+  if (!isAuthenticated) {
     return <AccessDenied />;
   }
   

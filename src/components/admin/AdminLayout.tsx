@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, LayoutDashboard, FileText, FileCode, CreditCard } from 'lucide-react';
+import { Users, Settings, LayoutDashboard, FileText, FileCode, CreditCard, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -14,9 +16,27 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   activeTab, 
   onTabChange 
 }) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth');
+    toast({
+      title: 'Logout realizado',
+      description: 'Você foi desconectado do painel administrativo',
+    });
+    navigate('/admin-auth');
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Painel Administrativo</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Painel Administrativo</h1>
+        <Button variant="outline" onClick={handleLogout} className="flex items-center">
+          <LogOut className="mr-2 h-4 w-4" />
+          Sair
+        </Button>
+      </div>
       
       <div className="flex flex-wrap gap-2 mb-6">
         <Button 

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
+import AdminAuth from "./pages/AdminAuth";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -27,11 +28,8 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={
-              <ProtectedRoute requireAuth={true} requiredRole="admin">
-                <Admin />
-              </ProtectedRoute>
-            } />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin-auth" element={<AdminAuth />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
