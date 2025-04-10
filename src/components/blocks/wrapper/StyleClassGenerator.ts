@@ -10,7 +10,7 @@ const spacingMap = {
   xl: '12'
 };
 
-// Generate CSS classes based on block style options
+// Generate CSS classes based on block style options - for preview reference only
 export const getStyleClasses = (block: BlockBase): string => {
   if (!block.style) return '';
   

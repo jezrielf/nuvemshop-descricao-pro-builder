@@ -12,6 +12,7 @@ import ImageTextBlock from './ImageTextBlock';
 import TextImageBlock from './TextImageBlock';
 import FAQBlock from './FAQBlock';
 import CTABlock from './CTABlock';
+import { getStylesFromBlock } from '@/utils/styleConverter';
 
 interface BlockRendererProps {
   block: Block;
@@ -40,11 +41,24 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
   // Create a style object based on block.style for the preview
   const previewStyles: React.CSSProperties = {};
   if (isPreview && block.style) {
-    if (block.style.backgroundColor) previewStyles.backgroundColor = block.style.backgroundColor;
-    if (block.style.textColor) previewStyles.color = block.style.textColor;
-    if (block.style.textAlign) previewStyles.textAlign = block.style.textAlign as any;
+    // When in preview mode, convert all block styles to inline styles
+    const styleString = getStylesFromBlock(block);
     
-    // Add more style properties as needed
+    // Parse the style string into a CSSProperties object
+    if (styleString) {
+      const styleEntries = styleString.split(';').filter(Boolean).map(style => {
+        const [property, value] = style.split(':').map(s => s.trim());
+        return [property, value];
+      });
+      
+      styleEntries.forEach(([prop, value]) => {
+        if (prop && value) {
+          // Convert kebab-case to camelCase for React inline styles
+          const camelProp = prop.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+          (previewStyles as any)[camelProp] = value;
+        }
+      });
+    }
   }
 
   const renderBlock = () => {

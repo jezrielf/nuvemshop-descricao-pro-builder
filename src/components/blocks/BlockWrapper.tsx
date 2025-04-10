@@ -24,32 +24,16 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
     selectBlock(block.id);
   };
   
-  // Generate style classes for the block
-  const styleClasses = getStyleClasses(block);
-  
-  // Create inline styles for the preview
-  const inlineStyles: React.CSSProperties = {};
-  
-  if (block.style) {
-    if (block.style.backgroundColor) inlineStyles.backgroundColor = block.style.backgroundColor;
-    if (block.style.textColor) inlineStyles.color = block.style.textColor;
-    
-    // Add other styles as needed
-    if (block.style.textAlign) inlineStyles.textAlign = block.style.textAlign as any;
-  }
-  
-  console.log(`Applied style classes to block ${block.id}:`, styleClasses);
-  console.log(`Applied inline styles to block ${block.id}:`, inlineStyles);
+  // We don't apply any style classes to the editor blocks themselves
+  // These will only be used in the preview
   
   return (
     <div 
       className={cn(
         "relative group mb-4 block-panel transition-all",
         isSelected && "block-selected",
-        !block.visible && "opacity-50",
-        styleClasses
+        !block.visible && "opacity-50"
       )}
-      style={inlineStyles}
       onClick={handleSelectBlock}
       data-block-id={block.id}
       data-has-custom-style={!!block.style}
