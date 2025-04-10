@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const UserButton: React.FC = () => {
@@ -53,6 +53,17 @@ export const UserButton: React.FC = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {isAdmin() && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/admin" className="flex items-center cursor-pointer">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Painel Admin</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sair</span>
