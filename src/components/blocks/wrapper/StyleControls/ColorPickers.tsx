@@ -10,23 +10,23 @@ interface ColorPickersProps {
 }
 
 const ColorPickers: React.FC<ColorPickersProps> = ({ block, updateStyle }) => {
-  const handleColorChange = (type: 'backgroundColor' | 'textColor', value: string) => {
-    // Garantir que a cor seja atualizada imediatamente
+  const handleColorChange = (type: 'backgroundColor' | 'textColor' | 'headingColor', value: string) => {
+    // Immediately update the style
     updateStyle({ [type]: value });
     
-    // Registrar a mudança para fins de depuração
-    console.log(`Updating ${type} to ${value} for block ${block.id}`);
+    // Log the change for debugging
+    console.log(`Updated ${type} to ${value} for block ${block.id}`);
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <h5 className="text-sm font-medium">Cores</h5>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label htmlFor="bgcolor">Cor de fundo</Label>
+          <Label htmlFor={`bgcolor-${block.id}`}>Cor de fundo</Label>
           <div className="flex items-center mt-1">
             <Input 
-              id="bgcolor"
+              id={`bgcolor-${block.id}`}
               type="color" 
               value={block.style?.backgroundColor || '#ffffff'} 
               onChange={(e) => handleColorChange('backgroundColor', e.target.value)}
@@ -34,14 +34,28 @@ const ColorPickers: React.FC<ColorPickersProps> = ({ block, updateStyle }) => {
             />
           </div>
         </div>
+        
         <div>
-          <Label htmlFor="textcolor">Cor do texto</Label>
+          <Label htmlFor={`textcolor-${block.id}`}>Cor do texto</Label>
           <div className="flex items-center mt-1">
             <Input 
-              id="textcolor"
+              id={`textcolor-${block.id}`}
               type="color" 
               value={block.style?.textColor || '#000000'} 
               onChange={(e) => handleColorChange('textColor', e.target.value)}
+              className="h-8 w-full"
+            />
+          </div>
+        </div>
+        
+        <div className="col-span-2">
+          <Label htmlFor={`headingcolor-${block.id}`}>Cor dos títulos</Label>
+          <div className="flex items-center mt-1">
+            <Input 
+              id={`headingcolor-${block.id}`}
+              type="color" 
+              value={block.style?.headingColor || '#000000'} 
+              onChange={(e) => handleColorChange('headingColor', e.target.value)}
               className="h-8 w-full"
             />
           </div>

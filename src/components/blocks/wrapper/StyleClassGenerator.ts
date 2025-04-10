@@ -1,7 +1,7 @@
 
 import { BlockBase } from '@/types/editor';
 
-// Mapeia valores de espaçamento para classes Tailwind
+// Map spacing values to Tailwind classes
 const spacingMap = {
   xs: '2',
   sm: '4',
@@ -10,7 +10,7 @@ const spacingMap = {
   xl: '12'
 };
 
-// Gera classes CSS baseadas nas opções de estilo do bloco
+// Generate CSS classes based on block style options
 export const getStyleClasses = (block: BlockBase): string => {
   if (!block.style) return '';
   
@@ -18,7 +18,6 @@ export const getStyleClasses = (block: BlockBase): string => {
   
   // Background
   if (block.style.backgroundColor) {
-    // Use formato específico para cores hex no Tailwind
     classes.push(`bg-[${block.style.backgroundColor}]`);
   }
   
@@ -29,7 +28,17 @@ export const getStyleClasses = (block: BlockBase): string => {
   
   // Font family
   if (block.style.fontFamily) {
-    classes.push(`font-${block.style.fontFamily}`);
+    switch (block.style.fontFamily) {
+      case 'sans':
+        classes.push('font-sans');
+        break;
+      case 'serif':
+        classes.push('font-serif');
+        break;
+      case 'mono':
+        classes.push('font-mono');
+        break;
+    }
   }
   
   // Font size
@@ -55,18 +64,22 @@ export const getStyleClasses = (block: BlockBase): string => {
   // Border
   if (block.style.hasBorder) {
     classes.push('border');
+    
     if (block.style.borderColor) {
       classes.push(`border-[${block.style.borderColor}]`);
     }
-  }
-  
-  // Border radius
-  if (block.style.borderRadius && block.style.hasBorder) {
-    classes.push(`rounded-${block.style.borderRadius === 'xs' ? 'sm' : 
-                          block.style.borderRadius === 'sm' ? 'md' : 
-                          block.style.borderRadius === 'md' ? 'lg' : 
-                          block.style.borderRadius === 'lg' ? 'xl' : 
-                          '2xl'}`);
+    
+    // Border radius (only apply if has border)
+    if (block.style.borderRadius) {
+      const radiusMap = {
+        'xs': 'rounded-sm',
+        'sm': 'rounded-md',
+        'md': 'rounded-lg',
+        'lg': 'rounded-xl',
+        'xl': 'rounded-2xl'
+      };
+      classes.push(radiusMap[block.style.borderRadius] || 'rounded');
+    }
   }
   
   // Shadow

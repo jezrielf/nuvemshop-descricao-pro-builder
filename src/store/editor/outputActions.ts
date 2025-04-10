@@ -7,32 +7,51 @@ export const createOutputActions = (get: () => EditorState) => ({
   getHtmlOutput: () => {
     const description = get().description;
     
-    // Check if description exists and has blocks before trying to map over them
+    // Check if description exists and has blocks
     if (!description || !description.blocks || description.blocks.length === 0) {
-      return '';
+      return '<div style="padding: 20px; text-align: center; color: #666;">Nenhum conteúdo adicionado</div>';
     }
 
-    // Generate HTML for each visible block type with styles applied
+    // Generate HTML for each visible block
     const blocksHtml = description.blocks
       .filter(block => {
-        // Make sure the block is valid and has the visible property
+        // Filter only visible blocks
         return block && typeof block === 'object' && 'visible' in block && block.visible;
       })
       .map(block => {
-        console.log(`Generating HTML for block ${block.id} of type ${block.type}`);
-        
-        // Log the style for debugging
-        if (block.style) {
-          console.log(`Block style:`, block.style);
+        try {
+          console.log(`Generating HTML for block ${block.id} of type ${block.type}`);
+          
+          // Log style for debugging
+          if (block.style) {
+            console.log(`Block style:`, JSON.stringify(block.style));
+          }
+          
+          // Generate block HTML with styles applied
+          const html = generateBlockHtml(block);
+          
+          // Log generated HTML for debugging (first 100 chars)
+          if (html) {
+            console.log(`Generated HTML preview: ${html.substring(0, 100)}...`);
+          } else {
+            console.warn(`No HTML generated for block ${block.id}`);
+          }
+          
+          return html;
+        } catch (error) {
+          console.error(`Error generating HTML for block ${block.id}:`, error);
+          return `<div style="padding: 20px; border: 1px solid #f00; color: #f00;">Erro ao gerar HTML para o bloco ${block.id}</div>`;
         }
-        
-        // Generate HTML with styles applied
-        const html = generateBlockHtml(block);
-        console.log(`Generated HTML: ${html.substring(0, 100)}...`);
-        return html;
       })
-      .join('');
+      .join('\n\n');
 
-    return blocksHtml;
+    // Wrap all blocks in a container div
+    const finalHtml = `
+      <div class="product-description">
+        ${blocksHtml}
+      </div>
+    `;
+    
+    return finalHtml;
   }
 });

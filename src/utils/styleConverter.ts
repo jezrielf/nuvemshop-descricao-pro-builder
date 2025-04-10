@@ -1,18 +1,18 @@
 
 import { Block, BlockStyle, SpacingSize } from '@/types/editor';
 
-// Function to convert the styles defined to inline CSS
+// Function to convert the styles defined to proper inline CSS
 export const getStylesFromBlock = (block: Block): string => {
   if (!block.style) return '';
   
   const style = block.style;
   const styles: Record<string, string> = {};
   
-  // Cores
+  // Colors
   if (style.backgroundColor) styles.backgroundColor = style.backgroundColor;
   if (style.textColor) styles.color = style.textColor;
   
-  // Tipografia
+  // Typography
   if (style.fontFamily) {
     switch (style.fontFamily) {
       case 'sans':
@@ -27,7 +27,7 @@ export const getStylesFromBlock = (block: Block): string => {
     }
   }
   
-  // Tamanho da fonte
+  // Font size
   if (style.fontSize) {
     const fontSizeMap: Record<string, string> = {
       'xs': '0.75rem',
@@ -42,10 +42,10 @@ export const getStylesFromBlock = (block: Block): string => {
     styles.fontSize = fontSizeMap[style.fontSize] || '1rem';
   }
   
-  // Alinhamento
+  // Text alignment
   if (style.textAlign) styles.textAlign = style.textAlign;
   
-  // Espaçamento
+  // Spacing
   if (style.padding) {
     const paddingMap: Record<SpacingSize, string> = {
       'xs': '0.5rem',
@@ -68,7 +68,7 @@ export const getStylesFromBlock = (block: Block): string => {
     styles.margin = marginMap[style.margin];
   }
   
-  // Borda
+  // Border
   if (style.hasBorder) {
     styles.border = `1px solid ${style.borderColor || '#e5e7eb'}`;
     
@@ -85,7 +85,7 @@ export const getStylesFromBlock = (block: Block): string => {
     }
   }
   
-  // Sombra
+  // Shadow
   if (style.hasShadow) {
     styles.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
   }
@@ -93,8 +93,8 @@ export const getStylesFromBlock = (block: Block): string => {
   // Log the styles being applied
   console.log(`Style conversion for block ${block.id}:`, styles);
   
-  // Converte para string de estilo inline
+  // Convert to inline style string with proper format
   return Object.entries(styles)
-    .map(([key, value]) => `${key}:${value}`)
-    .join(';');
+    .map(([key, value]) => `${key}: ${value}`)
+    .join('; ');
 };

@@ -24,8 +24,9 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
     selectBlock(block.id);
   };
   
-  // Gerar classes de estilo
+  // Generate style classes for the block
   const styleClasses = getStyleClasses(block);
+  console.log(`Applied style classes to block ${block.id}:`, styleClasses);
   
   return (
     <div 
@@ -37,6 +38,7 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
       )}
       onClick={handleSelectBlock}
       data-block-id={block.id}
+      data-has-custom-style={!!block.style}
     >
       <BlockHeader block={block} />
       

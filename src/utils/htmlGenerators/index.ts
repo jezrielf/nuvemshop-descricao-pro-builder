@@ -19,6 +19,10 @@ export const generateBlockHtml = (block: Block): string => {
     return '';
   }
   
+  // Get properly formatted style string
+  const blockStyles = getStylesFromBlock(block);
+  console.log(`Generated styles for block ${block.id}:`, blockStyles);
+  
   switch(block.type) {
     case 'hero':
       return generateHeroHtml(block);
@@ -43,7 +47,6 @@ export const generateBlockHtml = (block: Block): string => {
     case 'cta':
       return generateCTAHtml(block);
     default:
-      const blockStyleAttr = getStylesFromBlock(block) ? ` style="${getStylesFromBlock(block)}"` : '';
-      return `<div${blockStyleAttr} class="unknown-block" style="padding:20px;margin-bottom:20px;border:1px dashed #ccc;">Bloco do tipo ${(block as any).type}</div>`;
+      return `<div class="unknown-block" style="padding: 20px; margin-bottom: 20px; border: 1px dashed #ccc; ${blockStyles}">Bloco do tipo ${(block as any).type}</div>`;
   }
 };
