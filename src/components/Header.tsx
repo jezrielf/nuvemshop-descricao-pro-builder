@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useEditorStore } from '@/store/editor';
@@ -13,13 +12,19 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 
 const Header: React.FC = () => {
-  const { description, createNewDescription, getHtmlOutput, saveCurrentDescription, loadSavedDescriptions, savedDescriptions } = useEditorStore();
+  const { description, createNewDescription, getHtmlOutput, saveCurrentDescription, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
   const [newDescriptionName, setNewDescriptionName] = React.useState('');
   const [showHtmlDialog, setShowHtmlDialog] = React.useState(false);
   const [showNewDialog, setShowNewDialog] = React.useState(false);
   const [showSavedDialog, setShowSavedDialog] = React.useState(false);
   const { toast } = useToast();
-  const { user, isPremium, descriptionCount, canCreateMoreDescriptions } = useAuth();
+  const auth = useAuth();
+  const { user, isPremium, descriptionCount, canCreateMoreDescriptions } = auth;
+  
+  // Set auth context in the store when component mounts
+  useEffect(() => {
+    setAuthContext(auth);
+  }, [auth, setAuthContext]);
   
   useEffect(() => {
     // Load saved descriptions when component mounts

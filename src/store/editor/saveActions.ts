@@ -4,31 +4,37 @@ import { EditorState } from './types';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const createSaveActions = (get: () => EditorState, set: any) => {
-  // Helper to get auth context - need to create this outside component because
-  // we can't use hooks directly in zustand actions
-  const getAuth = () => {
-    // This is a bit of a hack but we need to access auth context
-    const authModule = require('@/contexts/AuthContext');
-    const context = authModule.useAuth();
-    return context;
+  // We'll store the auth context reference globally
+  let authContext: ReturnType<typeof useAuth> | null = null;
+
+  // Function to set the auth context from components
+  const setAuthContext = (context: ReturnType<typeof useAuth>) => {
+    authContext = context;
   };
 
   return {
+    // Add the setter function for auth context
+    setAuthContext,
+    
     saveCurrentDescription: () => {
       const description = get().description;
       if (!description) return false;
       
       try {
-        const auth = getAuth();
+        // Check if auth context is available
+        if (!authContext) {
+          console.warn('Auth context not available for saving description');
+          return false;
+        }
         
         // Check if user is premium or has saved less than 3 descriptions
-        if (!auth.isPremium() && !auth.canCreateMoreDescriptions()) {
+        if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
           return false;
         }
         
         // Increment description count for free users
-        if (!auth.isPremium()) {
-          auth.incrementDescriptionCount();
+        if (!authContext.isPremium()) {
+          authContext.incrementDescriptionCount();
         }
         
         // Update the timestamp
@@ -49,7 +55,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         }
         
         // Save to localStorage
-        const storageKey = auth.user ? `savedDescriptions_${auth.user.id}` : 'savedDescriptions_anonymous';
+        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
         localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
         
         // Update state
@@ -67,8 +73,13 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     
     loadSavedDescriptions: () => {
       try {
-        const auth = getAuth();
-        const storageKey = auth.user ? `savedDescriptions_${auth.user.id}` : 'savedDescriptions_anonymous';
+        // Check if auth context is available
+        if (!authContext) {
+          console.warn('Auth context not available for loading descriptions');
+          return;
+        }
+        
+        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
         const saved = localStorage.getItem(storageKey);
         
         if (saved) {

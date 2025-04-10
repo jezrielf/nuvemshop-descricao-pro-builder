@@ -6,6 +6,7 @@ import {
   BlockType, 
   ColumnLayout 
 } from '@/types/editor';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface EditorState {
   description: ProductDescription | null;
@@ -29,4 +30,5 @@ export interface EditorState {
   saveCurrentDescription: () => boolean;
   loadSavedDescriptions: () => void;
   getSavedDescriptions: () => ProductDescription[];
+  setAuthContext: (authContext: ReturnType<typeof useAuth>) => void;
 }
