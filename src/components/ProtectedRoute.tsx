@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
   requiredRole, 
-  requireAuth = true 
+  requireAuth = false // Alterado para false por padrão
 }) => {
   const { user, profile, loading, hasRole } = useAuth();
   
