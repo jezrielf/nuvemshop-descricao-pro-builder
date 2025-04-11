@@ -84,6 +84,7 @@ export interface Template {
   thumbnail?: string;
 }
 
-// Re-export the Block type, usando 'export type' para resolver o erro
+// Corrigido o export usando 'export type' para resolver o erro TS1205
 import type { Block } from './blocks';
 export type { Block };
+
