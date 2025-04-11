@@ -7,11 +7,13 @@ import UserTable from './UserTable';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
   
@@ -36,6 +38,8 @@ const UsersPanel: React.FC = () => {
   const fetchProfiles = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -43,9 +47,13 @@ const UsersPanel: React.FC = () => {
         
       if (error) throw error;
       
+      console.log('Fetched profiles:', data);
       setProfiles(data as Profile[] || []);
       setFilteredProfiles(data as Profile[] || []);
     } catch (error: any) {
+      console.error('Error fetching profiles:', error);
+      setError(error.message);
+      
       toast({
         title: 'Erro ao carregar perfis',
         description: error.message,
@@ -83,12 +91,41 @@ const UsersPanel: React.FC = () => {
         </div>
       </div>
       
+      {error && (
+        <div className="border border-red-200 bg-red-50 text-red-700 p-4 rounded-md mb-4">
+          <p className="font-medium">Erro ao carregar usuários</p>
+          <p className="text-sm">{error}</p>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={fetchProfiles}
+            className="mt-2"
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      )}
+      
       <div className="border rounded-lg overflow-hidden">
-        <UserTable 
-          profiles={filteredProfiles} 
-          loading={loading}
-          onRefresh={fetchProfiles}
-        />
+        {loading ? (
+          <div className="p-6 space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <UserTable 
+            profiles={filteredProfiles} 
+            loading={loading}
+            onRefresh={fetchProfiles}
+          />
+        )}
       </div>
       
       <div className="mt-4 text-sm text-gray-500">

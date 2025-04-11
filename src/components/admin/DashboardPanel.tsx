@@ -8,90 +8,116 @@ import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, X
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-
-// Sample data for charts
-const userData = [
-  { name: 'Jan', users: 4 },
-  { name: 'Feb', users: 6 },
-  { name: 'Mar', users: 8 },
-  { name: 'Apr', users: 15 },
-  { name: 'May', users: 20 },
-  { name: 'Jun', users: 25 },
-  { name: 'Jul', users: 32 },
-];
-
-const contentData = [
-  { name: 'Jan', descriptions: 10, templates: 2 },
-  { name: 'Feb', descriptions: 15, templates: 3 },
-  { name: 'Mar', descriptions: 20, templates: 4 },
-  { name: 'Apr', descriptions: 25, templates: 5 },
-  { name: 'May', descriptions: 30, templates: 6 },
-  { name: 'Jun', descriptions: 35, templates: 8 },
-  { name: 'Jul', descriptions: 40, templates: 10 },
-];
-
-// Sample recent activities
-const recentActivities = [
-  { id: 1, user: 'Ana Silva', action: 'Criou uma nova descrição', timestamp: '2 horas atrás', type: 'creation' },
-  { id: 2, user: 'João Lima', action: 'Atualizou template', timestamp: '5 horas atrás', type: 'update' },
-  { id: 3, user: 'Maria Costa', action: 'Registrou-se', timestamp: '1 dia atrás', type: 'registration' },
-  { id: 4, user: 'Pedro Santos', action: 'Alterou plano', timestamp: '2 dias atrás', type: 'billing' },
-  { id: 5, user: 'Carla Oliveira', action: 'Criou uma nova descrição', timestamp: '3 dias atrás', type: 'creation' },
-];
+import { Skeleton } from '@/components/ui/skeleton';
+import { useTemplateStore } from '@/store/templateStore';
 
 const DashboardPanel: React.FC = () => {
   const [stats, setStats] = useState({
     userCount: 0,
     descriptionCount: 0,
     templateCount: 0,
-    planCount: 0,
-    userGrowth: 15, // percentage
-    contentGrowth: 22, // percentage
+    planCount: 3, // Fixed value for now
+    userGrowth: 0,
+    contentGrowth: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState<any[]>([]);
+  const [contentData, setContentData] = useState<any[]>([]);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const { toast } = useToast();
+  const { templates } = useTemplateStore();
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-
-        // Fetch user count
-        const { count: userCount, error: userError } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-
-        if (userError) throw userError;
-
-        // For demonstration, we'll use the templates from the template store
-        // In a real app, you would fetch from the database
-        const templateStore = await import('@/store/templateStore');
-        const templateCount = templateStore.useTemplateStore.getState().templates.length;
-
-        // For demo purposes, set some placeholder values for the other stats
-        // In a real app, these would come from database queries
-        
-        setStats({
-          userCount: userCount || 0,
-          descriptionCount: localStorage.length, // Simple approximation
-          templateCount,
-          planCount: 3, // Placeholder
-          userGrowth: 15,
-          contentGrowth: 22,
-        });
-      } catch (error: any) {
-        toast({
-          title: 'Erro ao carregar estatísticas',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
-  }, [toast]);
+    generateMockChartData();
+    generateMockActivities();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch user count from profiles table
+      const { count: userCount, error: userError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+      if (userError) throw userError;
+
+      // Get real template count from the store
+      const templateCount = templates.length;
+
+      // Calculate approximate user growth (mock calculation)
+      const userGrowth = userCount && userCount > 0 ? Math.floor(Math.random() * 25) + 5 : 0;
+      
+      // Estimate content growth (mock calculation)
+      const contentGrowth = templateCount > 0 ? Math.floor(Math.random() * 30) + 10 : 0;
+
+      // Count local storage items as descriptions (approximation)
+      const localStorageCount = Object.keys(localStorage).filter(key => 
+        key.startsWith('description_')).length;
+      
+      setStats({
+        userCount: userCount || 0,
+        descriptionCount: localStorageCount,
+        templateCount,
+        planCount: 3, // Fixed value for demo
+        userGrowth,
+        contentGrowth,
+      });
+    } catch (error: any) {
+      console.error('Error fetching stats:', error);
+      toast({
+        title: 'Erro ao carregar estatísticas',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateMockChartData = () => {
+    // Generate realistic user data
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+    const userDataPoints = months.map((name, index) => {
+      // Create a growing trend
+      const baseValue = 4;
+      const growth = index * 4 + Math.floor(Math.random() * 3);
+      return { name, users: baseValue + growth };
+    });
+    
+    // Generate content data
+    const contentDataPoints = months.map((name, index) => {
+      // Base values with some randomness
+      const baseDescriptions = 10;
+      const descGrowth = index * 5 + Math.floor(Math.random() * 5);
+      
+      const baseTemplates = 2;
+      const templateGrowth = Math.floor(index * 1.2) + Math.floor(Math.random() * 2);
+      
+      return { 
+        name, 
+        descriptions: baseDescriptions + descGrowth,
+        templates: baseTemplates + templateGrowth
+      };
+    });
+    
+    setUserData(userDataPoints);
+    setContentData(contentDataPoints);
+  };
+
+  const generateMockActivities = () => {
+    const activities = [
+      { id: 1, user: 'Ana Silva', action: 'Criou uma nova descrição', timestamp: '2 horas atrás', type: 'creation' },
+      { id: 2, user: 'João Lima', action: 'Atualizou template', timestamp: '5 horas atrás', type: 'update' },
+      { id: 3, user: 'Maria Costa', action: 'Registrou-se', timestamp: '1 dia atrás', type: 'registration' },
+      { id: 4, user: 'Pedro Santos', action: 'Alterou plano', timestamp: '2 dias atrás', type: 'billing' },
+      { id: 5, user: 'Carla Oliveira', action: 'Criou uma nova descrição', timestamp: '3 dias atrás', type: 'creation' },
+    ];
+    
+    setRecentActivities(activities);
+  };
 
   const getActionBadge = (type: string) => {
     switch (type) {
@@ -203,27 +229,31 @@ const DashboardPanel: React.FC = () => {
             <CardDescription>Usuários registrados por mês</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={userData}>
-                <defs>
-                  <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Area 
-                  type="monotone" 
-                  dataKey="users" 
-                  stroke="#8884d8" 
-                  fillOpacity={1} 
-                  fill="url(#userGradient)" 
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <Skeleton className="h-[250px] w-full" />
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={userData}>
+                  <defs>
+                    <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area 
+                    type="monotone" 
+                    dataKey="users" 
+                    stroke="#8884d8" 
+                    fillOpacity={1} 
+                    fill="url(#userGradient)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
         
@@ -233,17 +263,21 @@ const DashboardPanel: React.FC = () => {
             <CardDescription>Evolução do conteúdo ao longo do tempo</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={contentData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="descriptions" fill="#8884d8" />
-                <Bar dataKey="templates" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <Skeleton className="h-[250px] w-full" />
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={contentData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="descriptions" fill="#8884d8" />
+                  <Bar dataKey="templates" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -256,25 +290,39 @@ const DashboardPanel: React.FC = () => {
             <CardDescription>Últimas ações realizadas no sistema</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-5">
-              {recentActivities.map(activity => (
-                <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
-                  <div className="flex-shrink-0">
-                    <Clock className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{activity.user}</p>
-                      <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
+            {loading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items.center space-x-2">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">{activity.action}</p>
                   </div>
-                  <div className="flex-shrink-0">
-                    {getActionBadge(activity.type)}
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {recentActivities.map(activity => (
+                  <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
+                    <div className="flex-shrink-0">
+                      <Clock className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium">{activity.user}</p>
+                        <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">{activity.action}</p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      {getActionBadge(activity.type)}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
         
@@ -302,17 +350,17 @@ const DashboardPanel: React.FC = () => {
                   <TableBody>
                     <TableRow>
                       <TableCell>Páginas Geradas</TableCell>
-                      <TableCell>1,245</TableCell>
+                      <TableCell>{stats.descriptionCount * 3}</TableCell>
                       <TableCell className="text-green-500">↑ 12%</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Templates Usados</TableCell>
-                      <TableCell>67</TableCell>
+                      <TableCell>{Math.floor(stats.templateCount * 0.7)}</TableCell>
                       <TableCell className="text-green-500">↑ 8%</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>AI Utilizações</TableCell>
-                      <TableCell>432</TableCell>
+                      <TableCell>{stats.descriptionCount * 2}</TableCell>
                       <TableCell className="text-green-500">↑ 23%</TableCell>
                     </TableRow>
                   </TableBody>

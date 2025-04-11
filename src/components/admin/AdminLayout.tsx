@@ -17,7 +17,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
 interface AdminLayoutProps {
@@ -34,7 +34,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const navigate = useNavigate();
   const { toast } = useToast();
   const [darkMode, setDarkMode] = useState(localStorage.getItem('adminDarkMode') === 'true');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     // Apply dark mode class to the document
@@ -61,7 +61,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     navigate('/admin-auth');
   };
 
-  // Tab defintion array for reuse in both desktop and mobile views
+  const handleTabChange = (tab: 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings') => {
+    onTabChange(tab);
+    setDrawerOpen(false);
+  };
+
+  // Tab definition array for reuse in both desktop and mobile views
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'users', label: 'Usuários', icon: Users },
@@ -92,7 +97,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           
-          <Drawer>
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Menu className="h-5 w-5" />
@@ -107,10 +112,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                   <Button 
                     key={tab.id}
                     variant={activeTab === tab.id ? 'default' : 'outline'} 
-                    onClick={() => {
-                      onTabChange(tab.id as any);
-                      setIsMobileMenuOpen(false);
-                    }}
+                    onClick={() => handleTabChange(tab.id as any)}
                     className="flex items-center justify-start w-full"
                   >
                     <tab.icon className="mr-2 h-5 w-5" />
@@ -126,6 +128,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                   Sair
                 </Button>
               </div>
+              <DrawerClose className="sr-only">Close</DrawerClose>
             </DrawerContent>
           </Drawer>
         </div>
@@ -156,7 +159,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                 <Button 
                   key={tab.id}
                   variant={activeTab === tab.id ? 'default' : 'outline'} 
-                  onClick={() => onTabChange(tab.id as any)}
+                  onClick={() => handleTabChange(tab.id as any)}
                   className="flex items-center justify-start w-full"
                 >
                   <tab.icon className="mr-2 h-5 w-5" />
