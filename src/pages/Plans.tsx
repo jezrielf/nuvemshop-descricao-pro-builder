@@ -1,115 +1,180 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Check, PackageCheck } from "lucide-react";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Check, Crown, Star, BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
-import { Plan } from '@/components/admin/plans/types';
-import { mockPlans } from '@/components/admin/plans/mockData';
+import Header from '@/components/Header';
 
 const Plans: React.FC = () => {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  // For now, we're using mock data (same as in PlansPanel)
-  // In a real app, this would come from Supabase or another backend
-  useEffect(() => {
-    // Only show active plans to customers
-    setPlans(mockPlans.filter(plan => plan.isActive));
-    setLoading(false);
-  }, []);
-
-  const handleSelectPlan = (plan: Plan) => {
-    if (!user) {
-      toast({
-        title: "Login necessário",
-        description: "Faça login para assinar este plano",
-        variant: "default",
-      });
-      navigate('/auth');
-      return;
-    }
-
-    toast({
-      title: `Plano ${plan.name} selecionado`,
-      description: "Você será redirecionado para o checkout",
-    });
-    
-    // In a real app, this would redirect to a checkout page
-    // navigate('/checkout', { state: { planId: plan.id } });
-  };
-
-  const formatPrice = (price: number) => {
-    if (price === 0) return 'Grátis';
-    return `R$ ${price.toFixed(2)}/mês`;
-  };
-
-  if (loading) {
-    return (
-      <div className="container mx-auto py-16 px-4">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-2">Carregando planos...</h2>
+  const { isPremium } = useAuth();
+  
+  const userHasPremium = isPremium();
+  
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header />
+      
+      <div className="flex-1 container max-w-6xl mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Escolha seu plano</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Desbloqueie todo o potencial do Descrição Pro com nossos planos acessíveis
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Plano Grátis */}
+          <Card className="p-6 border shadow-sm transition-all hover:shadow-md">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-bold">Plano Grátis</h2>
+                <p className="text-gray-500 text-sm mt-1">Experimente grátis</p>
+              </div>
+              <Badge variant="outline" className="bg-gray-100">
+                Grátis
+              </Badge>
+            </div>
+            
+            <div className="mt-6 mb-6">
+              <p className="text-3xl font-bold">R$ 0<span className="text-lg text-gray-500 font-normal">/mês</span></p>
+              <p className="text-gray-500 text-sm mt-1">Sem cartão de crédito</p>
+            </div>
+            
+            <div className="space-y-3 mb-8">
+              <div className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Até 3 descrições salvas</p>
+              </div>
+              <div className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Acesso a templates básicos</p>
+              </div>
+              <div className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Acesso à ferramentas SEO básicas</p>
+              </div>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="w-full"
+              onClick={() => navigate('/')}
+            >
+              Continuar com o plano grátis
+            </Button>
+          </Card>
+          
+          {/* Plano Premium */}
+          <Card className="p-6 border border-purple-200 shadow-sm transition-all hover:shadow-md bg-gradient-to-br from-white to-purple-50 relative overflow-hidden">
+            <div className="absolute top-0 right-0">
+              <div className="bg-purple-600 text-white px-4 py-1 transform rotate-45 translate-x-2 translate-y-3 text-xs font-medium">
+                Popular
+              </div>
+            </div>
+            
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-bold">Plano Premium</h2>
+                <p className="text-gray-500 text-sm mt-1">Para profissionais</p>
+              </div>
+              <Badge className="bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200">
+                <Crown className="h-3 w-3 mr-1" />
+                Premium
+              </Badge>
+            </div>
+            
+            <div className="mt-6 mb-6">
+              <p className="text-3xl font-bold">R$ 29<span className="text-lg text-gray-500 font-normal">/mês</span></p>
+              <p className="text-purple-600 text-sm mt-1">7 dias de garantia</p>
+            </div>
+            
+            <div className="space-y-3 mb-8">
+              <div className="flex items-start">
+                <BadgeCheck className="h-5 w-5 text-purple-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Descrições <strong>ilimitadas</strong></p>
+              </div>
+              <div className="flex items-start">
+                <BadgeCheck className="h-5 w-5 text-purple-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Acesso a <strong>todos</strong> os templates</p>
+              </div>
+              <div className="flex items-start">
+                <BadgeCheck className="h-5 w-5 text-purple-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Ferramentas de análise SEO avançadas</p>
+              </div>
+              <div className="flex items-start">
+                <BadgeCheck className="h-5 w-5 text-purple-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Geração de descrições com IA</p>
+              </div>
+              <div className="flex items-start">
+                <BadgeCheck className="h-5 w-5 text-purple-500 mr-3 mt-0.5 shrink-0" />
+                <p className="text-gray-700">Suporte prioritário</p>
+              </div>
+            </div>
+            
+            <Button 
+              size="lg" 
+              className="w-full bg-purple-600 hover:bg-purple-700"
+              disabled={userHasPremium}
+            >
+              {userHasPremium ? (
+                <span className="flex items-center justify-center">
+                  <BadgeCheck className="h-5 w-5 mr-2" />
+                  Plano atual
+                </span>
+              ) : (
+                "Assinar agora"
+              )}
+            </Button>
+            
+            {!userHasPremium && (
+              <p className="text-center text-sm text-gray-500 mt-3">
+                Cancele a qualquer momento
+              </p>
+            )}
+          </Card>
+        </div>
+        
+        <div className="mt-12 text-center">
+          <h3 className="text-xl font-medium mb-4">Todas as nossas assinaturas incluem</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            <Card className="p-4 text-center">
+              <div className="bg-purple-100 text-purple-600 rounded-full h-12 w-12 flex items-center justify-center mx-auto mb-3">
+                <Check className="h-6 w-6" />
+              </div>
+              <p className="font-medium">Sem limite de visualizações</p>
+            </Card>
+            <Card className="p-4 text-center">
+              <div className="bg-purple-100 text-purple-600 rounded-full h-12 w-12 flex items-center justify-center mx-auto mb-3">
+                <Check className="h-6 w-6" />
+              </div>
+              <p className="font-medium">Acesso a todas as atualizações</p>
+            </Card>
+            <Card className="p-4 text-center">
+              <div className="bg-purple-100 text-purple-600 rounded-full h-12 w-12 flex items-center justify-center mx-auto mb-3">
+                <Check className="h-6 w-6" />
+              </div>
+              <p className="font-medium">Exportação HTML</p>
+            </Card>
+            <Card className="p-4 text-center">
+              <div className="bg-purple-100 text-purple-600 rounded-full h-12 w-12 flex items-center justify-center mx-auto mb-3">
+                <Check className="h-6 w-6" />
+              </div>
+              <p className="font-medium">Suporte por email</p>
+            </Card>
+          </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto py-16 px-4">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl font-bold mb-2">Nossos Planos</h2>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Escolha o plano ideal para o seu negócio e comece a criar descrições incríveis para seus produtos
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {plans.map((plan) => (
-          <Card key={plan.id} className={`flex flex-col h-full ${plan.isDefault ? 'border-primary' : ''}`}>
-            <CardHeader>
-              {plan.isDefault && (
-                <Badge className="self-start mb-2">Recomendado</Badge>
-              )}
-              <CardTitle className="text-2xl">{plan.name}</CardTitle>
-              <CardDescription>
-                <span className="text-3xl font-bold">{formatPrice(plan.price)}</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <ul className="space-y-2">
-                {plan.features.map((feature) => (
-                  <li key={feature.id} className="flex items-start">
-                    {feature.included ? (
-                      <>
-                        <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>{feature.name}</span>
-                      </>
-                    ) : (
-                      <span className="ml-7 text-muted-foreground">{feature.name}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                onClick={() => handleSelectPlan(plan)} 
-                className="w-full" 
-                variant={plan.isDefault ? "default" : "outline"}
-              >
-                <PackageCheck className="mr-2 h-4 w-4" />
-                Assinar {plan.name}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      
+      <footer className="bg-white border-t py-8">
+        <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
+          <p>© 2025 Descrição Pro. Todos os direitos reservados.</p>
+        </div>
+      </footer>
     </div>
   );
 };

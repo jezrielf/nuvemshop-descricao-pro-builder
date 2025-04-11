@@ -22,9 +22,10 @@ import {
   DialogFooter,
   DialogClose
 } from '@/components/ui/dialog';
-import { Eye, Trash, Copy, Edit } from 'lucide-react';
+import { Eye, Trash, Copy, Edit, BadgeCheck, Crown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import SubscriptionBanner from './descriptions/SubscriptionBanner';
 
 const DescriptionsPanel: React.FC = () => {
   const [descriptions, setDescriptions] = useState<ProductDescription[]>([]);
@@ -90,6 +91,9 @@ const DescriptionsPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Gerenciar Descrições</h2>
+      
+      {/* Subscription Banner */}
+      <SubscriptionBanner />
       
       <Card className="p-6">
         {loading ? (
