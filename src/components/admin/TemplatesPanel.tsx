@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import { useTemplateStore } from '@/store/templateStore';
 import TemplateActions from './templates/TemplateActions';
 import TemplateFiltering from './templates/TemplateFiltering';
-import { Template } from '@/types/editor';
+import { Template, ProductCategory, BlockType } from '@/types/editor';
 import { getCategoryName } from './templates/utils';
 import { useToast } from '@/hooks/use-toast';
+import { createBlock } from '@/utils/blockCreators';
 
 const TemplatesPanel: React.FC = () => {
   const { toast } = useToast();
@@ -101,10 +102,14 @@ const TemplatesPanel: React.FC = () => {
     }
   };
 
-  const handleUpdateTemplate = (id: string, templateData: Partial<Template>) => {
+  const handleUpdateTemplate = (templateData: Partial<Template>) => {
     try {
+      if (!templateData.id) {
+        throw new Error('Template ID is required');
+      }
+      
       const store = useTemplateStore.getState();
-      const updatedTemplate = store.updateTemplate(id, templateData);
+      const updatedTemplate = store.updateTemplate(templateData.id, templateData);
       
       if (updatedTemplate) {
         toast({
@@ -164,34 +169,36 @@ const TemplatesPanel: React.FC = () => {
     }
   };
 
-  const handleAddBlock = (blocks: any[]) => {
+  const handleAddBlock = (blockType: BlockType) => {
     if (editedTemplate) {
-      setEditedTemplate({
-        ...editedTemplate,
-        blocks: [...(editedTemplate.blocks || []), ...blocks]
-      });
+      const block = createBlock(blockType, 1);
+      if (block) {
+        setEditedTemplate({
+          ...editedTemplate,
+          blocks: [...(editedTemplate.blocks || []), block]
+        });
+      }
     } else if (newTemplate) {
-      setNewTemplate({
-        ...newTemplate,
-        blocks: [...(newTemplate.blocks || []), ...blocks]
-      });
+      const block = createBlock(blockType, 1);
+      if (block) {
+        setNewTemplate({
+          ...newTemplate,
+          blocks: [...(newTemplate.blocks || []), block]
+        });
+      }
     }
   };
 
-  const handleRemoveBlock = (index: number) => {
+  const handleRemoveBlock = (blockId: string) => {
     if (editedTemplate) {
-      const newBlocks = [...(editedTemplate.blocks || [])];
-      newBlocks.splice(index, 1);
       setEditedTemplate({
         ...editedTemplate,
-        blocks: newBlocks
+        blocks: editedTemplate.blocks.filter(block => block.id !== blockId)
       });
-    } else if (newTemplate) {
-      const newBlocks = [...(newTemplate.blocks || [])];
-      newBlocks.splice(index, 1);
+    } else if (newTemplate && newTemplate.blocks) {
       setNewTemplate({
         ...newTemplate,
-        blocks: newBlocks
+        blocks: newTemplate.blocks.filter(block => block.id !== blockId)
       });
     }
   };
@@ -202,7 +209,7 @@ const TemplatesPanel: React.FC = () => {
     <div className="space-y-6">
       <TemplateActions
         editedTemplate={editedTemplate}
-        setEditedTemplate={setEditedTemplate}
+        setEditedTemplate={(template) => setEditedTemplate(template as Template | null)}
         newTemplate={newTemplate}
         setNewTemplate={setNewTemplate}
         onDeleteTemplate={handleDeleteTemplate}

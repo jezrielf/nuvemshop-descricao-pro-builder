@@ -2,9 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { Template, ProductCategory, BlockType, Block } from '@/types/editor';
-import { createBlock } from '@/utils/blockCreators';
-import { getAllProductCategories, getCategoryName } from './utils';
+import { Template, ProductCategory, BlockType } from '@/types/editor';
 import TemplatePreviewDialog from './TemplatePreviewDialog';
 import TemplateEditDialog from './TemplateEditDialog';
 import TemplateDeleteDialog from './TemplateDeleteDialog';
@@ -12,13 +10,13 @@ import NewTemplateDialog from './NewTemplateDialog';
 import { DialogProvider, useDialogs } from './dialogs/DialogProvider';
 
 interface TemplateActionsProps {
-  editedTemplate: Partial<Template>;
-  setEditedTemplate: (template: Partial<Template>) => void;
-  newTemplate: Partial<Template>;
-  setNewTemplate: (template: Partial<Template>) => void;
-  onDeleteTemplate: (template: Template | null) => void;
+  editedTemplate: Template | null;
+  setEditedTemplate: (template: Template | null) => void;
+  newTemplate: Partial<Template> | null;
+  setNewTemplate: (template: Partial<Template> | null) => void;
+  onDeleteTemplate: (template: Template) => boolean;
   onUpdateTemplate: (template: Partial<Template>) => boolean;
-  onCreateTemplate: (template: Partial<Template>) => boolean;
+  onCreateTemplate: (template: Omit<Template, "id">) => boolean;
   onAddBlock: (type: BlockType) => void;
   onRemoveBlock: (blockId: string) => void;
 }
@@ -58,30 +56,31 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   ];
 
   const handleDeleteConfirm = () => {
-    onDeleteTemplate(selectedTemplate);
-    toggleDialog('isDeleteDialogOpen');
+    if (selectedTemplate) {
+      onDeleteTemplate(selectedTemplate);
+      toggleDialog('isDeleteDialogOpen');
+    }
   };
 
   const handleEditConfirm = () => {
-    if (onUpdateTemplate(editedTemplate)) {
+    if (editedTemplate && onUpdateTemplate(editedTemplate)) {
       toggleDialog('isEditDialogOpen');
     }
   };
 
   const handleCreateTemplate = () => {
-    if (onCreateTemplate(newTemplate)) {
-      toggleDialog('isNewTemplateDialogOpen');
-      setNewTemplate({
-        name: '',
-        category: 'other' as ProductCategory,
-        blocks: []
-      });
+    if (newTemplate) {
+      // Cast to required type for the createTemplate function
+      const templateToCreate = newTemplate as Omit<Template, "id">;
+      if (onCreateTemplate(templateToCreate)) {
+        toggleDialog('isNewTemplateDialogOpen');
+        setNewTemplate({
+          name: '',
+          category: 'other' as ProductCategory,
+          blocks: []
+        });
+      }
     }
-  };
-
-  // The handler for updating new template data with explicit type casting
-  const handleNewTemplateChange = (templateData: Partial<Template>) => {
-    setNewTemplate(templateData);
   };
 
   return (
@@ -105,7 +104,7 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
         isOpen={dialogState.isEditDialogOpen}
         onOpenChange={() => toggleDialog('isEditDialogOpen')}
         template={editedTemplate}
-        onTemplateChange={setEditedTemplate}
+        onTemplateChange={(template) => setEditedTemplate(template as Template)}
         onSave={handleEditConfirm}
       />
 
@@ -119,13 +118,17 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
       <NewTemplateDialog
         isOpen={dialogState.isNewTemplateDialogOpen}
         onOpenChange={() => toggleDialog('isNewTemplateDialogOpen')}
-        template={newTemplate as Template}
-        onTemplateChange={handleNewTemplateChange}
+        template={newTemplate || {
+          name: '',
+          category: 'other' as ProductCategory,
+          blocks: []
+        }}
+        onTemplateChange={setNewTemplate}
         onCreateTemplate={handleCreateTemplate}
         onAddBlock={onAddBlock}
         onRemoveBlock={onRemoveBlock}
         blockTypes={blockTypes}
-        categories={getAllProductCategories()}
+        categories={['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other']}
         getCategoryName={getCategoryName}
       />
     </>
