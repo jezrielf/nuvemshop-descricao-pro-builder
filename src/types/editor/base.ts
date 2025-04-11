@@ -84,6 +84,6 @@ export interface Template {
   thumbnail?: string;
 }
 
-// Re-export all block types from their respective files
-import { Block } from './blocks';
-export { Block };
+// Re-export the Block type, usando 'export type' para resolver o erro
+import type { Block } from './blocks';
+export type { Block };

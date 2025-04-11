@@ -14,7 +14,6 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
   const info = blockTypeInfo[type];
   const commonProps = {
     id: uuidv4(),
-    type,
     title: info.name,
     columns,
     visible: true,
@@ -24,6 +23,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'hero':
       return {
         ...commonProps,
+        type: 'hero' as const,
         heading: 'Título Principal',
         subheading: 'Subtítulo com descrição do produto',
         buttonText: 'Saiba Mais',
@@ -33,6 +33,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'text':
       return {
         ...commonProps,
+        type: 'text' as const,
         heading: 'Título do Texto',
         content: '<p>Digite seu texto aqui. Este é um bloco de texto que você pode personalizar com conteúdo sobre seu produto.</p>'
       };
@@ -40,6 +41,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'features':
       return {
         ...commonProps,
+        type: 'features' as const,
         heading: 'Recursos do Produto',
         features: [
           {
@@ -60,6 +62,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'benefits':
       return {
         ...commonProps,
+        type: 'benefits' as const,
         heading: 'Benefícios',
         benefits: [
           {
@@ -80,6 +83,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'specifications':
       return {
         ...commonProps,
+        type: 'specifications' as const,
         heading: 'Especificações Técnicas',
         specs: [
           {
@@ -98,6 +102,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'image':
       return {
         ...commonProps,
+        type: 'image' as const,
         src: '',
         alt: 'Imagem do produto',
         caption: 'Legenda da imagem'
@@ -106,6 +111,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'gallery':
       return {
         ...commonProps,
+        type: 'gallery' as const,
         images: [
           {
             id: uuidv4(),
@@ -125,6 +131,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'imageText':
       return {
         ...commonProps,
+        type: 'imageText' as const,
         image: {
           src: '',
           alt: 'Imagem do produto'
@@ -136,6 +143,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'textImage':
       return {
         ...commonProps,
+        type: 'textImage' as const,
         image: {
           src: '',
           alt: 'Imagem do produto'
@@ -147,6 +155,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'faq':
       return {
         ...commonProps,
+        type: 'faq' as const,
         heading: 'Perguntas Frequentes',
         questions: [
           {
@@ -165,6 +174,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
     case 'cta':
       return {
         ...commonProps,
+        type: 'cta' as const,
         heading: 'Gostou do Produto?',
         content: '<p>Aproveite as condições especiais e garanta já o seu.</p>',
         buttonText: 'Comprar Agora',
@@ -172,12 +182,8 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
       };
     
     default:
-      // Ensure type safety by adding generic block
-      return {
-        ...commonProps,
-        heading: 'Default Heading',
-        content: 'Default Content',
-        buttonText: 'Default Button'
-      } as Block;
+      // Este caso nunca deveria acontecer se a validação acima funcionar
+      console.error(`Unhandled block type: ${type}`);
+      return null;
   }
 };
