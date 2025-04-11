@@ -1,7 +1,7 @@
 
 import React from 'react';
-import TemplateFiltering from '../templates/TemplateFiltering';
 import { Template, ProductCategory } from '@/types/editor';
+import TemplateFiltering from '../../templates/TemplateFiltering';
 
 interface TemplateFilterPanelProps {
   displayedTemplates: Template[];

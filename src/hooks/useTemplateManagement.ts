@@ -10,9 +10,9 @@ export function useTemplateManagement() {
   const {
     templates,
     loadTemplates,
-    storeCreateTemplate,
-    storeUpdateTemplate,
-    storeDeleteTemplate
+    createTemplate,
+    updateTemplate,
+    deleteTemplate
   } = useTemplateStore();
 
   const {
@@ -34,9 +34,9 @@ export function useTemplateManagement() {
     handleUpdateTemplate,
     handleDeleteTemplate
   } = useTemplateActions({
-    storeCreateTemplate,
-    storeUpdateTemplate,
-    storeDeleteTemplate
+    storeCreateTemplate: createTemplate,
+    storeUpdateTemplate: updateTemplate,
+    storeDeleteTemplate: deleteTemplate
   });
 
   const {

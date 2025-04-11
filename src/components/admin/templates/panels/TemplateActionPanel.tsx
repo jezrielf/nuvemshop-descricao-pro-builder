@@ -1,8 +1,8 @@
 
 import React from 'react';
-import TemplateActions from '../templates/TemplateActions';
 import { Template } from '@/types/editor';
 import { BlockType } from '@/types/editor';
+import TemplateActions from '../../templates/TemplateActions';
 
 interface TemplateActionPanelProps {
   editedTemplate: Template | null;
