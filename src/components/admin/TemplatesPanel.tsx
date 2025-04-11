@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,8 @@ import { getCategoryName, getAllProductCategories } from './templates/utils';
 
 const TemplatesPanel: React.FC = () => {
   const { templates: allTemplates, categories } = useTemplateStore();
-  const [templates, setTemplates] = useState<Template[]>(allTemplates);
+  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
+  const [displayedTemplates, setDisplayedTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -34,6 +36,12 @@ const TemplatesPanel: React.FC = () => {
     category: 'other' as ProductCategory,
     blocks: []
   });
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+  
   const { toast } = useToast();
 
   // Block type options for template creation
@@ -58,8 +66,23 @@ const TemplatesPanel: React.FC = () => {
       );
     }
     
-    setTemplates(filtered);
-  }, [allTemplates, searchTerm, selectedCategory]);
+    setFilteredTemplates(filtered);
+    
+    // Calculate total pages
+    setTotalPages(Math.max(1, Math.ceil(filtered.length / itemsPerPage)));
+    
+    // Reset to first page when filters change
+    if (currentPage > Math.ceil(filtered.length / itemsPerPage)) {
+      setCurrentPage(1);
+    }
+  }, [allTemplates, searchTerm, selectedCategory, itemsPerPage]);
+
+  useEffect(() => {
+    // Apply pagination
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setDisplayedTemplates(filteredTemplates.slice(startIndex, endIndex));
+  }, [filteredTemplates, currentPage, itemsPerPage]);
 
   const handleViewTemplate = (template: Template) => {
     setSelectedTemplate(template);
@@ -152,6 +175,15 @@ const TemplatesPanel: React.FC = () => {
     }
   };
 
+  // Pagination handlers
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
+
   // The handler for updating new template data with explicit type casting
   const handleNewTemplateChange = (templateData: Partial<Template>) => {
     setNewTemplate(templateData);
@@ -179,7 +211,7 @@ const TemplatesPanel: React.FC = () => {
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <TemplateList
-            templates={templates}
+            templates={displayedTemplates}
             onView={handleViewTemplate}
             onEdit={handleEditTemplate}
             onDelete={handleDeleteClick}
@@ -189,10 +221,12 @@ const TemplatesPanel: React.FC = () => {
       </Card>
 
       <Pagination
-        onPrevious={() => {}}
-        onNext={() => {}}
-        isPreviousDisabled={true}
-        isNextDisabled={true}
+        onPrevious={handlePreviousPage}
+        onNext={handleNextPage}
+        isPreviousDisabled={currentPage <= 1}
+        isNextDisabled={currentPage >= totalPages}
+        currentPage={currentPage}
+        totalPages={totalPages}
       />
 
       <TemplatePreviewDialog

@@ -10,6 +10,7 @@ interface TemplateState {
   loadTemplates: () => void;
   selectCategory: (category: string | null) => void;
   getTemplatesByCategory: (category: string | null) => Template[];
+  searchTemplates: (searchTerm: string, category: string | null) => Template[];
 }
 
 export const useTemplateStore = create<TemplateState>((set, get) => ({
@@ -40,5 +41,22 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
     const { templates } = get();
     if (!category) return templates;
     return templates.filter(template => template.category === category);
+  },
+  
+  searchTemplates: (searchTerm, category) => {
+    const { templates } = get();
+    let filtered = [...templates];
+    
+    if (searchTerm) {
+      filtered = filtered.filter(template => 
+        template.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    if (category) {
+      filtered = filtered.filter(template => template.category === category);
+    }
+    
+    return filtered;
   }
 }));
