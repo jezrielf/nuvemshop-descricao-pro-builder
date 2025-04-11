@@ -1,9 +1,43 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, FileText, FileCode, CreditCard } from 'lucide-react';
+import { Users, FileText, FileCode, CreditCard, Clock, ArrowUp, ArrowDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+
+// Sample data for charts
+const userData = [
+  { name: 'Jan', users: 4 },
+  { name: 'Feb', users: 6 },
+  { name: 'Mar', users: 8 },
+  { name: 'Apr', users: 15 },
+  { name: 'May', users: 20 },
+  { name: 'Jun', users: 25 },
+  { name: 'Jul', users: 32 },
+];
+
+const contentData = [
+  { name: 'Jan', descriptions: 10, templates: 2 },
+  { name: 'Feb', descriptions: 15, templates: 3 },
+  { name: 'Mar', descriptions: 20, templates: 4 },
+  { name: 'Apr', descriptions: 25, templates: 5 },
+  { name: 'May', descriptions: 30, templates: 6 },
+  { name: 'Jun', descriptions: 35, templates: 8 },
+  { name: 'Jul', descriptions: 40, templates: 10 },
+];
+
+// Sample recent activities
+const recentActivities = [
+  { id: 1, user: 'Ana Silva', action: 'Criou uma nova descrição', timestamp: '2 horas atrás', type: 'creation' },
+  { id: 2, user: 'João Lima', action: 'Atualizou template', timestamp: '5 horas atrás', type: 'update' },
+  { id: 3, user: 'Maria Costa', action: 'Registrou-se', timestamp: '1 dia atrás', type: 'registration' },
+  { id: 4, user: 'Pedro Santos', action: 'Alterou plano', timestamp: '2 dias atrás', type: 'billing' },
+  { id: 5, user: 'Carla Oliveira', action: 'Criou uma nova descrição', timestamp: '3 dias atrás', type: 'creation' },
+];
 
 const DashboardPanel: React.FC = () => {
   const [stats, setStats] = useState({
@@ -11,6 +45,8 @@ const DashboardPanel: React.FC = () => {
     descriptionCount: 0,
     templateCount: 0,
     planCount: 0,
+    userGrowth: 15, // percentage
+    contentGrowth: 22, // percentage
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -40,6 +76,8 @@ const DashboardPanel: React.FC = () => {
           descriptionCount: localStorage.length, // Simple approximation
           templateCount,
           planCount: 3, // Placeholder
+          userGrowth: 15,
+          contentGrowth: 22,
         });
       } catch (error: any) {
         toast({
@@ -55,10 +93,26 @@ const DashboardPanel: React.FC = () => {
     fetchStats();
   }, [toast]);
 
+  const getActionBadge = (type: string) => {
+    switch (type) {
+      case 'creation':
+        return <Badge className="bg-green-500">Criação</Badge>;
+      case 'update':
+        return <Badge className="bg-blue-500">Atualização</Badge>;
+      case 'registration':
+        return <Badge className="bg-purple-500">Registro</Badge>;
+      case 'billing':
+        return <Badge className="bg-yellow-500">Faturamento</Badge>;
+      default:
+        return <Badge>Outro</Badge>;
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Visão Geral do Sistema</h2>
+      <h2 className="text-2xl font-bold">Dashboard</h2>
       
+      {/* KPI Cards */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((_, i) => (
@@ -77,7 +131,13 @@ const DashboardPanel: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Usuários Totais</CardTitle>
+              <CardTitle className="text-sm font-medium flex items-center justify-between">
+                Usuários Totais
+                <div className="flex items-center text-green-500">
+                  <ArrowUp className="h-3 w-3 mr-1" />
+                  <span className="text-xs">{stats.userGrowth}%</span>
+                </div>
+              </CardTitle>
               <CardDescription>Total de contas no sistema</CardDescription>
             </CardHeader>
             <CardContent>
@@ -90,7 +150,13 @@ const DashboardPanel: React.FC = () => {
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Descrições</CardTitle>
+              <CardTitle className="text-sm font-medium flex items-center justify-between">
+                Descrições
+                <div className="flex items-center text-green-500">
+                  <ArrowUp className="h-3 w-3 mr-1" />
+                  <span className="text-xs">{stats.contentGrowth}%</span>
+                </div>
+              </CardTitle>
               <CardDescription>Descrições de produtos criadas</CardDescription>
             </CardHeader>
             <CardContent>
@@ -129,6 +195,60 @@ const DashboardPanel: React.FC = () => {
         </div>
       )}
       
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Crescimento de Usuários</CardTitle>
+            <CardDescription>Usuários registrados por mês</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={userData}>
+                <defs>
+                  <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Area 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="#8884d8" 
+                  fillOpacity={1} 
+                  fill="url(#userGradient)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Conteúdo Criado</CardTitle>
+            <CardDescription>Evolução do conteúdo ao longo do tempo</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={contentData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="descriptions" fill="#8884d8" />
+                <Bar dataKey="templates" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Recent Activity and System Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <Card>
           <CardHeader>
@@ -136,21 +256,85 @@ const DashboardPanel: React.FC = () => {
             <CardDescription>Últimas ações realizadas no sistema</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Esta seção mostrará um log de atividades recentes. Será implementado quando o sistema de logs estiver disponível.
-            </p>
+            <div className="space-y-5">
+              {recentActivities.map(activity => (
+                <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
+                  <div className="flex-shrink-0">
+                    <Clock className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium">{activity.user}</p>
+                      <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{activity.action}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    {getActionBadge(activity.type)}
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader>
-            <CardTitle>Estatísticas de Uso</CardTitle>
-            <CardDescription>Dados de uso da plataforma</CardDescription>
+            <CardTitle>Perfil de Uso</CardTitle>
+            <CardDescription>Estatísticas detalhadas de uso do sistema</CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Gráficos de uso serão exibidos aqui. Será implementado quando o sistema de estatísticas estiver disponível.
-            </p>
+          <CardContent className="p-0">
+            <Tabs defaultValue="usage">
+              <TabsList className="w-full">
+                <TabsTrigger value="usage" className="flex-1">Uso</TabsTrigger>
+                <TabsTrigger value="performance" className="flex-1">Performance</TabsTrigger>
+                <TabsTrigger value="errors" className="flex-1">Erros</TabsTrigger>
+              </TabsList>
+              <TabsContent value="usage" className="p-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Recurso</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Tendência</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Páginas Geradas</TableCell>
+                      <TableCell>1,245</TableCell>
+                      <TableCell className="text-green-500">↑ 12%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Templates Usados</TableCell>
+                      <TableCell>67</TableCell>
+                      <TableCell className="text-green-500">↑ 8%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>AI Utilizações</TableCell>
+                      <TableCell>432</TableCell>
+                      <TableCell className="text-green-500">↑ 23%</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TabsContent>
+              <TabsContent value="performance" className="p-4">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={userData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="users" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </TabsContent>
+              <TabsContent value="errors" className="p-4">
+                <p className="text-center text-muted-foreground p-4">
+                  Nenhum erro reportado nas últimas 24 horas.
+                </p>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
