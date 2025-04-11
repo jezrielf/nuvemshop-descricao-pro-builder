@@ -37,12 +37,14 @@ const DashboardPanel: React.FC = () => {
     try {
       setLoading(true);
 
-      // Fetch user count from profiles table
+      // Get exact count of profiles - this should match the total user count
       const { count: userCount, error: userError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
       if (userError) throw userError;
+
+      console.log('Fetched user count:', userCount);
 
       // Get real template count from the store
       const templateCount = templates.length;

@@ -40,6 +40,7 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      // Get all profiles with no filters to ensure we get everyone
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -47,7 +48,10 @@ const UsersPanel: React.FC = () => {
         
       if (error) throw error;
       
-      console.log('Fetched profiles:', data);
+      console.log('Fetched profiles (total count):', data?.length);
+      console.log('Fetched profiles data:', data);
+      
+      // Set the profiles
       setProfiles(data as Profile[] || []);
       setFilteredProfiles(data as Profile[] || []);
     } catch (error: any) {
