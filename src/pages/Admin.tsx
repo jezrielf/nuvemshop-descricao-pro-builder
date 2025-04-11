@@ -10,6 +10,7 @@ import PlansPanel from '@/components/admin/PlansPanel';
 import DashboardPanel from '@/components/admin/DashboardPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
 import { useTemplateStore } from '@/store/templateStore';
+import { useToast } from '@/hooks/use-toast';
 
 const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings'>('dashboard');
@@ -17,9 +18,10 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { loadTemplates } = useTemplateStore();
+  const { toast } = useToast();
   
   useEffect(() => {
-    // Check if admin is authenticated
+    // Verificar se o admin está autenticado
     const adminAuth = localStorage.getItem('adminAuth');
     if (adminAuth !== 'true') {
       navigate('/admin-auth');
@@ -29,11 +31,20 @@ const Admin: React.FC = () => {
     setLoading(false);
   }, [navigate]);
   
-  // Preload templates when admin page loads to avoid blank screen
+  // Pré-carregar templates quando a página admin carrega
   useEffect(() => {
-    // Load templates data when the component mounts
-    loadTemplates();
-  }, [loadTemplates]);
+    try {
+      // Carregar dados dos templates quando o componente monta
+      loadTemplates();
+    } catch (error) {
+      console.error('Erro ao carregar templates:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar os templates.',
+        variant: 'destructive'
+      });
+    }
+  }, [loadTemplates, toast]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;

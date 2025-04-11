@@ -16,13 +16,13 @@ interface TemplateActionsProps {
   newTemplate: Partial<Template> | null;
   setNewTemplate: (template: Partial<Template> | null) => void;
   onDeleteTemplate: (template: Template) => boolean;
-  onUpdateTemplate: (template: Partial<Template>) => boolean;
+  onUpdateTemplate: (template: Template) => boolean;
   onCreateTemplate: (template: Omit<Template, "id">) => boolean;
   onAddBlock: (type: BlockType) => void;
   onRemoveBlock: (blockId: string) => void;
 }
 
-// This is the main TemplateActions component that uses the DialogProvider
+// Este é o componente principal TemplateActions que usa o DialogProvider
 const TemplateActions: React.FC<TemplateActionsProps> = (props) => {
   return (
     <DialogProvider>
@@ -31,7 +31,7 @@ const TemplateActions: React.FC<TemplateActionsProps> = (props) => {
   );
 };
 
-// The content component that uses the dialog context
+// O componente de conteúdo que usa o contexto do diálogo
 const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   editedTemplate,
   setEditedTemplate,
@@ -50,7 +50,7 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
     toggleDialog
   } = useDialogs();
 
-  // Block type options for template creation
+  // Opções de tipo de bloco para criação de template
   const blockTypes: BlockType[] = [
     'hero', 'features', 'benefits', 'specifications', 'text',
     'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta'
@@ -64,15 +64,21 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   };
 
   const handleEditConfirm = () => {
-    if (editedTemplate && onUpdateTemplate(editedTemplate)) {
+    if (editedTemplate) {
+      onUpdateTemplate(editedTemplate);
       toggleDialog('isEditDialogOpen');
     }
   };
 
   const handleCreateTemplate = () => {
     if (newTemplate) {
-      // Cast to required type for the createTemplate function
-      const templateToCreate = newTemplate as Omit<Template, "id">;
+      // Converter para o tipo requerido para a função createTemplate
+      const templateToCreate = {
+        name: newTemplate.name || '',
+        category: newTemplate.category || 'other' as ProductCategory,
+        blocks: newTemplate.blocks || []
+      };
+      
       if (onCreateTemplate(templateToCreate)) {
         toggleDialog('isNewTemplateDialogOpen');
         setNewTemplate({
@@ -84,8 +90,8 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
     }
   };
 
-  // Create a safe template object to pass to NewTemplateDialog
-  // This ensures all required properties are present
+  // Criar um objeto de template seguro para passar para NewTemplateDialog
+  // Isso garante que todas as propriedades necessárias estejam presentes
   const safeNewTemplate = {
     name: newTemplate?.name || '',
     category: newTemplate?.category || 'other' as ProductCategory,
