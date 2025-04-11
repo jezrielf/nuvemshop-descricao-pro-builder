@@ -6,6 +6,7 @@ import TemplatesPanel from '@/components/admin/TemplatesPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
 import { useTemplateStore } from '@/store/templateStore';
 import { useToast } from '@/hooks/use-toast';
+import { AdminTab } from '@/components/admin/navigation/NavigationTabs';
 
 const AdminTemplates: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

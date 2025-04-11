@@ -9,9 +9,10 @@ import PlansPanel from '@/components/admin/PlansPanel';
 import DashboardPanel from '@/components/admin/DashboardPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
 import { useToast } from '@/hooks/use-toast';
+import { AdminTab } from '@/components/admin/navigation/NavigationTabs';
 
 const Admin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

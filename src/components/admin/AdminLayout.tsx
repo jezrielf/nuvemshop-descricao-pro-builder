@@ -1,28 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  Users, 
-  Settings, 
-  LayoutDashboard, 
-  FileText, 
-  FileCode, 
-  CreditCard, 
-  LogOut, 
-  Moon, 
-  Sun, 
-  Menu, 
-  X 
-} from 'lucide-react';
+
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { useDarkMode } from '@/hooks/useDarkMode';
 import { cn } from '@/lib/utils';
+import { AdminTab, getTabPath } from './navigation/NavigationTabs';
+import MobileHeader from './navigation/MobileHeader';
+import MobileNavigation from './navigation/MobileNavigation';
+import DesktopSidebar from './navigation/DesktopSidebar';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
-  activeTab: 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings') => void;
+  activeTab: AdminTab;
+  onTabChange: (tab: AdminTab) => void;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ 
@@ -33,24 +23,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const [darkMode, setDarkMode] = useState(localStorage.getItem('adminDarkMode') === 'true');
+  const { darkMode, toggleDarkMode } = useDarkMode('adminDarkMode');
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    // Apply dark mode class to the document
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Save preference to localStorage
-    localStorage.setItem('adminDarkMode', darkMode ? 'true' : 'false');
-  }, [darkMode]);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
@@ -61,25 +35,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     navigate('/admin-auth');
   };
 
-  const handleTabChange = (tab: 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings') => {
-    if (tab === 'templates') {
-      navigate('/admin-templates');
-    } else {
-      onTabChange(tab);
-      navigate('/admin');
-    }
+  const handleTabChange = (tab: AdminTab) => {
+    const path = getTabPath(tab);
+    onTabChange(tab);
+    navigate(path);
     setDrawerOpen(false);
   };
-
-  // Tab definition array for reuse in both desktop and mobile views
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
-    { id: 'users', label: 'Usuários', icon: Users, path: '/admin' },
-    { id: 'descriptions', label: 'Descrições', icon: FileText, path: '/admin' },
-    { id: 'templates', label: 'Templates', icon: FileCode, path: '/admin-templates' },
-    { id: 'plans', label: 'Planos', icon: CreditCard, path: '/admin' },
-    { id: 'settings', label: 'Configurações', icon: Settings, path: '/admin' }
-  ];
 
   // Determine active tab based on current path or activeTab prop
   const currentTab = location.pathname === '/admin-templates' ? 'templates' : activeTab;
@@ -90,104 +51,32 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
     )}>
       {/* Mobile Header */}
-      <div className={cn(
-        "lg:hidden flex justify-between items-center p-4 border-b",
-        darkMode ? "border-gray-700" : "border-gray-200"
-      )}>
-        <h1 className="text-xl font-bold">Admin</h1>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleDarkMode}
-            className="rounded-full"
-          >
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-          
-          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <DrawerTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className={cn(
-              "p-4 rounded-t-lg",
-              darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
-            )}>
-              <div className="flex flex-col gap-2 mb-6">
-                {tabs.map(tab => (
-                  <Button 
-                    key={tab.id}
-                    variant={currentTab === tab.id ? 'default' : 'outline'} 
-                    onClick={() => handleTabChange(tab.id as any)}
-                    className="flex items-center justify-start w-full"
-                  >
-                    <tab.icon className="mr-2 h-5 w-5" />
-                    {tab.label}
-                  </Button>
-                ))}
-                <Button 
-                  variant="destructive" 
-                  onClick={handleLogout} 
-                  className="flex items-center justify-start w-full mt-4"
-                >
-                  <LogOut className="mr-2 h-5 w-5" />
-                  Sair
-                </Button>
-              </div>
-              <DrawerClose className="sr-only">Close</DrawerClose>
-            </DrawerContent>
-          </Drawer>
-        </div>
-      </div>
+      <MobileHeader 
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        onMenuToggle={() => setDrawerOpen(true)}
+      />
+      
+      {/* Mobile Navigation Drawer */}
+      <MobileNavigation 
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        currentTab={currentTab as AdminTab}
+        onTabChange={handleTabChange}
+        onLogout={handleLogout}
+        darkMode={darkMode}
+      />
       
       {/* Desktop Layout */}
       <div className="flex h-screen lg:overflow-hidden">
-        {/* Sidebar */}
-        <div className={cn(
-          "hidden lg:block w-64 border-r p-4 h-full",
-          darkMode ? "border-gray-700 bg-gray-900" : "border-gray-200"
-        )}>
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-xl font-bold">Admin Panel</h1>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleDarkMode}
-              className="rounded-full"
-            >
-              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
-          </div>
-          
-          <ScrollArea className="h-[calc(100vh-10rem)]">
-            <nav className="flex flex-col gap-2">
-              {tabs.map(tab => (
-                <Button 
-                  key={tab.id}
-                  variant={currentTab === tab.id ? 'default' : 'outline'} 
-                  onClick={() => handleTabChange(tab.id as any)}
-                  className="flex items-center justify-start w-full"
-                >
-                  <tab.icon className="mr-2 h-5 w-5" />
-                  {tab.label}
-                </Button>
-              ))}
-            </nav>
-          </ScrollArea>
-          
-          <div className="absolute bottom-4 w-56">
-            <Button 
-              variant="outline" 
-              onClick={handleLogout} 
-              className="flex items-center w-full mt-4"
-            >
-              <LogOut className="mr-2 h-5 w-5" />
-              Sair
-            </Button>
-          </div>
-        </div>
+        {/* Desktop Sidebar */}
+        <DesktopSidebar 
+          currentTab={currentTab as AdminTab}
+          onTabChange={handleTabChange}
+          onLogout={handleLogout}
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+        />
         
         {/* Main Content */}
         <div className="flex-1 overflow-auto">
