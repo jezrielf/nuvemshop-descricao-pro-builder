@@ -7,22 +7,8 @@ import { Check, PackageCheck } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
-
-// Define the Plan interface (same as in PlansPanel)
-interface PlanFeature {
-  id: string;
-  name: string;
-  included: boolean;
-}
-
-interface Plan {
-  id: string;
-  name: string;
-  price: number;
-  features: PlanFeature[];
-  isActive: boolean;
-  isDefault: boolean;
-}
+import { Plan } from '@/components/admin/plans/types';
+import { mockPlans } from '@/components/admin/plans/mockData';
 
 const Plans: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -34,57 +20,6 @@ const Plans: React.FC = () => {
   // For now, we're using mock data (same as in PlansPanel)
   // In a real app, this would come from Supabase or another backend
   useEffect(() => {
-    // Mock getting plans from admin
-    const mockPlans = [
-      {
-        id: '1',
-        name: 'Gratuito',
-        price: 0,
-        features: [
-          { id: '1', name: 'Até 3 descrições', included: true },
-          { id: '2', name: 'Templates básicos', included: true },
-          { id: '3', name: 'Exportação HTML', included: true },
-          { id: '4', name: 'Descrições ilimitadas', included: false },
-          { id: '5', name: 'Todos os templates', included: false },
-          { id: '6', name: 'Suporte prioritário', included: false },
-        ],
-        isActive: true,
-        isDefault: true
-      },
-      {
-        id: '2',
-        name: 'Premium',
-        price: 29.90,
-        features: [
-          { id: '1', name: 'Até 3 descrições', included: true },
-          { id: '2', name: 'Templates básicos', included: true },
-          { id: '3', name: 'Exportação HTML', included: true },
-          { id: '4', name: 'Descrições ilimitadas', included: true },
-          { id: '5', name: 'Todos os templates', included: true },
-          { id: '6', name: 'Suporte prioritário', included: true },
-        ],
-        isActive: true,
-        isDefault: false
-      },
-      {
-        id: '3',
-        name: 'Empresarial',
-        price: 99.90,
-        features: [
-          { id: '1', name: 'Até 3 descrições', included: true },
-          { id: '2', name: 'Templates básicos', included: true },
-          { id: '3', name: 'Exportação HTML', included: true },
-          { id: '4', name: 'Descrições ilimitadas', included: true },
-          { id: '5', name: 'Todos os templates', included: true },
-          { id: '6', name: 'Suporte prioritário', included: true },
-          { id: '7', name: 'API para integração', included: true },
-          { id: '8', name: 'White label', included: true },
-        ],
-        isActive: true,
-        isDefault: false
-      }
-    ];
-
     // Only show active plans to customers
     setPlans(mockPlans.filter(plan => plan.isActive));
     setLoading(false);
