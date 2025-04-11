@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import AdminAuth from "./pages/AdminAuth";
 import AdminTemplates from "./pages/AdminTemplates";
+import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -29,6 +30,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/plans" element={<Plans />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin-templates" element={<AdminTemplates />} />
             <Route path="/admin-auth" element={<AdminAuth />} />
