@@ -6,9 +6,7 @@ import {
   Pagination as UIPagination, 
   PaginationContent, 
   PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
+  PaginationLink,
 } from '@/components/ui/pagination';
 
 interface PaginationProps {
@@ -41,11 +39,16 @@ const Pagination: React.FC<PaginationProps> = ({
       <UIPagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious 
+            <Button 
+              variant="ghost" 
+              size="icon" 
               onClick={onPrevious} 
               disabled={prevDisabled}
               className={prevDisabled ? "opacity-50 cursor-not-allowed" : ""}
-            />
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Página anterior</span>
+            </Button>
           </PaginationItem>
           
           {totalPages > 0 && (
@@ -57,11 +60,16 @@ const Pagination: React.FC<PaginationProps> = ({
           )}
           
           <PaginationItem>
-            <PaginationNext 
+            <Button 
+              variant="ghost" 
+              size="icon" 
               onClick={onNext} 
               disabled={nextDisabled}
               className={nextDisabled ? "opacity-50 cursor-not-allowed" : ""}
-            />
+            >
+              <ChevronRight className="h-4 w-4" />
+              <span className="sr-only">Próxima página</span>
+            </Button>
           </PaginationItem>
         </PaginationContent>
       </UIPagination>
