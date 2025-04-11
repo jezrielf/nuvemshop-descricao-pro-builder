@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import TemplatesPanel from '@/components/admin/TemplatesPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
-import { useTemplateStore } from '@/store/templateStore';
 import { useToast } from '@/hooks/use-toast';
 import { AdminTab } from '@/components/admin/navigation/NavigationTabs';
 
@@ -12,7 +11,6 @@ const AdminTemplates: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { loadTemplates } = useTemplateStore();
   const { toast } = useToast();
   
   useEffect(() => {
@@ -26,20 +24,6 @@ const AdminTemplates: React.FC = () => {
     setLoading(false);
   }, [navigate]);
   
-  // Pré-carregar templates quando a página carrega
-  useEffect(() => {
-    try {
-      loadTemplates();
-    } catch (error) {
-      console.error('Erro ao carregar templates:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível carregar os templates.',
-        variant: 'destructive'
-      });
-    }
-  }, [loadTemplates, toast]);
-  
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;
   }
@@ -49,7 +33,7 @@ const AdminTemplates: React.FC = () => {
   }
   
   return (
-    <AdminLayout activeTab="templates" onTabChange={() => {}}>
+    <AdminLayout activeTab="templates" onTabChange={(tab: AdminTab) => {}}>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Gerenciamento de Templates</h1>
         <p className="text-muted-foreground">Crie, edite e gerencie os templates do sistema</p>

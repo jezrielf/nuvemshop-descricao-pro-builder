@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Template } from '@/types/editor';
 import { useTemplateStore } from './useTemplateStore';
 import { useTemplateFilters } from './useTemplateFilters';
@@ -16,6 +16,11 @@ export function useTemplates() {
   } = useTemplateStore();
   
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+
+  // Carregar templates quando o componente montar
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
 
   // Use specialized hooks for different functionalities
   const {
