@@ -8,6 +8,7 @@ import TemplateEditDialog from './TemplateEditDialog';
 import TemplateDeleteDialog from './TemplateDeleteDialog';
 import NewTemplateDialog from './NewTemplateDialog';
 import { DialogProvider, useDialogs } from './dialogs/DialogProvider';
+import { getCategoryName } from './utils';
 
 interface TemplateActionsProps {
   editedTemplate: Template | null;
