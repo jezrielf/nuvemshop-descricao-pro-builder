@@ -5,7 +5,6 @@ import { Template, ProductCategory } from '@/types/editor';
 import TemplateSearch from './TemplateSearch';
 import TemplateList from './TemplateList';
 import Pagination from './Pagination';
-import { getCategoryName } from './utils';
 
 interface TemplateFilteringProps {
   displayedTemplates: Template[];
@@ -21,6 +20,7 @@ interface TemplateFilteringProps {
   totalPages: number;
   onPreviousPage: () => void;
   onNextPage: () => void;
+  getCategoryName: (category: ProductCategory) => string;
 }
 
 const TemplateFiltering: React.FC<TemplateFilteringProps> = ({
@@ -36,7 +36,8 @@ const TemplateFiltering: React.FC<TemplateFilteringProps> = ({
   currentPage,
   totalPages,
   onPreviousPage,
-  onNextPage
+  onNextPage,
+  getCategoryName
 }) => {
   return (
     <>
@@ -62,12 +63,12 @@ const TemplateFiltering: React.FC<TemplateFilteringProps> = ({
       </Card>
 
       <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
         onPrevious={onPreviousPage}
         onNext={onNextPage}
         isPreviousDisabled={currentPage <= 1}
         isNextDisabled={currentPage >= totalPages}
-        currentPage={currentPage}
-        totalPages={totalPages}
       />
     </>
   );

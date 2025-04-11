@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { Template, ProductCategory, BlockType } from '@/types/editor';
+import { Template, ProductCategory, BlockType, Block } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
 import { getAllProductCategories, getCategoryName } from './utils';
 import TemplatePreviewDialog from './TemplatePreviewDialog';
@@ -19,6 +19,8 @@ interface TemplateActionsProps {
   onDeleteTemplate: (template: Template | null) => void;
   onUpdateTemplate: (template: Partial<Template>) => boolean;
   onCreateTemplate: (template: Partial<Template>) => boolean;
+  onAddBlock: (type: BlockType) => void;
+  onRemoveBlock: (blockId: string) => void;
 }
 
 // This is the main TemplateActions component that uses the DialogProvider
@@ -38,7 +40,9 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   setNewTemplate,
   onDeleteTemplate,
   onUpdateTemplate,
-  onCreateTemplate
+  onCreateTemplate,
+  onAddBlock,
+  onRemoveBlock
 }) => {
   const { 
     selectedTemplate, 
@@ -52,29 +56,6 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
     'hero', 'features', 'benefits', 'specifications', 'text',
     'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta'
   ];
-
-  const handleAddBlock = (type: BlockType) => {
-    if (!newTemplate.blocks) {
-      newTemplate.blocks = [];
-    }
-    
-    const block = createBlock(type, 1);
-    if (block) {
-      setNewTemplate({
-        ...newTemplate,
-        blocks: [...newTemplate.blocks, block]
-      });
-    }
-  };
-
-  const handleRemoveBlock = (blockId: string) => {
-    if (newTemplate.blocks) {
-      setNewTemplate({
-        ...newTemplate,
-        blocks: newTemplate.blocks.filter(block => block.id !== blockId)
-      });
-    }
-  };
 
   const handleDeleteConfirm = () => {
     onDeleteTemplate(selectedTemplate);
@@ -141,8 +122,8 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
         template={newTemplate as Template}
         onTemplateChange={handleNewTemplateChange}
         onCreateTemplate={handleCreateTemplate}
-        onAddBlock={handleAddBlock}
-        onRemoveBlock={handleRemoveBlock}
+        onAddBlock={onAddBlock}
+        onRemoveBlock={onRemoveBlock}
         blockTypes={blockTypes}
         categories={getAllProductCategories()}
         getCategoryName={getCategoryName}

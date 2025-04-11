@@ -2,6 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { 
+  Pagination as UIPagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
 
 interface PaginationProps {
   currentPage: number;
@@ -20,31 +28,43 @@ const Pagination: React.FC<PaginationProps> = ({
   isPreviousDisabled = false,
   isNextDisabled = false
 }) => {
+  // Use the actual pagination values to determine if buttons should be disabled
+  const prevDisabled = isPreviousDisabled || currentPage <= 1;
+  const nextDisabled = isNextDisabled || currentPage >= totalPages;
+  
   return (
     <div className="flex items-center justify-between py-4">
       <div className="text-sm text-muted-foreground">
         Página {currentPage} de {totalPages}
       </div>
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onPrevious}
-          disabled={isPreviousDisabled}
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onNext}
-          disabled={isNextDisabled}
-        >
-          Próxima
-          <ChevronRight className="h-4 w-4 ml-1" />
-        </Button>
-      </div>
+      
+      <UIPagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious 
+              onClick={onPrevious} 
+              disabled={prevDisabled}
+              className={prevDisabled ? "opacity-50 cursor-not-allowed" : ""}
+            />
+          </PaginationItem>
+          
+          {totalPages > 0 && (
+            <PaginationItem>
+              <PaginationLink isActive={true}>
+                {currentPage}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          
+          <PaginationItem>
+            <PaginationNext 
+              onClick={onNext} 
+              disabled={nextDisabled}
+              className={nextDisabled ? "opacity-50 cursor-not-allowed" : ""}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </UIPagination>
     </div>
   );
 };

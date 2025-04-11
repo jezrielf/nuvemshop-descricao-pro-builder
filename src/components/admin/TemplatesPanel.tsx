@@ -4,6 +4,7 @@ import { useTemplates } from '@/hooks/useTemplates';
 import TemplateActions from './templates/TemplateActions';
 import TemplateFiltering from './templates/TemplateFiltering';
 import { Template } from '@/types/editor';
+import { getCategoryName } from './templates/utils';
 
 const TemplatesPanel: React.FC = () => {
   const {
@@ -26,7 +27,9 @@ const TemplatesPanel: React.FC = () => {
     handleDeleteTemplate,
     handleUpdateTemplate,
     handlePreviousPage,
-    handleNextPage
+    handleNextPage,
+    handleAddBlock,
+    handleRemoveBlock
   } = useTemplates();
 
   const handleView = (template: Template) => {
@@ -48,6 +51,8 @@ const TemplatesPanel: React.FC = () => {
         onDeleteTemplate={handleDeleteTemplate}
         onUpdateTemplate={handleUpdateTemplate}
         onCreateTemplate={handleCreateTemplate}
+        onAddBlock={handleAddBlock}
+        onRemoveBlock={handleRemoveBlock}
       />
       
       <TemplateFiltering
@@ -59,11 +64,12 @@ const TemplatesPanel: React.FC = () => {
         categories={categories}
         onViewTemplate={handleView}
         onEditTemplate={handleEditTemplate}
-        onDeleteTemplate={(template) => handleView(template)}
+        onDeleteTemplate={handleDeleteTemplate}
         currentPage={currentPage}
         totalPages={totalPages}
         onPreviousPage={handlePreviousPage}
         onNextPage={handleNextPage}
+        getCategoryName={getCategoryName}
       />
     </div>
   );
