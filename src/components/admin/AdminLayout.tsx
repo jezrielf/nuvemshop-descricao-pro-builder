@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { useDarkMode } from '@/hooks/useDarkMode';
 import { cn } from '@/lib/utils';
 import { AdminTab, getTabPath } from './navigation/NavigationTabs';
-import MobileHeader from './navigation/MobileHeader';
 import MobileNavigation from './navigation/MobileNavigation';
 import DesktopSidebar from './navigation/DesktopSidebar';
+import AdminHeader from './layout/AdminHeader';
+import AdminContainer from './layout/AdminContainer';
+import AdminContent from './layout/AdminContent';
+import { AdminLayoutProvider, useAdminLayout } from './layout/AdminLayoutProvider';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -15,16 +17,19 @@ interface AdminLayoutProps {
   onTabChange: (tab: AdminTab) => void;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ 
-  children, 
-  activeTab, 
-  onTabChange 
+const AdminLayoutContent: React.FC<Omit<AdminLayoutProps, 'onTabChange'>> = ({ 
+  children
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { toast } = useToast();
-  const { darkMode, toggleDarkMode } = useDarkMode('adminDarkMode');
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { 
+    darkMode, 
+    toggleDarkMode, 
+    drawerOpen, 
+    setDrawerOpen, 
+    activeTab,
+    setActiveTab
+  } = useAdminLayout();
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
@@ -37,31 +42,21 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const handleTabChange = (tab: AdminTab) => {
     const path = getTabPath(tab);
-    onTabChange(tab);
+    setActiveTab(tab);
     navigate(path);
     setDrawerOpen(false);
   };
 
-  // Determine active tab based on current path or activeTab prop
-  const currentTab = location.pathname === '/admin-templates' ? 'templates' : activeTab;
-
   return (
-    <div className={cn(
-      "min-h-screen transition-colors",
-      darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-    )}>
+    <AdminContainer>
       {/* Mobile Header */}
-      <MobileHeader 
-        darkMode={darkMode}
-        toggleDarkMode={toggleDarkMode}
-        onMenuToggle={() => setDrawerOpen(true)}
-      />
+      <AdminHeader onLogout={handleLogout} />
       
       {/* Mobile Navigation Drawer */}
       <MobileNavigation 
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
-        currentTab={currentTab as AdminTab}
+        currentTab={activeTab}
         onTabChange={handleTabChange}
         onLogout={handleLogout}
         darkMode={darkMode}
@@ -71,7 +66,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       <div className="flex h-screen lg:overflow-hidden">
         {/* Desktop Sidebar */}
         <DesktopSidebar 
-          currentTab={currentTab as AdminTab}
+          currentTab={activeTab}
           onTabChange={handleTabChange}
           onLogout={handleLogout}
           darkMode={darkMode}
@@ -79,16 +74,25 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         />
         
         {/* Main Content */}
-        <div className="flex-1 overflow-auto">
-          <div className={cn(
-            "p-6 max-w-7xl mx-auto",
-            darkMode ? "bg-gray-900" : "bg-white"
-          )}>
-            {children}
-          </div>
-        </div>
+        <AdminContent>
+          {children}
+        </AdminContent>
       </div>
-    </div>
+    </AdminContainer>
+  );
+};
+
+const AdminLayout: React.FC<AdminLayoutProps> = ({ 
+  children, 
+  activeTab, 
+  onTabChange 
+}) => {
+  return (
+    <AdminLayoutProvider initialTab={activeTab} onTabChange={onTabChange}>
+      <AdminLayoutContent activeTab={activeTab}>
+        {children}
+      </AdminLayoutContent>
+    </AdminLayoutProvider>
   );
 };
 
