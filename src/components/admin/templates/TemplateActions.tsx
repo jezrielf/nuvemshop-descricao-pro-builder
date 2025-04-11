@@ -1,18 +1,17 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { Template, ProductCategory, BlockType, Block } from '@/types/editor';
+import { Template, ProductCategory, BlockType } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
 import { getAllProductCategories, getCategoryName } from './utils';
 import TemplatePreviewDialog from './TemplatePreviewDialog';
 import TemplateEditDialog from './TemplateEditDialog';
 import TemplateDeleteDialog from './TemplateDeleteDialog';
 import NewTemplateDialog from './NewTemplateDialog';
+import { DialogProvider, useDialogs } from './dialogs/DialogProvider';
 
 interface TemplateActionsProps {
-  selectedTemplate: Template | null;
-  setSelectedTemplate: (template: Template | null) => void;
   editedTemplate: Partial<Template>;
   setEditedTemplate: (template: Partial<Template>) => void;
   newTemplate: Partial<Template>;
@@ -22,9 +21,17 @@ interface TemplateActionsProps {
   onCreateTemplate: (template: Partial<Template>) => boolean;
 }
 
-const TemplateActions: React.FC<TemplateActionsProps> = ({
-  selectedTemplate,
-  setSelectedTemplate,
+// This is the main TemplateActions component that uses the DialogProvider
+const TemplateActions: React.FC<TemplateActionsProps> = (props) => {
+  return (
+    <DialogProvider>
+      <TemplateActionsContent {...props} />
+    </DialogProvider>
+  );
+};
+
+// The content component that uses the dialog context
+const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   editedTemplate,
   setEditedTemplate,
   newTemplate,
@@ -33,54 +40,18 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
   onUpdateTemplate,
   onCreateTemplate
 }) => {
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isNewTemplateDialogOpen, setIsNewTemplateDialogOpen] = useState(false);
+  const { 
+    selectedTemplate, 
+    dialogState, 
+    openNewTemplateDialog,
+    toggleDialog
+  } = useDialogs();
 
   // Block type options for template creation
   const blockTypes: BlockType[] = [
     'hero', 'features', 'benefits', 'specifications', 'text',
     'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta'
   ];
-
-  const handleViewTemplate = (template: Template) => {
-    setSelectedTemplate(template);
-    setIsPreviewOpen(true);
-  };
-
-  const handleEditTemplate = (template: Template) => {
-    setSelectedTemplate(template);
-    setEditedTemplate({...template});
-    setIsEditDialogOpen(true);
-  };
-
-  const handleDeleteClick = (template: Template) => {
-    setSelectedTemplate(template);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    onDeleteTemplate(selectedTemplate);
-    setIsDeleteDialogOpen(false);
-  };
-
-  const handleEditConfirm = () => {
-    if (onUpdateTemplate(editedTemplate)) {
-      setIsEditDialogOpen(false);
-    }
-  };
-
-  const handleCreateTemplate = () => {
-    if (onCreateTemplate(newTemplate)) {
-      setIsNewTemplateDialogOpen(false);
-      setNewTemplate({
-        name: '',
-        category: 'other' as ProductCategory,
-        blocks: []
-      });
-    }
-  };
 
   const handleAddBlock = (type: BlockType) => {
     if (!newTemplate.blocks) {
@@ -105,6 +76,28 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
     }
   };
 
+  const handleDeleteConfirm = () => {
+    onDeleteTemplate(selectedTemplate);
+    toggleDialog('isDeleteDialogOpen');
+  };
+
+  const handleEditConfirm = () => {
+    if (onUpdateTemplate(editedTemplate)) {
+      toggleDialog('isEditDialogOpen');
+    }
+  };
+
+  const handleCreateTemplate = () => {
+    if (onCreateTemplate(newTemplate)) {
+      toggleDialog('isNewTemplateDialogOpen');
+      setNewTemplate({
+        name: '',
+        category: 'other' as ProductCategory,
+        blocks: []
+      });
+    }
+  };
+
   // The handler for updating new template data with explicit type casting
   const handleNewTemplateChange = (templateData: Partial<Template>) => {
     setNewTemplate(templateData);
@@ -114,37 +107,37 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold">Gerenciar Templates</h2>
-        <Button onClick={() => setIsNewTemplateDialogOpen(true)}>
+        <Button onClick={openNewTemplateDialog}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Template
         </Button>
       </div>
 
       <TemplatePreviewDialog
-        isOpen={isPreviewOpen}
-        onOpenChange={setIsPreviewOpen}
+        isOpen={dialogState.isPreviewOpen}
+        onOpenChange={() => toggleDialog('isPreviewOpen')}
         template={selectedTemplate}
         getCategoryName={getCategoryName}
       />
 
       <TemplateEditDialog
-        isOpen={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
+        isOpen={dialogState.isEditDialogOpen}
+        onOpenChange={() => toggleDialog('isEditDialogOpen')}
         template={editedTemplate}
         onTemplateChange={setEditedTemplate}
         onSave={handleEditConfirm}
       />
 
       <TemplateDeleteDialog
-        isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
+        isOpen={dialogState.isDeleteDialogOpen}
+        onOpenChange={() => toggleDialog('isDeleteDialogOpen')}
         template={selectedTemplate}
         onConfirm={handleDeleteConfirm}
       />
 
       <NewTemplateDialog
-        isOpen={isNewTemplateDialogOpen}
-        onOpenChange={setIsNewTemplateDialogOpen}
+        isOpen={dialogState.isNewTemplateDialogOpen}
+        onOpenChange={() => toggleDialog('isNewTemplateDialogOpen')}
         template={newTemplate as Template}
         onTemplateChange={handleNewTemplateChange}
         onCreateTemplate={handleCreateTemplate}

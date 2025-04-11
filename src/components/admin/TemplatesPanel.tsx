@@ -3,6 +3,7 @@ import React from 'react';
 import { useTemplates } from '@/hooks/useTemplates';
 import TemplateActions from './templates/TemplateActions';
 import TemplateFiltering from './templates/TemplateFiltering';
+import { Template } from '@/types/editor';
 
 const TemplatesPanel: React.FC = () => {
   const {
@@ -28,15 +29,11 @@ const TemplatesPanel: React.FC = () => {
     handleNextPage
   } = useTemplates();
 
-  const handleView = (template: React.SetStateAction<import("@/types/editor").Template | null>) => {
-    if (typeof template === 'function') {
-      setSelectedTemplate(template);
-      return;
-    }
+  const handleView = (template: Template) => {
     handleViewTemplate(template);
   };
 
-  const handleEditTemplate = (template: import("@/types/editor").Template) => {
+  const handleEditTemplate = (template: Template) => {
     setSelectedTemplate(template);
     setEditedTemplate({...template});
   };
@@ -44,8 +41,6 @@ const TemplatesPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       <TemplateActions
-        selectedTemplate={selectedTemplate}
-        setSelectedTemplate={setSelectedTemplate}
         editedTemplate={editedTemplate}
         setEditedTemplate={setEditedTemplate}
         newTemplate={newTemplate}

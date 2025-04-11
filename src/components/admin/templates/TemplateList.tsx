@@ -9,9 +9,8 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { TemplateActions } from './TemplateListActions';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Trash, Edit } from 'lucide-react';
 import { Template, ProductCategory } from '@/types/editor';
 
 interface TemplateListProps {
@@ -58,32 +57,12 @@ const TemplateList: React.FC<TemplateListProps> = ({
               </TableCell>
               <TableCell>{template.blocks.length}</TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => onView(template)}
-                    title="Visualizar"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => onEdit(template)}
-                    title="Editar"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => onDelete(template)}
-                    title="Excluir"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
+                <TemplateActions 
+                  template={template}
+                  onView={onView}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
               </TableCell>
             </TableRow>
           ))
