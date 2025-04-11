@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { getCategoryName } from './templates/utils';
-import { useTemplateManagement } from '@/hooks/useTemplateManagement';
+import { useTemplates } from '@/hooks/templates/useTemplates';
 import TemplateActionPanel from './templates/panels/TemplateActionPanel';
 import TemplateFilterPanel from './templates/panels/TemplateFilterPanel';
 
@@ -27,7 +27,7 @@ const TemplatesPanel: React.FC = () => {
     handleNextPage,
     handleAddBlock,
     handleRemoveBlock
-  } = useTemplateManagement();
+  } = useTemplates();
 
   return (
     <div className="space-y-6">

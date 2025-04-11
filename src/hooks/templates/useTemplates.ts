@@ -1,20 +1,23 @@
 
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { Template } from '@/types/editor';
-import { useTemplateStore } from './templates/useTemplateStore';
-import { useTemplateFilters } from './templates/useTemplateFilters';
-import { useTemplateActions } from './templates/useTemplateActions';
-import { useTemplateEditor } from './templates/useTemplateEditor';
+import { useTemplateStore } from './useTemplateStore';
+import { useTemplateFilters } from './useTemplateFilters';
+import { useTemplateActions } from './useTemplateActions';
+import { useTemplateEditor } from './useTemplateEditor';
 
-export function useTemplateManagement() {
+export function useTemplates() {
   const {
-    templates,
+    templates: allTemplates,
     loadTemplates,
     createTemplate,
     updateTemplate,
     deleteTemplate
   } = useTemplateStore();
+  
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
+  // Use specialized hooks for different functionalities
   const {
     displayedTemplates,
     searchTerm,
@@ -26,13 +29,13 @@ export function useTemplateManagement() {
     totalPages,
     handlePreviousPage,
     handleNextPage
-  } = useTemplateFilters(templates);
+  } = useTemplateFilters(allTemplates);
 
   const {
     handleViewTemplate,
     handleCreateTemplate,
-    handleUpdateTemplate,
-    handleDeleteTemplate
+    handleDeleteTemplate,
+    handleUpdateTemplate
   } = useTemplateActions({
     storeCreateTemplate: createTemplate,
     storeUpdateTemplate: updateTemplate,
@@ -40,8 +43,6 @@ export function useTemplateManagement() {
   });
 
   const {
-    selectedTemplate,
-    setSelectedTemplate,
     editedTemplate,
     setEditedTemplate,
     newTemplate,
@@ -50,13 +51,8 @@ export function useTemplateManagement() {
     handleRemoveBlock
   } = useTemplateEditor();
 
-  // Load templates when the component mounts
-  useEffect(() => {
-    loadTemplates();
-  }, [loadTemplates]);
-
   return {
-    templates,
+    allTemplates,
     displayedTemplates,
     selectedTemplate,
     setSelectedTemplate,
@@ -73,8 +69,8 @@ export function useTemplateManagement() {
     totalPages,
     handleViewTemplate,
     handleCreateTemplate,
-    handleUpdateTemplate,
     handleDeleteTemplate,
+    handleUpdateTemplate,
     handlePreviousPage,
     handleNextPage,
     handleAddBlock,
