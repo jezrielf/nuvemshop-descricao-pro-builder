@@ -1,9 +1,9 @@
 
-import { BlockType, ColumnLayout } from '@/types/editor';
+import { BlockType, ColumnLayout, Block } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import { blockTypeInfo } from './blockTypeInfo';
 
-export const createBlock = (type: BlockType, columns: ColumnLayout) => {
+export const createBlock = (type: BlockType, columns: ColumnLayout): Block | null => {
   // Make sure type is a valid BlockType before proceeding
   if (!Object.keys(blockTypeInfo).includes(type)) {
     console.error(`Invalid block type: ${type}`);
@@ -12,37 +12,34 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
   
   // Now that we've validated the type, TypeScript knows it's a valid key
   const info = blockTypeInfo[type];
+  const commonProps = {
+    id: uuidv4(),
+    type,
+    title: info.name,
+    columns,
+    visible: true,
+  };
   
   switch (type) {
     case 'hero':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Título Principal',
         subheading: 'Subtítulo com descrição do produto',
         buttonText: 'Saiba Mais',
         buttonUrl: '#'
       };
+    
     case 'text':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Título do Texto',
         content: '<p>Digite seu texto aqui. Este é um bloco de texto que você pode personalizar com conteúdo sobre seu produto.</p>'
       };
+    
     case 'features':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Recursos do Produto',
         features: [
           {
@@ -59,13 +56,10 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
           }
         ]
       };
+    
     case 'benefits':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Benefícios',
         benefits: [
           {
@@ -82,13 +76,10 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
           }
         ]
       };
+    
     case 'specifications':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Especificações Técnicas',
         specs: [
           {
@@ -103,24 +94,18 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
           }
         ]
       };
+    
     case 'image':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         src: '',
         alt: 'Imagem do produto',
         caption: 'Legenda da imagem'
       };
+    
     case 'gallery':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         images: [
           {
             id: uuidv4(),
@@ -136,13 +121,10 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
           }
         ]
       };
+    
     case 'imageText':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         image: {
           src: '',
           alt: 'Imagem do produto'
@@ -150,13 +132,10 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
         heading: 'Título da Seção',
         content: '<p>Texto com descrição detalhada do produto ou características.</p>'
       };
+    
     case 'textImage':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         image: {
           src: '',
           alt: 'Imagem do produto'
@@ -164,13 +143,10 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
         heading: 'Título da Seção',
         content: '<p>Texto com descrição detalhada do produto ou características.</p>'
       };
+    
     case 'faq':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Perguntas Frequentes',
         questions: [
           {
@@ -185,29 +161,23 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
           }
         ]
       };
+    
     case 'cta':
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Gostou do Produto?',
         content: '<p>Aproveite as condições especiais e garanta já o seu.</p>',
         buttonText: 'Comprar Agora',
         buttonUrl: '#'
       };
+    
     default:
       // Ensure type safety by adding generic block
       return {
-        id: uuidv4(),
-        type,
-        title: info.name,
-        columns,
-        visible: true,
+        ...commonProps,
         heading: 'Default Heading',
         content: 'Default Content',
         buttonText: 'Default Button'
-      };
+      } as Block;
   }
 };
