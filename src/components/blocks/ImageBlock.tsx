@@ -5,7 +5,7 @@ import BlockWrapper from './BlockWrapper';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Image, Upload } from 'lucide-react';
+import { Upload, Image } from 'lucide-react';
 import ImageLibrary from '../ImageLibrary/ImageLibrary';
 
 interface ImageBlockProps {
@@ -17,25 +17,22 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
   const { updateBlock, selectedBlockId } = useEditorStore();
   const isEditing = selectedBlockId === block.id && !isPreview;
   
-  const handleUpdateImageSrc = (src: string) => {
-    updateBlock(block.id, { image: { ...block.image, src } });
+  const handleUpdateSrc = (src: string) => {
+    updateBlock(block.id, { src });
   };
   
-  const handleUpdateImageAlt = (alt: string) => {
-    updateBlock(block.id, { image: { ...block.image, alt } });
+  const handleUpdateAlt = (alt: string) => {
+    updateBlock(block.id, { alt });
   };
   
   const handleUpdateCaption = (caption: string) => {
-    updateBlock(block.id, { image: { ...block.image, caption } });
+    updateBlock(block.id, { caption });
   };
   
   const handleSelectFromLibrary = (imageUrl: string, alt: string) => {
     updateBlock(block.id, { 
-      image: { 
-        ...block.image, 
-        src: imageUrl, 
-        alt: alt 
-      } 
+      src: imageUrl,
+      alt: alt 
     });
   };
   
@@ -43,15 +40,15 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
     return (
       <div className="w-full p-4">
         <div className="max-w-2xl mx-auto">
-          {block.image.src ? (
+          {block.src ? (
             <>
               <img 
-                src={block.image.src} 
-                alt={block.image.alt || 'Imagem do produto'} 
+                src={block.src} 
+                alt={block.alt || 'Imagem do produto'} 
                 className="w-full h-auto rounded-md"
               />
-              {block.image.caption && (
-                <p className="text-sm text-gray-500 text-center mt-2">{block.image.caption}</p>
+              {block.caption && (
+                <p className="text-sm text-gray-500 text-center mt-2">{block.caption}</p>
               )}
             </>
           ) : (
@@ -72,8 +69,8 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
             <label className="block text-sm font-medium mb-1">URL da Imagem</label>
             <div className="flex gap-2">
               <Input
-                value={block.image.src || ''}
-                onChange={(e) => handleUpdateImageSrc(e.target.value)}
+                value={block.src || ''}
+                onChange={(e) => handleUpdateSrc(e.target.value)}
                 placeholder="https://exemplo.com/imagem.jpg"
               />
               <ImageLibrary 
@@ -90,8 +87,8 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
           <div>
             <label className="block text-sm font-medium mb-1">Texto Alternativo</label>
             <Input
-              value={block.image.alt || ''}
-              onChange={(e) => handleUpdateImageAlt(e.target.value)}
+              value={block.alt || ''}
+              onChange={(e) => handleUpdateAlt(e.target.value)}
               placeholder="Descrição da imagem"
             />
           </div>
@@ -99,18 +96,18 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
           <div>
             <label className="block text-sm font-medium mb-1">Legenda (opcional)</label>
             <Input
-              value={block.image.caption || ''}
+              value={block.caption || ''}
               onChange={(e) => handleUpdateCaption(e.target.value)}
               placeholder="Legenda da imagem"
             />
           </div>
           
           <div className="pt-2">
-            {block.image.src ? (
+            {block.src ? (
               <div className="bg-gray-50 p-2 rounded-md">
                 <img
-                  src={block.image.src}
-                  alt={block.image.alt || 'Imagem do produto'}
+                  src={block.src}
+                  alt={block.alt || 'Imagem do produto'}
                   className="w-full h-auto max-h-64 object-contain rounded-md"
                 />
               </div>

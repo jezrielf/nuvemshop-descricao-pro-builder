@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { Template } from '@/types/editor';
 import { advancedTemplates } from '@/utils/advancedTemplates';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TemplateState {
   templates: Template[];
@@ -11,6 +12,9 @@ interface TemplateState {
   selectCategory: (category: string | null) => void;
   getTemplatesByCategory: (category: string | null) => Template[];
 }
+
+// Helper function to generate IDs
+const generateId = () => uuidv4();
 
 // Simula o carregamento de templates da API
 const mockTemplates: Template[] = [
@@ -28,11 +32,7 @@ const mockTemplates: Template[] = [
         heading: 'Suplemento Proteico',
         subheading: 'Maximize seus resultados com nossa fórmula exclusiva',
         buttonText: 'Comprar Agora',
-        buttonUrl: '#',
-        image: {
-          src: '',
-          alt: 'Suplemento Proteico'
-        }
+        buttonUrl: '#'
       },
       {
         id: 'block-2',
@@ -42,9 +42,9 @@ const mockTemplates: Template[] = [
         visible: true,
         heading: 'Principais Características',
         features: [
-          { title: 'Alta Absorção', description: 'Fórmula de rápida absorção para melhores resultados' },
-          { title: 'Sem Açúcar', description: 'Zero açúcar para não comprometer sua dieta' },
-          { title: 'Sabor Superior', description: 'Sabor desenvolvido para uma experiência agradável' }
+          { id: generateId(), title: 'Alta Absorção', description: 'Fórmula de rápida absorção para melhores resultados' },
+          { id: generateId(), title: 'Sem Açúcar', description: 'Zero açúcar para não comprometer sua dieta' },
+          { id: generateId(), title: 'Sabor Superior', description: 'Sabor desenvolvido para uma experiência agradável' }
         ]
       },
       {
@@ -74,11 +74,7 @@ const mockTemplates: Template[] = [
         heading: 'Camiseta Premium',
         subheading: 'Conforto e estilo para o dia a dia',
         buttonText: 'Ver Detalhes',
-        buttonUrl: '#',
-        image: {
-          src: '',
-          alt: 'Camiseta Premium'
-        }
+        buttonUrl: '#'
       },
       {
         id: 'block-2',
@@ -87,9 +83,9 @@ const mockTemplates: Template[] = [
         columns: 3,
         visible: true,
         images: [
-          { src: '', alt: 'Frente', caption: 'Vista frontal' },
-          { src: '', alt: 'Costas', caption: 'Vista traseira' },
-          { src: '', alt: 'Detalhe', caption: 'Detalhe do tecido' }
+          { id: generateId(), src: '', alt: 'Frente', caption: 'Vista frontal' },
+          { id: generateId(), src: '', alt: 'Costas', caption: 'Vista traseira' },
+          { id: generateId(), src: '', alt: 'Detalhe', caption: 'Detalhe do tecido' }
         ]
       },
       {
@@ -100,10 +96,10 @@ const mockTemplates: Template[] = [
         visible: true,
         heading: 'Especificações do Produto',
         specs: [
-          { name: 'Material', value: '100% Algodão' },
-          { name: 'Cores', value: 'Preto, Branco, Azul' },
-          { name: 'Tamanhos', value: 'P, M, G, GG' },
-          { name: 'Tipo de Gola', value: 'Redonda' }
+          { id: generateId(), name: 'Material', value: '100% Algodão' },
+          { id: generateId(), name: 'Cores', value: 'Preto, Branco, Azul' },
+          { id: generateId(), name: 'Tamanhos', value: 'P, M, G, GG' },
+          { id: generateId(), name: 'Tipo de Gola', value: 'Redonda' }
         ]
       },
       {
@@ -134,11 +130,7 @@ const mockTemplates: Template[] = [
         heading: 'Smartphone XYZ',
         subheading: 'A tecnologia do futuro em suas mãos',
         buttonText: 'Saiba Mais',
-        buttonUrl: '#',
-        image: {
-          src: '',
-          alt: 'Smartphone XYZ'
-        }
+        buttonUrl: '#'
       },
       {
         id: 'block-2',
@@ -148,12 +140,12 @@ const mockTemplates: Template[] = [
         visible: true,
         heading: 'Especificações Técnicas',
         specs: [
-          { name: 'Processador', value: 'Octa-core 2.3GHz' },
-          { name: 'Memória RAM', value: '8GB' },
-          { name: 'Armazenamento', value: '128GB' },
-          { name: 'Tela', value: '6.5" AMOLED' },
-          { name: 'Câmera', value: '48MP + 12MP + 5MP' },
-          { name: 'Bateria', value: '4500mAh' }
+          { id: generateId(), name: 'Processador', value: 'Octa-core 2.3GHz' },
+          { id: generateId(), name: 'Memória RAM', value: '8GB' },
+          { id: generateId(), name: 'Armazenamento', value: '128GB' },
+          { id: generateId(), name: 'Tela', value: '6.5" AMOLED' },
+          { id: generateId(), name: 'Câmera', value: '48MP + 12MP + 5MP' },
+          { id: generateId(), name: 'Bateria', value: '4500mAh' }
         ]
       },
       {
@@ -164,9 +156,9 @@ const mockTemplates: Template[] = [
         visible: true,
         heading: 'Recursos Principais',
         features: [
-          { title: 'Carregamento Rápido', description: '50% de bateria em apenas 30 minutos' },
-          { title: 'Câmera Profissional', description: 'Capture momentos com qualidade de DSLR' },
-          { title: 'Resistente à Água', description: 'Certificação IP68 contra água e poeira' }
+          { id: generateId(), title: 'Carregamento Rápido', description: '50% de bateria em apenas 30 minutos' },
+          { id: generateId(), title: 'Câmera Profissional', description: 'Capture momentos com qualidade de DSLR' },
+          { id: generateId(), title: 'Resistente à Água', description: 'Certificação IP68 contra água e poeira' }
         ]
       }
     ]
@@ -185,11 +177,7 @@ const mockTemplates: Template[] = [
         heading: 'Produto Premium',
         subheading: 'Qualidade e inovação em cada detalhe',
         buttonText: 'Ver Mais',
-        buttonUrl: '#',
-        image: {
-          src: '',
-          alt: 'Produto Premium'
-        }
+        buttonUrl: '#'
       },
       {
         id: 'block-2',

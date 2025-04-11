@@ -1,5 +1,5 @@
 
-import { BlockStyle, Block } from '@/types/editor';
+import { BlockStyle, Block, BlockSpacing } from '@/types/editor';
 
 // Converte um objeto de estilo em uma string CSS para uso inline
 export const getStylesFromBlock = (block: Block): string => {
@@ -51,15 +51,23 @@ export const getBlockSpacingClass = (block: Block): string => {
   
   const { blockSpacing } = block.style;
   
+  if (!blockSpacing) return 'mb-8'; // Valor padrão se não especificado
+  
+  // Mapeamento de valores para classes Tailwind
   switch (blockSpacing) {
     case 'none':
       return 'mb-0';
+    case 'xs':
     case 'small':
       return 'mb-4';
+    case 'sm':
     case 'medium':
       return 'mb-8';
+    case 'md':
     case 'large':
       return 'mb-12';
+    case 'lg':
+    case 'xl':
     case 'extra-large':
       return 'mb-16';
     default:

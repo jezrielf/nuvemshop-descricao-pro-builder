@@ -9,13 +9,18 @@ export const generateImageHtml = (block: ImageBlock): string => {
   const imageFit = block.style?.imageFit || 'contain';
   const objectFitStyle = `object-fit:${imageFit};`;
   
+  // Use src diretamente do bloco, com fallback para image.src (para compatibilidade)
+  const imageSrc = block.src || (block.image?.src || '');
+  const imageAlt = block.alt || (block.image?.alt || '');
+  const imageCaption = block.caption || (block.image?.caption || '');
+  
   return `
     <div${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;text-align:center;">
-      ${block.src ? 
-        `<img src="${block.src}" alt="${block.alt || ''}" style="max-width:100%;height:auto;${objectFitStyle}border-radius:4px;" />` :
+      ${imageSrc ? 
+        `<img src="${imageSrc}" alt="${imageAlt}" style="max-width:100%;height:auto;${objectFitStyle}border-radius:4px;" />` :
         `<div style="background-color:#f3f4f6;height:200px;display:flex;align-items:center;justify-content:center;border-radius:4px;"><span style="color:#9ca3af;">Imagem do Produto</span></div>`
       }
-      ${block.caption ? `<p style="margin-top:8px;font-size:14px;color:#6b7280;">${block.caption}</p>` : ''}
+      ${imageCaption ? `<p style="margin-top:8px;font-size:14px;color:#6b7280;">${imageCaption}</p>` : ''}
     </div>
   `;
 };

@@ -1,3 +1,4 @@
+
 export type BlockType = 
   | 'hero' 
   | 'features' 
@@ -16,7 +17,7 @@ export type ColumnLayout = 1 | 2 | 3 | 4;
 export type TextAlign = 'left' | 'center' | 'right' | 'justify';
 export type SpacingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
-export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'extra-large';
 export type FontWeight = 'normal' | 'medium' | 'semibold' | 'bold';
 export type FontStyle = 'normal' | 'italic';
 export type TextDecoration = 'none' | 'underline';
@@ -41,6 +42,13 @@ export interface BlockStyle {
   hasBorder?: boolean;
   hasShadow?: boolean;
   imageFit?: ImageFit;
+  // Propriedades adicionais para resolver erros
+  backgroundImage?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+  lineHeight?: string;
+  borderWidth?: string;
+  boxShadow?: string;
 }
 
 export interface BlockBase {
@@ -59,6 +67,10 @@ export interface HeroBlock extends BlockBase {
   backgroundImage?: string;
   buttonText?: string;
   buttonUrl?: string;
+  image?: {
+    src: string;
+    alt: string;
+  };
 }
 
 export interface FeaturesBlock extends BlockBase {
@@ -95,6 +107,7 @@ export interface SpecificationsBlock extends BlockBase {
 
 export interface TextBlock extends BlockBase {
   type: 'text';
+  heading: string;
   content: string;
 }
 
@@ -103,6 +116,11 @@ export interface ImageBlock extends BlockBase {
   src: string;
   alt: string;
   caption?: string;
+  image?: {
+    src: string;
+    alt: string;
+    caption?: string;
+  };
 }
 
 export interface GalleryBlock extends BlockBase {

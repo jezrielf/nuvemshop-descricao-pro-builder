@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import AIContentGenerator from '../AIGenerator/AIContentGenerator';
+import { v4 as uuidv4 } from 'uuid';
 
 interface BenefitsBlockProps {
   block: BenefitsBlockType;
@@ -23,7 +24,7 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
   };
   
   const handleAddBenefit = () => {
-    const newBenefits = [...(block.benefits || []), { title: 'Novo Benefício', description: 'Descrição do benefício' }];
+    const newBenefits = [...(block.benefits || []), { id: uuidv4(), title: 'Novo Benefício', description: 'Descrição do benefício' }];
     updateBlock(block.id, { benefits: newBenefits });
   };
   
@@ -48,7 +49,16 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
   // Handler para benefícios gerados por IA
   const handleGeneratedBenefits = (content: string) => {
     try {
-      const benefitsArray = JSON.parse(content);
+      let benefitsArray = JSON.parse(content);
+      
+      // Garantir que cada benefício tem um ID
+      benefitsArray = benefitsArray.map((benefit: any) => {
+        if (!benefit.id) {
+          return { ...benefit, id: uuidv4() };
+        }
+        return benefit;
+      });
+      
       updateBlock(block.id, { benefits: benefitsArray });
     } catch (e) {
       console.error("Erro ao processar benefícios gerados:", e);
@@ -78,7 +88,7 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
           <h2 className="text-2xl font-bold mb-6 text-center">{block.heading}</h2>
           <div className={`grid ${getGridClasses()} gap-6`}>
             {block.benefits && block.benefits.map((benefit, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
+              <div key={benefit.id || index} className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-medium mb-2">{benefit.title}</h3>
                 <p className="text-gray-600">{benefit.description}</p>
               </div>
@@ -115,7 +125,7 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
           
           <div className="space-y-4 mt-2">
             {block.benefits && block.benefits.map((benefit, index) => (
-              <div key={index} className="border p-3 rounded-md bg-gray-50">
+              <div key={benefit.id || index} className="border p-3 rounded-md bg-gray-50">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-medium text-sm">Benefício {index + 1}</h4>
                   <Button 
