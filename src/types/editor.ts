@@ -42,7 +42,7 @@ export interface BlockStyle {
   hasBorder?: boolean;
   hasShadow?: boolean;
   imageFit?: ImageFit;
-  // Propriedades adicionais para resolver erros
+  // Additional properties that are actually used in the code
   backgroundImage?: string;
   backgroundPosition?: string;
   backgroundSize?: string;
@@ -116,11 +116,7 @@ export interface ImageBlock extends BlockBase {
   src: string;
   alt: string;
   caption?: string;
-  image?: {
-    src: string;
-    alt: string;
-    caption?: string;
-  };
+  // Remove the image property since we're using direct properties instead
 }
 
 export interface GalleryBlock extends BlockBase {

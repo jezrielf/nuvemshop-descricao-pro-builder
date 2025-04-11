@@ -9,10 +9,10 @@ export const generateImageHtml = (block: ImageBlock): string => {
   const imageFit = block.style?.imageFit || 'contain';
   const objectFitStyle = `object-fit:${imageFit};`;
   
-  // Use src diretamente do bloco, com fallback para image.src (para compatibilidade)
-  const imageSrc = block.src || (block.image?.src || '');
-  const imageAlt = block.alt || (block.image?.alt || '');
-  const imageCaption = block.caption || (block.image?.caption || '');
+  // Use src directly from the block
+  const imageSrc = block.src || '';
+  const imageAlt = block.alt || '';
+  const imageCaption = block.caption || '';
   
   return `
     <div${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;text-align:center;">

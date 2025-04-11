@@ -1,52 +1,111 @@
-
 import { Template, BlockType, Block } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
-// Helper function to create template blocks
-const createBlock = (type: BlockType, overrides = {}) => {
+// Helper function to create template blocks with proper typing
+const createBlock = (type: BlockType, overrides = {}): Block => {
   const baseBlock = {
     id: uuidv4(),
     type,
-    title: type,
+    title: type.charAt(0).toUpperCase() + type.slice(1),
     columns: 1,
     visible: true,
     style: {},
   };
 
-  const completeBlock = { ...baseBlock, ...overrides };
-  
-  // Guarantees the minimum required properties for each block type
+  // Based on type, ensure the block has all the required properties
   switch (type) {
     case 'hero':
       return {
-        ...completeBlock,
-        heading: completeBlock.heading || 'Heading',
-        subheading: completeBlock.subheading || 'Subheading',
-      };
+        ...baseBlock,
+        heading: 'Default Heading',
+        subheading: 'Default Subheading',
+        ...overrides,
+      } as Block;
+    
     case 'text':
       return {
-        ...completeBlock,
-        heading: completeBlock.heading || 'Heading',
-        content: completeBlock.content || 'Content',
-      };
+        ...baseBlock,
+        heading: 'Default Heading',
+        content: 'Default Content',
+        ...overrides,
+      } as Block;
+    
+    case 'features':
+      return {
+        ...baseBlock,
+        heading: 'Default Features',
+        features: [],
+        ...overrides,
+      } as Block;
+    
+    case 'benefits':
+      return {
+        ...baseBlock,
+        heading: 'Default Benefits',
+        benefits: [],
+        ...overrides,
+      } as Block;
+    
+    case 'specifications':
+      return {
+        ...baseBlock,
+        heading: 'Default Specifications',
+        specs: [],
+        ...overrides,
+      } as Block;
+    
+    case 'image':
+      return {
+        ...baseBlock,
+        src: '',
+        alt: 'Default Alt',
+        ...overrides,
+      } as Block;
+    
+    case 'gallery':
+      return {
+        ...baseBlock,
+        images: [],
+        ...overrides,
+      } as Block;
+    
+    case 'imageText':
+      return {
+        ...baseBlock,
+        heading: 'Default Heading',
+        content: 'Default Content',
+        image: { src: '', alt: 'Default Alt' },
+        ...overrides,
+      } as Block;
+    
+    case 'textImage':
+      return {
+        ...baseBlock,
+        heading: 'Default Heading',
+        content: 'Default Content',
+        image: { src: '', alt: 'Default Alt' },
+        ...overrides,
+      } as Block;
+    
+    case 'faq':
+      return {
+        ...baseBlock,
+        heading: 'Default FAQ',
+        questions: [],
+        ...overrides,
+      } as Block;
+    
     case 'cta':
       return {
-        ...completeBlock,
-        heading: completeBlock.heading || 'Call to Action',
-        content: completeBlock.content || 'Content',
-        buttonText: completeBlock.buttonText || 'Button',
-      };
-    case 'features':
-    case 'benefits':
-    case 'specifications':
-    case 'image':
-    case 'gallery':
-    case 'imageText':
-    case 'textImage':
-    case 'faq':
-      return completeBlock;
+        ...baseBlock,
+        heading: 'Default CTA',
+        content: 'Default Content',
+        buttonText: 'Click me',
+        ...overrides,
+      } as Block;
+    
     default:
-      return completeBlock;
+      throw new Error(`Unsupported block type: ${type}`);
   }
 };
 
@@ -62,11 +121,7 @@ export const advancedTemplates: Template[] = [
         heading: 'Proteína Whey Premium',
         subheading: 'Maximize seus resultados com a proteína de mais alta qualidade do mercado',
         buttonText: 'Comprar Agora',
-        buttonUrl: '#',
-        image: {
-          src: 'https://images.unsplash.com/photo-1579722820478-a3171b9bc332',
-          alt: 'Proteína Whey Premium'
-        }
+        buttonUrl: '#'
       }),
       createBlock('benefits', {
         heading: 'Benefícios Exclusivos',
@@ -134,11 +189,7 @@ export const advancedTemplates: Template[] = [
         heading: 'Tênis de Corrida Pro-Runner',
         subheading: 'Desenvolvido para quem busca desempenho máximo em cada passada',
         buttonText: 'Ver Detalhes',
-        buttonUrl: '#',
-        image: {
-          src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-          alt: 'Tênis de Corrida Profissional'
-        }
+        buttonUrl: '#'
       }),
       createBlock('gallery', {
         columns: 4,
@@ -210,11 +261,7 @@ export const advancedTemplates: Template[] = [
         heading: 'UltraPhone Pro X',
         subheading: 'Redefina o conceito de smartphone com a mais avançada tecnologia disponível',
         buttonText: 'Explorar Recursos',
-        buttonUrl: '#',
-        image: {
-          src: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97',
-          alt: 'UltraPhone Pro X'
-        }
+        buttonUrl: '#'
       }),
       createBlock('gallery', {
         columns: 3,
