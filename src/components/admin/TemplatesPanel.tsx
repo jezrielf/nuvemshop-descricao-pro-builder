@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,7 @@ import TemplateEditDialog from './templates/TemplateEditDialog';
 import TemplateDeleteDialog from './templates/TemplateDeleteDialog';
 import NewTemplateDialog from './templates/NewTemplateDialog';
 import Pagination from './templates/Pagination';
-import { getCategoryName } from './templates/utils';
+import { getCategoryName, getAllProductCategories } from './templates/utils';
 
 const TemplatesPanel: React.FC = () => {
   const { templates: allTemplates, categories } = useTemplateStore();
@@ -32,7 +31,7 @@ const TemplatesPanel: React.FC = () => {
   const [editedTemplate, setEditedTemplate] = useState<Partial<Template>>({});
   const [newTemplate, setNewTemplate] = useState<Partial<Template>>({
     name: '',
-    category: 'other',
+    category: 'other' as ProductCategory,
     blocks: []
   });
   const { toast } = useToast();
@@ -120,7 +119,7 @@ const TemplatesPanel: React.FC = () => {
     setIsNewTemplateDialogOpen(false);
     setNewTemplate({
       name: '',
-      category: 'other',
+      category: 'other' as ProductCategory,
       blocks: []
     });
     
@@ -151,6 +150,11 @@ const TemplatesPanel: React.FC = () => {
         blocks: newTemplate.blocks.filter(block => block.id !== blockId)
       });
     }
+  };
+
+  // The handler for updating new template data with explicit type casting
+  const handleNewTemplateChange = (templateData: Partial<Template>) => {
+    setNewTemplate(templateData);
   };
 
   return (
@@ -204,7 +208,6 @@ const TemplatesPanel: React.FC = () => {
         template={editedTemplate}
         onTemplateChange={setEditedTemplate}
         onSave={handleEditConfirm}
-        getCategoryName={getCategoryName}
       />
 
       <TemplateDeleteDialog
@@ -217,13 +220,13 @@ const TemplatesPanel: React.FC = () => {
       <NewTemplateDialog
         isOpen={isNewTemplateDialogOpen}
         onOpenChange={setIsNewTemplateDialogOpen}
-        template={newTemplate as {name: string, category: string, blocks: Block[]}}
-        onTemplateChange={setNewTemplate}
+        template={newTemplate as Template}
+        onTemplateChange={handleNewTemplateChange}
         onCreateTemplate={handleCreateTemplate}
         onAddBlock={handleAddBlock}
         onRemoveBlock={handleRemoveBlock}
         blockTypes={blockTypes}
-        categories={categories}
+        categories={getAllProductCategories()}
         getCategoryName={getCategoryName}
       />
     </div>

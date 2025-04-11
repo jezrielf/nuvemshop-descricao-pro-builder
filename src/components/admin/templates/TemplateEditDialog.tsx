@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Template, ProductCategory } from '@/types/editor';
+import { getCategoryName, getAllProductCategories } from './utils';
 
 interface TemplateEditDialogProps {
   isOpen: boolean;
@@ -20,7 +21,6 @@ interface TemplateEditDialogProps {
   template: Partial<Template>;
   onTemplateChange: (template: Partial<Template>) => void;
   onSave: () => void;
-  getCategoryName: (category: ProductCategory) => string;
 }
 
 const TemplateEditDialog: React.FC<TemplateEditDialogProps> = ({
@@ -28,9 +28,10 @@ const TemplateEditDialog: React.FC<TemplateEditDialogProps> = ({
   onOpenChange,
   template,
   onTemplateChange,
-  onSave,
-  getCategoryName
+  onSave
 }) => {
+  const categories = getAllProductCategories();
+  
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
@@ -58,16 +59,16 @@ const TemplateEditDialog: React.FC<TemplateEditDialogProps> = ({
               Categoria
             </Label>
             <Select 
-              value={template.category as string || ''} 
+              value={template.category || ''} 
               onValueChange={(value) => onTemplateChange({...template, category: value as ProductCategory})}
             >
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                {Object.keys(getCategoryName).map(category => (
+                {categories.map(category => (
                   <SelectItem key={category} value={category}>
-                    {getCategoryName(category as ProductCategory)}
+                    {getCategoryName(category)}
                   </SelectItem>
                 ))}
               </SelectContent>
