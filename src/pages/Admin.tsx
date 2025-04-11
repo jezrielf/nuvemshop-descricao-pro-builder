@@ -9,12 +9,14 @@ import TemplatesPanel from '@/components/admin/TemplatesPanel';
 import PlansPanel from '@/components/admin/PlansPanel';
 import DashboardPanel from '@/components/admin/DashboardPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
+import { useTemplateStore } from '@/store/templateStore';
 
 const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings'>('dashboard');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { loadTemplates } = useTemplateStore();
   
   useEffect(() => {
     // Check if admin is authenticated
@@ -26,6 +28,13 @@ const Admin: React.FC = () => {
     }
     setLoading(false);
   }, [navigate]);
+  
+  useEffect(() => {
+    // Load templates data when the templates tab is active
+    if (activeTab === 'templates') {
+      loadTemplates();
+    }
+  }, [activeTab, loadTemplates]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;
