@@ -2,7 +2,7 @@
 import React from 'react';
 import { Template } from '@/types/editor';
 import { BlockType } from '@/types/editor';
-import TemplateActions from '../../templates/TemplateActions';
+import TemplateActionsProvider from '../actions/TemplateActionsProvider';
 
 interface TemplateActionPanelProps {
   editedTemplate: Template | null;
@@ -28,7 +28,7 @@ const TemplateActionPanel: React.FC<TemplateActionPanelProps> = ({
   onRemoveBlock
 }) => {
   return (
-    <TemplateActions
+    <TemplateActionsProvider
       editedTemplate={editedTemplate}
       setEditedTemplate={setEditedTemplate}
       newTemplate={newTemplate}

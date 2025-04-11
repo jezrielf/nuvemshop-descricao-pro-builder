@@ -1,16 +1,14 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import { Template, ProductCategory, BlockType } from '@/types/editor';
-import TemplatePreviewDialog from './TemplatePreviewDialog';
-import TemplateEditDialog from './TemplateEditDialog';
-import TemplateDeleteDialog from './TemplateDeleteDialog';
-import NewTemplateDialog from './NewTemplateDialog';
-import { DialogProvider, useDialogs } from './dialogs/DialogProvider';
-import { getCategoryName } from './utils';
+import { useDialogs } from '../dialogs/DialogProvider';
+import TemplatePreviewDialog from '../dialogs/TemplatePreviewDialog';
+import TemplateEditDialog from '../dialogs/TemplateEditDialog';
+import TemplateDeleteDialog from '../dialogs/TemplateDeleteDialog';
+import NewTemplateDialog from '../dialogs/NewTemplateDialog';
+import { getCategoryName } from '../utils';
 
-interface TemplateActionsProps {
+interface TemplateDialogsProps {
   editedTemplate: Template | null;
   setEditedTemplate: (template: Template | null) => void;
   newTemplate: Partial<Template> | null;
@@ -22,17 +20,7 @@ interface TemplateActionsProps {
   onRemoveBlock: (blockId: string) => void;
 }
 
-// Este é o componente principal TemplateActions que usa o DialogProvider
-const TemplateActions: React.FC<TemplateActionsProps> = (props) => {
-  return (
-    <DialogProvider>
-      <TemplateActionsContent {...props} />
-    </DialogProvider>
-  );
-};
-
-// O componente de conteúdo que usa o contexto do diálogo
-const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
+const TemplateDialogs: React.FC<TemplateDialogsProps> = ({
   editedTemplate,
   setEditedTemplate,
   newTemplate,
@@ -46,11 +34,10 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   const { 
     selectedTemplate, 
     dialogState, 
-    openNewTemplateDialog,
     toggleDialog
   } = useDialogs();
 
-  // Opções de tipo de bloco para criação de template
+  // Block types for template creation
   const blockTypes: BlockType[] = [
     'hero', 'features', 'benefits', 'specifications', 'text',
     'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta'
@@ -72,7 +59,7 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
 
   const handleCreateTemplate = () => {
     if (newTemplate) {
-      // Converter para o tipo requerido para a função createTemplate
+      // Convert to the required type for createTemplate function
       const templateToCreate = {
         name: newTemplate.name || '',
         category: newTemplate.category || 'other' as ProductCategory,
@@ -90,8 +77,8 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
     }
   };
 
-  // Criar um objeto de template seguro para passar para NewTemplateDialog
-  // Isso garante que todas as propriedades necessárias estejam presentes
+  // Create a safe template object to pass to NewTemplateDialog
+  // This ensures all necessary properties are present
   const safeNewTemplate = {
     name: newTemplate?.name || '',
     category: newTemplate?.category || 'other' as ProductCategory,
@@ -100,14 +87,6 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold">Gerenciar Templates</h2>
-        <Button onClick={openNewTemplateDialog}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Template
-        </Button>
-      </div>
-
       <TemplatePreviewDialog
         isOpen={dialogState.isPreviewOpen}
         onOpenChange={() => toggleDialog('isPreviewOpen')}
@@ -146,4 +125,4 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
   );
 };
 
-export default TemplateActions;
+export default TemplateDialogs;
