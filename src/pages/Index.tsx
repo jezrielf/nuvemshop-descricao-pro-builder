@@ -6,12 +6,28 @@ import Preview from '@/components/Preview';
 import { useTemplateStore } from '@/store/templateStore';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
+// Adicionamos o diretório public/tutorial para as imagens do tutorial
+const placeholderImages = [
+  '/tutorial/welcome.png',
+  '/tutorial/add-blocks.png',
+  '/tutorial/templates.png',
+  '/tutorial/customize.png',
+  '/tutorial/preview.png',
+  '/tutorial/export.png'
+];
+
 const Index = () => {
   const { loadTemplates } = useTemplateStore();
   
   useEffect(() => {
     // Carrega os templates iniciais
     loadTemplates();
+    
+    // Pré-carrega as imagens do tutorial
+    placeholderImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
   }, [loadTemplates]);
   
   return (

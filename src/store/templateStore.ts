@@ -1,274 +1,238 @@
 
 import { create } from 'zustand';
-import { Template, ProductCategory } from '@/types/editor';
-import { v4 as uuidv4 } from 'uuid';
+import { Template } from '@/types/editor';
+import { advancedTemplates } from '@/utils/advancedTemplates';
 
 interface TemplateState {
   templates: Template[];
-  categories: ProductCategory[];
-  selectedCategory: ProductCategory | null;
-  
-  // Actions
+  categories: string[];
+  selectedCategory: string | null;
   loadTemplates: () => void;
-  selectCategory: (category: ProductCategory | null) => void;
-  getTemplatesByCategory: (category: ProductCategory | null) => Template[];
+  selectCategory: (category: string | null) => void;
+  getTemplatesByCategory: (category: string | null) => Template[];
 }
 
-// Templates iniciais para demonstração
-const initialTemplates: Template[] = [
+// Simula o carregamento de templates da API
+const mockTemplates: Template[] = [
   {
-    id: '1',
-    name: 'Suplemento Básico',
+    id: 'template-1',
+    name: 'Descrição Básica',
     category: 'supplements',
     blocks: [
       {
-        id: uuidv4(),
+        id: 'block-1',
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Nome do Suplemento',
-        subheading: 'Melhore seu desempenho com nosso suplemento de alta qualidade',
-        buttonText: 'Comprar Agora'
+        heading: 'Suplemento Proteico',
+        subheading: 'Maximize seus resultados com nossa fórmula exclusiva',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#',
+        image: {
+          src: '',
+          alt: 'Suplemento Proteico'
+        }
       },
       {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Benefícios',
+        id: 'block-2',
+        type: 'features',
+        title: 'Características',
         columns: 3,
         visible: true,
-        heading: 'Benefícios Principais',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Aumento de Energia',
-            description: 'Proporciona mais energia para seus treinos diários',
-            icon: 'zap'
-          },
-          {
-            id: uuidv4(),
-            title: 'Recuperação Muscular',
-            description: 'Acelera a recuperação após exercícios intensos',
-            icon: 'activity'
-          },
-          {
-            id: uuidv4(),
-            title: 'Ganho de Massa',
-            description: 'Ajuda no desenvolvimento muscular quando combinado com exercícios',
-            icon: 'dumbbell'
-          }
+        heading: 'Principais Características',
+        features: [
+          { title: 'Alta Absorção', description: 'Fórmula de rápida absorção para melhores resultados' },
+          { title: 'Sem Açúcar', description: 'Zero açúcar para não comprometer sua dieta' },
+          { title: 'Sabor Superior', description: 'Sabor desenvolvido para uma experiência agradável' }
         ]
       },
       {
-        id: uuidv4(),
-        type: 'specifications',
-        title: 'Especificações',
+        id: 'block-3',
+        type: 'cta',
+        title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Informações Nutricionais',
-        specs: [
-          {
-            id: uuidv4(),
-            name: 'Proteína',
-            value: '25g por porção'
-          },
-          {
-            id: uuidv4(),
-            name: 'Carboidratos',
-            value: '3g por porção'
-          },
-          {
-            id: uuidv4(),
-            name: 'Gorduras',
-            value: '1.5g por porção'
-          },
-          {
-            id: uuidv4(),
-            name: 'Calorias',
-            value: '120 por porção'
-          }
-        ]
+        heading: 'Experimente Agora',
+        content: 'Transforme seus resultados com nosso suplemento premium.',
+        buttonText: 'Comprar',
+        buttonUrl: '#'
       }
     ]
   },
   {
-    id: '2',
-    name: 'Camiseta Básica',
+    id: 'template-2',
+    name: 'Descrição Detalhada',
     category: 'clothing',
     blocks: [
       {
-        id: uuidv4(),
+        id: 'block-1',
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Nome da Camiseta',
-        subheading: 'Estilo e conforto para o seu dia a dia',
-        buttonText: 'Ver Opções'
+        heading: 'Camiseta Premium',
+        subheading: 'Conforto e estilo para o dia a dia',
+        buttonText: 'Ver Detalhes',
+        buttonUrl: '#',
+        image: {
+          src: '',
+          alt: 'Camiseta Premium'
+        }
       },
       {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Características',
-        columns: 2,
+        id: 'block-2',
+        type: 'gallery',
+        title: 'Galeria',
+        columns: 3,
         visible: true,
-        heading: 'Características do Produto',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Material Premium',
-            description: '100% algodão de alta qualidade para maior conforto',
-            icon: 'shirt'
-          },
-          {
-            id: uuidv4(),
-            title: 'Durabilidade',
-            description: 'Tecido resistente à lavagens mantendo a qualidade',
-            icon: 'repeat'
-          }
+        images: [
+          { src: '', alt: 'Frente', caption: 'Vista frontal' },
+          { src: '', alt: 'Costas', caption: 'Vista traseira' },
+          { src: '', alt: 'Detalhe', caption: 'Detalhe do tecido' }
         ]
       },
       {
-        id: uuidv4(),
+        id: 'block-3',
         type: 'specifications',
         title: 'Especificações',
         columns: 1,
         visible: true,
-        heading: 'Informações Técnicas',
+        heading: 'Especificações do Produto',
         specs: [
-          {
-            id: uuidv4(),
-            name: 'Material',
-            value: '100% Algodão'
-          },
-          {
-            id: uuidv4(),
-            name: 'Peso',
-            value: '180g/m²'
-          },
-          {
-            id: uuidv4(),
-            name: 'Tamanhos',
-            value: 'P, M, G, GG'
-          },
-          {
-            id: uuidv4(),
-            name: 'Instruções de Lavagem',
-            value: 'Lavar à mão ou máquina (água fria)'
-          }
+          { name: 'Material', value: '100% Algodão' },
+          { name: 'Cores', value: 'Preto, Branco, Azul' },
+          { name: 'Tamanhos', value: 'P, M, G, GG' },
+          { name: 'Tipo de Gola', value: 'Redonda' }
         ]
+      },
+      {
+        id: 'block-4',
+        type: 'cta',
+        title: 'Chamada para Ação',
+        columns: 1,
+        visible: true,
+        heading: 'Adicione ao Carrinho',
+        content: 'Renove seu guarda-roupa com nossa camiseta premium.',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#'
       }
     ]
   },
+  // Adicionando mais templates básicos
   {
-    id: '3',
-    name: 'Produto Eletrônico',
+    id: 'template-3',
+    name: 'Descrição de Eletrônicos',
     category: 'electronics',
     blocks: [
       {
-        id: uuidv4(),
+        id: 'block-1',
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Nome do Produto Eletrônico',
-        subheading: 'Tecnologia avançada para facilitar seu dia a dia',
-        buttonText: 'Saiba Mais'
+        heading: 'Smartphone XYZ',
+        subheading: 'A tecnologia do futuro em suas mãos',
+        buttonText: 'Saiba Mais',
+        buttonUrl: '#',
+        image: {
+          src: '',
+          alt: 'Smartphone XYZ'
+        }
       },
       {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Recursos',
-        columns: 3,
-        visible: true,
-        heading: 'Recursos Principais',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Alta Performance',
-            description: 'Processador de última geração para máxima eficiência',
-            icon: 'cpu'
-          },
-          {
-            id: uuidv4(),
-            title: 'Bateria Duradoura',
-            description: 'Até 10 horas de uso contínuo com uma única carga',
-            icon: 'battery'
-          },
-          {
-            id: uuidv4(),
-            title: 'Conexão Rápida',
-            description: 'Wi-Fi 6 e Bluetooth 5.0 para conexões estáveis',
-            icon: 'wifi'
-          }
-        ]
-      },
-      {
-        id: uuidv4(),
+        id: 'block-2',
         type: 'specifications',
         title: 'Especificações',
         columns: 1,
         visible: true,
         heading: 'Especificações Técnicas',
         specs: [
-          {
-            id: uuidv4(),
-            name: 'Processador',
-            value: 'Intel Core i7 10ª Geração'
-          },
-          {
-            id: uuidv4(),
-            name: 'Memória RAM',
-            value: '16GB DDR4'
-          },
-          {
-            id: uuidv4(),
-            name: 'Armazenamento',
-            value: 'SSD 512GB'
-          },
-          {
-            id: uuidv4(),
-            name: 'Sistema Operacional',
-            value: 'Windows 11'
-          }
+          { name: 'Processador', value: 'Octa-core 2.3GHz' },
+          { name: 'Memória RAM', value: '8GB' },
+          { name: 'Armazenamento', value: '128GB' },
+          { name: 'Tela', value: '6.5" AMOLED' },
+          { name: 'Câmera', value: '48MP + 12MP + 5MP' },
+          { name: 'Bateria', value: '4500mAh' }
         ]
       },
       {
-        id: uuidv4(),
-        type: 'faq',
-        title: 'Perguntas Frequentes',
+        id: 'block-3',
+        type: 'features',
+        title: 'Recursos',
+        columns: 3,
+        visible: true,
+        heading: 'Recursos Principais',
+        features: [
+          { title: 'Carregamento Rápido', description: '50% de bateria em apenas 30 minutos' },
+          { title: 'Câmera Profissional', description: 'Capture momentos com qualidade de DSLR' },
+          { title: 'Resistente à Água', description: 'Certificação IP68 contra água e poeira' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'template-4',
+    name: 'Descrição Simples',
+    category: 'other',
+    blocks: [
+      {
+        id: 'block-1',
+        type: 'hero',
+        title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Dúvidas Comuns',
-        questions: [
-          {
-            id: uuidv4(),
-            question: 'Qual é a garantia do produto?',
-            answer: 'Oferecemos garantia de 12 meses contra defeitos de fabricação.'
-          },
-          {
-            id: uuidv4(),
-            question: 'O produto vem com carregador?',
-            answer: 'Sim, o produto inclui carregador e cabo USB-C na embalagem.'
-          },
-          {
-            id: uuidv4(),
-            question: 'É possível expandir a memória?',
-            answer: 'Sim, há um slot adicional para expansão de memória RAM até 32GB.'
-          }
-        ]
+        heading: 'Produto Premium',
+        subheading: 'Qualidade e inovação em cada detalhe',
+        buttonText: 'Ver Mais',
+        buttonUrl: '#',
+        image: {
+          src: '',
+          alt: 'Produto Premium'
+        }
+      },
+      {
+        id: 'block-2',
+        type: 'text',
+        title: 'Texto',
+        columns: 1,
+        visible: true,
+        heading: 'Sobre o Produto',
+        content: 'Este produto foi desenvolvido com os mais altos padrões de qualidade para atender às suas necessidades. Com design moderno e funcionalidades exclusivas, ele certamente superará suas expectativas.'
+      },
+      {
+        id: 'block-3',
+        type: 'cta',
+        title: 'Chamada para Ação',
+        columns: 1,
+        visible: true,
+        heading: 'Não Perca Esta Oportunidade',
+        content: 'Adquira agora mesmo e aproveite todos os benefícios.',
+        buttonText: 'Comprar',
+        buttonUrl: '#'
       }
     ]
   }
 ];
 
 export const useTemplateStore = create<TemplateState>((set, get) => ({
-  templates: initialTemplates,
-  categories: ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other'],
+  templates: [],
+  categories: [],
   selectedCategory: null,
   
   loadTemplates: () => {
-    set({ templates: initialTemplates });
+    // Combina os templates básicos com os avançados
+    const allTemplates = [...mockTemplates, ...advancedTemplates];
+    
+    // Extrai categorias únicas dos templates
+    const uniqueCategories = Array.from(
+      new Set(allTemplates.map(template => template.category))
+    );
+    
+    set({
+      templates: allTemplates,
+      categories: uniqueCategories
+    });
   },
   
   selectCategory: (category) => {
@@ -278,6 +242,6 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   getTemplatesByCategory: (category) => {
     const { templates } = get();
     if (!category) return templates;
-    return templates.filter((template) => template.category === category);
+    return templates.filter(template => template.category === category);
   }
 }));

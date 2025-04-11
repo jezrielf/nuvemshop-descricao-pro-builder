@@ -5,8 +5,8 @@ import BlockWrapper from './BlockWrapper';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Image } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Image, Upload } from 'lucide-react';
+import ImageLibrary from '../ImageLibrary/ImageLibrary';
 
 interface ImageBlockProps {
   block: ImageBlockType;
@@ -17,115 +17,111 @@ const ImageBlock: React.FC<ImageBlockProps> = ({ block, isPreview = false }) => 
   const { updateBlock, selectedBlockId } = useEditorStore();
   const isEditing = selectedBlockId === block.id && !isPreview;
   
-  const handleUpdateSrc = (src: string) => {
-    updateBlock(block.id, { src });
+  const handleUpdateImageSrc = (src: string) => {
+    updateBlock(block.id, { image: { ...block.image, src } });
   };
   
-  const handleUpdateAlt = (alt: string) => {
-    updateBlock(block.id, { alt });
+  const handleUpdateImageAlt = (alt: string) => {
+    updateBlock(block.id, { image: { ...block.image, alt } });
   };
   
   const handleUpdateCaption = (caption: string) => {
-    updateBlock(block.id, { caption });
+    updateBlock(block.id, { image: { ...block.image, caption } });
   };
   
-  const handleImageFitChange = (value: string) => {
-    const currentStyle = block.style || {};
+  const handleSelectFromLibrary = (imageUrl: string, alt: string) => {
     updateBlock(block.id, { 
-      style: {
-        ...currentStyle, 
-        imageFit: value as 'contain' | 'cover'
-      }
+      image: { 
+        ...block.image, 
+        src: imageUrl, 
+        alt: alt 
+      } 
     });
   };
   
-  const imageFitValue = block.style?.imageFit || 'contain';
-  const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
-  
-  // Preview mode
   if (isPreview) {
     return (
       <div className="w-full p-4">
-        <figure className="text-center">
-          {block.src ? (
-            <img
-              src={block.src}
-              alt={block.alt || "Imagem do produto"}
-              className={`mx-auto max-w-full h-auto ${imageObjectFit} rounded-md`}
-            />
+        <div className="max-w-2xl mx-auto">
+          {block.image.src ? (
+            <>
+              <img 
+                src={block.image.src} 
+                alt={block.image.alt || 'Imagem do produto'} 
+                className="w-full h-auto rounded-md"
+              />
+              {block.image.caption && (
+                <p className="text-sm text-gray-500 text-center mt-2">{block.image.caption}</p>
+              )}
+            </>
           ) : (
-            <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md">
-              <Image className="h-12 w-12 text-gray-400" />
+            <div className="aspect-video bg-gray-100 rounded-md flex items-center justify-center">
+              <span className="text-gray-400">Imagem</span>
             </div>
           )}
-          {block.caption && (
-            <figcaption className="mt-2 text-sm text-gray-600">{block.caption}</figcaption>
-          )}
-        </figure>
+        </div>
       </div>
     );
   }
   
-  // Edit mode
   return (
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">
-        <div className="mb-4">
-          {block.src ? (
-            <img
-              src={block.src}
-              alt={block.alt || "Imagem do produto"}
-              className={`mx-auto max-w-full h-auto ${imageObjectFit} rounded-md mb-4`}
-            />
-          ) : (
-            <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md mb-4">
-              <Image className="h-12 w-12 text-gray-400" />
-            </div>
-          )}
-          
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">URL da Imagem</label>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">URL da Imagem</label>
+            <div className="flex gap-2">
               <Input
-                value={block.src}
-                onChange={(e) => handleUpdateSrc(e.target.value)}
+                value={block.image.src || ''}
+                onChange={(e) => handleUpdateImageSrc(e.target.value)}
                 placeholder="https://exemplo.com/imagem.jpg"
               />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Texto Alternativo</label>
-              <Input
-                value={block.alt}
-                onChange={(e) => handleUpdateAlt(e.target.value)}
-                placeholder="Descrição da imagem"
+              <ImageLibrary 
+                onSelectImage={handleSelectFromLibrary}
+                trigger={
+                  <Button variant="outline" size="icon">
+                    <Image className="h-4 w-4" />
+                  </Button>
+                }
               />
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Legenda (opcional)</label>
-              <Input
-                value={block.caption || ''}
-                onChange={(e) => handleUpdateCaption(e.target.value)}
-                placeholder="Legenda da imagem"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Preenchimento da Imagem</label>
-              <Select value={imageFitValue} onValueChange={handleImageFitChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Escolha o tipo de preenchimento" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="contain">Conter (mostrar imagem inteira)</SelectItem>
-                  <SelectItem value="cover">Cobrir (preencher todo o espaço)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="mt-1 text-xs text-gray-500">
-                "Cobrir" preencherá todo o espaço, possivelmente cortando partes da imagem.
-              </p>
-            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Texto Alternativo</label>
+            <Input
+              value={block.image.alt || ''}
+              onChange={(e) => handleUpdateImageAlt(e.target.value)}
+              placeholder="Descrição da imagem"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Legenda (opcional)</label>
+            <Input
+              value={block.image.caption || ''}
+              onChange={(e) => handleUpdateCaption(e.target.value)}
+              placeholder="Legenda da imagem"
+            />
+          </div>
+          
+          <div className="pt-2">
+            {block.image.src ? (
+              <div className="bg-gray-50 p-2 rounded-md">
+                <img
+                  src={block.image.src}
+                  alt={block.image.alt || 'Imagem do produto'}
+                  className="w-full h-auto max-h-64 object-contain rounded-md"
+                />
+              </div>
+            ) : (
+              <div className="aspect-video bg-gray-100 rounded-md flex items-center justify-center">
+                <div className="text-center">
+                  <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                  <span className="text-gray-500 block">Adicione uma URL de imagem</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

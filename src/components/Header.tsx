@@ -9,6 +9,8 @@ import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
 import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
+import TutorialManager from './tutorial/TutorialManager';
+import SEOAnalyzer from './SEO/SEOAnalyzer';
 
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
@@ -70,6 +72,10 @@ const Header: React.FC = () => {
           />
           
           {description && <HtmlOutputDialog />}
+          
+          {description && <SEOAnalyzer description={description} />}
+          
+          <TutorialManager />
           
           <UserButton />
         </div>

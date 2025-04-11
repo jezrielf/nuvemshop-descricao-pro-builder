@@ -1,133 +1,68 @@
 
-import { Block, BlockStyle, SpacingSize, BlockSpacing, FontWeight } from '@/types/editor';
+import { BlockStyle, Block } from '@/types/editor';
 
-// Function to convert the styles defined to proper inline CSS
+// Converte um objeto de estilo em uma string CSS para uso inline
 export const getStylesFromBlock = (block: Block): string => {
-  if (!block.style) return '';
+  if (!block || !block.style) return '';
   
-  const style = block.style;
-  const styles: Record<string, string> = {};
+  const style: BlockStyle = block.style;
+  const styleProps: string[] = [];
   
-  // Colors
-  if (style.backgroundColor) styles['background-color'] = style.backgroundColor;
-  if (style.textColor) styles['color'] = style.textColor;
-  if (style.headingColor) styles['--heading-color'] = style.headingColor;
+  // Background styles
+  if (style.backgroundColor) styleProps.push(`background-color: ${style.backgroundColor}`);
+  if (style.backgroundImage) styleProps.push(`background-image: url(${style.backgroundImage})`);
+  if (style.backgroundPosition) styleProps.push(`background-position: ${style.backgroundPosition}`);
+  if (style.backgroundSize) styleProps.push(`background-size: ${style.backgroundSize}`);
   
-  // Typography
-  if (style.fontFamily) {
-    switch (style.fontFamily) {
-      case 'sans':
-        styles['font-family'] = "'Inter', system-ui, sans-serif";
-        break;
-      case 'serif':
-        styles['font-family'] = "'Georgia', serif";
-        break;
-      case 'mono':
-        styles['font-family'] = "'Consolas', monospace";
-        break;
-    }
+  // Typography styles
+  if (style.fontFamily) styleProps.push(`font-family: ${style.fontFamily}`);
+  if (style.fontSize) styleProps.push(`font-size: ${style.fontSize}`);
+  if (style.fontWeight) styleProps.push(`font-weight: ${style.fontWeight}`);
+  if (style.textColor) styleProps.push(`color: ${style.textColor}`);
+  if (style.textAlign) styleProps.push(`text-align: ${style.textAlign}`);
+  if (style.lineHeight) styleProps.push(`line-height: ${style.lineHeight}`);
+  
+  // Spacing styles
+  if (style.padding) styleProps.push(`padding: ${style.padding}`);
+  if (style.margin) styleProps.push(`margin: ${style.margin}`);
+  
+  // Border and layout styles
+  if (style.borderRadius) styleProps.push(`border-radius: ${style.borderRadius}`);
+  if (style.borderWidth && style.borderColor) {
+    styleProps.push(`border: ${style.borderWidth} solid ${style.borderColor}`);
+  } else if (style.borderWidth) {
+    styleProps.push(`border-width: ${style.borderWidth}`);
+  } else if (style.borderColor) {
+    styleProps.push(`border-color: ${style.borderColor}`);
   }
   
-  // Font size
-  if (style.fontSize) {
-    const fontSizeMap: Record<string, string> = {
-      'xs': '0.75rem',
-      'sm': '0.875rem',
-      'base': '1rem',
-      'lg': '1.125rem',
-      'xl': '1.25rem',
-      '2xl': '1.5rem',
-      '3xl': '1.875rem',
-      '4xl': '2.25rem'
-    };
-    styles['font-size'] = fontSizeMap[style.fontSize] || '1rem';
+  // Box shadow (if present)
+  if (style.boxShadow) styleProps.push(`box-shadow: ${style.boxShadow}`);
+  
+  // Responsive padding for block spacing
+  // We handle this in the block-specific generators
+  
+  return styleProps.join('; ');
+};
+
+// Esta função gera classes de espaçamento específicas para controle do espaçamento entre blocos
+export const getBlockSpacingClass = (block: Block): string => {
+  if (!block || !block.style) return 'mb-8'; // Espaçamento padrão
+  
+  const { blockSpacing } = block.style;
+  
+  switch (blockSpacing) {
+    case 'none':
+      return 'mb-0';
+    case 'small':
+      return 'mb-4';
+    case 'medium':
+      return 'mb-8';
+    case 'large':
+      return 'mb-12';
+    case 'extra-large':
+      return 'mb-16';
+    default:
+      return 'mb-8'; // Valor padrão médio
   }
-  
-  // Text formatting options
-  if (style.fontWeight) {
-    const fontWeightMap: Record<FontWeight, string> = {
-      'normal': '400',
-      'medium': '500',
-      'semibold': '600',
-      'bold': '700'
-    };
-    styles['font-weight'] = fontWeightMap[style.fontWeight];
-  }
-  
-  if (style.fontStyle === 'italic') {
-    styles['font-style'] = 'italic';
-  }
-  
-  if (style.textDecoration === 'underline') {
-    styles['text-decoration'] = 'underline';
-  }
-  
-  // Text alignment
-  if (style.textAlign) styles['text-align'] = style.textAlign;
-  
-  // Spacing
-  if (style.padding) {
-    const paddingMap: Record<SpacingSize, string> = {
-      'xs': '0.5rem',
-      'sm': '1rem',
-      'md': '1.5rem',
-      'lg': '2rem',
-      'xl': '3rem'
-    };
-    styles['padding'] = paddingMap[style.padding];
-  }
-  
-  if (style.margin) {
-    const marginMap: Record<SpacingSize, string> = {
-      'xs': '0.5rem',
-      'sm': '1rem',
-      'md': '1.5rem',
-      'lg': '2rem',
-      'xl': '3rem'
-    };
-    styles['margin'] = marginMap[style.margin];
-  }
-  
-  // Block spacing - applies to margin-bottom for blocks
-  if (style.blockSpacing) {
-    const blockSpacingMap: Record<BlockSpacing, string> = {
-      'none': '0',
-      'xs': '0.5rem',
-      'sm': '1rem',
-      'md': '1.5rem',
-      'lg': '2rem',
-      'xl': '3rem'
-    };
-    styles['margin-bottom'] = blockSpacingMap[style.blockSpacing];
-  }
-  
-  // Border
-  if (style.hasBorder) {
-    styles['border'] = `1px solid ${style.borderColor || '#e5e7eb'}`;
-    
-    // Border radius
-    if (style.borderRadius) {
-      const radiusMap: Record<SpacingSize, string> = {
-        'xs': '0.125rem',
-        'sm': '0.25rem',
-        'md': '0.375rem',
-        'lg': '0.5rem',
-        'xl': '0.75rem'
-      };
-      styles['border-radius'] = radiusMap[style.borderRadius];
-    }
-  }
-  
-  // Shadow
-  if (style.hasShadow) {
-    styles['box-shadow'] = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-  }
-  
-  // Log the styles being applied
-  console.log(`Style conversion for block ${block.id}:`, styles);
-  
-  // Convert to inline style string with proper format
-  return Object.entries(styles)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join('; ');
 };

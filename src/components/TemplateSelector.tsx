@@ -5,7 +5,7 @@ import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText } from 'lucide-react';
+import { FileText, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType } from '@/types/editor';
 
@@ -36,6 +36,32 @@ const TemplateSelector: React.FC = () => {
   };
   
   const displayedTemplates = getTemplatesByCategory(selectedCategory);
+
+  // Verifica se é um template avançado pelo ID
+  const isAdvancedTemplate = (id: string) => id.startsWith('adv-');
+  
+  // Gera uma miniatura para o template
+  const getTemplateThumbnail = (template: TemplateType) => {
+    const category = template.category;
+    
+    // Miniaturas personalizadas por categoria
+    switch(category) {
+      case 'supplements':
+        return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd';
+      case 'clothing':
+        return 'https://images.unsplash.com/photo-1560243563-062bfc001d68';
+      case 'shoes':
+        return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff';
+      case 'electronics':
+        return 'https://images.unsplash.com/photo-1498049794561-7780e7231661';
+      case 'energy':
+        return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
+      case 'accessories':
+        return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
+      default:
+        return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
+    }
+  };
   
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -82,13 +108,26 @@ const TemplateSelector: React.FC = () => {
                   key={template.id}
                   className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                 >
-                  <div className="bg-gray-100 h-32 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">
-                      Preview do Template
-                    </span>
+                  <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
+                    {isAdvancedTemplate(template.id) ? (
+                      <img 
+                        src={getTemplateThumbnail(template)} 
+                        alt={template.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-400 text-sm">
+                        Preview do Template
+                      </span>
+                    )}
                   </div>
                   <div className="p-4 flex flex-col flex-grow">
-                    <h3 className="font-medium">{template.name}</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium">{template.name}</h3>
+                      {isAdvancedTemplate(template.id) && (
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500 mt-1 mb-3">
                       {categoryNames[template.category]}
                     </p>
