@@ -29,12 +29,11 @@ const Admin: React.FC = () => {
     setLoading(false);
   }, [navigate]);
   
+  // Preload templates when admin page loads to avoid blank screen
   useEffect(() => {
-    // Load templates data when the templates tab is active
-    if (activeTab === 'templates') {
-      loadTemplates();
-    }
-  }, [activeTab, loadTemplates]);
+    // Load templates data when the component mounts
+    loadTemplates();
+  }, [loadTemplates]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;

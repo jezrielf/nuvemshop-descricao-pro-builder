@@ -25,6 +25,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   loadTemplates: () => {
     // Carrega todos os templates
     const allTemplates = getAllTemplates();
+    console.log('Loading templates from store, total count:', allTemplates.length);
     
     // Extrai categorias únicas dos templates
     const uniqueCategories = Array.from(
@@ -74,6 +75,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       templates: [...state.templates, newTemplate]
     }));
 
+    console.log('Template created:', newTemplate.name);
     return newTemplate;
   },
 
@@ -92,6 +94,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       return { templates: updatedTemplates };
     });
 
+    console.log('Template updated:', updatedTemplate?.name);
     return updatedTemplate;
   },
 
@@ -110,6 +113,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       return { templates: filteredTemplates };
     });
 
+    console.log('Template deleted, success:', success);
     return success;
   }
 }));
