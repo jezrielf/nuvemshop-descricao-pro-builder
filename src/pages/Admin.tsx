@@ -5,11 +5,9 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import UsersPanel from '@/components/admin/UsersPanel';
 import SettingsPanel from '@/components/admin/SettingsPanel';
 import DescriptionsPanel from '@/components/admin/DescriptionsPanel';
-import TemplatesPanel from '@/components/admin/TemplatesPanel';
 import PlansPanel from '@/components/admin/PlansPanel';
 import DashboardPanel from '@/components/admin/DashboardPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
-import { useTemplateStore } from '@/store/templateStore';
 import { useToast } from '@/hooks/use-toast';
 
 const Admin: React.FC = () => {
@@ -17,7 +15,6 @@ const Admin: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { loadTemplates } = useTemplateStore();
   const { toast } = useToast();
   
   useEffect(() => {
@@ -31,20 +28,14 @@ const Admin: React.FC = () => {
     setLoading(false);
   }, [navigate]);
   
-  // Pré-carregar templates quando a página admin carrega
+  // Watch for 'templates' tab and redirect
   useEffect(() => {
-    try {
-      // Carregar dados dos templates quando o componente monta
-      loadTemplates();
-    } catch (error) {
-      console.error('Erro ao carregar templates:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível carregar os templates.',
-        variant: 'destructive'
-      });
+    if (activeTab === 'templates') {
+      navigate('/admin-templates');
+      // Reset to dashboard to avoid redirect loop if user comes back
+      setActiveTab('dashboard');
     }
-  }, [loadTemplates, toast]);
+  }, [activeTab, navigate]);
   
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;
@@ -59,7 +50,6 @@ const Admin: React.FC = () => {
       {activeTab === 'dashboard' && <DashboardPanel />}
       {activeTab === 'users' && <UsersPanel />}
       {activeTab === 'descriptions' && <DescriptionsPanel />}
-      {activeTab === 'templates' && <TemplatesPanel />}
       {activeTab === 'plans' && <PlansPanel />}
       {activeTab === 'settings' && <SettingsPanel />}
     </AdminLayout>

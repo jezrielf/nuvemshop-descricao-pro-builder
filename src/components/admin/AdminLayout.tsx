@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,7 +13,7 @@ import {
   Menu, 
   X 
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
@@ -32,6 +31,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   onTabChange 
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [darkMode, setDarkMode] = useState(localStorage.getItem('adminDarkMode') === 'true');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -62,19 +62,27 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   };
 
   const handleTabChange = (tab: 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings') => {
-    onTabChange(tab);
+    if (tab === 'templates') {
+      navigate('/admin-templates');
+    } else {
+      onTabChange(tab);
+      navigate('/admin');
+    }
     setDrawerOpen(false);
   };
 
   // Tab definition array for reuse in both desktop and mobile views
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'users', label: 'Usuários', icon: Users },
-    { id: 'descriptions', label: 'Descrições', icon: FileText },
-    { id: 'templates', label: 'Templates', icon: FileCode },
-    { id: 'plans', label: 'Planos', icon: CreditCard },
-    { id: 'settings', label: 'Configurações', icon: Settings }
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
+    { id: 'users', label: 'Usuários', icon: Users, path: '/admin' },
+    { id: 'descriptions', label: 'Descrições', icon: FileText, path: '/admin' },
+    { id: 'templates', label: 'Templates', icon: FileCode, path: '/admin-templates' },
+    { id: 'plans', label: 'Planos', icon: CreditCard, path: '/admin' },
+    { id: 'settings', label: 'Configurações', icon: Settings, path: '/admin' }
   ];
+
+  // Determine active tab based on current path or activeTab prop
+  const currentTab = location.pathname === '/admin-templates' ? 'templates' : activeTab;
 
   return (
     <div className={cn(
@@ -111,7 +119,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                 {tabs.map(tab => (
                   <Button 
                     key={tab.id}
-                    variant={activeTab === tab.id ? 'default' : 'outline'} 
+                    variant={currentTab === tab.id ? 'default' : 'outline'} 
                     onClick={() => handleTabChange(tab.id as any)}
                     className="flex items-center justify-start w-full"
                   >
@@ -158,7 +166,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
               {tabs.map(tab => (
                 <Button 
                   key={tab.id}
-                  variant={activeTab === tab.id ? 'default' : 'outline'} 
+                  variant={currentTab === tab.id ? 'default' : 'outline'} 
                   onClick={() => handleTabChange(tab.id as any)}
                   className="flex items-center justify-start w-full"
                 >
