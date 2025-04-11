@@ -19,6 +19,7 @@ const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({ blockTypes, onAdd
           variant="outline" 
           size="sm"
           onClick={() => onAddBlock(type)}
+          className="flex items-center"
         >
           <Plus className="h-3 w-3 mr-1" /> {getBlockTypeName(type)}
         </Button>
