@@ -84,6 +84,14 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
     }
   };
 
+  // Create a safe template object to pass to NewTemplateDialog
+  // This ensures all required properties are present
+  const safeNewTemplate = {
+    name: newTemplate?.name || '',
+    category: newTemplate?.category || 'other' as ProductCategory,
+    blocks: newTemplate?.blocks || []
+  };
+
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -119,11 +127,7 @@ const TemplateActionsContent: React.FC<TemplateActionsProps> = ({
       <NewTemplateDialog
         isOpen={dialogState.isNewTemplateDialogOpen}
         onOpenChange={() => toggleDialog('isNewTemplateDialogOpen')}
-        template={newTemplate || {
-          name: '',
-          category: 'other' as ProductCategory,
-          blocks: []
-        }}
+        template={safeNewTemplate}
         onTemplateChange={setNewTemplate}
         onCreateTemplate={handleCreateTemplate}
         onAddBlock={onAddBlock}
