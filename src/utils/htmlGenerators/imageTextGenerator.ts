@@ -10,7 +10,7 @@ export const generateImageTextHtml = (block: ImageTextBlock): string => {
   const objectFitStyle = `object-fit:${imageFit};`;
   
   return `
-    <div${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;">
+    <div${blockStyleAttr} id="block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">
       <div style="display:flex;flex-direction:column;gap:20px;width:100%;">
         <div style="width:100%;">
           ${block.image.src ? 
@@ -37,5 +37,5 @@ export const generateImageTextHtml = (block: ImageTextBlock): string => {
         }
       }
     </style>
-  `.replace('<div style="width:100%;padding:20px;margin-bottom:20px;">', `<div id="block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">`);
+  `;
 };

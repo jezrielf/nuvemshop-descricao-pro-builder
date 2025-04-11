@@ -25,7 +25,7 @@ export const generateGalleryHtml = (block: GalleryBlock): string => {
     : '';
   
   return `
-    <div${blockStyleAttr} class="gallery-block w-full p-4">
+    <div${blockStyleAttr} id="block-${block.id}" class="gallery-block w-full p-4">
       <div class="grid grid-cols-1 ${columnClass} gap-4">${galleryHtml}</div>
     </div>
   `;

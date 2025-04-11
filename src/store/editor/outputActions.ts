@@ -48,7 +48,12 @@ export const createOutputActions = (get: () => EditorState) => ({
             blockSpacingStyle = 'margin-bottom: 1.5rem;';
           }
           
-          const wrappedHtml = `<div class="product-description-block" style="${blockSpacingStyle}">${html}</div>`;
+          // Add one consistent wrapper for all blocks to ensure proper styling
+          const wrappedHtml = `
+            <div class="product-description-block" style="${blockSpacingStyle}" id="product-block-${block.id}">
+              ${html}
+            </div>
+          `;
           
           // Log generated HTML for debugging (first 100 chars)
           if (wrappedHtml) {
@@ -65,9 +70,31 @@ export const createOutputActions = (get: () => EditorState) => ({
       })
       .join('\n\n');
 
-    // Wrap all blocks in a container div
+    // Include global responsive styles
+    const globalStyles = `
+      <style>
+        /* Global styles for all product blocks */
+        .product-description {
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        
+        /* Responsive grid adjustments */
+        @media (max-width: 768px) {
+          .grid.md\\:grid-cols-2, 
+          .grid.md\\:grid-cols-3, 
+          .grid.md\\:grid-cols-4 {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      </style>
+    `;
+
+    // Wrap all blocks in a container div with global styles
     const finalHtml = `
       <div class="product-description">
+        ${globalStyles}
         ${blocksHtml}
       </div>
     `;

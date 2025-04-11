@@ -23,7 +23,7 @@ export const generateFeaturesHtml = (block: FeaturesBlock): string => {
     : '';
   
   return `
-    <div${blockStyleAttr} class="features-block">
+    <div${blockStyleAttr} id="block-${block.id}" class="features-block">
       <h2 style="color:${headingColor};font-weight:${headingWeight};font-size:24px;margin-bottom:20px;text-align:center;">${block.heading}</h2>
       <div class="grid grid-cols-1 ${columnClass} gap-4">${featuresHtml}</div>
     </div>
