@@ -5,16 +5,16 @@ export function useTemplateStore() {
   const {
     templates,
     loadTemplates,
-    createTemplate: storeCreateTemplate,
-    updateTemplate: storeUpdateTemplate,
-    deleteTemplate: storeDeleteTemplate
+    createTemplate,
+    updateTemplate,
+    deleteTemplate
   } = useZustandTemplateStore();
 
   return {
     templates,
     loadTemplates,
-    storeCreateTemplate,
-    storeUpdateTemplate,
-    storeDeleteTemplate
+    createTemplate,
+    updateTemplate,
+    deleteTemplate
   };
 }

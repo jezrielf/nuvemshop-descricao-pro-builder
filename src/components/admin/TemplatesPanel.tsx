@@ -1,9 +1,9 @@
 
 import React from 'react';
-import TemplateActions from './templates/TemplateActions';
-import TemplateFiltering from './templates/TemplateFiltering';
 import { getCategoryName } from './templates/utils';
 import { useTemplateManagement } from '@/hooks/useTemplateManagement';
+import TemplateActionPanel from './templates/panels/TemplateActionPanel';
+import TemplateFilterPanel from './templates/panels/TemplateFilterPanel';
 
 const TemplatesPanel: React.FC = () => {
   const {
@@ -31,7 +31,7 @@ const TemplatesPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <TemplateActions
+      <TemplateActionPanel
         editedTemplate={editedTemplate}
         setEditedTemplate={setEditedTemplate}
         newTemplate={newTemplate}
@@ -43,7 +43,7 @@ const TemplatesPanel: React.FC = () => {
         onRemoveBlock={handleRemoveBlock}
       />
       
-      <TemplateFiltering
+      <TemplateFilterPanel
         displayedTemplates={displayedTemplates}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
