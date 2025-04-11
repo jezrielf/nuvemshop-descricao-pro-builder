@@ -116,7 +116,6 @@ export interface ImageBlock extends BlockBase {
   src: string;
   alt: string;
   caption?: string;
-  // Remove the image property since we're using direct properties instead
 }
 
 export interface GalleryBlock extends BlockBase {

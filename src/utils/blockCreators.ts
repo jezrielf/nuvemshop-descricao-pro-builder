@@ -16,6 +16,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
   switch (type) {
     case 'hero':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -27,14 +28,17 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'text':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
         visible: true,
+        heading: 'Título do Texto',
         content: '<p>Digite seu texto aqui. Este é um bloco de texto que você pode personalizar com conteúdo sobre seu produto.</p>'
       };
     case 'features':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -57,6 +61,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'benefits':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -79,6 +84,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'specifications':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -99,6 +105,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'image':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -109,6 +116,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'gallery':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -130,6 +138,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'imageText':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -143,6 +152,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'textImage':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -156,6 +166,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'faq':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -176,6 +187,7 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
       };
     case 'cta':
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
@@ -188,10 +200,14 @@ export const createBlock = (type: BlockType, columns: ColumnLayout) => {
     default:
       // Ensure type safety by adding generic block
       return {
+        id: uuidv4(),
         type,
         title: info.name,
         columns,
-        visible: true
+        visible: true,
+        heading: 'Default Heading',
+        content: 'Default Content',
+        buttonText: 'Default Button'
       };
   }
 };

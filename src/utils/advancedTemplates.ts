@@ -1,3 +1,4 @@
+
 import { Template, BlockType, Block } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -59,6 +60,7 @@ const createBlock = (type: BlockType, overrides = {}): Block => {
         ...baseBlock,
         src: '',
         alt: 'Default Alt',
+        caption: '',
         ...overrides,
       } as Block;
     
@@ -105,7 +107,15 @@ const createBlock = (type: BlockType, overrides = {}): Block => {
       } as Block;
     
     default:
-      throw new Error(`Unsupported block type: ${type}`);
+      // For completeness, ensure we have a fallback that includes
+      // the minimum requirements of all block types
+      return {
+        ...baseBlock,
+        heading: 'Default Heading',
+        content: 'Default Content',
+        buttonText: 'Click me',
+        ...overrides,
+      } as Block;
   }
 };
 
