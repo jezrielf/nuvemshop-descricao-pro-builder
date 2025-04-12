@@ -181,6 +181,13 @@ export const createBlock = (type: BlockType, columns: ColumnLayout): Block | nul
         buttonUrl: '#'
       };
     
+    case 'ai':
+      return {
+        ...commonProps,
+        type: 'ai' as const,
+        content: ''
+      };
+    
     default:
       // Este caso nunca deveria acontecer se a validação acima funcionar
       console.error(`Unhandled block type: ${type}`);

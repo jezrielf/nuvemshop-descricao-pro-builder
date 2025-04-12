@@ -10,6 +10,7 @@ import { ImageTextBlock } from './imageText';
 import { TextImageBlock } from './textImage';
 import { FAQBlock } from './faq';
 import { CTABlock } from './cta';
+import { AIBlock } from './ai';
 
 export * from './hero';
 export * from './text';
@@ -22,6 +23,7 @@ export * from './imageText';
 export * from './textImage';
 export * from './faq';
 export * from './cta';
+export * from './ai';
 
 export type Block = 
   | HeroBlock 
@@ -34,4 +36,5 @@ export type Block =
   | ImageTextBlock
   | TextImageBlock
   | FAQBlock
-  | CTABlock;
+  | CTABlock
+  | AIBlock;
