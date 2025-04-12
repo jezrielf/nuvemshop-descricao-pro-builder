@@ -149,6 +149,7 @@ const AIDescriptionForm: React.FC = () => {
         <AISubmitButton 
           isLoading={isLoading}
           isPremium={isPremium()}
+          onClick={handleSubmit}
         />
       </form>
     </Card>

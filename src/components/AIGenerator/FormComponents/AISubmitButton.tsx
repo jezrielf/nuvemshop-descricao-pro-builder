@@ -5,20 +5,22 @@ import { Sparkles } from 'lucide-react';
 
 interface AISubmitButtonProps {
   isLoading: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   text?: string;
+  isPremium: boolean;
 }
 
 const AISubmitButton: React.FC<AISubmitButtonProps> = ({ 
   isLoading, 
   onClick, 
-  text = "Gerar com IA" 
+  text = "Gerar com IA",
+  isPremium
 }) => {
   return (
     <Button
       type="button"
       onClick={onClick}
-      disabled={isLoading}
+      disabled={isLoading || !isPremium}
       className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium py-2 transition-all duration-200 shadow-md hover:shadow-lg"
     >
       {isLoading ? (
