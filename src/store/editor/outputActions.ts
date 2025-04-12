@@ -70,7 +70,7 @@ export const createOutputActions = (get: () => EditorState) => ({
       })
       .join('\n\n');
 
-    // Include inline styles instead of using a style tag
+    // CSS completo e inline - sem JavaScript
     const inlineStyles = `
       <style>
         /* Reset básico */
@@ -150,7 +150,7 @@ export const createOutputActions = (get: () => EditorState) => ({
           }
         }
         
-        /* FAQ estilos */
+        /* FAQ estilos com CSS puro (sem JavaScript) */
         .faq-item {
           border: 1px solid #e5e7eb;
           border-radius: 4px;
@@ -164,27 +164,12 @@ export const createOutputActions = (get: () => EditorState) => ({
           font-weight: 500;
           cursor: pointer;
           position: relative;
-          border-bottom: 1px solid transparent;
-        }
-        
-        .faq-question:after {
-          content: '+';
-          position: absolute;
-          right: 15px;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 20px;
-        }
-        
-        .faq-question.active:after {
-          content: '-';
         }
         
         .faq-answer {
-          padding: 0;
-          height: 0;
+          max-height: 0;
           overflow: hidden;
-          transition: height 0.3s ease;
+          transition: max-height 0.3s ease;
           background-color: white;
         }
         
@@ -192,33 +177,8 @@ export const createOutputActions = (get: () => EditorState) => ({
           padding: 15px;
         }
         
-        /* Adicionando JavaScript inline para fazer o efeito sanfona */
-        .faq-js-code {
-          display: none;
-        }
+        /* Demais estilos são definidos inline em cada bloco */
       </style>
-      
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          // Função para alternar os FAQs
-          var faqQuestions = document.querySelectorAll('.faq-question');
-          
-          faqQuestions.forEach(function(question) {
-            question.addEventListener('click', function() {
-              this.classList.toggle('active');
-              var answer = this.nextElementSibling;
-              
-              if (this.classList.contains('active')) {
-                answer.style.height = answer.scrollHeight + 'px';
-                answer.style.borderBottom = '1px solid #e5e7eb';
-              } else {
-                answer.style.height = '0';
-                answer.style.borderBottom = 'none';
-              }
-            });
-          });
-        });
-      </script>
     `;
 
     // Wrap all blocks in a container div with global styles

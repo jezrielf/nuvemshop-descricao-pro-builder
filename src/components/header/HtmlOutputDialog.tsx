@@ -42,7 +42,7 @@ const HtmlOutputDialog: React.FC = () => {
         <Alert variant="default" className="my-2">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Este HTML inclui tudo necessário para funcionar corretamente na Nuvemshop, incluindo estilos e scripts. 
+            Este HTML é 100% compatível com a Nuvemshop, usando apenas HTML e CSS (sem JavaScript).
             Cole o código completo sem alterações.
           </AlertDescription>
         </Alert>
