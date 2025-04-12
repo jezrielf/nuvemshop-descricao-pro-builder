@@ -1,67 +1,96 @@
-
-import React from 'react';
 import { BlockType } from '@/types/editor';
-import { Layout, Type, Image, ImagePlus, FileText, List, BarChart, MessageSquare, Target, Sparkles } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Text, 
+  Image, 
+  Columns, 
+  ListChecks, 
+  ListOrdered, 
+  ImagePlus, 
+  LayoutList, 
+  QuestionMarkCircle, 
+  Lightbulb,
+  Sparkles
+} from 'lucide-react';
 
-export const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactNode; description: string }> = {
+interface BlockTypeInfo {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  defaultColumns: number;
+}
+
+export const blockTypeInfo: Record<BlockType, BlockTypeInfo> = {
+  text: {
+    title: 'Texto',
+    description: 'Adicione um bloco de texto',
+    icon: <Text className="h-6 w-6 text-gray-500" />,
+    defaultColumns: 1
+  },
   hero: {
-    name: 'Banner Principal',
-    icon: <Layout className="h-5 w-5" />,
-    description: 'Seção de destaque com título, subtítulo e botão opcional'
+    title: 'Hero',
+    description: 'Adicione um bloco de hero',
+    icon: <LayoutDashboard className="h-6 w-6 text-blue-500" />,
+    defaultColumns: 1
   },
   features: {
-    name: 'Recursos',
-    icon: <BarChart className="h-5 w-5" />,
-    description: 'Lista de recursos ou características do produto'
+    title: 'Recursos',
+    description: 'Adicione um bloco de recursos',
+    icon: <ListChecks className="h-6 w-6 text-green-500" />,
+    defaultColumns: 3
   },
   benefits: {
-    name: 'Benefícios',
-    icon: <List className="h-5 w-5" />,
-    description: 'Destaque os principais benefícios do produto'
-  },
-  specifications: {
-    name: 'Especificações',
-    icon: <FileText className="h-5 w-5" />,
-    description: 'Lista técnica de especificações do produto'
-  },
-  text: {
-    name: 'Texto',
-    icon: <Type className="h-5 w-5" />,
-    description: 'Bloco de texto com formatação livre'
+    title: 'Benefícios',
+    description: 'Adicione um bloco de benefícios',
+    icon: <Lightbulb className="h-6 w-6 text-yellow-500" />,
+    defaultColumns: 2
   },
   image: {
-    name: 'Imagem',
-    icon: <Image className="h-5 w-5" />,
-    description: 'Imagem única com legenda opcional'
+    title: 'Imagem',
+    description: 'Adicione um bloco de imagem',
+    icon: <Image className="h-6 w-6 text-orange-500" />,
+    defaultColumns: 1
   },
   gallery: {
-    name: 'Galeria',
-    icon: <ImagePlus className="h-5 w-5" />,
-    description: 'Conjunto de imagens em formato de galeria'
+    title: 'Galeria',
+    description: 'Adicione um bloco de galeria de imagens',
+    icon: <Columns className="h-6 w-6 text-purple-500" />,
+    defaultColumns: 2
   },
   imageText: {
-    name: 'Imagem + Texto',
-    icon: <Layout className="h-5 w-5" />,
-    description: 'Imagem à esquerda com texto à direita'
+    title: 'Imagem com Texto',
+    description: 'Adicione um bloco com imagem e texto lado a lado',
+    icon: <ImagePlus className="h-6 w-6 text-red-500" />,
+    defaultColumns: 1
   },
   textImage: {
-    name: 'Texto + Imagem',
-    icon: <Layout className="h-5 w-5" />,
-    description: 'Texto à esquerda com imagem à direita'
+    title: 'Texto com Imagem',
+    description: 'Adicione um bloco com texto e imagem lado a lado',
+    icon: <LayoutList className="h-6 w-6 text-teal-500" />,
+    defaultColumns: 1
   },
   faq: {
-    name: 'Perguntas Frequentes',
-    icon: <MessageSquare className="h-5 w-5" />,
-    description: 'Lista de perguntas e respostas comuns'
+    title: 'FAQ',
+    description: 'Adicione um bloco de perguntas frequentes',
+    icon: <QuestionMarkCircle className="h-6 w-6 text-indigo-500" />,
+    defaultColumns: 1
   },
   cta: {
-    name: 'Chamada para Ação',
-    icon: <Target className="h-5 w-5" />,
-    description: 'Bloco de conversão com botão de destaque'
+    title: 'CTA',
+    description: 'Adicione um bloco de chamada para ação',
+    icon: <ListOrdered className="h-6 w-6 text-pink-500" />,
+    defaultColumns: 1
+  },
+  specifications: {
+    title: 'Especificações',
+    description: 'Adicione um bloco de especificações técnicas',
+    icon: <ListChecks className="h-6 w-6 text-gray-500" />,
+    defaultColumns: 1
   },
   ai: {
-    name: 'Gerador de IA',
-    icon: <Sparkles className="h-5 w-5" />,
-    description: 'Criar descrição automaticamente com IA'
-  }
+    title: 'Conteúdo com IA',
+    description: 'Crie conteúdo automaticamente com IA',
+    icon: <Sparkles className="h-6 w-6 text-purple-500" />,
+    defaultColumns: 1
+  },
 };

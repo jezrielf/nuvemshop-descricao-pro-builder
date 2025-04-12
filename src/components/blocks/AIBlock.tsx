@@ -81,10 +81,16 @@ const AIBlock: React.FC<AIBlockProps> = ({ block, isPreview = false }) => {
         </div>
       )}
       
-      <div 
-        className={`prose max-w-none ${colorScheme.text}`}
-        dangerouslySetInnerHTML={{ __html: block.content || '' }}
-      />
+      {block.content ? (
+        <div 
+          className={`prose max-w-none ${colorScheme.text}`}
+          dangerouslySetInnerHTML={{ __html: block.content || '' }}
+        />
+      ) : (
+        <div className="text-center py-8 text-gray-500 italic">
+          Conteúdo gerado por IA
+        </div>
+      )}
       
       <div className="mt-4 text-sm text-right">
         <em>Conteúdo gerado por IA</em>
