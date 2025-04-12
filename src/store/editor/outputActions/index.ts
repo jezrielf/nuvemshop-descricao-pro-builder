@@ -11,7 +11,16 @@ export const createOutputActions = (get: () => EditorState) => ({
       // Log para debug
       console.log("HTML output length:", htmlOutput.length);
       
-      // Verifica se o HTML contém tags de abertura e fechamento básicas
+      // Verificar se todas as tags div estão fechadas corretamente
+      const openTags = (htmlOutput.match(/<div/g) || []).length;
+      const closeTags = (htmlOutput.match(/<\/div>/g) || []).length;
+      
+      if (openTags !== closeTags) {
+        console.error(`ERRO: Tags div desbalanceadas! Abertas: ${openTags}, Fechadas: ${closeTags}`);
+        return '<div class="product-description">Erro na geração do HTML - contate o suporte</div>';
+      }
+      
+      // Verificação adicional de tags essenciais
       if (!htmlOutput.includes('<div class="product-description"') || 
           !htmlOutput.includes('</div>')) {
         console.error('HTML output missing essential tags:', htmlOutput);
