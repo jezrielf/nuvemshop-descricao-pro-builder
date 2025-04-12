@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Block, BlockType } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
@@ -12,6 +11,7 @@ import ImageTextBlock from '../ImageTextBlock';
 import TextImageBlock from '../TextImageBlock';
 import FAQBlock from '../FAQBlock';
 import CTABlock from '../CTABlock';
+import VideoBlock from '../VideoBlock';
 import { validateBaseBlock, validateBlockByType } from '@/utils/blockCreators/validation';
 
 interface BlockRendererOptions {
@@ -62,6 +62,8 @@ export class BlockRendererFactory {
         return <FAQBlock block={block} isPreview={isPreview} />;
       case 'cta':
         return <CTABlock block={block} isPreview={isPreview} />;
+      case 'video':
+        return <VideoBlock block={block} isPreview={isPreview} />;
       default:
         return (
           <div className="p-4 border rounded-md bg-gray-100">
@@ -103,4 +105,3 @@ export class BlockRendererFactory {
     );
   }
 }
-

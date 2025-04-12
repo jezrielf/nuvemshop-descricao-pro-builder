@@ -47,6 +47,8 @@ export const validateBlockByType = (block: any): boolean => {
       return 'heading' in block && 'questions' in block && Array.isArray(block.questions);
     case 'cta':
       return 'heading' in block && 'content' in block && 'buttonText' in block;
+    case 'video':
+      return 'videoUrl' in block && 'autoplay' in block;
     default:
       return false;
   }
@@ -63,4 +65,3 @@ export const ensureValidBlock = (block: any, type: BlockType): Block => {
   
   return block as Block;
 };
-

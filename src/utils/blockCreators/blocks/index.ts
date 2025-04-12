@@ -10,3 +10,4 @@ export * from './imageTextBlock';
 export * from './textImageBlock';
 export * from './faqBlock';
 export * from './ctaBlock';
+export * from './videoBlock';

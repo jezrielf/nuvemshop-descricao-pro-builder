@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { BlockType } from '@/types/editor';
-import { Layout, Type, Image, ImagePlus, FileText, List, BarChart, MessageSquare, Target } from 'lucide-react';
+import { Layout, Type, Image, ImagePlus, FileText, List, BarChart, MessageSquare, Target, Play } from 'lucide-react';
 
 export const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactNode; description: string }> = {
   hero: {
@@ -58,5 +58,10 @@ export const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactN
     name: 'Chamada para Ação',
     icon: <Target className="h-5 w-5" />,
     description: 'Bloco de conversão com botão de destaque'
+  },
+  video: {
+    name: 'Vídeo',
+    icon: <Play className="h-5 w-5" />,
+    description: 'Vídeo do YouTube com autoplay'
   }
 };

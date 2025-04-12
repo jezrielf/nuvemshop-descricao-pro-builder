@@ -11,7 +11,8 @@ import {
   createImageTextBlock,
   createTextImageBlock,
   createFAQBlock,
-  createCTABlock
+  createCTABlock,
+  createVideoBlock
 } from './blocks';
 import { ensureValidBlock } from './validation';
 
@@ -64,6 +65,10 @@ export const createBlock = (type: BlockType, columns: ColumnLayout = 1): Block =
         block = createCTABlock(columns);
         break;
         
+      case 'video':
+        block = createVideoBlock(columns);
+        break;
+        
       default:
         // Provide a more detailed error message
         throw new Error(`Unrecognized block type: ${type}`);
@@ -77,4 +82,3 @@ export const createBlock = (type: BlockType, columns: ColumnLayout = 1): Block =
     return createTextBlock(columns);
   }
 };
-

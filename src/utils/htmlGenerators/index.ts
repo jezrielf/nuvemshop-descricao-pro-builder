@@ -11,6 +11,7 @@ import { generateImageTextHtml } from './imageTextGenerator';
 import { generateTextImageHtml } from './textImageGenerator';
 import { generateFAQHtml } from './faqGenerator';
 import { generateCTAHtml } from './ctaGenerator';
+import { generateVideoHtml } from './videoGenerator';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateBlockHtml = (block: Block): string => {
@@ -46,6 +47,8 @@ export const generateBlockHtml = (block: Block): string => {
       return generateFAQHtml(block);
     case 'cta':
       return generateCTAHtml(block);
+    case 'video':
+      return generateVideoHtml(block);
     default:
       return `<div class="unknown-block" style="padding: 20px; margin-bottom: 20px; border: 1px dashed #ccc; ${blockStyles}">Bloco do tipo ${(block as any).type}</div>`;
   }
