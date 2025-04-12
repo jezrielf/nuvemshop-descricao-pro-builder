@@ -84,6 +84,13 @@ const AIDescriptionForm: React.FC = () => {
     }
   };
 
+  // Create a handler that doesn't require the event parameter
+  const handleGenerateClick = () => {
+    // Create a synthetic event to pass to handleSubmit
+    const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+    handleSubmit(syntheticEvent);
+  };
+
   return (
     <Card className="p-6 bg-gradient-to-br from-violet-50 to-indigo-50 border-violet-100">
       <AIFormHeader />
@@ -149,7 +156,7 @@ const AIDescriptionForm: React.FC = () => {
         <AISubmitButton 
           isLoading={isLoading}
           isPremium={isPremium()}
-          onClick={handleSubmit}
+          onClick={handleGenerateClick}
         />
       </form>
     </Card>

@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 
 interface AISubmitButtonProps {
   isLoading: boolean;
-  onClick?: () => void;
+  onClick?: (e?: React.FormEvent) => void;
   text?: string;
   isPremium: boolean;
 }
