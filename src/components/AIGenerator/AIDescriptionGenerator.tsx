@@ -120,9 +120,17 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
     setIsGenerating(true);
     
     try {
+      // Fix: Make sure all required properties are provided to generateAIDescription
       const description = await generateAIDescription({
-        ...values,
-        imageUrl: uploadedImageUrl || undefined,
+        productName: values.productName,                 // Required
+        productCategory: values.productCategory,         // Required
+        productPrice: values.productPrice,               // Optional
+        companyInfo: values.companyInfo,                 // Required
+        targetAudience: values.targetAudience,           // Required
+        mainFeatures: values.mainFeatures,               // Required
+        additionalInfo: values.additionalInfo,           // Optional
+        tone: values.tone,                               // Required
+        imageUrl: uploadedImageUrl || undefined,         // Optional
       });
       
       setGeneratedDescription(description);
