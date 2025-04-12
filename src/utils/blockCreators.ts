@@ -22,7 +22,7 @@ export const createTextBlock = (columns: number = 1): TextBlock => ({
   id: uuidv4(),
   type: 'text',
   title: 'Bloco de Texto',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Título do Bloco',
   content: 'Adicione seu texto aqui...',
@@ -32,7 +32,7 @@ export const createHeroBlock = (columns: number = 1): HeroBlock => ({
   id: uuidv4(),
   type: 'hero',
   title: 'Bloco de Hero',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Título Principal',
   subheading: 'Subtítulo Atraente',
@@ -45,7 +45,7 @@ export const createFeaturesBlock = (columns: number = 1): FeaturesBlock => ({
   id: uuidv4(),
   type: 'features',
   title: 'Bloco de Características',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Nossas Características',
   features: [
@@ -59,7 +59,7 @@ export const createBenefitsBlock = (columns: number = 1): BenefitsBlock => ({
   id: uuidv4(),
   type: 'benefits',
   title: 'Bloco de Benefícios',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Nossos Benefícios',
   benefits: [
@@ -72,7 +72,7 @@ export const createImageBlock = (columns: number = 1): ImageBlock => ({
   id: uuidv4(),
   type: 'image',
   title: 'Bloco de Imagem',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   src: 'URL da Imagem',
   alt: 'Texto Alternativo',
@@ -83,7 +83,7 @@ export const createGalleryBlock = (columns: number = 1): GalleryBlock => ({
   id: uuidv4(),
   type: 'gallery',
   title: 'Bloco de Galeria',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   images: [
     { id: uuidv4(), src: 'URL da Imagem 1', alt: 'Texto Alternativo 1', caption: 'Legenda 1' },
@@ -95,7 +95,7 @@ export const createImageTextBlock = (columns: number = 1): ImageTextBlock => ({
   id: uuidv4(),
   type: 'imageText',
   title: 'Bloco de Imagem e Texto',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Título do Bloco',
   content: 'Seu conteúdo aqui...',
@@ -106,7 +106,7 @@ export const createTextImageBlock = (columns: number = 1): TextImageBlock => ({
   id: uuidv4(),
   type: 'textImage',
   title: 'Bloco de Texto e Imagem',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Título do Bloco',
   content: 'Seu conteúdo aqui...',
@@ -117,7 +117,7 @@ export const createFAQBlock = (columns: number = 1): FAQBlock => ({
   id: uuidv4(),
   type: 'faq',
   title: 'Bloco de FAQ',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Perguntas Frequentes',
   questions: [
@@ -130,7 +130,7 @@ export const createCTABlock = (columns: number = 1): CTABlock => ({
   id: uuidv4(),
   type: 'cta',
   title: 'Bloco de CTA',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Chamada para Ação',
   content: 'Descrição da chamada para ação...',
@@ -142,7 +142,7 @@ export const createSpecificationsBlock = (columns: number = 1): SpecificationsBl
   id: uuidv4(),
   type: 'specifications',
   title: 'Bloco de Especificações',
-  columns,
+  columns: columns as ColumnLayout,
   visible: true,
   heading: 'Especificações do Produto',
   specs: [
@@ -157,7 +157,7 @@ export const createAIBlock = (columns: number = 1): AIBlock => {
     id: uuidv4(),
     type: 'ai',
     title: 'Conteúdo Gerado por IA',
-    columns,
+    columns: columns as ColumnLayout,
     visible: true,
     content: '',
     heading: 'Conteúdo Gerado por IA',
@@ -169,32 +169,34 @@ export const createAIBlock = (columns: number = 1): AIBlock => {
 
 // Update the createBlock function to support AI blocks
 export const createBlock = (type: BlockType, columns: number = 1): Block => {
+  const columnLayout = columns as ColumnLayout;
+  
   switch (type) {
     case 'text':
-      return createTextBlock(columns);
+      return createTextBlock(columnLayout);
     case 'hero':
-      return createHeroBlock(columns);
+      return createHeroBlock(columnLayout);
     case 'features':
-      return createFeaturesBlock(columns);
+      return createFeaturesBlock(columnLayout);
     case 'benefits':
-      return createBenefitsBlock(columns);
+      return createBenefitsBlock(columnLayout);
     case 'image':
-      return createImageBlock(columns);
+      return createImageBlock(columnLayout);
     case 'gallery':
-      return createGalleryBlock(columns);
+      return createGalleryBlock(columnLayout);
     case 'imageText':
-      return createImageTextBlock(columns);
+      return createImageTextBlock(columnLayout);
     case 'textImage':
-      return createTextImageBlock(columns);
+      return createTextImageBlock(columnLayout);
     case 'faq':
-      return createFAQBlock(columns);
+      return createFAQBlock(columnLayout);
     case 'cta':
-      return createCTABlock(columns);
+      return createCTABlock(columnLayout);
     case 'specifications':
-      return createSpecificationsBlock(columns);
+      return createSpecificationsBlock(columnLayout);
     case 'ai':
-      return createAIBlock(columns);
+      return createAIBlock(columnLayout);
     default:
-      return createTextBlock(columns);
+      return createTextBlock(columnLayout);
   }
 };
