@@ -12,10 +12,12 @@ const AIDescriptionGenerator: React.FC = () => {
   const navigate = useNavigate();
   const userIsPremium = isPremium();
 
+  // For premium users, render the AIDescriptionForm
   if (userIsPremium) {
     return <AIDescriptionForm />;
   }
 
+  // For non-premium users, render the upgrade card
   return (
     <Card className="p-6 bg-gradient-to-br from-violet-50 to-indigo-50 border-violet-100">
       <div className="space-y-4">
