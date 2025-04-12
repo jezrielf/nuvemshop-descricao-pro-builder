@@ -10,22 +10,32 @@ export const generateFeaturesHtml = (block: FeaturesBlock): string => {
   const headingColor = block.style?.headingColor || 'inherit';
   const headingWeight = block.style?.headingWeight || 'bold';
   
-  // Generate responsive column classes based on the number of columns
-  const columnClass = block.columns > 1 ? `md:grid-cols-${block.columns}` : '';
-  
+  // Generate features HTML
   const featuresHtml = block.features && block.features.length > 0 
     ? block.features.map(feature => `
-      <div class="feature-item w-full p-4">
-        <h3 style="color:${headingColor};font-weight:${headingWeight};font-size:18px;margin-bottom:10px;">${feature.title}</h3>
-        <p style="font-size:14px;">${feature.description}</p>
+      <div style="flex:0 0 100%;padding:16px;box-sizing:border-box;margin-bottom:16px;">
+        <div style="padding:16px;border:1px solid #e5e7eb;border-radius:6px;height:100%;">
+          <h3 style="color:${headingColor};font-weight:${headingWeight};font-size:18px;margin-bottom:10px;">${feature.title}</h3>
+          <p style="font-size:14px;line-height:1.6;">${feature.description}</p>
+        </div>
       </div>
     `).join('')
     : '';
   
+  // Create responsive columns with inline styles
   return `
-    <div${blockStyleAttr} id="block-${block.id}" class="features-block">
+    <div${blockStyleAttr} id="block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">
       <h2 style="color:${headingColor};font-weight:${headingWeight};font-size:24px;margin-bottom:20px;text-align:center;">${block.heading}</h2>
-      <div class="grid grid-cols-1 ${columnClass} gap-4">${featuresHtml}</div>
+      <div style="display:flex;flex-wrap:wrap;margin:-8px;" class="features-container">
+        ${featuresHtml}
+      </div>
+      <style>
+        @media (min-width: 768px) {
+          #block-${block.id} .features-container > div {
+            flex: 0 0 ${100 / Math.min(block.columns || 1, 4)}%;
+          }
+        }
+      </style>
     </div>
   `;
 };

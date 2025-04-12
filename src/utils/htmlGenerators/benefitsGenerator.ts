@@ -10,22 +10,28 @@ export const generateBenefitsHtml = (block: BenefitsBlock): string => {
   const headingColor = block.style?.headingColor || 'inherit';
   const headingWeight = block.style?.headingWeight || 'bold';
   
-  // Generate responsive column classes based on the number of columns
-  const columnClass = block.columns > 1 ? `md:grid-cols-${block.columns}` : '';
-  
   const benefitsHtml = block.benefits && block.benefits.length > 0 
     ? block.benefits.map(benefit => `
-      <div class="benefit-item w-full p-4">
-        <h3 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 18px; margin-bottom: 10px;">${benefit.title}</h3>
-        <p style="font-size: 14px;">${benefit.description}</p>
+      <div style="flex:0 0 100%;padding:8px;box-sizing:border-box;" class="benefit-item">
+        <div style="padding:16px;border:1px solid #e5e7eb;border-radius:6px;height:100%;">
+          <h3 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 18px; margin-bottom: 10px;">${benefit.title}</h3>
+          <p style="font-size: 14px;line-height:1.6;">${benefit.description}</p>
+        </div>
       </div>
     `).join('')
     : '';
   
   return `
-    <div class="benefits-block" id="block-${block.id}" style="${blockStyles}">
+    <div class="benefits-block" id="block-${block.id}" style="${blockStyles}width:100%;padding:20px;margin-bottom:20px;">
       <h2 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 24px; margin-bottom: 20px; text-align: center;">${block.heading}</h2>
-      <div class="grid grid-cols-1 ${columnClass} gap-4">${benefitsHtml}</div>
+      <div style="display:flex;flex-wrap:wrap;margin:-8px;" class="benefits-container">${benefitsHtml}</div>
+      <style>
+        @media (min-width: 768px) {
+          #block-${block.id} .benefits-container > .benefit-item {
+            flex: 0 0 ${100 / Math.min(block.columns || 1, 4)}%;
+          }
+        }
+      </style>
     </div>
   `;
 };

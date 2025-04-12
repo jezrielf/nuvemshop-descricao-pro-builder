@@ -70,31 +70,161 @@ export const createOutputActions = (get: () => EditorState) => ({
       })
       .join('\n\n');
 
-    // Include global responsive styles
-    const globalStyles = `
+    // Include inline styles instead of using a style tag
+    const inlineStyles = `
       <style>
-        /* Global styles for all product blocks */
+        /* Reset básico */
+        .product-description div, .product-description p, .product-description h1, 
+        .product-description h2, .product-description h3, .product-description h4,
+        .product-description h5, .product-description h6, .product-description ul, 
+        .product-description ol, .product-description li, .product-description table,
+        .product-description tr, .product-description td, .product-description th {
+          margin: 0;
+          padding: 0;
+          border: 0;
+          font-size: 100%;
+          font: inherit;
+          vertical-align: baseline;
+          box-sizing: border-box;
+        }
+        
+        /* Estilos básicos */
         .product-description {
-          width: 100%;
-          max-width: 1200px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+        }
+        
+        .product-description h1 {
+          font-size: 28px;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+        
+        .product-description h2 {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 12px;
+        }
+        
+        .product-description h3 {
+          font-size: 20px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        
+        .product-description p {
+          margin-bottom: 15px;
+        }
+        
+        .product-description img {
+          max-width: 100%;
+          height: auto;
+          display: block;
           margin: 0 auto;
         }
         
-        /* Responsive grid adjustments */
-        @media (max-width: 768px) {
-          .grid.md\\:grid-cols-2, 
-          .grid.md\\:grid-cols-3, 
-          .grid.md\\:grid-cols-4 {
-            grid-template-columns: 1fr !important;
+        /* Grid system */
+        .grid {
+          display: flex;
+          flex-wrap: wrap;
+          margin: -10px;
+        }
+        
+        .grid > * {
+          padding: 10px;
+          flex: 0 0 100%;
+        }
+        
+        @media (min-width: 768px) {
+          .md\\:grid-cols-2 > * {
+            flex: 0 0 50%;
+          }
+          
+          .md\\:grid-cols-3 > * {
+            flex: 0 0 33.333333%;
+          }
+          
+          .md\\:grid-cols-4 > * {
+            flex: 0 0 25%;
           }
         }
+        
+        /* FAQ estilos */
+        .faq-item {
+          border: 1px solid #e5e7eb;
+          border-radius: 4px;
+          margin-bottom: 10px;
+          overflow: hidden;
+        }
+        
+        .faq-question {
+          padding: 15px;
+          background-color: #f9fafb;
+          font-weight: 500;
+          cursor: pointer;
+          position: relative;
+          border-bottom: 1px solid transparent;
+        }
+        
+        .faq-question:after {
+          content: '+';
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 20px;
+        }
+        
+        .faq-question.active:after {
+          content: '-';
+        }
+        
+        .faq-answer {
+          padding: 0;
+          height: 0;
+          overflow: hidden;
+          transition: height 0.3s ease;
+          background-color: white;
+        }
+        
+        .faq-answer-content {
+          padding: 15px;
+        }
+        
+        /* Adicionando JavaScript inline para fazer o efeito sanfona */
+        .faq-js-code {
+          display: none;
+        }
       </style>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Função para alternar os FAQs
+          var faqQuestions = document.querySelectorAll('.faq-question');
+          
+          faqQuestions.forEach(function(question) {
+            question.addEventListener('click', function() {
+              this.classList.toggle('active');
+              var answer = this.nextElementSibling;
+              
+              if (this.classList.contains('active')) {
+                answer.style.height = answer.scrollHeight + 'px';
+                answer.style.borderBottom = '1px solid #e5e7eb';
+              } else {
+                answer.style.height = '0';
+                answer.style.borderBottom = 'none';
+              }
+            });
+          });
+        });
+      </script>
     `;
 
     // Wrap all blocks in a container div with global styles
     const finalHtml = `
-      <div class="product-description">
-        ${globalStyles}
+      <div class="product-description" style="width: 100%; max-width: 1200px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333;">
+        ${inlineStyles}
         ${blocksHtml}
       </div>
     `;

@@ -3,9 +3,10 @@ import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { FileText, Copy } from 'lucide-react';
+import { FileText, Copy, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const HtmlOutputDialog: React.FC = () => {
   const [open, setOpen] = React.useState(false);
@@ -37,6 +38,15 @@ const HtmlOutputDialog: React.FC = () => {
             Copie este código HTML e cole diretamente na descrição do seu produto na Nuvemshop.
           </DialogDescription>
         </DialogHeader>
+        
+        <Alert variant="warning" className="my-2">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Este HTML inclui tudo necessário para funcionar corretamente na Nuvemshop, incluindo estilos e scripts. 
+            Cole o código completo sem alterações.
+          </AlertDescription>
+        </Alert>
+        
         <div className="py-4">
           <div className="relative">
             <Textarea
