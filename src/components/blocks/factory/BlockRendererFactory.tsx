@@ -12,6 +12,7 @@ import ImageTextBlock from '../ImageTextBlock';
 import TextImageBlock from '../TextImageBlock';
 import FAQBlock from '../FAQBlock';
 import CTABlock from '../CTABlock';
+import { validateBaseBlock, validateBlockByType } from '@/utils/blockCreators/validation';
 
 interface BlockRendererOptions {
   block: Block;
@@ -26,6 +27,18 @@ export class BlockRendererFactory {
    * Creates the appropriate block component based on block type
    */
   public static createBlockComponent({ block, isPreview = false }: BlockRendererOptions): React.ReactNode {
+    if (!this.isValidBlock(block)) {
+      return this.createErrorComponent('Bloco inválido');
+    }
+
+    if (!this.hasValidType(block)) {
+      return this.createErrorComponent('Bloco sem tipo definido');
+    }
+
+    if (!this.hasRequiredProperties(block)) {
+      return this.createErrorComponent(`Bloco do tipo "${block.type}" está faltando propriedades obrigatórias`);
+    }
+
     switch (block.type) {
       case 'hero':
         return <HeroBlock block={block} isPreview={isPreview} />;
@@ -62,14 +75,21 @@ export class BlockRendererFactory {
    * Validates if a block is valid before rendering
    */
   public static isValidBlock(block: any): boolean {
-    return block && typeof block === 'object';
+    return validateBaseBlock(block);
   }
 
   /**
    * Validates if a block has a valid type
    */
   public static hasValidType(block: any): boolean {
-    return 'type' in block;
+    return 'type' in block && typeof block.type === 'string';
+  }
+
+  /**
+   * Validates if a block has all the required properties for its type
+   */
+  public static hasRequiredProperties(block: any): boolean {
+    return validateBlockByType(block);
   }
 
   /**
@@ -77,9 +97,10 @@ export class BlockRendererFactory {
    */
   public static createErrorComponent(message: string): React.ReactNode {
     return (
-      <div className="p-4 border rounded-md bg-gray-100">
-        <p className="text-gray-500">{message}</p>
+      <div className="p-4 border rounded-md bg-red-50 text-red-600">
+        <p className="text-sm font-medium">{message}</p>
       </div>
     );
   }
 }
+

@@ -21,19 +21,29 @@ const AddBlock: React.FC = () => {
   const handleAddBlock = () => {
     if (!selectedType) return;
     
-    const blockData = createBlock(selectedType, columns);
-    
-    if (blockData) {
-      addBlock(blockData);
+    try {
+      const blockData = createBlock(selectedType, columns);
+      
+      if (blockData) {
+        addBlock(blockData);
+        
+        toast({
+          title: "Bloco adicionado",
+          description: `${blockTypeInfo[selectedType].name} foi adicionado à sua descrição.`,
+        });
+        
+        setSelectedType(null);
+        setColumns(1);
+        setOpen(false);
+      }
+    } catch (error) {
+      console.error('Error creating block:', error);
       
       toast({
-        title: "Bloco adicionado",
-        description: `${blockTypeInfo[selectedType].name} foi adicionado à sua descrição.`,
+        title: "Erro ao adicionar bloco",
+        description: `Não foi possível criar o bloco do tipo ${selectedType}.`,
+        variant: "destructive"
       });
-      
-      setSelectedType(null);
-      setColumns(1);
-      setOpen(false);
     }
   };
   
