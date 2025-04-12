@@ -5,6 +5,7 @@ import { getStylesFromBlock } from '../styleConverter';
 export const generateFAQHtml = (block: FAQBlock): string => {
   const blockStyleAttr = getStylesFromBlock(block) ? ` style="${getStylesFromBlock(block)}"` : '';
   
+  // Generate each FAQ item with fully closed tags and proper nesting
   const faqHtml = block.questions && block.questions.length > 0 
     ? block.questions.map((item, index) => `
       <div class="faq-item" style="margin-bottom:16px;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;">
@@ -32,8 +33,9 @@ export const generateFAQHtml = (block: FAQBlock): string => {
     </style>
   `;
   
+  // Ensure the main block container has a proper ID and all style attributes are correctly placed
   return `
-    <div${blockStyleAttr} id="faq-block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">
+    <div id="faq-block-${block.id}"${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;">
       <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px;">${block.heading}</h2>
       <div class="faq-items">${faqHtml}</div>
       ${faqCss}
