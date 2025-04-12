@@ -1,4 +1,3 @@
-
 import { Block } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
 import { v4 as uuidv4 } from 'uuid';
@@ -184,7 +183,6 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
       headingColor: '#5A2D82',
       padding: 'md',
       borderRadius: 'md',
-      marginBottom: 'sm',
     };
     addBlock(product1Block);
   }
@@ -202,7 +200,6 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
       headingColor: '#5A2D82',
       padding: 'md',
       borderRadius: 'md',
-      marginBottom: 'sm',
     };
     addBlock(product2Block);
   }
@@ -220,7 +217,6 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
       headingColor: '#5A2D82',
       padding: 'md',
       borderRadius: 'md',
-      marginBottom: 'sm',
     };
     addBlock(product3Block);
   }
@@ -238,7 +234,6 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
       headingColor: '#5A2D82',
       padding: 'md',
       borderRadius: 'md',
-      marginBottom: 'sm',
     };
     addBlock(product4Block);
   }
@@ -256,7 +251,6 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
       headingColor: '#5A2D82',
       padding: 'md',
       borderRadius: 'md',
-      marginBottom: 'sm',
     };
     addBlock(product5Block);
   }
