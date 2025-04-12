@@ -18,5 +18,5 @@ export * from './blocks/specifications';
 export * from './blocks/ai';
 
 // Prevent BlockType naming conflict
-export { BlockType as BlockTypeEnum } from './base';
-export { BlockType as BlockTypeUnion } from './blocks';
+export type { BlockType as BlockTypeEnum } from './base';
+export type { BlockType as BlockTypeUnion } from './blocks';
