@@ -1,10 +1,12 @@
 
 import React from 'react';
+import { useEditorStore } from '@/store/editor';
+import { cn } from '@/lib/utils';
 import { BlockBase } from '@/types/editor';
-import BlockHeader from './wrapper/BlockHeader';
 import BlockActions from './wrapper/BlockActions';
 import StyleControls from './wrapper/StyleControls';
-import AIBlockControls from './AIBlockControls';
+import BlockHeader from './wrapper/BlockHeader';
+import { getStyleClasses } from './wrapper/StyleClassGenerator';
 
 interface BlockWrapperProps {
   block: BlockBase;
@@ -13,25 +15,39 @@ interface BlockWrapperProps {
 }
 
 const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing = false }) => {
+  const { selectedBlockId, selectBlock } = useEditorStore();
+  
+  const isSelected = selectedBlockId === block.id;
+  
+  const handleSelectBlock = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    selectBlock(block.id);
+  };
+  
+  // We don't apply any style classes to the editor blocks themselves
+  // These will only be used in the preview
+  
   return (
-    <div className={`group relative border ${isEditing ? 'border-blue-300 ring-2 ring-blue-100' : 'border-transparent hover:border-gray-200'} rounded-lg transition-all mb-4`}>
+    <div 
+      className={cn(
+        "relative group mb-4 block-panel transition-all",
+        isSelected && "block-selected",
+        !block.visible && "opacity-50"
+      )}
+      onClick={handleSelectBlock}
+      data-block-id={block.id}
+      data-has-custom-style={!!block.style}
+    >
       <BlockHeader block={block} />
       
-      <div className="relative">
-        {children}
-        
-        <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm rounded-md p-1 shadow-sm">
-          <StyleControls block={block} />
-          <BlockActions block={block} />
-        </div>
+      <div className="flex items-center space-x-1">
+        <BlockActions block={block} />
+        <StyleControls block={block} />
       </div>
       
-      {/* Add AI controls specifically for AI blocks */}
-      {block.type === 'ai' && (
-        <div className="p-3 border-t border-gray-100">
-          <AIBlockControls blockId={block.id} currentBlock={block as any} />
-        </div>
-      )}
+      <div className="pt-8 pb-2 px-2">
+        {children}
+      </div>
     </div>
   );
 };

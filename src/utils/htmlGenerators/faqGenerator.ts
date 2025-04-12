@@ -1,5 +1,5 @@
 
-import { FAQBlock } from '@/types/editor/blocks/faq';
+import { FAQBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateFAQHtml = (block: FAQBlock): string => {

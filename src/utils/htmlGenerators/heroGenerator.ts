@@ -1,5 +1,5 @@
 
-import { HeroBlock } from '@/types/editor/blocks/hero';
+import { HeroBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateHeroHtml = (block: HeroBlock): string => {

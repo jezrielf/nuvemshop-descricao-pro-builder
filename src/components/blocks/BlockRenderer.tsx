@@ -12,7 +12,6 @@ import ImageTextBlock from './ImageTextBlock';
 import TextImageBlock from './TextImageBlock';
 import FAQBlock from './FAQBlock';
 import CTABlock from './CTABlock';
-import AIBlock from './AIBlock';
 import { getStylesFromBlock } from '@/utils/styleConverter';
 
 interface BlockRendererProps {
@@ -86,8 +85,6 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
         return <FAQBlock block={block} isPreview={isPreview} />;
       case 'cta':
         return <CTABlock block={block} isPreview={isPreview} />;
-      case 'ai':
-        return <AIBlock block={block} isPreview={isPreview} />;
       default:
         return (
           <div className="p-4 border rounded-md bg-gray-100">

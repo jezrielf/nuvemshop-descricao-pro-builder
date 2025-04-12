@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { BlockBase } from '@/types/editor';
+import { Grip } from 'lucide-react';
 
 interface BlockHeaderProps {
   block: BlockBase;
@@ -8,10 +9,16 @@ interface BlockHeaderProps {
 
 const BlockHeader: React.FC<BlockHeaderProps> = ({ block }) => {
   return (
-    <div className="py-1 px-3 text-xs text-gray-500 border-b border-gray-100 flex justify-between">
-      <span>{block.title}</span>
-      <span>ID: {block.id.slice(0, 8)}</span>
-    </div>
+    <>
+      <div className="absolute left-2 top-2 z-10 drag-handle">
+        <Grip className="h-5 w-5" />
+      </div>
+      
+      <div className="text-sm font-medium text-gray-500 mb-2 flex items-center justify-between">
+        <span>{block.title || block.type}</span>
+        <span className="text-xs bg-gray-100 px-2 py-1 rounded">{block.columns} coluna(s)</span>
+      </div>
+    </>
   );
 };
 

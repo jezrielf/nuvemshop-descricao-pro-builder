@@ -1,5 +1,5 @@
 
-import { GalleryBlock } from '@/types/editor/blocks/gallery';
+import { GalleryBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateGalleryHtml = (block: GalleryBlock): string => {

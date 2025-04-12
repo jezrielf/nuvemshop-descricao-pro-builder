@@ -1,3 +1,4 @@
+
 export type BlockType = 
   | 'hero' 
   | 'features' 
@@ -9,8 +10,7 @@ export type BlockType =
   | 'imageText'
   | 'textImage'
   | 'faq'
-  | 'cta'
-  | 'ai';
+  | 'cta';
 
 export type ColumnLayout = 1 | 2 | 3 | 4;
 

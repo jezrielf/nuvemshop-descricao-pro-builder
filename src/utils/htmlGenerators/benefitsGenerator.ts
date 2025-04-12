@@ -1,5 +1,5 @@
 
-import { BenefitsBlock } from '@/types/editor/blocks/benefits';
+import { BenefitsBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateBenefitsHtml = (block: BenefitsBlock): string => {
