@@ -11,6 +11,7 @@ import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
 import SEOAnalyzer from './SEO/SEOAnalyzer';
+import AIGeneratorButton from './header/AIGeneratorButton';
 
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
@@ -74,6 +75,8 @@ const Header: React.FC = () => {
           {description && <HtmlOutputDialog />}
           
           {description && <SEOAnalyzer description={description} />}
+          
+          <AIGeneratorButton />
           
           <TutorialManager />
           
