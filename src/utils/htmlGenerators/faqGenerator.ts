@@ -20,7 +20,7 @@ export const generateFAQHtml = (block: FAQBlock): string => {
     `).join('')
     : '';
   
-  // Pure CSS accordion implementation
+  // Pure CSS accordion implementation - localized to this specific block to avoid conflicts
   const faqCss = `
     <style>
       #faq-block-${block.id} input.faq-toggle:checked ~ .faq-answer {
@@ -33,7 +33,7 @@ export const generateFAQHtml = (block: FAQBlock): string => {
   `;
   
   return `
-    <div${blockStyleAttr} style="width:100%;padding:20px;margin-bottom:20px;" id="faq-block-${block.id}">
+    <div${blockStyleAttr} id="faq-block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">
       <h2 style="font-size:24px;font-weight:bold;margin-bottom:20px;">${block.heading}</h2>
       <div class="faq-items">${faqHtml}</div>
       ${faqCss}

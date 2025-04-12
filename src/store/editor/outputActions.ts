@@ -48,16 +48,16 @@ export const createOutputActions = (get: () => EditorState) => ({
             blockSpacingStyle = 'margin-bottom: 1.5rem;';
           }
           
-          // Add one consistent wrapper for all blocks to ensure proper styling
+          // Add one consistent wrapper for all blocks to ensure proper styling and closure
           const wrappedHtml = `
             <div class="product-description-block" style="${blockSpacingStyle}" id="product-block-${block.id}">
               ${html}
             </div>
           `;
           
-          // Log generated HTML for debugging (first 100 chars)
+          // Log generated HTML for debugging
           if (wrappedHtml) {
-            console.log(`Generated HTML preview: ${wrappedHtml.substring(0, 100)}...`);
+            console.log(`Generated HTML preview for block ${block.id}`);
           } else {
             console.warn(`No HTML generated for block ${block.id}`);
           }
