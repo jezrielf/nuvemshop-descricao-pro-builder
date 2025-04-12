@@ -1,5 +1,5 @@
 
-import { FeaturesBlock } from '@/types/editor';
+import { FeaturesBlock } from '@/types/editor/blocks/features';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateFeaturesHtml = (block: FeaturesBlock): string => {

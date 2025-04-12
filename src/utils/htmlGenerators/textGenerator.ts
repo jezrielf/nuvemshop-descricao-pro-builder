@@ -1,5 +1,5 @@
 
-import { TextBlock } from '@/types/editor';
+import { TextBlock } from '@/types/editor/blocks/text';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateTextHtml = (block: TextBlock): string => {

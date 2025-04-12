@@ -1,5 +1,5 @@
 
-import { SpecificationsBlock } from '@/types/editor';
+import { SpecificationsBlock } from '@/types/editor/blocks/specifications';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateSpecificationsHtml = (block: SpecificationsBlock): string => {

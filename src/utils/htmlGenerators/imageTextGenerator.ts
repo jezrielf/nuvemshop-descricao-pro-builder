@@ -1,5 +1,5 @@
 
-import { ImageTextBlock } from '@/types/editor';
+import { ImageTextBlock } from '@/types/editor/blocks/imageText';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateImageTextHtml = (block: ImageTextBlock): string => {

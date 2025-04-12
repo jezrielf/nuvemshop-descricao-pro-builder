@@ -1,5 +1,5 @@
 
-import { CTABlock } from '@/types/editor';
+import { CTABlock } from '@/types/editor/blocks/cta';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateCTAHtml = (block: CTABlock): string => {

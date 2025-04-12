@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -7,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useEditorStore } from '@/store/editor';
 import { Wand2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { AIBlock } from '@/types/editor';
+import { AIBlock } from '@/types/editor/blocks/ai';
 
 interface AIBlockControlsProps {
   blockId: string;

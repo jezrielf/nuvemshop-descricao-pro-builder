@@ -9,11 +9,12 @@ import AIBlockControls from './AIBlockControls';
 interface BlockWrapperProps {
   block: BlockBase;
   children: React.ReactNode;
+  isEditing?: boolean;
 }
 
-const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children }) => {
+const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing = false }) => {
   return (
-    <div className="group relative border border-transparent hover:border-gray-200 rounded-lg transition-all">
+    <div className={`group relative border ${isEditing ? 'border-blue-300 ring-2 ring-blue-100' : 'border-transparent hover:border-gray-200'} rounded-lg transition-all mb-4`}>
       <BlockHeader block={block} />
       
       <div className="relative">

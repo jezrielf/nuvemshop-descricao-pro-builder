@@ -1,19 +1,21 @@
+
 import {
   Block,
   BlockType,
-  TextBlock,
-  HeroBlock,
-  FeaturesBlock,
-  BenefitsBlock,
-  ImageBlock,
-  GalleryBlock,
-  ImageTextBlock,
-  TextImageBlock,
-  FAQBlock,
-  CTABlock,
-  SpecificationsBlock,
-  AIBlock
+  ColumnLayout
 } from '@/types/editor';
+import { TextBlock } from '@/types/editor/blocks/text';
+import { HeroBlock } from '@/types/editor/blocks/hero';
+import { FeaturesBlock } from '@/types/editor/blocks/features';
+import { BenefitsBlock } from '@/types/editor/blocks/benefits';
+import { ImageBlock } from '@/types/editor/blocks/image';
+import { GalleryBlock } from '@/types/editor/blocks/gallery';
+import { ImageTextBlock } from '@/types/editor/blocks/imageText';
+import { TextImageBlock } from '@/types/editor/blocks/textImage';
+import { FAQBlock } from '@/types/editor/blocks/faq';
+import { CTABlock } from '@/types/editor/blocks/cta';
+import { SpecificationsBlock } from '@/types/editor/blocks/specifications';
+import { AIBlock } from '@/types/editor/blocks/ai';
 import { v4 as uuidv4 } from 'uuid';
 
 export const createTextBlock = (columns: number = 1): TextBlock => ({

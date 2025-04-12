@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { AIBlock as AIBlockType } from '@/types/editor';
+import { Block } from '@/types/editor';
+import { AIBlock as AIBlockType } from '@/types/editor/blocks/ai';
 import BlockWrapper from './BlockWrapper';
 
 interface AIBlockProps {
