@@ -70,7 +70,7 @@ export const createOutputActions = (get: () => EditorState) => ({
       })
       .join('\n\n');
 
-    // CSS completo e inline - sem JavaScript
+    // Complete inline CSS - no JavaScript
     const inlineStyles = `
       <style>
         /* Reset básico */
@@ -177,7 +177,13 @@ export const createOutputActions = (get: () => EditorState) => ({
           padding: 15px;
         }
         
-        /* Demais estilos são definidos inline em cada bloco */
+        .faq-toggle:checked ~ .faq-answer {
+          max-height: 1000px;
+        }
+        
+        .faq-toggle:checked + .faq-question .faq-icon {
+          transform: rotate(45deg);
+        }
       </style>
     `;
 

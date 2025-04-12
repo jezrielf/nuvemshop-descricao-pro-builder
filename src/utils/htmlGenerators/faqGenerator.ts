@@ -11,7 +11,7 @@ export const generateFAQHtml = (block: FAQBlock): string => {
         <input type="checkbox" id="faq-${block.id}-${index}" class="faq-toggle" style="display:none;">
         <label for="faq-${block.id}-${index}" class="faq-question" style="padding:12px 16px;background-color:#f9fafb;font-weight:500;cursor:pointer;position:relative;display:block;">
           ${item.question}
-          <span class="faq-icon" style="position:absolute;right:16px;top:12px;font-size:18px;">+</span>
+          <span class="faq-icon" style="position:absolute;right:16px;top:12px;font-size:18px;transition:transform 0.3s ease;">+</span>
         </label>
         <div class="faq-answer" style="max-height:0;overflow:hidden;background-color:white;transition:max-height 0.3s ease;">
           <div class="faq-answer-content" style="padding:16px;">${item.answer}</div>
@@ -20,7 +20,7 @@ export const generateFAQHtml = (block: FAQBlock): string => {
     `).join('')
     : '';
   
-  // Adicionando CSS inline para o comportamento do accordion
+  // Pure CSS accordion implementation
   const faqCss = `
     <style>
       #faq-block-${block.id} input.faq-toggle:checked ~ .faq-answer {
@@ -28,9 +28,6 @@ export const generateFAQHtml = (block: FAQBlock): string => {
       }
       #faq-block-${block.id} input.faq-toggle:checked + label .faq-icon {
         transform: rotate(45deg);
-      }
-      #faq-block-${block.id} .faq-icon {
-        transition: transform 0.3s ease;
       }
     </style>
   `;
