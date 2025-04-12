@@ -20,9 +20,11 @@ export type { AIBlock } from './blocks/ai';
 import type { BlockType as BaseBlockType } from './base';
 export type { BaseBlockType };
 
-// Similarly for BlockType from './blocks'
-import type { BlockType as BlocksType } from './blocks';
-export type { BlocksType };
+// Import BlockType from './blocks' and export it both as BlocksType and BlockType
+// This maintains backward compatibility with existing code
+import type { BlockType } from './blocks';
+export type { BlockType };  // Re-export with original name for compatibility
+export type { BlockType as BlocksType };  // Also export as BlocksType
 
 // Re-export Block from './blocks'
 export type { Block } from './blocks';
