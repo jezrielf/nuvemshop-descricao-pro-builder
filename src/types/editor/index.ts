@@ -18,5 +18,5 @@ export * from './blocks/specifications';
 export * from './blocks/ai';
 
 // Explicitly re-export the conflicting BlockType types with different names
-export { BlockType as BaseBlockType } from './base';
-export { BlockType as BlockUnionType } from './blocks';
+export type { BlockType as BaseBlockType } from './base';
+export type { BlockType as BlockUnionType } from './blocks';
