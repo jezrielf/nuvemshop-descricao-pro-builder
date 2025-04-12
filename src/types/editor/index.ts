@@ -17,6 +17,6 @@ export * from './blocks/cta';
 export * from './blocks/specifications';
 export * from './blocks/ai';
 
-// Prevent BlockType naming conflict by explicitly re-exporting with unique names
+// Use type aliases to prevent naming conflicts
 export type { BlockType as BaseBlockType } from './base';
 export type { BlockType as UnionBlockType } from './blocks';
