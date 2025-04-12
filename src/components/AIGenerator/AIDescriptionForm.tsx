@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEditorStore } from '@/store/editor';
 import { AIFormField, AIFormHeader, AISubmitButton } from './FormComponents';
 import { generateDescriptionBlocks } from './BlockGeneration/generateBlocks';
-import { generateHealthSupplementTemplate } from './BlockGeneration/healthSupplementTemplate';
+import { generateHealthSupplementTemplate } from './BlockGeneration/HealthSupplement';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ListChecks } from 'lucide-react';
