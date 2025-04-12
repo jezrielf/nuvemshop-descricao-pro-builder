@@ -39,7 +39,7 @@ const HtmlOutputDialog: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
         
-        <Alert variant="warning" className="my-2">
+        <Alert variant="default" className="my-2">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Este HTML inclui tudo necessário para funcionar corretamente na Nuvemshop, incluindo estilos e scripts. 
