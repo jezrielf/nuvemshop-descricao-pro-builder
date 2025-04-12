@@ -15,7 +15,7 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
       textColor: '#333',
-      buttonColor: '#69B345',
+      // buttonColor is not in the BlockStyle type, so we'll remove it
     };
     addBlock(heroBlock);
   }
@@ -148,8 +148,8 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     benefitsBlock.style = {
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
-      borderRadius: '8px',
-      padding: '20px',
+      borderRadius: 'md',
+      padding: 'md',
     };
     addBlock(benefitsBlock);
   }
@@ -182,9 +182,9 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     product1Block.style = {
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
-      padding: '20px',
-      borderRadius: '8px',
-      marginBottom: '15px',
+      padding: 'md',
+      borderRadius: 'md',
+      marginBottom: 'sm',
     };
     addBlock(product1Block);
   }
@@ -200,9 +200,9 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     product2Block.style = {
       backgroundColor: '#ffffff',
       headingColor: '#5A2D82',
-      padding: '20px',
-      borderRadius: '8px',
-      marginBottom: '15px',
+      padding: 'md',
+      borderRadius: 'md',
+      marginBottom: 'sm',
     };
     addBlock(product2Block);
   }
@@ -218,9 +218,9 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     product3Block.style = {
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
-      padding: '20px',
-      borderRadius: '8px',
-      marginBottom: '15px',
+      padding: 'md',
+      borderRadius: 'md',
+      marginBottom: 'sm',
     };
     addBlock(product3Block);
   }
@@ -236,9 +236,9 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     product4Block.style = {
       backgroundColor: '#ffffff',
       headingColor: '#5A2D82',
-      padding: '20px',
-      borderRadius: '8px',
-      marginBottom: '15px',
+      padding: 'md',
+      borderRadius: 'md',
+      marginBottom: 'sm',
     };
     addBlock(product4Block);
   }
@@ -254,9 +254,9 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     product5Block.style = {
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
-      padding: '20px',
-      borderRadius: '8px',
-      marginBottom: '15px',
+      padding: 'md',
+      borderRadius: 'md',
+      marginBottom: 'sm',
     };
     addBlock(product5Block);
   }
@@ -292,8 +292,8 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     targetAudienceBlock.style = {
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
-      padding: '30px',
-      borderRadius: '10px',
+      padding: 'lg',
+      borderRadius: 'lg',
     };
     addBlock(targetAudienceBlock);
   }
@@ -337,8 +337,8 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     guaranteesBlock.style = {
       backgroundColor: '#ffffff',
       headingColor: '#5A2D82',
-      padding: '20px',
-      borderRadius: '8px',
+      padding: 'md',
+      borderRadius: 'md',
     };
     addBlock(guaranteesBlock);
   }
@@ -356,9 +356,8 @@ export const generateHealthSupplementTemplate = (addBlock: (block: Block) => voi
     ctaBlock.style = {
       backgroundColor: '#f8f9fa',
       headingColor: '#5A2D82',
-      buttonColor: '#69B345',
-      padding: '40px',
-      borderRadius: '10px',
+      padding: 'xl',
+      borderRadius: 'lg',
     };
     addBlock(ctaBlock);
   }
