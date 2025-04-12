@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEditorStore } from '@/store/editor';
 import { createBlock } from '@/utils/blockCreators';
-import { ProductDescription, Block, BlockType } from '@/types/editor';
+import { ProductDescription } from '@/types/editor';
 
 interface FormData {
   productName: string;
@@ -101,7 +101,7 @@ const AIDescriptionForm: React.FC = () => {
     
     // Hero block
     const heroBlock = createBlock('hero', 1);
-    if (heroBlock) {
+    if (heroBlock && heroBlock.type === 'hero') {
       heroBlock.heading = formData.productName;
       heroBlock.subheading = `A melhor escolha para ${formData.targetAudience}`;
       addBlock(heroBlock);
@@ -109,7 +109,7 @@ const AIDescriptionForm: React.FC = () => {
     
     // Text block for product description
     const textBlock = createBlock('text', 1);
-    if (textBlock) {
+    if (textBlock && textBlock.type === 'text') {
       textBlock.heading = 'Sobre o Produto';
       textBlock.content = `<p>${formData.productDescription}</p>`;
       addBlock(textBlock);
@@ -119,7 +119,7 @@ const AIDescriptionForm: React.FC = () => {
     const featuresData = formData.keyFeatures.split('\n').filter(f => f.trim());
     if (featuresData.length > 0) {
       const featuresBlock = createBlock('features', 2);
-      if (featuresBlock) {
+      if (featuresBlock && featuresBlock.type === 'features') {
         featuresBlock.heading = 'Recursos Principais';
         featuresBlock.features = featuresData.map((feature, index) => ({
           id: `feature-${index}`,
@@ -134,7 +134,7 @@ const AIDescriptionForm: React.FC = () => {
     // Company info as text block
     if (formData.companyInfo.trim()) {
       const companyBlock = createBlock('text', 1);
-      if (companyBlock) {
+      if (companyBlock && companyBlock.type === 'text') {
         companyBlock.heading = 'Sobre a Empresa';
         companyBlock.content = `<p>${formData.companyInfo}</p>`;
         addBlock(companyBlock);
@@ -143,7 +143,7 @@ const AIDescriptionForm: React.FC = () => {
     
     // CTA block
     const ctaBlock = createBlock('cta', 1);
-    if (ctaBlock) {
+    if (ctaBlock && ctaBlock.type === 'cta') {
       ctaBlock.heading = 'Interessado em nosso produto?';
       ctaBlock.content = '<p>Entre em contato conosco para saber mais ou realizar um pedido.</p>';
       ctaBlock.buttonText = 'Fale Conosco';
