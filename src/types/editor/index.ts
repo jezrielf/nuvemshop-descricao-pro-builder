@@ -1,9 +1,4 @@
-
-// Re-export block types explicitly to avoid ambiguity
-export * from './base';
-export * from './blocks';
-
-// Re-export block specific types
+// Re-export block types in a safer way to avoid ambiguity
 export * from './blocks/text';
 export * from './blocks/hero';
 export * from './blocks/features';
@@ -15,8 +10,37 @@ export * from './blocks/textImage';
 export * from './blocks/faq';
 export * from './blocks/cta';
 export * from './blocks/specifications';
-export * from './blocks/ai';
 
-// Explicitly re-export the conflicting BlockType types with different names
-export type { BlockType as EditorBaseBlockType } from './base';
-export type { BlockType as EditorUnionBlockType } from './blocks';
+// We'll handle the AI block re-export carefully
+export type { AIBlock } from './blocks/ai';
+
+// Handle the conflicting BlockType exports differently
+// Don't re-export BlockType from './base' directly
+// Instead, import and export with a different name
+import type { BlockType as BaseBlockType } from './base';
+export type { BaseBlockType };
+
+// Similarly for BlockType from './blocks'
+import type { BlockType as BlocksType } from './blocks';
+export type { BlocksType };
+
+// Re-export Block from './blocks'
+export type { Block } from './blocks';
+
+// Other exports from base that don't conflict
+export type {
+  ColumnLayout,
+  TextAlign,
+  SpacingSize,
+  FontSize,
+  BlockSpacing,
+  FontWeight,
+  FontStyle,
+  TextDecoration,
+  ImageFit,
+  BlockStyle,
+  BlockBase,
+  ProductCategory,
+  ProductDescription,
+  Template
+} from './base';

@@ -1,3 +1,4 @@
+
 import { TextBlock } from './text';
 import { HeroBlock } from './hero';
 import { FeaturesBlock } from './features';
@@ -9,7 +10,7 @@ import { TextImageBlock } from './textImage';
 import { FAQBlock } from './faq';
 import { CTABlock } from './cta';
 import { SpecificationsBlock } from './specifications';
-import { AIBlock } from '../ai';
+import { AIBlock } from '../blocks/ai';
 
 // Update the Block type to include AIBlock
 export type Block =
