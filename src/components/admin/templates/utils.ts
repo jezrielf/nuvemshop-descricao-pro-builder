@@ -29,7 +29,8 @@ export const getBlockTypeName = (type: BlockType): string => {
     imageText: 'Imagem e Texto',
     textImage: 'Texto e Imagem',
     faq: 'Perguntas e Respostas',
-    cta: 'Chamada para Ação'
+    cta: 'Chamada para Ação',
+    video: 'Vídeo'
   };
   
   return typeNames[type] || type;

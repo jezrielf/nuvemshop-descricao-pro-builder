@@ -2,7 +2,7 @@
 import { VideoBlock } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
-export const createVideoBlock = (columns = 1): VideoBlock => {
+export const createVideoBlock = (columns = 1 as 1 | 2 | 3 | 4): VideoBlock => {
   return {
     id: uuidv4(),
     type: 'video',
