@@ -18,20 +18,13 @@ interface TemplateActionsProviderProps {
 }
 
 const TemplateActionsProvider: React.FC<TemplateActionsProviderProps> = (props) => {
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  // We don't need to use these variables if TemplateActions doesn't expect them
+  // Remove the state and function that aren't needed by TemplateActions
   const { toast } = useToast();
-
-  const handleViewTemplate = (template: Template) => {
-    setSelectedTemplate(template);
-  };
 
   return (
     <DialogProvider>
-      <TemplateActions 
-        {...props} 
-        onViewTemplate={handleViewTemplate}
-        selectedTemplate={selectedTemplate}
-      />
+      <TemplateActions {...props} />
     </DialogProvider>
   );
 };
