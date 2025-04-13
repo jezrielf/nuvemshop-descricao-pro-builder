@@ -9,8 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
-import { Settings, ChevronDown, Search, Tag, Image, List, BarChart, Lightbulb } from 'lucide-react';
+import { Settings, ChevronDown } from 'lucide-react';
 import { ProductDescription } from '@/types/editor';
 import SEOAnalyzer from './SEOAnalyzer';
 import MetaTagValidator from './MetaTagValidator';
@@ -57,64 +56,49 @@ const SEOTools: React.FC<SEOToolsProps> = ({ description }) => {
   };
   
   return (
-    <div className="flex items-center space-x-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8">
-            <Settings className="h-4 w-4 mr-1" />
-            Ferramentas SEO
-            <ChevronDown className="h-4 w-4 ml-1" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Otimização de SEO</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <div className="cursor-default w-full">
-              <SEOAnalyzer description={description} />
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <div className="cursor-default w-full">
-              <SEOChecklist description={description} />
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <div className="cursor-default w-full">
-              <MetaTagValidator description={description} />
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <div className="cursor-default w-full">
-              <ImageOptimizer 
-                description={description} 
-                onUpdateImage={handleUpdateImage}
-              />
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Recursos de IA</DropdownMenuLabel>
-          <DropdownMenuItem asChild>
-            <div className="cursor-default w-full">
-              <AIContentRecommender description={description} />
-            </div>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      
-      <Separator orientation="vertical" className="h-8" />
-      
-      <div className="flex space-x-1">
-        <SEOAnalyzer description={description} />
-        <SEOChecklist description={description} />
-        <MetaTagValidator description={description} />
-        <ImageOptimizer 
-          description={description} 
-          onUpdateImage={handleUpdateImage}
-        />
-        <AIContentRecommender description={description} />
-      </div>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-8">
+          <Settings className="h-4 w-4 mr-1" />
+          Ferramentas SEO
+          <ChevronDown className="h-4 w-4 ml-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Otimização de SEO</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <div className="cursor-default w-full">
+            <SEOAnalyzer description={description} />
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <div className="cursor-default w-full">
+            <SEOChecklist description={description} />
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <div className="cursor-default w-full">
+            <MetaTagValidator description={description} />
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <div className="cursor-default w-full">
+            <ImageOptimizer 
+              description={description} 
+              onUpdateImage={handleUpdateImage}
+            />
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Recursos de IA</DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <div className="cursor-default w-full">
+            <AIContentRecommender description={description} />
+          </div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
