@@ -13,6 +13,7 @@ interface AIDescriptionInput {
   additionalInfo?: string;
   tone: 'formal' | 'casual' | 'professional' | 'enthusiastic';
   imageUrl?: string;
+  modelImageUrl?: string; // Nova propriedade para a imagem modelo
 }
 
 // Mock placeholder images for the generated blocks
@@ -54,6 +55,31 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   // Create blocks array
   const blocks: Block[] = [];
   
+  // Se houver uma imagem modelo, adaptamos o layout da descrição para se assemelhar a ela
+  const hasModelImage = !!input.modelImageUrl;
+  
+  // Determinamos o estilo com base na imagem modelo (simulação)
+  let layoutStyle = {
+    backgroundColor: '#f9fafb',
+    headingColor: '#1f2937',
+    textAlign: 'center',
+    padding: 'lg',
+    blockSpacing: 'md'
+  };
+  
+  if (hasModelImage) {
+    console.log("Usando imagem modelo para inspiração no layout: ", input.modelImageUrl);
+    // Aqui, em um sistema real, poderíamos analisar a imagem e extrair cores, estilo, etc.
+    // Para este mock, usamos um estilo diferente para mostrar que reconhecemos a imagem modelo
+    layoutStyle = {
+      backgroundColor: '#f0f9ff', // Azul mais claro para indicar inspiração na imagem modelo
+      headingColor: '#0f172a', // Cor de cabeçalho mais escura
+      textAlign: 'center',
+      padding: 'xl', // Padding maior
+      blockSpacing: 'lg' // Espaçamento maior entre blocos
+    };
+  }
+  
   // Add a hero block
   const heroBlock = createBlock('hero', 1) as Block;
   heroBlock.visible = true;
@@ -62,19 +88,21 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   (heroBlock as any).subheading = `Descubra porque este é o produto perfeito para você. ${input.productPrice ? `Apenas ${input.productPrice}` : ''}`;
   (heroBlock as any).buttonText = 'Saiba Mais';
   (heroBlock as any).buttonUrl = '#features';
+  
+  // Priorizar a imagem do produto se fornecida, senão usar a imagem modelo, ou por último um placeholder
   if (input.imageUrl) {
     (heroBlock as any).image = {
       src: input.imageUrl,
       alt: input.productName
     };
+  } else if (input.modelImageUrl) {
+    (heroBlock as any).image = {
+      src: input.modelImageUrl,
+      alt: `Inspiração para ${input.productName}`
+    };
   }
-  heroBlock.style = {
-    backgroundColor: '#f9fafb',
-    headingColor: '#1f2937',
-    textAlign: 'center',
-    padding: 'lg',
-    blockSpacing: 'md'
-  };
+  
+  heroBlock.style = layoutStyle;
   blocks.push(heroBlock);
   
   // Add features block
@@ -88,10 +116,10 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
       id: uuidv4(),
       title: `Recurso ${index + 1}`,
       description: point,
-      icon: '✨'
+      icon: hasModelImage ? '🔥' : '✨' // Icone diferente para mostrar influência da imagem modelo
     }));
     featuresBlock.style = {
-      backgroundColor: '#ffffff',
+      backgroundColor: hasModelImage ? '#f8fafc' : '#ffffff',
       padding: 'md',
       blockSpacing: 'md'
     };
@@ -109,10 +137,10 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
       id: uuidv4(),
       title: `Benefício ${index + 1}`,
       description: point,
-      icon: '🌟'
+      icon: hasModelImage ? '💎' : '🌟' // Icone diferente para mostrar influência da imagem modelo
     }));
     benefitsBlock.style = {
-      backgroundColor: '#f3f4f6',
+      backgroundColor: hasModelImage ? '#f1f5f9' : '#f3f4f6',
       padding: 'md',
       blockSpacing: 'md'
     };
@@ -120,18 +148,28 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   }
   
   // Add imageText block if there's an uploaded image
-  if (input.imageUrl) {
+  if (input.imageUrl || input.modelImageUrl) {
     const imageTextBlock = createBlock('imageText', 2) as Block;
     imageTextBlock.visible = true;
     imageTextBlock.title = 'Imagem e Texto';
     (imageTextBlock as any).heading = 'Qualidade Excepcional';
     (imageTextBlock as any).content = `${input.productName} foi desenvolvido para atender às necessidades do seu público-alvo. ${input.mainFeatures.split('.')[0]}.`;
-    (imageTextBlock as any).image = {
-      src: input.imageUrl,
-      alt: input.productName
-    };
+    
+    // Priorizar a imagem do produto, depois a imagem modelo
+    if (input.imageUrl) {
+      (imageTextBlock as any).image = {
+        src: input.imageUrl,
+        alt: input.productName
+      };
+    } else if (input.modelImageUrl) {
+      (imageTextBlock as any).image = {
+        src: input.modelImageUrl,
+        alt: `Inspiração para ${input.productName}`
+      };
+    }
+    
     imageTextBlock.style = {
-      backgroundColor: '#ffffff',
+      backgroundColor: hasModelImage ? '#ffffff' : '#ffffff',
       padding: 'md',
       blockSpacing: 'md'
     };
@@ -176,20 +214,21 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     ].filter(spec => spec.value.length > 3);
     
     specificationsBlock.style = {
-      backgroundColor: '#f9fafb',
+      backgroundColor: hasModelImage ? '#fafafa' : '#f9fafb',
       padding: 'md',
       blockSpacing: 'md'
     };
     blocks.push(specificationsBlock);
   }
   
-  // Add a gallery block with placeholder images
+  // Add a gallery block with images
   const galleryBlock = createBlock('gallery', 3) as Block;
   galleryBlock.visible = true;
   galleryBlock.title = 'Galeria do Produto';
   
-  // If we have a user image, include it in the gallery along with placeholders
+  // Se temos imagens enviadas, incluímos na galeria junto com placeholders
   const galleryImages = [];
+  
   if (input.imageUrl) {
     galleryImages.push({
       id: uuidv4(),
@@ -199,8 +238,18 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     });
   }
   
-  // Add some placeholder images
-  for (let i = 0; i < 3; i++) {
+  if (input.modelImageUrl && input.modelImageUrl !== input.imageUrl) {
+    galleryImages.push({
+      id: uuidv4(),
+      src: input.modelImageUrl,
+      alt: `${input.productName} - Referência de Design`,
+      caption: `Estilo de Referência para ${input.productName}`
+    });
+  }
+  
+  // Adicionar algumas imagens placeholder para completar a galeria
+  const placeholdersNeeded = Math.max(0, 3 - galleryImages.length);
+  for (let i = 0; i < placeholdersNeeded; i++) {
     galleryImages.push({
       id: uuidv4(),
       src: getRandomImage(),
@@ -211,7 +260,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   
   (galleryBlock as any).images = galleryImages;
   galleryBlock.style = {
-    backgroundColor: '#ffffff',
+    backgroundColor: hasModelImage ? '#ffffff' : '#ffffff',
     padding: 'md',
     blockSpacing: 'md'
   };
@@ -248,7 +297,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   ];
   
   faqBlock.style = {
-    backgroundColor: '#f9fafb',
+    backgroundColor: hasModelImage ? '#f8fafc' : '#f9fafb',
     padding: 'md',
     blockSpacing: 'md'
   };
@@ -261,7 +310,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   (companyBlock as any).heading = 'Sobre Nossa Empresa';
   (companyBlock as any).content = input.companyInfo;
   companyBlock.style = {
-    backgroundColor: '#ffffff',
+    backgroundColor: hasModelImage ? '#ffffff' : '#ffffff',
     padding: 'md',
     blockSpacing: 'md'
   };
@@ -276,7 +325,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   (ctaBlock as any).buttonText = 'Comprar Agora';
   (ctaBlock as any).buttonUrl = '#';
   ctaBlock.style = {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: hasModelImage ? '#f0f9ff' : '#f3f4f6',
     headingColor: '#1f2937',
     padding: 'lg',
     blockSpacing: 'lg'
