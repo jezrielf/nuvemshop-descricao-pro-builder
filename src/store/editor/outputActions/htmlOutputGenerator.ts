@@ -2,7 +2,6 @@
 import { EditorState } from '../types';
 import { Block } from '@/types/editor';
 import { generateBlockHtml } from '@/utils/htmlGenerators';
-import { generateInlineStyles } from './styleUtils';
 
 /**
  * Generates the complete HTML output for the product description
@@ -11,7 +10,7 @@ import { generateInlineStyles } from './styleUtils';
 export const generateCompleteHtml = (state: EditorState): string => {
   // Check if description exists and has blocks
   if (!state.description || !state.description.blocks || state.description.blocks.length === 0) {
-    return '<div class="product-description">Nenhum conteúdo adicionado</div>';
+    return '<div class="product-description" style="width:100%;max-width:1200px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;line-height:1.6;color:#333;">Nenhum conteúdo adicionado</div>';
   }
 
   // Filter only visible blocks
@@ -20,11 +19,8 @@ export const generateCompleteHtml = (state: EditorState): string => {
   });
 
   if (visibleBlocks.length === 0) {
-    return '<div class="product-description">Nenhum bloco visível</div>';
+    return '<div class="product-description" style="width:100%;max-width:1200px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;line-height:1.6;color:#333;">Nenhum bloco visível</div>';
   }
-
-  // Get the CSS styles
-  const cssStyles = generateInlineStyles();
   
   // Generate HTML for each block
   let blocksHtml = '';
@@ -52,8 +48,11 @@ export const generateCompleteHtml = (state: EditorState): string => {
     }
   }
 
-  // Construct the complete HTML with proper container div
-  const completeHtml = `<div class="product-description" style="width: 100%; max-width: 1200px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333;">\n${cssStyles}\n${blocksHtml}</div>`;
+  // Base styles for the product description container with all styles inline
+  const baseStyles = `width:100%;max-width:1200px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.6;color:#333;`;
+  
+  // Construct the complete HTML with proper container div and inline styles
+  const completeHtml = `<div class="product-description" style="${baseStyles}">\n${blocksHtml}</div>`;
 
   console.log("HTML output gerado com " + visibleBlocks.length + " blocos visíveis");
   

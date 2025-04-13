@@ -22,21 +22,30 @@ export const generateFAQHtml = (block: FAQBlock): string => {
             <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
               <div class="faq-answer-content" style="padding:0 0 16px 0;color:#666;">${item.answer}</div>
             </div>
-            <style>
-              #faq-${block.id}-${index}:checked ~ .faq-answer {
-                max-height: 1000px;
-              }
-              #faq-${block.id}-${index}:checked + label .faq-icon {
-                transform: rotate(45deg);
-              }
-              label[for="faq-${block.id}-${index}"]:hover {
-                color: #000;
-              }
-            </style>
           </div>
         `;
       }).join('')
     : '';
+  
+  // Conteúdo CSS para os elementos FAQ - será aplicado como atributos style inline em cada elemento
+  const faqStyles = `
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var toggles = document.querySelectorAll('#faq-block-${block.id} .faq-toggle');
+        toggles.forEach(function(toggle) {
+          toggle.addEventListener('change', function() {
+            if (this.checked) {
+              this.nextElementSibling.nextElementSibling.style.maxHeight = '1000px';
+              this.nextElementSibling.querySelector('.faq-icon').style.transform = 'rotate(45deg)';
+            } else {
+              this.nextElementSibling.nextElementSibling.style.maxHeight = '0';
+              this.nextElementSibling.querySelector('.faq-icon').style.transform = 'rotate(0)';
+            }
+          });
+        });
+      });
+    </script>
+  `;
   
   // HTML completo com todas as tags devidamente fechadas e estilos inline
   return `
@@ -45,6 +54,7 @@ export const generateFAQHtml = (block: FAQBlock): string => {
       <div class="faq-items" style="border-radius:4px;background-color:#fff;">
         ${faqHtml}
       </div>
+      ${faqStyles}
     </div>
   `;
 };
