@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Template, BlockType } from '@/types/editor';
 import TemplateActions from './TemplateActions';
-import { useDialogs, DialogProvider } from '../dialogs/DialogProvider';
+import { DialogProvider } from '../dialogs/DialogProvider';
 import { useToast } from '@/hooks/use-toast';
 
 interface TemplateActionsProviderProps {
@@ -26,10 +26,7 @@ const TemplateActionsProvider: React.FC<TemplateActionsProviderProps> = (props) 
   };
 
   return (
-    <DialogProvider
-      selectedTemplate={selectedTemplate}
-      setSelectedTemplate={setSelectedTemplate}
-    >
+    <DialogProvider>
       <TemplateActions {...props} />
     </DialogProvider>
   );

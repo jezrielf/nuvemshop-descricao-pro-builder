@@ -21,15 +21,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   } = useAuthProvider();
 
   const checkHasRole = (role: string): boolean => {
-    return hasRole(profile, role);
+    return hasRole(profile?.role, role);
   };
 
   const checkIsAdmin = (): boolean => {
-    return isAdmin(profile);
+    return isAdmin(profile?.role);
   };
 
   const checkIsPremium = (): boolean => {
-    return isPremium(profile);
+    return isPremium(profile?.role);
   };
 
   const incrementDescriptionCount = () => {

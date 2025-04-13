@@ -25,6 +25,24 @@ export const hasRole = (role: string | string[] | null, roleToCheck: string): bo
 };
 
 /**
+ * Check if a user has admin role
+ * @param role string or string[] representing user roles
+ * @returns boolean indicating if the user is an admin
+ */
+export const isAdmin = (role: string | string[] | null): boolean => {
+  return hasRole(role, 'admin');
+};
+
+/**
+ * Check if a user has premium role
+ * @param role string or string[] representing user roles
+ * @returns boolean indicating if the user is premium
+ */
+export const isPremium = (role: string | string[] | null): boolean => {
+  return hasRole(role, 'premium');
+};
+
+/**
  * Add a role to a user's roles
  * @param currentRoles string or string[] representing current user roles
  * @param roleToAdd the role to add
