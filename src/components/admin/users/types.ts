@@ -9,5 +9,5 @@ export interface UserTableProps {
 
 export interface UserFormValues {
   nome: string;
-  role: string;
+  role: string; // For form values, we'll still use a single role string
 }

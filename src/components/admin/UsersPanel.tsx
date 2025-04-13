@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getRoles } from '@/utils/roleUtils';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -29,7 +30,11 @@ const UsersPanel: React.FC = () => {
       const filtered = profiles.filter(profile => 
         (profile.nome && profile.nome.toLowerCase().includes(lowercasedSearch)) || 
         profile.id.toLowerCase().includes(lowercasedSearch) ||
-        (profile.role && profile.role.toLowerCase().includes(lowercasedSearch))
+        (profile.role && (
+          typeof profile.role === 'string' 
+            ? profile.role.toLowerCase().includes(lowercasedSearch)
+            : profile.role.some(r => r.toLowerCase().includes(lowercasedSearch))
+        ))
       );
       setFilteredProfiles(filtered);
     }

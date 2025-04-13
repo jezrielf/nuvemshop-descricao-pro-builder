@@ -8,6 +8,7 @@ import { Profile } from '@/types/auth';
 import { UserFormValues } from './types';
 import UserRoleSelector from './UserRoleSelector';
 import UserQuickActions from './UserQuickActions';
+import { getRoles } from '@/utils/roleUtils';
 
 interface UserEditFormProps {
   profile: Profile;
@@ -20,10 +21,15 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
   onUpdateProfile, 
   onUpdateRole 
 }) => {
+  // Get the primary role from the profile
+  const primaryRole = Array.isArray(profile.role) 
+    ? profile.role[0] || 'user' 
+    : profile.role || 'user';
+
   const form = useForm<UserFormValues>({
     defaultValues: {
       nome: profile.nome || '',
-      role: profile.role || 'user'
+      role: primaryRole
     }
   });
 
@@ -56,7 +62,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
         <h3 className="text-sm font-medium mb-2">Alterar Papel Rápido</h3>
         <UserQuickActions 
           profileId={profile.id}
-          currentRole={profile.role}
+          currentRole={primaryRole}
           onUpdateRole={onUpdateRole}
         />
       </div>
