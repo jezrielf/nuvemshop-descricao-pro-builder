@@ -6,6 +6,7 @@ import { Lightbulb, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProductDescription } from '@/types/editor';
 import { useEditorStore } from '@/store/editor';
+import { ColumnLayout } from '@/types/editor/base';
 
 interface AIContentRecommenderProps {
   description: ProductDescription | null;
@@ -62,9 +63,9 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
     // Basic implementation: Add a text block with the recommendation
     const newBlock = {
       id: Math.random().toString(36).substring(7),
-      type: 'text' as const, // Fixed: Explicitly define as literal type
+      type: 'text' as const, // Explicitly define as literal type
       title: 'Recomendação IA',
-      columns: 1,
+      columns: 1 as ColumnLayout, // Fixed: Explicitly type as ColumnLayout
       visible: true,
       content: `<p>${recommendation}</p>`
     };
