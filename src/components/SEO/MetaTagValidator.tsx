@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,9 @@ import { ProductDescription } from '@/types/editor';
 interface MetaTagValidatorProps {
   description: ProductDescription | null;
 }
+
+// Define the valid status types
+type MetaTagStatus = 'pass' | 'fail' | 'warning';
 
 const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
   const [open, setOpen] = React.useState(false);
@@ -60,13 +62,13 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
       {
         id: 'title-present',
         title: 'Meta título presente',
-        status: title ? 'pass' : 'fail',
+        status: title ? 'pass' : 'fail' as MetaTagStatus,
         description: title ? 'A página tem um meta título definido' : 'A página não tem um meta título definido'
       },
       {
         id: 'title-length',
         title: 'Comprimento do título',
-        status: title.length > 10 && title.length <= 60 ? 'pass' : title.length > 60 ? 'fail' : 'warning',
+        status: title.length > 10 && title.length <= 60 ? 'pass' : title.length > 60 ? 'fail' : 'warning' as MetaTagStatus,
         description: title.length > 60 
           ? `O título tem ${title.length} caracteres, o ideal é até 60` 
           : title.length <= 10 && title.length > 0
@@ -78,13 +80,13 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
       {
         id: 'description-present',
         title: 'Meta descrição presente',
-        status: description_ ? 'pass' : 'fail',
+        status: description_ ? 'pass' : 'fail' as MetaTagStatus,
         description: description_ ? 'A página tem uma meta descrição definida' : 'A página não tem uma meta descrição definida'
       },
       {
         id: 'description-length',
         title: 'Comprimento da descrição',
-        status: description_.length > 50 && description_.length <= 160 ? 'pass' : description_.length > 160 ? 'warning' : 'fail',
+        status: description_.length > 50 && description_.length <= 160 ? 'pass' : description_.length > 160 ? 'warning' : 'fail' as MetaTagStatus,
         description: description_.length > 160 
           ? `A descrição tem ${description_.length} caracteres, o ideal é até 160` 
           : description_.length <= 50 && description_.length > 0
@@ -96,7 +98,7 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
       {
         id: 'canonical-present',
         title: 'Link canônico',
-        status: canonical ? 'pass' : 'warning',
+        status: canonical ? 'pass' : 'warning' as MetaTagStatus,
         description: canonical 
           ? 'A página tem um link canônico definido' 
           : 'Recomendamos definir um link canônico para evitar conteúdo duplicado'
@@ -104,7 +106,7 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
       {
         id: 'canonical-valid',
         title: 'URL canônica válida',
-        status: canonical && isValidUrl(canonical) ? 'pass' : canonical ? 'fail' : 'warning',
+        status: canonical && isValidUrl(canonical) ? 'pass' : canonical ? 'fail' : 'warning' as MetaTagStatus,
         description: canonical 
           ? isValidUrl(canonical)
             ? 'A URL canônica é válida'
@@ -146,7 +148,7 @@ ${canonical ? `<link rel="canonical" href="${canonical}" />` : ''}`;
     });
   };
   
-  const getStatusIcon = (status: 'pass' | 'fail' | 'warning') => {
+  const getStatusIcon = (status: MetaTagStatus) => {
     switch (status) {
       case 'pass':
         return <CheckCircle2 className="h-5 w-5 text-green-500" />;

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -61,7 +62,7 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
     // Basic implementation: Add a text block with the recommendation
     const newBlock = {
       id: Math.random().toString(36).substring(7),
-      type: 'text',
+      type: 'text' as const, // Fixed: Explicitly define as literal type
       title: 'Recomendação IA',
       columns: 1,
       visible: true,
