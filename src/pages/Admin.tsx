@@ -29,11 +29,11 @@ const Admin: React.FC = () => {
     setLoading(false);
   }, [navigate]);
   
-  // Watch for 'templates' tab and redirect
+  // Observar a aba 'templates' e redirecionar
   useEffect(() => {
     if (activeTab === 'templates') {
       navigate('/admin-templates');
-      // Reset to dashboard to avoid redirect loop if user comes back
+      // Resetar para o dashboard para evitar loop de redirecionamento se o usuário voltar
       setActiveTab('dashboard');
     }
   }, [activeTab, navigate]);

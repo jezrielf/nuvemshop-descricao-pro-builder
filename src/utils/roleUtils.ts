@@ -11,6 +11,6 @@ export const isAdmin = (profile: Profile | null): boolean => {
 };
 
 export const isPremium = (profile: Profile | null): boolean => {
-  if (isAdmin(profile)) return true; // Admins are always premium
+  if (isAdmin(profile)) return true; // Admins são sempre premium
   return hasRole(profile, 'premium');
 };
