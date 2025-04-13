@@ -27,7 +27,11 @@ const TemplateActionsProvider: React.FC<TemplateActionsProviderProps> = (props) 
 
   return (
     <DialogProvider>
-      <TemplateActions {...props} />
+      <TemplateActions 
+        {...props} 
+        onViewTemplate={handleViewTemplate}
+        selectedTemplate={selectedTemplate}
+      />
     </DialogProvider>
   );
 };

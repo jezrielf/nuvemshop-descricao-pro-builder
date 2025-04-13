@@ -81,7 +81,7 @@ const Editor: React.FC = () => {
     <div className="h-full flex flex-col">
       <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
         <TemplateSelector />
-        <SEOTools description={description} />
+        {description && <SEOTools description={description} />}
       </div>
       
       <ScrollArea className="flex-1 p-4">
@@ -92,7 +92,7 @@ const Editor: React.FC = () => {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
-                {description.blocks.length > 0 ? (
+                {description && description.blocks.length > 0 ? (
                   description.blocks.map((block, index) => (
                     <Draggable key={block.id} draggableId={block.id} index={index}>
                       {(provided) => (
