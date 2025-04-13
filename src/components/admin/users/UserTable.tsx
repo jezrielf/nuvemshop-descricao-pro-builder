@@ -1,0 +1,147 @@
+
+import React, { useState } from 'react';
+import { Profile } from '@/types/auth';
+import { 
+  Table, 
+  TableBody, 
+  TableCaption, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { UserTableProps, UserFormValues } from './types';
+import UserRoleBadge from './UserRoleBadge';
+import UserEditForm from './UserEditForm';
+
+const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
+  const { toast } = useToast();
+  const [editingUser, setEditingUser] = useState<Profile | null>(null);
+
+  const openEditSheet = (profile: Profile) => {
+    setEditingUser(profile);
+  };
+
+  const updateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Perfil atualizado',
+        description: 'O papel do usuário foi atualizado com sucesso.',
+      });
+      
+      onRefresh();
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao atualizar perfil',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const updateUserProfile = async (values: UserFormValues) => {
+    if (!editingUser) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          nome: values.nome,
+          role: values.role,
+          atualizado_em: new Date().toISOString()
+        })
+        .eq('id', editingUser.id);
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Perfil atualizado',
+        description: 'Os dados do usuário foram atualizados com sucesso.',
+      });
+      
+      setEditingUser(null);
+      onRefresh();
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao atualizar perfil',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  if (loading) {
+    return <p>Carregando...</p>;
+  }
+
+  return (
+    <>
+      <Table>
+        <TableCaption>Lista de todos os usuários registrados no sistema</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Nome</TableHead>
+            <TableHead>ID</TableHead>
+            <TableHead>Papel</TableHead>
+            <TableHead>Data de Criação</TableHead>
+            <TableHead>Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {profiles.length > 0 ? (
+            profiles.map((profile) => (
+              <TableRow key={profile.id}>
+                <TableCell className="font-medium">{profile.nome || 'Sem nome'}</TableCell>
+                <TableCell className="text-xs truncate max-w-[150px]">{profile.id}</TableCell>
+                <TableCell>
+                  <UserRoleBadge role={profile.role} />
+                </TableCell>
+                <TableCell>{new Date(profile.criado_em).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Editar</Button>
+                    </SheetTrigger>
+                    <SheetContent className="sm:max-w-md">
+                      <SheetHeader>
+                        <SheetTitle>Editar Usuário</SheetTitle>
+                        <SheetDescription>
+                          Altere as informações do usuário {profile.nome || 'Sem nome'}
+                        </SheetDescription>
+                      </SheetHeader>
+                      
+                      <UserEditForm 
+                        profile={profile}
+                        onUpdateProfile={updateUserProfile}
+                        onUpdateRole={updateUserRole}
+                      />
+                    </SheetContent>
+                  </Sheet>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                Nenhum usuário encontrado
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </>
+  );
+};
+
+export default UserTable;
