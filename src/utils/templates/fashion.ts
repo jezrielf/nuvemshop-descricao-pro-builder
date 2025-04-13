@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -115,7 +114,6 @@ export const fashionTemplate: Template = {
       title: 'Galeria da Coleção',
       columns: 3,
       visible: true,
-      heading: 'Conheça nossa coleção exclusiva',
       images: [
         {
           id: uuidv4(),

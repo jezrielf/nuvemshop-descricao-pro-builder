@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle2, XCircle, AlertCircle, Tag, Info } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, Tag, Info, Copy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import { ProductDescription } from '@/types/editor';
 
 interface MetaTagValidatorProps {
@@ -21,6 +23,36 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
   const [title, setTitle] = React.useState('');
   const [description_, setDescription] = React.useState('');
   const [canonical, setCanonical] = React.useState('');
+  const { toast } = useToast();
+  
+  // Generate recommended meta tags based on description
+  const generateRecommendedMetaTags = () => {
+    if (!description) return;
+    
+    // Generate title from description name
+    const generatedTitle = description.name;
+    setTitle(generatedTitle);
+    
+    // Generate description from content
+    let contentText = '';
+    description.blocks.forEach(block => {
+      if (block.type === 'text' && 'content' in block) {
+        const plainText = block.content.replace(/<[^>]+>/g, ' ');
+        contentText += plainText + ' ';
+      }
+      else if (block.type === 'hero' && 'subheading' in block) {
+        contentText += block.subheading + ' ';
+      }
+    });
+    
+    // Trim and limit to 160 characters
+    contentText = contentText.trim();
+    if (contentText.length > 160) {
+      contentText = contentText.substring(0, 157) + '...';
+    }
+    
+    setDescription(contentText);
+  };
   
   // Sample meta tag validation checks
   const validateMetaTags = () => {
@@ -94,49 +126,27 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
     }
   };
   
-  // Function to generate recommended meta tags based on description
-  const generateRecommendedTags = () => {
-    if (!description) return { title: '', description: '' };
+  // Function to copy meta tags to clipboard
+  const copyMetaTags = () => {
+    const metaTags = `<title>${title}</title>
+<meta name="description" content="${description_}" />
+${canonical ? `<link rel="canonical" href="${canonical}" />` : ''}`;
     
-    // Extract potential title from first hero or heading
-    let recommendedTitle = '';
-    let recommendedDescription = '';
-    
-    // Look for a hero block first
-    const heroBlock = description.blocks.find(block => block.type === 'hero');
-    if (heroBlock && 'heading' in heroBlock) {
-      recommendedTitle = heroBlock.heading || '';
-      if ('subheading' in heroBlock) {
-        recommendedDescription = heroBlock.subheading || '';
-      }
-    } 
-    
-    // If no hero, try to find another block with a heading
-    if (!recommendedTitle) {
-      const blockWithHeading = description.blocks.find(block => 'heading' in block && block.heading);
-      if (blockWithHeading && 'heading' in blockWithHeading) {
-        recommendedTitle = blockWithHeading.heading || '';
-      }
-    }
-    
-    // If still no description, look for a text block
-    if (!recommendedDescription) {
-      const textBlock = description.blocks.find(block => block.type === 'text');
-      if (textBlock && 'content' in textBlock) {
-        // Strip HTML and get first 160 chars
-        const text = textBlock.content.replace(/<[^>]+>/g, ' ').trim();
-        recommendedDescription = text.substring(0, 160);
-        if (text.length > 160) recommendedDescription += '...';
-      }
-    }
-    
-    return {
-      title: recommendedTitle,
-      description: recommendedDescription
-    };
+    navigator.clipboard.writeText(metaTags).then(() => {
+      toast({
+        title: "Copiado para a área de transferência",
+        description: "As meta tags foram copiadas com sucesso.",
+      });
+    }).catch(err => {
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar as meta tags.",
+        variant: "destructive"
+      });
+    });
   };
   
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: 'pass' | 'fail' | 'warning') => {
     switch (status) {
       case 'pass':
         return <CheckCircle2 className="h-5 w-5 text-green-500" />;
@@ -144,228 +154,146 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
         return <XCircle className="h-5 w-5 text-red-500" />;
       case 'warning':
         return <AlertCircle className="h-5 w-5 text-yellow-500" />;
-      default:
-        return <Info className="h-5 w-5 text-blue-500" />;
     }
   };
   
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pass':
-        return 'bg-green-100 text-green-800';
-      case 'fail':
-        return 'bg-red-100 text-red-800';
-      case 'warning':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-blue-100 text-blue-800';
-    }
-  };
-  
-  // Generate recommended tags
-  const recommendedTags = generateRecommendedTags();
-  
-  // Use recommended tags as default if no user input
+  // Effect to auto-generate meta tags when the dialog opens
   React.useEffect(() => {
-    if (recommendedTags.title && !title) {
-      setTitle(recommendedTags.title);
+    if (open && description) {
+      generateRecommendedMetaTags();
     }
-    if (recommendedTags.description && !description_) {
-      setDescription(recommendedTags.description);
-    }
-  }, [recommendedTags, title, description_]);
-  
-  // Validation checks
-  const checks = validateMetaTags();
+  }, [open, description]);
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center">
           <Tag className="h-4 w-4 mr-1" />
-          Validar Meta Tags
+          Meta Tags
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Validação de Meta Tags</DialogTitle>
           <DialogDescription>
-            Defina e valide as meta tags essenciais para SEO.
+            Otimize suas meta tags para melhorar o SEO e a apresentação nos resultados de busca.
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="editor" className="flex flex-col h-[60vh]">
-          <TabsList className="w-full">
-            <TabsTrigger value="editor" className="flex-1">Editor de Meta Tags</TabsTrigger>
-            <TabsTrigger value="validation" className="flex-1">Validação</TabsTrigger>
-            <TabsTrigger value="preview" className="flex-1">Pré-visualização</TabsTrigger>
+        <Tabs defaultValue="editor">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="editor">Editor</TabsTrigger>
+            <TabsTrigger value="preview">Pré-visualização</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="editor" className="flex-grow overflow-hidden">
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-6 py-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="meta-title">Meta Título</Label>
-                    <span className={`text-xs ${title.length > 60 ? 'text-red-500' : 'text-gray-500'}`}>
-                      {title.length}/60
-                    </span>
-                  </div>
-                  <Input 
-                    id="meta-title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Digite o título da página (50-60 caracteres)"
-                  />
-                  <p className="text-xs text-gray-500">
-                    O título aparece nos resultados de busca e na aba do navegador.
-                  </p>
-                  
-                  {recommendedTags.title && (
-                    <div className="mt-1">
-                      <Button 
-                        variant="link" 
-                        className="p-0 h-auto text-xs"
-                        onClick={() => setTitle(recommendedTags.title)}
-                      >
-                        Usar título recomendado
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="meta-description">Meta Descrição</Label>
-                    <span className={`text-xs ${description_.length > 160 ? 'text-yellow-500' : 'text-gray-500'}`}>
-                      {description_.length}/160
-                    </span>
-                  </div>
-                  <textarea
-                    id="meta-description"
-                    value={description_}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Digite a descrição da página (120-160 caracteres)"
-                    rows={3}
-                    className="w-full min-h-[80px] rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                  <p className="text-xs text-gray-500">
-                    A descrição aparece nos resultados de busca abaixo do título.
-                  </p>
-                  
-                  {recommendedTags.description && (
-                    <div className="mt-1">
-                      <Button 
-                        variant="link" 
-                        className="p-0 h-auto text-xs"
-                        onClick={() => setDescription(recommendedTags.description)}
-                      >
-                        Usar descrição recomendada
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="canonical-url">URL Canônica</Label>
-                  <Input 
-                    id="canonical-url"
-                    value={canonical}
-                    onChange={(e) => setCanonical(e.target.value)}
-                    placeholder="https://www.example.com/product-page"
-                  />
-                  <p className="text-xs text-gray-500">
-                    Define a versão preferencial de uma página para evitar conteúdo duplicado.
-                  </p>
-                </div>
-                
-                <div className="p-4 border rounded-md bg-gray-50">
-                  <h4 className="font-medium mb-2">Dicas para meta tags eficazes:</h4>
-                  <ul className="space-y-1 text-sm">
-                    <li>• Use palavras-chave relevantes no início do título</li>
-                    <li>• Inclua sua marca ou nome da empresa no título</li>
-                    <li>• Escreva descrições atrativas que incentivem cliques</li>
-                    <li>• Cada página deve ter meta tags únicas</li>
-                  </ul>
+          <TabsContent value="editor" className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Meta Título</Label>
+              <div className="relative">
+                <Input
+                  id="title"
+                  placeholder="Digite o título da página..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="pr-16"
+                />
+                <div className="absolute right-3 top-2.5 text-xs text-gray-500">
+                  {title.length}/60
                 </div>
               </div>
-            </ScrollArea>
-          </TabsContent>
-          
-          <TabsContent value="validation" className="flex-grow overflow-hidden">
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-4 py-4">
-                {checks.map((check) => (
-                  <div key={check.id} className="flex items-start p-3 border rounded-md">
-                    <div className="mr-3 mt-0.5 flex-shrink-0">
-                      {getStatusIcon(check.status)}
-                    </div>
-                    <div className="flex-grow">
-                      <h4 className="font-medium">{check.title}</h4>
-                      <p className="text-sm text-gray-600">{check.description}</p>
-                    </div>
-                    <Badge className={`ml-2 ${getStatusColor(check.status)}`}>
-                      {check.status === 'pass' ? 'OK' : 
-                       check.status === 'warning' ? 'Atenção' : 'Erro'}
-                    </Badge>
-                  </div>
-                ))}
+              <p className="text-xs text-gray-500">O título ideal tem entre 50-60 caracteres.</p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description">Meta Descrição</Label>
+              <div className="relative">
+                <Textarea
+                  id="description"
+                  placeholder="Digite a descrição da página..."
+                  value={description_}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="resize-none"
+                  rows={4}
+                />
+                <div className="absolute right-3 bottom-3 text-xs text-gray-500">
+                  {description_.length}/160
+                </div>
               </div>
-            </ScrollArea>
+              <p className="text-xs text-gray-500">A descrição ideal tem entre 120-160 caracteres.</p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="canonical">Link Canônico</Label>
+              <Input
+                id="canonical"
+                placeholder="https://www.seusite.com/pagina-principal"
+                value={canonical}
+                onChange={(e) => setCanonical(e.target.value)}
+              />
+              <p className="text-xs text-gray-500">Ajuda a prevenir problemas de conteúdo duplicado.</p>
+            </div>
+            
+            <div className="pt-2 flex gap-2">
+              <Button onClick={generateRecommendedMetaTags}>
+                Gerar Recomendações
+              </Button>
+              <Button variant="outline" onClick={copyMetaTags}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copiar Meta Tags
+              </Button>
+            </div>
           </TabsContent>
           
-          <TabsContent value="preview" className="flex-grow overflow-hidden">
-            <ScrollArea className="h-full pr-4">
-              <div className="py-4 space-y-6">
-                <div className="space-y-2">
-                  <Label className="text-sm">Como aparecerá nos resultados de busca:</Label>
-                  <Card className="overflow-hidden border-gray-200">
-                    <CardContent className="p-0">
-                      <div className="p-4 border-b bg-gray-50">
-                        <div className="flex items-center mb-1">
-                          <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
-                          <div className="text-xs text-gray-600 truncate">
-                            {canonical || 'example.com'}
-                          </div>
+          <TabsContent value="preview" className="py-4">
+            <Card>
+              <CardContent className="pt-6 space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Validação</h3>
+                    {validateMetaTags().map(check => (
+                      <div key={check.id} className="flex items-start space-x-2 py-2 border-b last:border-0">
+                        <div className="pt-0.5">
+                          {getStatusIcon(check.status)}
                         </div>
-                        <h3 className="text-blue-600 text-lg font-medium line-clamp-1">
-                          {title || 'Título da página não definido'}
-                        </h3>
-                        <p className="text-sm text-gray-700 line-clamp-2">
-                          {description_ || 'Descrição da página não definida...'}
-                        </p>
+                        <div>
+                          <h4 className="font-medium">{check.title}</h4>
+                          <p className="text-sm text-gray-600">{check.description}</p>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="text-sm">Código HTML gerado:</Label>
-                  <div className="bg-gray-900 text-gray-300 p-4 rounded-md overflow-x-auto">
-                    <pre className="text-xs">
-                      {`<head>
-  <!-- Meta tags essenciais -->
-  <title>${title || 'Título não definido'}</title>
-  <meta name="description" content="${description_ || 'Descrição não definida'}" />
-  ${canonical ? `<link rel="canonical" href="${canonical}" />` : '<!-- Link canônico não definido -->'}
-  
-  <!-- Open Graph para compartilhamento em redes sociais -->
-  <meta property="og:type" content="product" />
-  <meta property="og:title" content="${title || 'Título não definido'}" />
-  <meta property="og:description" content="${description_ || 'Descrição não definida'}" />
-  <meta property="og:url" content="${canonical || 'URL não definida'}" />
-  <meta property="og:site_name" content="Nome da Loja" />
-  
-  <!-- Outros meta tags importantes -->
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="index, follow" />
-</head>`}
-                    </pre>
+                    ))}
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Pré-visualização no Google</h3>
+                    <div className="border rounded-md p-4 space-y-1">
+                      <div className="text-blue-800 text-xl font-medium line-clamp-1">
+                        {title || 'Título da sua página'}
+                      </div>
+                      <div className="text-green-700 text-sm">
+                        {canonical || 'www.seusite.com/sua-pagina'}
+                      </div>
+                      <div className="text-gray-600 text-sm line-clamp-2">
+                        {description_ || 'A descrição da sua página aparecerá aqui. Uma boa descrição resume o conteúdo da página e inclui palavras-chave relevantes.'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Dicas para otimização:</h3>
+                    <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
+                      <li>Inclua palavras-chave relevantes no início do título e da descrição</li>
+                      <li>Cada página deve ter um título e descrição únicos</li>
+                      <li>O título deve descrever com precisão o conteúdo da página</li>
+                      <li>A descrição deve resumir o conteúdo e incentivar o clique</li>
+                      <li>Use URLs descritivas que incluam palavras-chave</li>
+                    </ul>
                   </div>
                 </div>
-              </div>
-            </ScrollArea>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </DialogContent>

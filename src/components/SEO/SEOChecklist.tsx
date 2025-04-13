@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -129,17 +128,17 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
           }
           break;
         case 'hero':
-          if (block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
-          if (block.subheading) wordCount += block.subheading.split(/\s+/).filter(Boolean).length;
+          if ('heading' in block && block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
+          if ('subheading' in block && block.subheading) wordCount += block.subheading.split(/\s+/).filter(Boolean).length;
           break;
         case 'cta':
-          if (block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
-          if (block.content) wordCount += block.content.split(/\s+/).filter(Boolean).length;
+          if ('heading' in block && block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
+          if ('content' in block && block.content) wordCount += block.content.split(/\s+/).filter(Boolean).length;
           break;
         case 'textImage':
         case 'imageText':
-          if (block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
-          if (block.content) {
+          if ('heading' in block && block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
+          if ('content' in block && block.content) {
             const content = block.content.replace(/<[^>]+>/g, ' ');
             wordCount += content.split(/\s+/).filter(Boolean).length;
           }
@@ -154,10 +153,10 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
     let headingCount = 0;
     desc.blocks.forEach(block => {
       // Count block headings
-      if (block.heading) headingCount++;
+      if ('heading' in block && block.heading) headingCount++;
       
       // Count headings in HTML content
-      if (block.type === 'text' && block.content) {
+      if (block.type === 'text' && 'content' in block && block.content) {
         const h1Count = (block.content.match(/<h1[^>]*>/g) || []).length;
         const h2Count = (block.content.match(/<h2[^>]*>/g) || []).length;
         const h3Count = (block.content.match(/<h3[^>]*>/g) || []).length;
@@ -172,19 +171,19 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
     let allHaveAlt = true;
     
     desc.blocks.forEach(block => {
-      if (block.type === 'image' && block.alt === '') {
+      if (block.type === 'image' && 'alt' in block && block.alt === '') {
         allHaveAlt = false;
       }
-      else if (block.type === 'hero' && block.image && (!block.image.alt || block.image.alt === '')) {
+      else if (block.type === 'hero' && 'image' in block && block.image && (!block.image.alt || block.image.alt === '')) {
         allHaveAlt = false;
       }
-      else if (block.type === 'gallery' && block.images) {
+      else if (block.type === 'gallery' && 'images' in block && block.images) {
         block.images.forEach(img => {
           if (!img.alt || img.alt === '') allHaveAlt = false;
         });
       }
       else if ((block.type === 'imageText' || block.type === 'textImage') && 
-               block.image && (!block.image.alt || block.image.alt === '')) {
+               'image' in block && block.image && (!block.image.alt || block.image.alt === '')) {
         allHaveAlt = false;
       }
     });

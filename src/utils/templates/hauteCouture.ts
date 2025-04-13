@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -54,7 +53,7 @@ export const hauteCoutureTemplate: Template = {
       title: 'Ateliê e Processo Criativo',
       columns: 3,
       visible: true,
-      heading: 'Do conceito à criação',
+      // Remove the heading property as it doesn't exist in GalleryBlock type
       images: [
         {
           id: uuidv4(),
