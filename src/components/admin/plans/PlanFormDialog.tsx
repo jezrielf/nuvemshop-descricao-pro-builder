@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Plan } from './types';
 
+// Create a schema that ensures required fields are present
 const formSchema = z.object({
   name: z.string().min(3, {
     message: 'O nome do plano deve ter pelo menos 3 caracteres.',
@@ -64,6 +65,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
     { id: 'feature-5', name: 'Integrações com marketplaces', included: false },
   ];
 
+  // Set default values with the correct types to match Plan
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -76,6 +78,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   });
 
   const handleSubmit = (values: FormValues) => {
+    // Since FormValues matches Omit<Plan, 'id'>, we can safely pass values
     onSubmit(values);
     form.reset();
   };
