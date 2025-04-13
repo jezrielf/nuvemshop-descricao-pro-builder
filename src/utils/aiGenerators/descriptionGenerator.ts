@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { BlockType, ProductDescription, Block, TextAlign } from '@/types/editor';
+import { BlockType, ProductDescription, Block, TextAlign, SpacingSize, BlockSpacing } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
 
 interface AIDescriptionInput {
@@ -63,8 +62,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     backgroundColor: '#f9fafb',
     headingColor: '#1f2937',
     textAlign: 'center' as TextAlign,
-    padding: 'lg',
-    blockSpacing: 'md'
+    padding: 'lg' as SpacingSize,
+    blockSpacing: 'md' as BlockSpacing
   };
   
   if (hasModelImage) {
@@ -75,8 +74,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
       backgroundColor: '#f0f9ff', // Azul mais claro para indicar inspiração na imagem modelo
       headingColor: '#0f172a', // Cor de cabeçalho mais escura
       textAlign: 'center' as TextAlign, // Explicitamente tipado como TextAlign
-      padding: 'xl', // Padding maior
-      blockSpacing: 'lg' // Espaçamento maior entre blocos
+      padding: 'xl' as SpacingSize, // Padding maior
+      blockSpacing: 'lg' as BlockSpacing // Espaçamento maior entre blocos
     };
   }
   
@@ -120,8 +119,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     }));
     featuresBlock.style = {
       backgroundColor: hasModelImage ? '#f8fafc' : '#ffffff',
-      padding: 'md',
-      blockSpacing: 'md'
+      padding: 'md' as SpacingSize,
+      blockSpacing: 'md' as BlockSpacing
     };
     blocks.push(featuresBlock);
   }
@@ -141,8 +140,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     }));
     benefitsBlock.style = {
       backgroundColor: hasModelImage ? '#f1f5f9' : '#f3f4f6',
-      padding: 'md',
-      blockSpacing: 'md'
+      padding: 'md' as SpacingSize,
+      blockSpacing: 'md' as BlockSpacing
     };
     blocks.push(benefitsBlock);
   }
@@ -170,8 +169,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     
     imageTextBlock.style = {
       backgroundColor: hasModelImage ? '#ffffff' : '#ffffff',
-      padding: 'md',
-      blockSpacing: 'md'
+      padding: 'md' as SpacingSize,
+      blockSpacing: 'md' as BlockSpacing
     };
     blocks.push(imageTextBlock);
   } else {
@@ -187,8 +186,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     };
     imageTextBlock.style = {
       backgroundColor: '#ffffff',
-      padding: 'md',
-      blockSpacing: 'md'
+      padding: 'md' as SpacingSize,
+      blockSpacing: 'md' as BlockSpacing
     };
     blocks.push(imageTextBlock);
   }
@@ -215,8 +214,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     
     specificationsBlock.style = {
       backgroundColor: hasModelImage ? '#fafafa' : '#f9fafb',
-      padding: 'md',
-      blockSpacing: 'md'
+      padding: 'md' as SpacingSize,
+      blockSpacing: 'md' as BlockSpacing
     };
     blocks.push(specificationsBlock);
   }
@@ -261,8 +260,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   (galleryBlock as any).images = galleryImages;
   galleryBlock.style = {
     backgroundColor: hasModelImage ? '#ffffff' : '#ffffff',
-    padding: 'md',
-    blockSpacing: 'md'
+    padding: 'md' as SpacingSize,
+    blockSpacing: 'md' as BlockSpacing
   };
   blocks.push(galleryBlock);
   
@@ -298,8 +297,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   
   faqBlock.style = {
     backgroundColor: hasModelImage ? '#f8fafc' : '#f9fafb',
-    padding: 'md',
-    blockSpacing: 'md'
+    padding: 'md' as SpacingSize,
+    blockSpacing: 'md' as BlockSpacing
   };
   blocks.push(faqBlock);
   
@@ -311,8 +310,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   (companyBlock as any).content = input.companyInfo;
   companyBlock.style = {
     backgroundColor: hasModelImage ? '#ffffff' : '#ffffff',
-    padding: 'md',
-    blockSpacing: 'md'
+    padding: 'md' as SpacingSize,
+    blockSpacing: 'md' as BlockSpacing
   };
   blocks.push(companyBlock);
   
@@ -327,8 +326,8 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   ctaBlock.style = {
     backgroundColor: hasModelImage ? '#f0f9ff' : '#f3f4f6',
     headingColor: '#1f2937',
-    padding: 'lg',
-    blockSpacing: 'lg'
+    padding: 'lg' as SpacingSize,
+    blockSpacing: 'lg' as BlockSpacing
   };
   blocks.push(ctaBlock);
   
