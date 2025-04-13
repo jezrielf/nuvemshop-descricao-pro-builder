@@ -10,7 +10,7 @@ import SaveDescriptionButton from './header/SaveDescriptionButton';
 import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
-import SEOAnalyzer from './SEO/SEOAnalyzer';
+import SEOAnalyzer from './SEO/analyzers/SEOAnalyzer';
 import AIGeneratorButton from './header/AIGeneratorButton';
 
 const Header: React.FC = () => {
