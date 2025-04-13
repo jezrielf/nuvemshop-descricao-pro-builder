@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -194,11 +193,8 @@ export const healthTemplate: Template = {
       title: 'Imagem dos Produtos',
       columns: 1,
       visible: true,
-      heading: 'Cinco produtos essenciais para transformar sua qualidade de vida',
-      image: {
-        src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-        alt: 'Produtos de Saúde e Bem-estar'
-      },
+      src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
+      alt: 'Produtos de Saúde e Bem-estar',
       caption: 'Vitamina D, Clorella, Triple Ômega, Feno Grego e Melatonina+',
       style: {
         backgroundColor: '#f8f9fa',
