@@ -5,5 +5,5 @@ export type Profile = {
   avatar_url: string | null;
   criado_em: string;
   atualizado_em: string;
-  role: string | null; // Campo role para corresponder ao nosso esquema de banco de dados
+  role: string | string[] | null; // Updated to support an array of roles
 };
