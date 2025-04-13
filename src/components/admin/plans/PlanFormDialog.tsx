@@ -44,7 +44,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface PlanFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: FormValues) => void;
+  onSubmit: (data: Omit<Plan, 'id'>) => void;
   title: string;
   initialData?: Plan | null;
 }
