@@ -21,9 +21,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Plan } from './types';
+import { Plan, PlanFeature } from './types';
 
-// Create a schema that ensures required fields are present
+// Create a schema that ensures all required fields are present
 const formSchema = z.object({
   name: z.string().min(3, {
     message: 'O nome do plano deve ter pelo menos 3 caracteres.',
@@ -40,6 +40,7 @@ const formSchema = z.object({
   })),
 });
 
+// This type ensures we match the Plan type exactly (minus the id field)
 type FormValues = z.infer<typeof formSchema>;
 
 interface PlanFormDialogProps {
@@ -57,7 +58,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   title,
   initialData,
 }) => {
-  const defaultFeatures = [
+  const defaultFeatures: PlanFeature[] = [
     { id: 'feature-1', name: 'Descrições ilimitadas', included: true },
     { id: 'feature-2', name: 'Suporte prioritário', included: false },
     { id: 'feature-3', name: 'Acesso a todos os templates', included: false },
@@ -65,7 +66,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
     { id: 'feature-5', name: 'Integrações com marketplaces', included: false },
   ];
 
-  // Set default values with the correct types to match Plan
+  // Set default values with the correct types to match Plan requirements
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -78,7 +79,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   });
 
   const handleSubmit = (values: FormValues) => {
-    // Since FormValues matches Omit<Plan, 'id'>, we can safely pass values
+    // FormValues now exactly matches Omit<Plan, 'id'>, since all fields are required
     onSubmit(values);
     form.reset();
   };
