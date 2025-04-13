@@ -40,7 +40,6 @@ const formSchema = z.object({
   additionalInfo: z.string().optional(),
   tone: z.enum(['formal', 'casual', 'professional', 'enthusiastic']).default('professional'),
   imageUrl: z.string().optional(),
-  modelImageUrl: z.string().optional(), // Nova propriedade para a imagem modelo
 });
 
 interface AIDescriptionGeneratorProps {
@@ -60,7 +59,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState<ProductDescription | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-  const [uploadedModelImageUrl, setUploadedModelImageUrl] = useState<string | null>(null); // Estado para a imagem modelo
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,7 +72,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
       additionalInfo: '',
       tone: 'professional',
       imageUrl: '',
-      modelImageUrl: '', // Valor inicial para a imagem modelo
     },
   });
 
@@ -119,20 +116,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
     }
   };
 
-  // Função para lidar com o upload da imagem modelo
-  const handleModelImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const imageUrl = reader.result as string;
-        setUploadedModelImageUrl(imageUrl);
-        form.setValue('modelImageUrl', imageUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsGenerating(true);
     
@@ -148,7 +131,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
         additionalInfo: values.additionalInfo,           // Optional
         tone: values.tone,                               // Required
         imageUrl: uploadedImageUrl || undefined,         // Optional
-        modelImageUrl: uploadedModelImageUrl || undefined, // Nova propriedade opcional
       });
       
       setGeneratedDescription(description);
@@ -184,7 +166,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
     setGeneratedDescription(null);
     form.reset();
     setUploadedImageUrl(null);
-    setUploadedModelImageUrl(null); // Resetar a imagem modelo também
   };
 
   return (
@@ -369,7 +350,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
                     )}
                   />
                   
-                  {/* Imagem do Produto (opcional) */}
                   <div className="space-y-2">
                     <Label>Imagem do Produto (opcional)</Label>
                     <Card className="p-4">
@@ -416,64 +396,6 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
                               <span>
                                 <Upload className="h-4 w-4 mr-2" />
                                 Escolher Imagem
-                              </span>
-                            </Button>
-                          </Label>
-                        </div>
-                      )}
-                    </Card>
-                  </div>
-                  
-                  {/* Nova seção: Imagem Modelo (opcional) */}
-                  <div className="space-y-2 mt-6">
-                    <Label>Imagem Modelo para Referência (opcional)</Label>
-                    <FormDescription>
-                      Forneça uma imagem de referência que a IA pode usar como modelo para gerar a descrição visual.
-                    </FormDescription>
-                    <Card className="p-4">
-                      {uploadedModelImageUrl ? (
-                        <div className="flex flex-col items-center space-y-2">
-                          <div className="relative w-full max-h-48 overflow-hidden flex justify-center items-center border rounded-md">
-                            <img 
-                              src={uploadedModelImageUrl} 
-                              alt="Modelo de Referência" 
-                              className="max-h-48 object-contain" 
-                            />
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => {
-                              setUploadedModelImageUrl(null);
-                              form.setValue('modelImageUrl', '');
-                            }}
-                          >
-                            Remover Imagem Modelo
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center space-y-2">
-                          <div className="border-2 border-dashed border-gray-300 rounded-md p-8 w-full flex flex-col items-center justify-center">
-                            <Image className="h-10 w-10 text-gray-400 mb-2" />
-                            <p className="text-sm text-gray-500">
-                              Adicione uma imagem de referência para o estilo visual
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              A IA usará como inspiração para o layout e estilo
-                            </p>
-                          </div>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            id="model-image-upload"
-                            onChange={handleModelImageUpload}
-                          />
-                          <Label htmlFor="model-image-upload" className="cursor-pointer">
-                            <Button variant="outline" size="sm" type="button" asChild>
-                              <span>
-                                <Upload className="h-4 w-4 mr-2" />
-                                Escolher Imagem Modelo
                               </span>
                             </Button>
                           </Label>
