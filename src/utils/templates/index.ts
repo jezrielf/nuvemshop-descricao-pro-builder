@@ -5,13 +5,19 @@ import { supplementsTemplate } from './supplements';
 import { shoesTemplate } from './shoes';
 import { electronicsTemplate } from './electronics';
 import { healthTemplate } from './health';
+import { fashionTemplate } from './fashion';
+import { accessoriesTemplate } from './accessories';
+import { hauteCoutureTemplate } from './hauteCouture';
 
-// Combinando todos os templates
+// Combining all templates
 export const advancedTemplates: Template[] = [
   supplementsTemplate,
   shoesTemplate,
   electronicsTemplate,
-  healthTemplate
+  healthTemplate,
+  fashionTemplate,
+  accessoriesTemplate,
+  hauteCoutureTemplate
 ];
 
 export const getAllTemplates = (): Template[] => {
@@ -23,3 +29,6 @@ export * from './supplements';
 export * from './shoes';
 export * from './electronics';
 export * from './health';
+export * from './fashion';
+export * from './accessories';
+export * from './hauteCouture';

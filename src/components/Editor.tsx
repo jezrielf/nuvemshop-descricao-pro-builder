@@ -11,6 +11,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AIDescriptionGenerator from './AIGenerator/AIDescriptionGenerator';
+import SEOTools from './SEO/SEOTools';
 import { useState } from 'react';
 
 const Editor: React.FC = () => {
@@ -78,8 +79,9 @@ const Editor: React.FC = () => {
   
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b bg-gray-50">
+      <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
         <TemplateSelector />
+        <SEOTools description={description} />
       </div>
       
       <ScrollArea className="flex-1 p-4">
