@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { BlockType, ProductDescription, Block } from '@/types/editor';
+import { BlockType, ProductDescription, Block, TextAlign } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
 
 interface AIDescriptionInput {
@@ -62,7 +62,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   let layoutStyle = {
     backgroundColor: '#f9fafb',
     headingColor: '#1f2937',
-    textAlign: 'center',
+    textAlign: 'center' as TextAlign,
     padding: 'lg',
     blockSpacing: 'md'
   };
@@ -74,7 +74,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
     layoutStyle = {
       backgroundColor: '#f0f9ff', // Azul mais claro para indicar inspiração na imagem modelo
       headingColor: '#0f172a', // Cor de cabeçalho mais escura
-      textAlign: 'center',
+      textAlign: 'center' as TextAlign, // Explicitamente tipado como TextAlign
       padding: 'xl', // Padding maior
       blockSpacing: 'lg' // Espaçamento maior entre blocos
     };
