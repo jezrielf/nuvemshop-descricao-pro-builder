@@ -9,12 +9,14 @@ import { Plan } from './types';
 interface PlanItemProps {
   plan: Plan;
   onViewPlan: (plan: Plan) => void;
+  onEditClick: (plan: Plan) => void;
   onDeleteClick: (plan: Plan) => void;
 }
 
 const PlanItem: React.FC<PlanItemProps> = ({ 
   plan, 
   onViewPlan, 
+  onEditClick,
   onDeleteClick 
 }) => {
   const formatPrice = (price: number) => {
@@ -57,6 +59,7 @@ const PlanItem: React.FC<PlanItemProps> = ({
           <Button 
             variant="outline" 
             size="sm"
+            onClick={() => onEditClick(plan)}
           >
             <Edit className="h-4 w-4" />
           </Button>

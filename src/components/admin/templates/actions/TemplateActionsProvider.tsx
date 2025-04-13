@@ -1,8 +1,9 @@
 
-import React from 'react';
-import { Template, ProductCategory, BlockType } from '@/types/editor';
-import { DialogProvider } from '../dialogs/DialogProvider';
+import React, { useState } from 'react';
+import { Template, BlockType } from '@/types/editor';
 import TemplateActions from './TemplateActions';
+import { useDialogs, DialogProvider } from '../dialogs/DialogProvider';
+import { useToast } from '@/hooks/use-toast';
 
 interface TemplateActionsProviderProps {
   editedTemplate: Template | null;
@@ -17,8 +18,18 @@ interface TemplateActionsProviderProps {
 }
 
 const TemplateActionsProvider: React.FC<TemplateActionsProviderProps> = (props) => {
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const { toast } = useToast();
+
+  const handleViewTemplate = (template: Template) => {
+    setSelectedTemplate(template);
+  };
+
   return (
-    <DialogProvider>
+    <DialogProvider
+      selectedTemplate={selectedTemplate}
+      setSelectedTemplate={setSelectedTemplate}
+    >
       <TemplateActions {...props} />
     </DialogProvider>
   );

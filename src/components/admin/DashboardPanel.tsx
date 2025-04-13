@@ -1,393 +1,227 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, FileText, FileCode, CreditCard, Clock, ArrowUp, ArrowDown } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useTemplateStore } from '@/store/templateStore';
+import { User, Users, ShoppingCart, FileText, RefreshCw } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { mockPlans } from './plans/mockData';
+import { useToast } from '@/hooks/use-toast';
+
+// Demo data
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 const DashboardPanel: React.FC = () => {
-  const [stats, setStats] = useState({
-    userCount: 0,
-    descriptionCount: 0,
-    templateCount: 0,
-    planCount: 3, // Fixed value for now
-    userGrowth: 0,
-    contentGrowth: 0,
+  const [loading, setLoading] = useState(false);
+  const [userStats, setUserStats] = useState({
+    total: 125,
+    premium: 45,
+    admin: 3,
+    newToday: 5
   });
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<any[]>([]);
-  const [contentData, setContentData] = useState<any[]>([]);
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [salesData, setSalesData] = useState([
+    { name: 'Jan', value: 1200 },
+    { name: 'Fev', value: 1900 },
+    { name: 'Mar', value: 2400 },
+    { name: 'Abr', value: 1800 },
+    { name: 'Mai', value: 2800 },
+    { name: 'Jun', value: 3100 }
+  ]);
+  const [planDistribution, setPlanDistribution] = useState([
+    { name: 'Básico', value: 80 },
+    { name: 'Premium', value: 35 },
+    { name: 'Empresarial', value: 10 }
+  ]);
+  const [templateUsage, setTemplateUsage] = useState([
+    { name: 'Suplementos', value: 45 },
+    { name: 'Eletrônicos', value: 30 },
+    { name: 'Roupas', value: 65 },
+    { name: 'Calçados', value: 38 },
+    { name: 'Outros', value: 22 }
+  ]);
   const { toast } = useToast();
-  const { templates } = useTemplateStore();
+
+  const refreshData = () => {
+    setLoading(true);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      setLoading(false);
+      toast({
+        title: "Dashboard atualizado",
+        description: "Os dados do dashboard foram atualizados com sucesso.",
+      });
+    }, 1500);
+  };
 
   useEffect(() => {
-    fetchStats();
-    generateMockChartData();
-    generateMockActivities();
+    // Load data when component mounts
+    refreshData();
   }, []);
-
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-
-      // Get exact count of profiles - this should match the total user count
-      const { count: userCount, error: userError } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
-
-      if (userError) throw userError;
-
-      console.log('Fetched user count:', userCount);
-
-      // Get real template count from the store
-      const templateCount = templates.length;
-
-      // Calculate approximate user growth (mock calculation)
-      const userGrowth = userCount && userCount > 0 ? Math.floor(Math.random() * 25) + 5 : 0;
-      
-      // Estimate content growth (mock calculation)
-      const contentGrowth = templateCount > 0 ? Math.floor(Math.random() * 30) + 10 : 0;
-
-      // Count local storage items as descriptions (approximation)
-      const localStorageCount = Object.keys(localStorage).filter(key => 
-        key.startsWith('description_')).length;
-      
-      setStats({
-        userCount: userCount || 0,
-        descriptionCount: localStorageCount,
-        templateCount,
-        planCount: 3, // Fixed value for demo
-        userGrowth,
-        contentGrowth,
-      });
-    } catch (error: any) {
-      console.error('Error fetching stats:', error);
-      toast({
-        title: 'Erro ao carregar estatísticas',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateMockChartData = () => {
-    // Generate realistic user data
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-    const userDataPoints = months.map((name, index) => {
-      // Create a growing trend
-      const baseValue = 4;
-      const growth = index * 4 + Math.floor(Math.random() * 3);
-      return { name, users: baseValue + growth };
-    });
-    
-    // Generate content data
-    const contentDataPoints = months.map((name, index) => {
-      // Base values with some randomness
-      const baseDescriptions = 10;
-      const descGrowth = index * 5 + Math.floor(Math.random() * 5);
-      
-      const baseTemplates = 2;
-      const templateGrowth = Math.floor(index * 1.2) + Math.floor(Math.random() * 2);
-      
-      return { 
-        name, 
-        descriptions: baseDescriptions + descGrowth,
-        templates: baseTemplates + templateGrowth
-      };
-    });
-    
-    setUserData(userDataPoints);
-    setContentData(contentDataPoints);
-  };
-
-  const generateMockActivities = () => {
-    const activities = [
-      { id: 1, user: 'Ana Silva', action: 'Criou uma nova descrição', timestamp: '2 horas atrás', type: 'creation' },
-      { id: 2, user: 'João Lima', action: 'Atualizou template', timestamp: '5 horas atrás', type: 'update' },
-      { id: 3, user: 'Maria Costa', action: 'Registrou-se', timestamp: '1 dia atrás', type: 'registration' },
-      { id: 4, user: 'Pedro Santos', action: 'Alterou plano', timestamp: '2 dias atrás', type: 'billing' },
-      { id: 5, user: 'Carla Oliveira', action: 'Criou uma nova descrição', timestamp: '3 dias atrás', type: 'creation' },
-    ];
-    
-    setRecentActivities(activities);
-  };
-
-  const getActionBadge = (type: string) => {
-    switch (type) {
-      case 'creation':
-        return <Badge className="bg-green-500">Criação</Badge>;
-      case 'update':
-        return <Badge className="bg-blue-500">Atualização</Badge>;
-      case 'registration':
-        return <Badge className="bg-purple-500">Registro</Badge>;
-      case 'billing':
-        return <Badge className="bg-yellow-500">Faturamento</Badge>;
-      default:
-        return <Badge>Outro</Badge>;
-    }
-  };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Dashboard</h2>
-      
-      {/* KPI Cards */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="pb-2">
-                <div className="h-5 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-10 bg-gray-200 rounded w-1/4"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center justify-between">
-                Usuários Totais
-                <div className="flex items-center text-green-500">
-                  <ArrowUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">{stats.userGrowth}%</span>
-                </div>
-              </CardTitle>
-              <CardDescription>Total de contas no sistema</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 text-muted-foreground mr-2" />
-                <span className="text-2xl font-bold">{stats.userCount}</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center justify-between">
-                Descrições
-                <div className="flex items-center text-green-500">
-                  <ArrowUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">{stats.contentGrowth}%</span>
-                </div>
-              </CardTitle>
-              <CardDescription>Descrições de produtos criadas</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <FileText className="h-5 w-5 text-muted-foreground mr-2" />
-                <span className="text-2xl font-bold">{stats.descriptionCount}</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Templates</CardTitle>
-              <CardDescription>Templates disponíveis</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <FileCode className="h-5 w-5 text-muted-foreground mr-2" />
-                <span className="text-2xl font-bold">{stats.templateCount}</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Planos</CardTitle>
-              <CardDescription>Planos de assinatura ativos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <CreditCard className="h-5 w-5 text-muted-foreground mr-2" />
-                <span className="text-2xl font-bold">{stats.planCount}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+        <Button variant="outline" onClick={refreshData} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Atualizar
+        </Button>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Crescimento de Usuários</CardTitle>
-            <CardDescription>Usuários registrados por mês</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-[250px] w-full" />
-            ) : (
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={userData}>
-                  <defs>
-                    <linearGradient id="userGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="users" 
-                    stroke="#8884d8" 
-                    fillOpacity={1} 
-                    fill="url(#userGradient)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
+            <div className="text-2xl font-bold">{userStats.total}</div>
+            <p className="text-xs text-muted-foreground">
+              +{userStats.newToday} hoje
+            </p>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardHeader>
-            <CardTitle>Conteúdo Criado</CardTitle>
-            <CardDescription>Evolução do conteúdo ao longo do tempo</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Usuários Premium</CardTitle>
+            <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-[250px] w-full" />
-            ) : (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={contentData}>
+            <div className="text-2xl font-bold">{userStats.premium}</div>
+            <p className="text-xs text-muted-foreground">
+              {Math.round((userStats.premium / userStats.total) * 100)}% do total
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Planos Ativos</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{mockPlans.filter(p => p.isActive).length}</div>
+            <p className="text-xs text-muted-foreground">
+              De {mockPlans.length} planos totais
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Descrições Geradas</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,234</div>
+            <p className="text-xs text-muted-foreground">
+              +48 nas últimas 24h
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="vendas" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="vendas">Vendas</TabsTrigger>
+          <TabsTrigger value="planos">Planos</TabsTrigger>
+          <TabsTrigger value="templates">Templates</TabsTrigger>
+        </TabsList>
+        <TabsContent value="vendas" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Vendas Mensais</CardTitle>
+              <CardDescription>
+                Visualização das vendas nos últimos 6 meses
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  width={500}
+                  height={300}
+                  data={salesData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="descriptions" fill="#8884d8" />
-                  <Bar dataKey="templates" fill="#82ca9d" />
+                  <Tooltip formatter={(value) => [`R$ ${value}`, 'Vendas']} />
+                  <Bar dataKey="value" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Recent Activity and System Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
-            <CardDescription>Últimas ações realizadas no sistema</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items.center space-x-2">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="space-y-2 flex-1">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-5">
-                {recentActivities.map(activity => (
-                  <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
-                    <div className="flex-shrink-0">
-                      <Clock className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{activity.user}</p>
-                        <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">{activity.action}</p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {getActionBadge(activity.type)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Perfil de Uso</CardTitle>
-            <CardDescription>Estatísticas detalhadas de uso do sistema</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <Tabs defaultValue="usage">
-              <TabsList className="w-full">
-                <TabsTrigger value="usage" className="flex-1">Uso</TabsTrigger>
-                <TabsTrigger value="performance" className="flex-1">Performance</TabsTrigger>
-                <TabsTrigger value="errors" className="flex-1">Erros</TabsTrigger>
-              </TabsList>
-              <TabsContent value="usage" className="p-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Recurso</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Tendência</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>Páginas Geradas</TableCell>
-                      <TableCell>{stats.descriptionCount * 3}</TableCell>
-                      <TableCell className="text-green-500">↑ 12%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Templates Usados</TableCell>
-                      <TableCell>{Math.floor(stats.templateCount * 0.7)}</TableCell>
-                      <TableCell className="text-green-500">↑ 8%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>AI Utilizações</TableCell>
-                      <TableCell>{stats.descriptionCount * 2}</TableCell>
-                      <TableCell className="text-green-500">↑ 23%</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TabsContent>
-              <TabsContent value="performance" className="p-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={userData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#8884d8" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </TabsContent>
-              <TabsContent value="errors" className="p-4">
-                <p className="text-center text-muted-foreground p-4">
-                  Nenhum erro reportado nas últimas 24 horas.
-                </p>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="planos" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Distribuição de Planos</CardTitle>
+              <CardDescription>
+                Distribuição de usuários por plano
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={planDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {planDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="templates" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Uso de Templates</CardTitle>
+              <CardDescription>
+                Templates mais utilizados por categoria
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  width={500}
+                  height={300}
+                  data={templateUsage}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

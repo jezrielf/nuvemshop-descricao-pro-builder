@@ -1,75 +1,58 @@
 
-import { Profile } from '@/types/auth';
+/**
+ * Utility functions for handling user roles
+ */
 
 /**
- * Checks if a profile has a specific role
+ * Get user roles as an array
+ * @param role string or string[] representing user roles
+ * @returns array of roles
  */
-export const hasRole = (profile: Profile | null, role: string): boolean => {
-  if (!profile) return false;
-  
-  // If the role is stored as an array, check if it includes the role
-  if (Array.isArray(profile.role)) {
-    return profile.role.includes(role);
+export const getRoles = (role: string | string[] | null): string[] => {
+  if (!role) return ['user'];
+  return Array.isArray(role) ? role : [role];
+};
+
+/**
+ * Check if a user has a specific role
+ * @param role string or string[] representing user roles
+ * @param roleToCheck the role to check for
+ * @returns boolean indicating if the user has the role
+ */
+export const hasRole = (role: string | string[] | null, roleToCheck: string): boolean => {
+  const roles = getRoles(role);
+  return roles.includes(roleToCheck);
+};
+
+/**
+ * Add a role to a user's roles
+ * @param currentRoles string or string[] representing current user roles
+ * @param roleToAdd the role to add
+ * @returns updated roles array
+ */
+export const addRole = (currentRoles: string | string[] | null, roleToAdd: string): string[] => {
+  const roles = getRoles(currentRoles);
+  if (!roles.includes(roleToAdd)) {
+    roles.push(roleToAdd);
   }
-  
-  // Backward compatibility for profiles with a single role string
-  return profile.role === role;
+  return roles;
 };
 
 /**
- * Checks if a profile has admin role
+ * Remove a role from a user's roles
+ * @param currentRoles string or string[] representing current user roles
+ * @param roleToRemove the role to remove
+ * @returns updated roles array
  */
-export const isAdmin = (profile: Profile | null): boolean => {
-  return hasRole(profile, 'admin');
+export const removeRole = (currentRoles: string | string[] | null, roleToRemove: string): string[] => {
+  const roles = getRoles(currentRoles);
+  return roles.filter(r => r !== roleToRemove);
 };
 
 /**
- * Checks if a profile has premium role
- * Admins are automatically considered premium
+ * Get available system roles
+ * @returns array of available system roles
  */
-export const isPremium = (profile: Profile | null): boolean => {
-  if (isAdmin(profile)) return true; // Admins are always premium
-  return hasRole(profile, 'premium');
-};
-
-/**
- * Get an array of roles from a profile
- */
-export const getRoles = (profile: Profile | null): string[] => {
-  if (!profile) return [];
-  
-  // If the role is already an array, return it
-  if (Array.isArray(profile.role)) {
-    return profile.role;
-  }
-  
-  // If the role is a string, convert it to an array
-  if (profile.role) {
-    return [profile.role];
-  }
-  
-  // If no role is defined, return an empty array
-  return [];
-};
-
-/**
- * Add a role to a profile's roles
- */
-export const addRole = (profile: Profile, role: string): string[] => {
-  const currentRoles = getRoles(profile);
-  
-  // Only add the role if it's not already in the array
-  if (!currentRoles.includes(role)) {
-    return [...currentRoles, role];
-  }
-  
-  return currentRoles;
-};
-
-/**
- * Remove a role from a profile's roles
- */
-export const removeRole = (profile: Profile, role: string): string[] => {
-  const currentRoles = getRoles(profile);
-  return currentRoles.filter(r => r !== role);
+export const getAvailableRoles = (): string[] => {
+  return ['user', 'premium', 'admin'];
 };

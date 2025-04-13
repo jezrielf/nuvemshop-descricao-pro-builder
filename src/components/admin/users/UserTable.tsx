@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { UserTableProps, UserFormValues } from './types';
 import UserRoleBadge from './UserRoleBadge';
 import UserEditForm from './UserEditForm';
+import { getRoles } from '@/utils/roleUtils';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
@@ -81,6 +82,34 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     }
   };
 
+  const deleteUser = async (profileId: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', profileId);
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Usuário excluído',
+        description: 'O usuário foi excluído com sucesso.',
+      });
+      
+      onRefresh();
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao excluir usuário',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (loading) {
     return <p>Carregando...</p>;
   }
@@ -109,25 +138,35 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                 </TableCell>
                 <TableCell>{new Date(profile.criado_em).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Editar</Button>
-                    </SheetTrigger>
-                    <SheetContent className="sm:max-w-md">
-                      <SheetHeader>
-                        <SheetTitle>Editar Usuário</SheetTitle>
-                        <SheetDescription>
-                          Altere as informações do usuário {profile.nome || 'Sem nome'}
-                        </SheetDescription>
-                      </SheetHeader>
-                      
-                      <UserEditForm 
-                        profile={profile}
-                        onUpdateProfile={updateUserProfile}
-                        onUpdateRole={updateUserRole}
-                      />
-                    </SheetContent>
-                  </Sheet>
+                  <div className="flex space-x-2">
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Editar</Button>
+                      </SheetTrigger>
+                      <SheetContent className="sm:max-w-md">
+                        <SheetHeader>
+                          <SheetTitle>Editar Usuário</SheetTitle>
+                          <SheetDescription>
+                            Altere as informações do usuário {profile.nome || 'Sem nome'}
+                          </SheetDescription>
+                        </SheetHeader>
+                        
+                        <UserEditForm 
+                          profile={profile}
+                          onUpdateProfile={updateUserProfile}
+                          onUpdateRole={updateUserRole}
+                        />
+                      </SheetContent>
+                    </Sheet>
+                    
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => deleteUser(profile.id)}
+                    >
+                      Excluir
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))
