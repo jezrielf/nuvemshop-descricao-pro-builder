@@ -66,21 +66,24 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
     { id: 'feature-5', name: 'Integrações com marketplaces', included: false },
   ];
 
+  // Create a properly typed default value object that matches the FormValues type
+  const defaultValues: FormValues = {
+    name: '',
+    price: 0,
+    isActive: true,
+    isDefault: false,
+    features: defaultFeatures,
+  };
+
   // Set default values with the correct types to match Plan requirements
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: '',
-      price: 0,
-      isActive: true,
-      isDefault: false,
-      features: defaultFeatures,
-    },
+    defaultValues: initialData || defaultValues,
   });
 
   const handleSubmit = (values: FormValues) => {
-    // FormValues now exactly matches Omit<Plan, 'id'>, since all fields are required
-    onSubmit(values);
+    // We now have a properly typed FormValues object that matches Omit<Plan, 'id'>
+    onSubmit(values as Omit<Plan, 'id'>);
     form.reset();
   };
 
