@@ -1,4 +1,6 @@
 
+import { TextAlign, SpacingSize, BlockSpacing } from '@/types/editor';
+
 // Placeholder images for the generated blocks
 export const placeholderImages = [
   'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
