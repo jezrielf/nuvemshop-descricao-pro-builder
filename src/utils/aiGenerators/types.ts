@@ -1,5 +1,5 @@
 
-import { ProductCategory, BlockSpacing, SpacingSize, TextAlign } from '@/types/editor';
+import { ProductCategory, BlockSpacing, SpacingSize, TextAlign } from '@/types/editor/base';
 
 export interface AIDescriptionInput {
   productName: string;

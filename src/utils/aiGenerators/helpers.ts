@@ -1,5 +1,5 @@
 
-import { TextAlign, SpacingSize, BlockSpacing } from '@/types/editor';
+import { TextAlign, SpacingSize, BlockSpacing } from '@/types/editor/base';
 
 // Placeholder images for the generated blocks
 export const placeholderImages = [
