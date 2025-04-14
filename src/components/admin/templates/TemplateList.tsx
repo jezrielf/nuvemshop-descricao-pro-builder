@@ -28,8 +28,17 @@ const TemplateList: React.FC<TemplateListProps> = ({
   onDelete,
   getCategoryName
 }) => {
-  // Verificação adicional para garantir que templates é um array válido
+  // Garantir que templates é um array válido
   const validTemplates = Array.isArray(templates) ? templates : [];
+  
+  // Garantir que cada template tem todas as propriedades necessárias
+  const safeTemplates = validTemplates.filter(template => 
+    template && 
+    typeof template === 'object' && 
+    template.id && 
+    template.name && 
+    template.category
+  );
   
   return (
     <Table>
@@ -43,14 +52,14 @@ const TemplateList: React.FC<TemplateListProps> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {validTemplates.length === 0 ? (
+        {safeTemplates.length === 0 ? (
           <TableRow>
             <TableCell colSpan={4} className="h-24 text-center">
               Nenhum template encontrado.
             </TableCell>
           </TableRow>
         ) : (
-          validTemplates.map((template) => (
+          safeTemplates.map((template) => (
             <TableRow key={template.id}>
               <TableCell className="font-medium">{template.name}</TableCell>
               <TableCell>

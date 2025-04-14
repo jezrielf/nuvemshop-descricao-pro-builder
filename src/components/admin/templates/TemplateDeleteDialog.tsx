@@ -25,7 +25,10 @@ const TemplateDeleteDialog: React.FC<TemplateDeleteDialogProps> = ({
   template,
   onConfirm
 }) => {
-  if (!template) return null;
+  // Se o template for nulo ou não tiver um nome, retornar null
+  if (!template || !template.name) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

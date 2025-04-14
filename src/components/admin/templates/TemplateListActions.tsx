@@ -17,6 +17,12 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({
   onEdit,
   onDelete
 }) => {
+  // Adicionar verificação de segurança para template
+  if (!template || !template.id) {
+    console.error("Template inválido em TemplateActions:", template);
+    return null;
+  }
+
   return (
     <div className="flex justify-end space-x-2">
       <Button 

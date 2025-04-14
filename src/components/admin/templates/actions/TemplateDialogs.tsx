@@ -44,25 +44,25 @@ const TemplateDialogs: React.FC<TemplateDialogsProps> = ({
   ];
 
   const handleDeleteConfirm = () => {
-    if (selectedTemplate) {
+    if (selectedTemplate && selectedTemplate.id) {
       onDeleteTemplate(selectedTemplate);
       toggleDialog('isDeleteDialogOpen');
     }
   };
 
   const handleEditConfirm = () => {
-    if (editedTemplate) {
+    if (editedTemplate && editedTemplate.id && editedTemplate.name && editedTemplate.category) {
       onUpdateTemplate(editedTemplate);
       toggleDialog('isEditDialogOpen');
     }
   };
 
   const handleCreateTemplate = () => {
-    if (newTemplate) {
+    if (newTemplate && newTemplate.name && newTemplate.category) {
       // Convert to the required type for createTemplate function
       const templateToCreate = {
-        name: newTemplate.name || '',
-        category: newTemplate.category || 'other' as ProductCategory,
+        name: newTemplate.name,
+        category: newTemplate.category as ProductCategory,
         blocks: newTemplate.blocks || []
       };
       
@@ -85,10 +85,16 @@ const TemplateDialogs: React.FC<TemplateDialogsProps> = ({
     blocks: newTemplate?.blocks || []
   };
 
+  // Verifica se o template selecionado é válido para visualização e exclusão
+  const isValidTemplate = selectedTemplate && 
+                         selectedTemplate.id && 
+                         selectedTemplate.name && 
+                         selectedTemplate.category;
+
   return (
     <>
       <TemplatePreviewDialog
-        isOpen={dialogState.isPreviewOpen && selectedTemplate !== null}
+        isOpen={dialogState.isPreviewOpen && isValidTemplate !== undefined}
         onOpenChange={() => toggleDialog('isPreviewOpen')}
         template={selectedTemplate}
         getCategoryName={getCategoryName}
@@ -103,7 +109,7 @@ const TemplateDialogs: React.FC<TemplateDialogsProps> = ({
       />
 
       <TemplateDeleteDialog
-        isOpen={dialogState.isDeleteDialogOpen && selectedTemplate !== null}
+        isOpen={dialogState.isDeleteDialogOpen && isValidTemplate !== undefined}
         onOpenChange={() => toggleDialog('isDeleteDialogOpen')}
         template={selectedTemplate}
         onConfirm={handleDeleteConfirm}

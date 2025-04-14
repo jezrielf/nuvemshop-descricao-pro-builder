@@ -22,7 +22,27 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
   template,
   getCategoryName
 }) => {
-  if (!template) return null;
+  // Se não há template ou o diálogo não está aberto, não renderiza nada
+  if (!isOpen || !template) {
+    return null;
+  }
+
+  // Garantir que o template tem as propriedades necessárias
+  if (!template.name || !template.category || !template.blocks) {
+    console.error("Template inválido:", template);
+    return (
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Erro na Visualização</DialogTitle>
+          </DialogHeader>
+          <div className="p-4 text-red-500">
+            O template selecionado é inválido ou está corrompido.
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -40,12 +60,17 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
           <div className="space-y-4">
             {template.blocks.map(block => (
               <div key={block.id} className="border rounded p-4">
-                <h4 className="font-medium mb-2">{block.type}: {block.title}</h4>
+                <h4 className="font-medium mb-2">{block.type}: {block.title || 'Sem título'}</h4>
                 <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">
                   {JSON.stringify(block, null, 2)}
                 </pre>
               </div>
             ))}
+            {template.blocks.length === 0 && (
+              <div className="text-muted-foreground text-center p-4 border rounded">
+                Este template não possui blocos.
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

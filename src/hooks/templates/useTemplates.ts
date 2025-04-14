@@ -61,9 +61,20 @@ export function useTemplates() {
   useEffect(() => {
     console.log("Templates loaded in useTemplates hook:", allTemplates.length);
     console.log("Displayed templates:", displayedTemplates.length);
+    
+    // Verificar templates vazios ou inválidos
+    const invalidTemplates = allTemplates.filter(t => !t || !t.name || !t.category);
+    if (invalidTemplates.length > 0) {
+      console.warn("Templates inválidos encontrados:", invalidTemplates);
+    }
   }, [allTemplates, displayedTemplates]);
 
   const viewTemplate = useCallback((template: Template) => {
+    if (!template || !template.name) {
+      console.error("Tentativa de visualizar template inválido:", template);
+      return null;
+    }
+    
     console.log("Viewing template:", template.name);
     setSelectedTemplate(template);
     return handleViewTemplate(template);
