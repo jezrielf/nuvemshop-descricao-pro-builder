@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { BadgeAlert, BadgeCheck, Crown } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Settings } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
@@ -61,7 +61,6 @@ const Header: React.FC = () => {
       );
     }
     
-    // Return an empty placeholder badge with the same height but invisible to prevent layout shifts
     return <div className="h-6 w-0 ml-2" aria-hidden="true"></div>;
   };
   
@@ -78,12 +77,14 @@ const Header: React.FC = () => {
             </span>
           )}
           
-          {/* Always render a badge container to prevent layout shifts */}
           {renderSubscriptionBadge()}
           
-          <Link to="/plans" className="text-sm text-blue-500 hover:text-blue-700 underline">
-            Ver planos
-          </Link>
+          {/* Só mostra o link para planos se não for premium ou business */}
+          {!isPremium() && !isBusiness() && (
+            <Link to="/plans" className="text-sm text-blue-500 hover:text-blue-700 underline">
+              Ver planos
+            </Link>
+          )}
         </div>
         
         <div className="flex items-center space-x-2">

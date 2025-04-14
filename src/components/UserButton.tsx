@@ -12,11 +12,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Shield } from 'lucide-react';
+import { LogOut, User, Shield, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const UserButton: React.FC = () => {
-  const { user, profile, signOut, isAdmin } = useAuth();
+  const { user, profile, signOut, isAdmin, isPremium, isBusiness, openCustomerPortal } = useAuth();
 
   if (!user) {
     return (
@@ -27,6 +27,7 @@ export const UserButton: React.FC = () => {
   }
 
   const userInitial = profile?.nome ? profile.nome[0].toUpperCase() : user.email?.[0].toUpperCase() || 'U';
+  const isSubscribed = isPremium() || isBusiness();
 
   return (
     <DropdownMenu>
@@ -60,6 +61,15 @@ export const UserButton: React.FC = () => {
                 <Shield className="mr-2 h-4 w-4" />
                 <span>Painel Admin</span>
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        {isSubscribed && (
+          <>
+            <DropdownMenuItem onClick={openCustomerPortal}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Gestão de Conta</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
