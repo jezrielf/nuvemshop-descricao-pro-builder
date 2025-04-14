@@ -11,3 +11,8 @@ export interface UserFormValues {
   nome: string;
   role: string;
 }
+
+export interface CreateUserFormValues extends UserFormValues {
+  email: string;
+  password: string;
+}

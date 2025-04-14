@@ -12,6 +12,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import CreateUserForm from './users/CreateUserForm';
 
+interface AuthUser {
+  id: string;
+  email?: string;
+}
+
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
@@ -69,8 +74,8 @@ const UsersPanel: React.FC = () => {
       
       if (authData && authData.users) {
         // Create a map of user IDs to emails
-        const userEmailMap = new Map();
-        authData.users.forEach(user => {
+        const userEmailMap = new Map<string, string>();
+        authData.users.forEach((user: AuthUser) => {
           if (user.id && user.email) {
             userEmailMap.set(user.id, user.email);
           }
@@ -79,7 +84,7 @@ const UsersPanel: React.FC = () => {
         // Add emails to profiles
         enrichedProfiles = enrichedProfiles.map(profile => ({
           ...profile,
-          email: userEmailMap.get(profile.id) || profile.email || null
+          email: userEmailMap.get(profile.id) || null
         }));
       }
       

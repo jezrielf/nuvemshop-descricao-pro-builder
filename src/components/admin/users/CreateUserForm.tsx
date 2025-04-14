@@ -7,14 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import UserRoleSelector from './UserRoleSelector';
-
-interface CreateUserFormValues {
-  email: string;
-  password: string;
-  nome: string;
-  role: string;
-}
+import { CreateUserFormValues } from './types';
+import CreateUserRoleSelector from './CreateUserRoleSelector';
 
 interface CreateUserFormProps {
   onUserCreated: () => void;
@@ -109,7 +103,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
       
       <div className="space-y-2">
         <h3 className="text-sm font-medium">Tipo de Usuário</h3>
-        <UserRoleSelector 
+        <CreateUserRoleSelector 
           watch={form.watch} 
           setValue={form.setValue} 
         />
