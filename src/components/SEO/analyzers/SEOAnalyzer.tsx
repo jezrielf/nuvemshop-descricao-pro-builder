@@ -31,16 +31,18 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
           Análise SEO
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col overflow-hidden">
         <AnalyzerDialogHeader />
-        <AnalyzerDialogContent
-          keyword={keyword}
-          setKeyword={setKeyword}
-          onAnalyze={handleAnalyze}
-          analyzing={analyzing}
-          results={results}
-          disabled={!description}
-        />
+        <div className="flex-grow overflow-hidden">
+          <AnalyzerDialogContent
+            keyword={keyword}
+            setKeyword={setKeyword}
+            onAnalyze={handleAnalyze}
+            analyzing={analyzing}
+            results={results}
+            disabled={!description}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
