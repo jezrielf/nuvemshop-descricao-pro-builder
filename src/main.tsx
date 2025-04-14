@@ -5,9 +5,13 @@ import './index.css'
 
 // Certifica-se de que o elemento root existe antes de renderizar
 const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error("Failed to find the root element");
+if (!rootElement) {
+  console.error("Elemento root não encontrado!");
+  throw new Error("Failed to find the root element");
+}
 
 const root = createRoot(rootElement);
+console.log("Root element encontrado, renderizando aplicação...");
 root.render(<App />);
 
 // Adiciona um log para debug
