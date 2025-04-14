@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for handling user roles
  */
@@ -63,7 +64,8 @@ export const isPremium = (role: string | string[] | null): boolean => {
  * @returns boolean indicating if the user is business
  */
 export const isBusiness = (role: string | string[] | null): boolean => {
-  return hasRole(role, 'business');
+  // Premium users should also have business privileges
+  return hasRole(role, 'business') || isPremium(role);
 };
 
 /**
@@ -96,5 +98,5 @@ export const removeRole = (currentRoles: string | string[] | null, roleToRemove:
  * @returns array of available system roles
  */
 export const getAvailableRoles = (): string[] => {
-  return ['user', 'premium', 'admin'];
+  return ['user', 'premium', 'business', 'admin'];
 };

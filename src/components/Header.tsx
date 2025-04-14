@@ -19,6 +19,9 @@ const Header: React.FC = () => {
   const auth = useAuth();
   const { isPremium, isBusiness, isSubscribed, descriptionCount, canCreateMoreDescriptions, subscriptionTier } = auth;
   
+  console.log("Header component - isPremium:", isPremium());
+  console.log("Header component - isBusiness:", isBusiness());
+  
   // Set auth context in the store when component mounts
   useEffect(() => {
     setAuthContext(auth);
@@ -92,9 +95,9 @@ const Header: React.FC = () => {
           
           {description && <HtmlOutputDialog />}
           
-          {description && isBusiness() && <SEOAnalyzer description={description} />}
+          {description && (isPremium() || isBusiness()) && <SEOAnalyzer description={description} />}
           
-          {isBusiness() && <AIGeneratorButton />}
+          <AIGeneratorButton />
           
           <TutorialManager />
           

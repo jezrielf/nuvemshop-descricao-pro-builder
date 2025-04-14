@@ -12,11 +12,16 @@ const AIGeneratorButton: React.FC = () => {
   const { isPremium, isBusiness } = useAuth();
   const navigate = useNavigate();
   
+  // Now premium users can use AI too
   const canUseAI = isPremium() || isBusiness();
+  
+  console.log("AIGeneratorButton - isPremium:", isPremium());
+  console.log("AIGeneratorButton - isBusiness:", isBusiness());
+  console.log("AIGeneratorButton - canUseAI:", canUseAI);
   
   const tooltipText = canUseAI 
     ? "Gerar descrição completa com IA" 
-    : "Recurso exclusivo: Assine o plano Empresarial para usar IA";
+    : "Recurso exclusivo: Assine o plano Premium ou Empresarial para usar IA";
   
   const handleClick = () => {
     if (canUseAI) {

@@ -5,7 +5,7 @@ import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useDescriptionCount } from '@/hooks/useDescriptionCount';
-import { hasRole } from '@/utils/roleUtils';
+import { hasRole, isAdmin, isPremium, isBusiness } from '@/utils/roleUtils';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -50,37 +50,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  // Fix for infinite loop: Add dependency check to avoid updating state repeatedly
+  // Update subscription tier based on user role
   useEffect(() => {
     if (profile?.role) {
       console.log("Verificação de role:", profile.role);
       
-      // Check if role is an array and use the first item, or use the role string directly
-      const roles = Array.isArray(profile.role) ? profile.role : [profile.role];
-      
-      if (roles.includes('premium') && subscriptionTier !== 'premium') {
+      if (isPremium(profile.role) && subscriptionTier !== 'premium') {
         console.log("Atualizando tier para premium");
         setSubscriptionTier('premium');
-      } else if (roles.includes('admin') && subscriptionTier !== 'admin') {
+      } else if (isAdmin(profile.role) && subscriptionTier !== 'admin') {
         console.log("Atualizando tier para admin");
         setSubscriptionTier('admin');
+      } else if (isBusiness(profile.role) && subscriptionTier !== 'business') {
+        console.log("Atualizando tier para business");
+        setSubscriptionTier('business');
       }
     }
   }, [profile, setSubscriptionTier, subscriptionTier]);
 
-  const isAdmin = () => {
-    return hasRole(profile?.role, 'admin');
+  const isAdminUser = () => {
+    return isAdmin(profile?.role);
   };
 
-  const isPremium = () => {
-    return hasRole(profile?.role, 'premium') || 
-           isAdmin() || 
+  const isPremiumUser = () => {
+    return isPremium(profile?.role) || 
+           isAdminUser() || 
            subscriptionTier?.toLowerCase() === 'premium' || 
            subscriptionTier?.toLowerCase() === 'admin';
   };
 
-  const isBusiness = () => {
-    return subscriptionTier?.toLowerCase() === 'empresarial';
+  const isBusinessUser = () => {
+    return isBusiness(profile?.role) || 
+           isPremiumUser() || // Premium users get business features too
+           subscriptionTier?.toLowerCase() === 'business';
   };
 
   const isSubscribed = () => {
@@ -103,9 +105,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     loading,
     hasRole: (role: string) => hasRole(profile?.role, role),
-    isAdmin,
-    isPremium,
-    isBusiness,
+    isAdmin: isAdminUser,
+    isPremium: isPremiumUser,
+    isBusiness: isBusinessUser,
     isSubscribed,
     subscriptionTier,
     subscriptionEnd,

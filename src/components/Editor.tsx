@@ -21,6 +21,10 @@ const Editor: React.FC = () => {
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const navigate = useNavigate();
   
+  // Log the role information for debugging
+  console.log("Editor component - isPremium:", isPremium());
+  console.log("Editor component - isBusiness:", isBusiness());
+  
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
     
@@ -64,7 +68,7 @@ const Editor: React.FC = () => {
               <p className="text-sm text-gray-500">Deixe nossa IA criar uma descrição completa para você</p>
             </div>
             <div className="p-4 flex justify-center">
-              {isBusiness() ? (
+              {isPremium() || isBusiness() ? (
                 <Button 
                   onClick={() => setIsAIGeneratorOpen(true)}
                   className="border-yellow-400 bg-gradient-to-r from-yellow-50 to-white"
@@ -78,7 +82,7 @@ const Editor: React.FC = () => {
                   variant="outline"
                 >
                   <Lock className="h-4 w-4 mr-2" />
-                  Recurso do Plano Empresarial
+                  Recurso do Plano Premium ou Empresarial
                 </Button>
               )}
             </div>
@@ -97,7 +101,7 @@ const Editor: React.FC = () => {
     <div className="h-full flex flex-col">
       <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
         <TemplateSelector />
-        {description && isBusiness() && <SEOTools description={description} />}
+        {description && (isPremium() || isBusiness()) && <SEOTools description={description} />}
       </div>
       
       <ScrollArea className="flex-1 p-4">

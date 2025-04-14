@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '@/store/editor';
@@ -28,6 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 import AIGeneratorResult from './AIGeneratorResult';
 import { ProductCategory, ProductDescription, Block, BlockType } from '@/types/editor';
 import { generateAIDescription } from '@/utils/aiGenerators/descriptionGenerator';
+import { isPremium } from '@/utils/roleUtils';
 
 // Form schema for AI description generation
 const formSchema = z.object({
@@ -51,7 +51,7 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
   isOpen, 
   onOpenChange 
 }) => {
-  const { isPremium } = useAuth();
+  const { isBusiness, profile } = useAuth();
   const navigate = useNavigate();
   const { createNewDescription, loadDescription } = useEditorStore();
   const { toast } = useToast();
@@ -76,14 +76,14 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
   });
 
   // If not premium, redirect to plans page
-  if (!isPremium()) {
+  if (!isPremium(profile?.role) && !isBusiness()) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Recurso Premium</DialogTitle>
             <DialogDescription>
-              O gerador de descrição por IA é exclusivo para assinantes premium.
+              O gerador de descrição por IA é exclusivo para assinantes premium ou empresarial.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center py-6">
