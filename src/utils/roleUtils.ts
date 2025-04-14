@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for handling user roles
  */
@@ -13,7 +12,17 @@ export const getRoles = (role: string | string[] | null): string[] => {
   
   console.log('Getting roles from:', role);
   
-  return Array.isArray(role) ? role : [role];
+  if (Array.isArray(role)) {
+    return role;
+  }
+  
+  // If it's a comma-separated string, split it
+  if (role?.includes(',')) {
+    return role.split(',').map(r => r.trim());
+  }
+  
+  // If it's a single string value
+  return [role];
 };
 
 /**

@@ -49,16 +49,18 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
       // 2. Atualizar o perfil com o papel (role) especificado
       // Convert role to string if it's an array
       const roleValue = Array.isArray(values.role) 
-        ? values.role 
+        ? values.role.join(',') // Convert array to comma-separated string
         : values.role;
         
-      // TypeScript fix: Type the update object explicitly
+      // TypeScript fix: Type the update object explicitly and use roleValue as string
       const profileUpdate: {
         nome: string;
-        role: string | string[];
+        role: string;
+        atualizado_em: string;
       } = {
         nome: values.nome,
-        role: roleValue
+        role: roleValue,
+        atualizado_em: new Date().toISOString()
       };
       
       const { error: profileError } = await supabase

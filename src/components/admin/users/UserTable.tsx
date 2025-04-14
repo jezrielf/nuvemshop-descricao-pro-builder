@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Profile } from '@/types/auth';
 import { 
@@ -32,13 +31,15 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     if (!editingUser) return;
     
     try {
-      // Ensure role is properly formatted for database
-      const roleValue = values.role;
+      // Ensure role is properly formatted for database - convert array to string if needed
+      const roleValue = Array.isArray(values.role) 
+        ? values.role.join(',') // Convert array to comma-separated string
+        : values.role;
       
-      // TypeScript fix: Type the update object explicitly
+      // TypeScript fix: Type the update object explicitly with roleValue as string
       const profileUpdate: {
         nome: string;
-        role: string | string[];
+        role: string;
         atualizado_em: string;
       } = {
         nome: values.nome,
@@ -74,12 +75,14 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       console.log(`Atualizando papel do usuário ${userId} para ${JSON.stringify(newRole)}`);
       
-      // Ensure role is properly formatted for database
-      const roleValue = newRole;
+      // Ensure role is properly formatted for database - convert array to string if needed
+      const roleValue = Array.isArray(newRole) 
+        ? newRole.join(',') // Convert array to comma-separated string
+        : newRole;
       
-      // TypeScript fix: Type the update object explicitly
+      // TypeScript fix: Type the update object explicitly with roleValue as string
       const profileUpdate: {
-        role: string | string[];
+        role: string;
         atualizado_em: string;
       } = {
         role: roleValue,
