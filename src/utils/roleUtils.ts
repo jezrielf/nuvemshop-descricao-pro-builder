@@ -11,8 +11,7 @@
 export const getRoles = (role: string | string[] | null): string[] => {
   if (!role) return ['user'];
   
-  console.log('Getting roles from:', role);
-  
+  // If it's already an array, return it directly
   if (Array.isArray(role)) {
     return role;
   }
@@ -34,7 +33,6 @@ export const getRoles = (role: string | string[] | null): string[] => {
  */
 export const hasRole = (role: string | string[] | null, roleToCheck: string): boolean => {
   const roles = getRoles(role);
-  console.log(`Checking if user has role ${roleToCheck}:`, roles.includes(roleToCheck));
   return roles.includes(roleToCheck);
 };
 
@@ -44,9 +42,7 @@ export const hasRole = (role: string | string[] | null, roleToCheck: string): bo
  * @returns boolean indicating if the user is an admin
  */
 export const isAdmin = (role: string | string[] | null): boolean => {
-  const isUserAdmin = hasRole(role, 'admin');
-  console.log('isAdmin check in roleUtils:', isUserAdmin, 'role:', role);
-  return isUserAdmin;
+  return hasRole(role, 'admin');
 };
 
 /**

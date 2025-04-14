@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Shield, Settings } from 'lucide-react';
+import { LogOut, Shield, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const UserButton: React.FC = () => {
@@ -65,6 +65,7 @@ export const UserButton: React.FC = () => {
             <DropdownMenuSeparator />
           </>
         )}
+        {/* Mostrar opção de gerenciamento de conta para usuários premium ou business */}
         {isSubscribed && (
           <>
             <DropdownMenuItem onClick={openCustomerPortal}>

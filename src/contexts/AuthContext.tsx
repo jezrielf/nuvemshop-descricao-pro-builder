@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
@@ -50,51 +50,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  // Update subscription tier based on user role
+  // Update subscription tier based on user role - once per profile change
   useEffect(() => {
     if (profile?.role) {
-      console.log("Verificação de role:", profile.role);
-      
       if (isPremium(profile.role) && subscriptionTier !== 'premium') {
-        console.log("Atualizando tier para premium");
         setSubscriptionTier('premium');
       } else if (isAdmin(profile.role) && subscriptionTier !== 'admin') {
-        console.log("Atualizando tier para admin");
         setSubscriptionTier('admin');
       } else if (isBusiness(profile.role) && subscriptionTier !== 'business') {
-        console.log("Atualizando tier para business");
         setSubscriptionTier('business');
       }
     }
   }, [profile, setSubscriptionTier, subscriptionTier]);
 
-  const isAdminUser = () => {
+  // Memoize role check functions to prevent rerenders
+  const isAdminUser = useMemo(() => {
     return isAdmin(profile?.role);
-  };
+  }, [profile?.role]);
 
-  const isPremiumUser = () => {
+  const isPremiumUser = useMemo(() => {
     return isPremium(profile?.role) || 
-           isAdminUser() || 
+           isAdminUser || 
            subscriptionTier?.toLowerCase() === 'premium' || 
            subscriptionTier?.toLowerCase() === 'admin';
-  };
+  }, [profile?.role, isAdminUser, subscriptionTier]);
 
-  const isBusinessUser = () => {
+  const isBusinessUser = useMemo(() => {
     return isBusiness(profile?.role) || 
-           isPremiumUser() || // Premium users get business features too
+           isPremiumUser || // Premium users get business features too
            subscriptionTier?.toLowerCase() === 'business';
-  };
+  }, [profile?.role, isPremiumUser, subscriptionTier]);
 
-  const isSubscribed = () => {
+  const isSubscribed = useMemo(() => {
     return subscriptionTier && subscriptionTier.toLowerCase() !== 'free';
-  };
+  }, [subscriptionTier]);
 
-  const canCreateMoreDescriptions = () => {
-    if (isSubscribed()) {
+  const canCreateMoreDescriptions = useMemo(() => {
+    if (isSubscribed) {
       return true;
     }
     return descriptionCount < 3;
-  };
+  }, [isSubscribed, descriptionCount]);
 
   const value = {
     session,
@@ -105,17 +101,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     loading,
     hasRole: (role: string) => hasRole(profile?.role, role),
-    isAdmin: isAdminUser,
-    isPremium: isPremiumUser,
-    isBusiness: isBusinessUser,
-    isSubscribed,
+    isAdmin: () => isAdminUser,
+    isPremium: () => isPremiumUser,
+    isBusiness: () => isBusinessUser,
+    isSubscribed: () => isSubscribed,
     subscriptionTier,
     subscriptionEnd,
     refreshSubscription,
     openCustomerPortal,
     descriptionCount,
     incrementDescriptionCount,
-    canCreateMoreDescriptions
+    canCreateMoreDescriptions: () => canCreateMoreDescriptions
   };
 
   return (
