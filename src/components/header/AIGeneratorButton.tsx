@@ -1,18 +1,30 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Lock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AIDescriptionGenerator from '../AIGenerator/AIDescriptionGenerator';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AIGeneratorButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { isPremium } = useAuth();
+  const { isPremium, isBusiness } = useAuth();
+  const navigate = useNavigate();
   
-  const tooltipText = isPremium() 
+  const canUseAI = isPremium() || isBusiness();
+  
+  const tooltipText = canUseAI 
     ? "Gerar descrição completa com IA" 
-    : "Recurso premium: Gerar descrição completa com IA";
+    : "Recurso exclusivo: Assine o plano Empresarial para usar IA";
+  
+  const handleClick = () => {
+    if (canUseAI) {
+      setIsOpen(true);
+    } else {
+      navigate('/plans');
+    }
+  };
 
   return (
     <>
@@ -21,11 +33,11 @@ const AIGeneratorButton: React.FC = () => {
           <TooltipTrigger asChild>
             <Button 
               variant="outline" 
-              className={isPremium() ? "border-yellow-400 hover:border-yellow-500 hover:bg-yellow-50" : ""}
-              onClick={() => setIsOpen(true)}
+              className={canUseAI ? "border-yellow-400 hover:border-yellow-500 hover:bg-yellow-50" : ""}
+              onClick={handleClick}
             >
-              <Sparkles className={`h-4 w-4 mr-2 ${isPremium() ? "text-yellow-500" : ""}`} />
-              {isPremium() ? "IA" : "Premium"}
+              <Sparkles className={`h-4 w-4 mr-2 ${canUseAI ? "text-yellow-500" : "text-gray-400"}`} />
+              {canUseAI ? "IA" : <><span className="mr-1">IA</span><Lock className="h-3 w-3 text-gray-400" /></>}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -34,10 +46,12 @@ const AIGeneratorButton: React.FC = () => {
         </Tooltip>
       </TooltipProvider>
       
-      <AIDescriptionGenerator 
-        isOpen={isOpen} 
-        onOpenChange={setIsOpen} 
-      />
+      {canUseAI && (
+        <AIDescriptionGenerator 
+          isOpen={isOpen} 
+          onOpenChange={setIsOpen} 
+        />
+      )}
     </>
   );
 };

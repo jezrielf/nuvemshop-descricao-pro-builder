@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -21,7 +21,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Plan, PlanFeature } from './types';
+import { Plan, PlanFeature, defaultFeaturesTemplate } from './types';
+import { Plus, Trash } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 // Create a schema that ensures all required fields are present
 const formSchema = z.object({
@@ -58,13 +60,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   title,
   initialData,
 }) => {
-  const defaultFeatures: PlanFeature[] = [
-    { id: 'feature-1', name: 'Descrições ilimitadas', included: true },
-    { id: 'feature-2', name: 'Suporte prioritário', included: false },
-    { id: 'feature-3', name: 'Acesso a todos os templates', included: false },
-    { id: 'feature-4', name: 'Exportação em múltiplos formatos', included: false },
-    { id: 'feature-5', name: 'Integrações com marketplaces', included: false },
-  ];
+  const [newFeatureName, setNewFeatureName] = useState('');
 
   // Create a properly typed default value object that matches the FormValues type
   const defaultValues: FormValues = {
@@ -72,7 +68,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
     price: 0,
     isActive: true,
     isDefault: false,
-    features: defaultFeatures,
+    features: [...defaultFeaturesTemplate],
   };
 
   // Set default values with the correct types to match Plan requirements
@@ -85,6 +81,27 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
     // We now have a properly typed FormValues object that matches Omit<Plan, 'id'>
     onSubmit(values as Omit<Plan, 'id'>);
     form.reset();
+  };
+
+  const addNewFeature = () => {
+    if (newFeatureName.trim() === '') return;
+    
+    const currentFeatures = form.getValues().features || [];
+    const newFeature: PlanFeature = {
+      id: `feature-${uuidv4()}`,
+      name: newFeatureName,
+      included: false
+    };
+    
+    form.setValue('features', [...currentFeatures, newFeature]);
+    setNewFeatureName('');
+  };
+
+  const removeFeature = (index: number) => {
+    const currentFeatures = form.getValues().features;
+    const updatedFeatures = [...currentFeatures];
+    updatedFeatures.splice(index, 1);
+    form.setValue('features', updatedFeatures);
   };
 
   return (
@@ -155,26 +172,59 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
             </div>
             <div className="space-y-2">
               <FormLabel>Recursos Incluídos</FormLabel>
-              {defaultFeatures.map((feature, index) => (
-                <FormField
-                  key={feature.id}
-                  control={form.control}
-                  name={`features.${index}.included`}
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                      <FormLabel className="m-0">
-                        {form.getValues().features[index].name}
-                      </FormLabel>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
+              <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2">
+                {form.getValues().features.map((feature, index) => (
+                  <FormField
+                    key={feature.id}
+                    control={form.control}
+                    name={`features.${index}.included`}
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                        <div className="flex-1 mr-2">
+                          <FormLabel className="m-0">
+                            {form.getValues().features[index].name}
+                          </FormLabel>
+                        </div>
+                        <div className="flex items-center">
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="ml-2"
+                            onClick={() => removeFeature(index)}
+                          >
+                            <Trash className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+              
+              <div className="flex items-center space-x-2 mt-4">
+                <Input 
+                  value={newFeatureName} 
+                  onChange={(e) => setNewFeatureName(e.target.value)}
+                  placeholder="Nome do novo recurso" 
+                  className="flex-1"
                 />
-              ))}
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={addNewFeature}
+                  disabled={!newFeatureName.trim()}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar
+                </Button>
+              </div>
             </div>
             <DialogFooter>
               <Button type="submit">Salvar</Button>

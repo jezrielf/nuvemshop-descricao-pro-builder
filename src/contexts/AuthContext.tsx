@@ -1,129 +1,97 @@
-
-import React, { createContext, useContext, useEffect } from 'react';
-import { authService } from '@/services/authService';
-import { useAuthProvider } from '@/hooks/useAuthProvider';
-import { hasRole, isAdmin, isPremium } from '@/utils/roleUtils';
+import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import { Session, User } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { Profile } from '@/types/auth';
 import { AuthContextProps } from '@/types/authContext';
-import { subscriptionService } from '@/services/subscriptionService';
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { 
-    session, 
-    user, 
-    profile, 
-    loading, 
-    descriptionCount, 
-    setLoading, 
-    setDescriptionCount,
-    subscriptionTier,
-    setSubscriptionTier,
-    subscriptionEnd,
-    setSubscriptionEnd,
-    toast, 
-    navigate 
-  } = useAuthProvider();
+export const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-  const checkHasRole = (role: string): boolean => {
-    return hasRole(profile?.role, role);
-  };
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [descriptionCount, setDescriptionCount] = useState(0);
+  const [subscriptionTier, setSubscriptionTier] = useState<string>('free');
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const checkIsAdmin = (): boolean => {
-    return isAdmin(profile?.role);
-  };
-
-  const checkIsPremium = (): boolean => {
-    // Check both role and subscription
-    return isPremium(profile?.role) || subscriptionTier === 'premium' || subscriptionTier === 'business';
-  };
-
-  const checkIsBusiness = (): boolean => {
-    // Check if user has business/enterprise plan
-    return subscriptionTier === 'business';
-  };
-
-  const checkIsSubscribed = (): boolean => {
-    // Check if user has any paid plan
-    return subscriptionTier === 'premium' || subscriptionTier === 'business';
-  };
-
-  const incrementDescriptionCount = () => {
-    const newCount = descriptionCount + 1;
-    setDescriptionCount(newCount);
-    
-    // Save to localStorage
-    if (user) {
-      localStorage.setItem(`descriptionCount_${user.id}`, newCount.toString());
-    } else {
-      localStorage.setItem('descriptionCount_anonymous', newCount.toString());
-    }
-  };
-
-  const canCreateMoreDescriptions = () => {
-    if (checkIsSubscribed()) return true; // Paid users have unlimited descriptions
-    return descriptionCount < 3; // Free users can create up to 3 descriptions
-  };
-
-  const refreshSubscription = async () => {
-    if (!user) return;
-    
-    try {
-      const subInfo = await subscriptionService.checkSubscription();
-      setSubscriptionTier(subInfo.subscription_tier);
-      setSubscriptionEnd(subInfo.subscription_end);
-    } catch (error) {
-      console.error('Failed to refresh subscription info:', error);
-    }
-  };
-
-  // Check subscription status on mount and when user changes
   useEffect(() => {
-    if (user) {
-      refreshSubscription();
-    } else {
-      // Reset to free tier when logged out
-      setSubscriptionTier('free');
-      setSubscriptionEnd(null);
-    }
-  }, [user]);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          setTimeout(() => fetchProfile(session.user.id), 0);
+          // Load description count from localStorage for this user
+          const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
+          if (storedCount) {
+            setDescriptionCount(parseInt(storedCount, 10));
+          }
+        } else {
+          setProfile(null);
+          // For anonymous users, use a generic key
+          const storedCount = localStorage.getItem('descriptionCount_anonymous');
+          if (storedCount) {
+            setDescriptionCount(parseInt(storedCount, 10));
+          }
+        }
+      }
+    );
 
-  const openCustomerPortal = async () => {
-    try {
-      setLoading(true);
-      const url = await subscriptionService.openCustomerPortal();
-      window.location.href = url;
-    } catch (error: any) {
-      toast({
-        title: 'Erro ao abrir portal',
-        description: error.message || 'Não foi possível abrir o portal de gerenciamento',
-        variant: 'destructive',
-      });
-    } finally {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        // Load description count for logged in user
+        const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
+        if (storedCount) {
+          setDescriptionCount(parseInt(storedCount, 10));
+        }
+      } else {
+        // Load description count for anonymous user
+        const storedCount = localStorage.getItem('descriptionCount_anonymous');
+        if (storedCount) {
+          setDescriptionCount(parseInt(storedCount, 10));
+        }
+      }
+      
       setLoading(false);
-    }
-  };
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const { data, error } = await authService.signIn(email, password);
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: 'Login realizado com sucesso!',
-        description: `Bem-vindo de volta!`,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      
-      navigate('/');
+      if (error) {
+        throw new Error(error.message);
+      }
+      setSession(data.session);
+      setUser(data.user);
+      toast({
+        title: "Login realizado com sucesso!",
+        description: `Bem-vindo(a) de volta!`,
+      });
     } catch (error: any) {
       toast({
-        title: 'Erro ao fazer login',
-        description: error.message || 'Por favor, verifique suas credenciais',
-        variant: 'destructive',
+        variant: "destructive",
+        title: "Erro ao realizar login",
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -131,25 +99,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, nome: string) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const { data, error } = await authService.signUp(email, password, nome);
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: 'Registro realizado com sucesso!',
-        description: 'Sua conta foi criada.',
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            nome,
+          },
+        },
       });
-
-      navigate('/');
+      if (error) {
+        throw new Error(error.message);
+      }
+      setSession(data.session);
+      setUser(data.user);
+      toast({
+        title: "Cadastro realizado com sucesso!",
+        description: `Bem-vindo(a), ${nome}!`,
+      });
     } catch (error: any) {
       toast({
-        title: 'Erro no registro',
-        description: error.message || 'Não foi possível criar sua conta',
-        variant: 'destructive',
+        variant: "destructive",
+        title: "Erro ao realizar cadastro",
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -157,58 +131,159 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      await authService.signOut();
+      await supabase.auth.signOut();
+      setSession(null);
+      setUser(null);
+      setProfile(null);
       toast({
-        title: 'Logout realizado',
-        description: 'Você foi desconectado',
+        title: "Logout realizado com sucesso!",
+        description: "Você foi desconectado(a) com segurança.",
       });
-      navigate('/auth');
     } catch (error: any) {
       toast({
-        title: 'Erro ao fazer logout',
+        variant: "destructive",
+        title: "Erro ao realizar logout",
         description: error.message,
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar perfil:', error);
+        return;
+      }
+
+      setProfile(data as Profile);
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+    }
+  };
+
+  const hasRole = (role: string) => {
+    return profile?.role === role;
+  };
+
+  const isAdmin = useCallback(() => {
+    return profile?.role === 'admin';
+  }, [profile?.role]);
+
+  const isPremium = useCallback(() => {
+    return subscriptionTier?.toLowerCase() === 'premium';
+  }, [subscriptionTier]);
+
+  const isBusiness = useCallback(() => {
+    return subscriptionTier?.toLowerCase() === 'empresarial';
+  }, [subscriptionTier]);
+
+  const isSubscribed = useCallback(() => {
+    return subscriptionTier && subscriptionTier.toLowerCase() !== 'free';
+  }, [subscriptionTier]);
+
+  const refreshSubscription = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (error) {
+        throw new Error(error.message);
+      }
+      setSubscriptionTier(data.subscription_tier);
+      setSubscriptionEnd(data.subscription_end);
+    } catch (error: any) {
+      console.error('Error refreshing subscription:', error);
+      toast({
+        title: 'Erro ao verificar assinatura',
+        description: error.message,
+        variant: 'destructive',
+      });
+      // Optionally, set a default subscription tier in case of error
+      setSubscriptionTier('free');
+      setSubscriptionEnd(null);
+    }
+  }, [toast]);
+
+  const openCustomerPortal = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      if (error) {
+        throw new Error(error.message);
+      }
+      window.location.href = data.url;
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao abrir portal do cliente',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const incrementDescriptionCount = () => {
+    const newCount = descriptionCount + 1;
+    setDescriptionCount(newCount);
+    if (user) {
+      localStorage.setItem(`descriptionCount_${user.id}`, newCount.toString());
+    } else {
+      localStorage.setItem('descriptionCount_anonymous', newCount.toString());
+    }
+  };
+
+  const canCreateMoreDescriptions = useCallback(() => {
+    if (isSubscribed()) {
+      return true;
+    }
+    return descriptionCount < 3;
+  }, [descriptionCount, isSubscribed]);
+
+  useEffect(() => {
+    if (user) {
+      refreshSubscription();
+    }
+  }, [user, refreshSubscription]);
+
+  const value = {
+    session,
+    user,
+    profile,
+    signIn,
+    signUp,
+    signOut,
+    loading,
+    hasRole,
+    isAdmin,
+    isPremium,
+    isBusiness,
+    isSubscribed,
+    subscriptionTier,
+    subscriptionEnd,
+    refreshSubscription,
+    openCustomerPortal,
+    descriptionCount,
+    incrementDescriptionCount,
+    canCreateMoreDescriptions
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user,
-        profile,
-        signIn,
-        signUp,
-        signOut,
-        loading,
-        hasRole: checkHasRole,
-        isAdmin: checkIsAdmin,
-        isPremium: checkIsPremium,
-        isBusiness: checkIsBusiness,
-        isSubscribed: checkIsSubscribed,
-        subscriptionTier,
-        subscriptionEnd,
-        refreshSubscription,
-        openCustomerPortal,
-        descriptionCount,
-        incrementDescriptionCount,
-        canCreateMoreDescriptions,
-      }}
-    >
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

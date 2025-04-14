@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Check, CircleX, Loader2, RefreshCw } from 'lucide-react';
+import { Check, CircleX, Loader2, RefreshCw, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { subscriptionService } from '@/services/subscriptionService';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,6 +124,19 @@ const Plans: React.FC = () => {
     }
   };
 
+  const getPlanDescription = (planName: string) => {
+    switch(planName.toLowerCase()) {
+      case 'gratuito':
+        return 'Perfeito para começar, com recursos básicos para suas primeiras descrições.';
+      case 'premium':
+        return 'Ideal para usuários que precisam de recursos avançados e descrições ilimitadas.';
+      case 'empresarial':
+        return 'Solução completa para empresas com ferramentas avançadas de SEO e IA.';
+      default:
+        return '';
+    }
+  };
+
   if (plansLoading) {
     return (
       <div className="container mx-auto py-8 px-4 flex justify-center items-center min-h-[50vh]">
@@ -185,7 +198,7 @@ const Plans: React.FC = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan) => {
-          // If there's a free plan, handle it specially
+          // Determine if this is the user's current plan
           const isPlanActive = plan.price === 0 
             ? !isSubscribed() 
             : subscriptionTier?.toLowerCase() === plan.name.toLowerCase();
@@ -195,6 +208,9 @@ const Plans: React.FC = () => {
             const [name, included] = feature.split(':');
             return { name, included: included === 'true' };
           });
+
+          // Get plan description
+          const planDescription = getPlanDescription(plan.name);
           
           return (
             <Card 
@@ -210,13 +226,17 @@ const Plans: React.FC = () => {
                     </span>
                   )}
                 </CardTitle>
-                <CardDescription className="text-2xl font-bold mt-2">
+                <CardDescription className="mt-2">
+                  {planDescription}
+                </CardDescription>
+                <div className="text-2xl font-bold mt-3">
                   {formatPrice(plan.price)}
                   {plan.price > 0 && <span className="text-sm font-normal text-muted-foreground"> /mês</span>}
-                </CardDescription>
+                </div>
               </CardHeader>
+              
               <CardContent className="flex-grow">
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {planFeatures.map((feature, index) => (
                     <li key={index} className="flex items-start">
                       {feature.included ? (
@@ -226,12 +246,16 @@ const Plans: React.FC = () => {
                       )}
                       <span className={feature.included ? '' : 'text-muted-foreground'}>
                         {feature.name}
+                        {!feature.included && plan.price === 0 && (
+                          <Lock className="h-3 w-3 inline ml-1 text-yellow-500" />
+                        )}
                       </span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter>
+              
+              <CardFooter className="pt-4">
                 {plan.price === 0 ? (
                   <Button variant="outline" className="w-full" disabled>
                     Plano Gratuito
@@ -260,6 +284,17 @@ const Plans: React.FC = () => {
           );
         })}
       </div>
+      
+      {!user && (
+        <div className="mt-10 text-center">
+          <p className="mb-4 text-muted-foreground">
+            Para assinar um plano, faça login em sua conta primeiro.
+          </p>
+          <Button onClick={() => navigate('/auth')}>
+            Fazer Login
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
