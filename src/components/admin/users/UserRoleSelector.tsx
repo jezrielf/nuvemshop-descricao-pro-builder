@@ -18,6 +18,7 @@ const UserRoleSelector: React.FC<UserRoleSelectorProps> = ({ watch, setValue }) 
   return (
     <RadioGroup
       defaultValue={currentRole}
+      value={currentRole}
       onValueChange={(value) => {
         console.log('RadioGroup - value changed to:', value);
         setValue('role', value);

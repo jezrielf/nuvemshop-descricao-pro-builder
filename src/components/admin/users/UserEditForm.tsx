@@ -8,7 +8,6 @@ import { Profile } from '@/types/auth';
 import { UserFormValues } from './types';
 import UserRoleSelector from './UserRoleSelector';
 import UserQuickActions from './UserQuickActions';
-import { getRoles } from '@/utils/roleUtils';
 
 interface UserEditFormProps {
   profile: Profile;

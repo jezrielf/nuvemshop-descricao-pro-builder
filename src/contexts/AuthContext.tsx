@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -168,22 +167,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setProfile(data as Profile);
+      console.log("Perfil carregado:", data);
+      
+      // Automatically update subscription tier based on role
+      if (data && data.role) {
+        const userRole = Array.isArray(data.role) ? data.role[0] : data.role;
+        if (userRole === 'premium') {
+          setSubscriptionTier('premium');
+        } else if (userRole === 'admin') {
+          setSubscriptionTier('admin');
+        }
+      }
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
     }
   };
 
   const hasRole = (role: string) => {
-    return profile?.role === role;
+    if (!profile || !profile.role) return false;
+    
+    const userRoles = Array.isArray(profile.role) ? profile.role : [profile.role];
+    return userRoles.includes(role);
   };
 
   const isAdmin = useCallback(() => {
-    return profile?.role === 'admin';
+    return hasRole('admin');
   }, [profile?.role]);
 
   const isPremium = useCallback(() => {
-    return subscriptionTier?.toLowerCase() === 'premium';
-  }, [subscriptionTier]);
+    return hasRole('premium') || hasRole('admin') || subscriptionTier?.toLowerCase() === 'premium';
+  }, [profile?.role, subscriptionTier]);
 
   const isBusiness = useCallback(() => {
     return subscriptionTier?.toLowerCase() === 'empresarial';

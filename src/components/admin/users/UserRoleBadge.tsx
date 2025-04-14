@@ -20,7 +20,7 @@ const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
     switch (roleType.toLowerCase()) {
       case 'admin':
         return (
-          <Badge variant="default" className="flex items-center gap-1 bg-red-500">
+          <Badge variant="default" className="flex items-center gap-1 bg-red-500 text-white">
             <Crown className="w-3 h-3" />
             Admin
           </Badge>
@@ -34,7 +34,7 @@ const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
         );
       default:
         return (
-          <Badge variant="outline" className="flex items-center gap-1">
+          <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
             <User className="w-3 h-3" />
             Usuário
           </Badge>

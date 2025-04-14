@@ -16,26 +16,34 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
   // Get primary role for comparison
   const primaryRole = Array.isArray(currentRole) ? currentRole[0] : currentRole;
   
+  const handleRoleChange = async (role: string) => {
+    try {
+      await onUpdateRole(profileId, role);
+    } catch (error) {
+      console.error(`Erro ao alterar papel para ${role}:`, error);
+    }
+  };
+  
   return (
     <div className="flex flex-wrap gap-2">
       <Button 
         variant={primaryRole === 'user' ? 'default' : 'outline'} 
         size="sm"
-        onClick={() => onUpdateRole(profileId, 'user')}
+        onClick={() => handleRoleChange('user')}
       >
         Usuário
       </Button>
       <Button 
         variant={primaryRole === 'premium' ? 'default' : 'outline'} 
         size="sm"
-        onClick={() => onUpdateRole(profileId, 'premium')}
+        onClick={() => handleRoleChange('premium')}
       >
         Premium
       </Button>
       <Button 
         variant={primaryRole === 'admin' ? 'default' : 'outline'} 
         size="sm"
-        onClick={() => onUpdateRole(profileId, 'admin')}
+        onClick={() => handleRoleChange('admin')}
       >
         Admin
       </Button>

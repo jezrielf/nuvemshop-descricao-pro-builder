@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,9 +6,11 @@ import { useToast } from '@/hooks/use-toast';
 import UserTable from './users';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import CreateUserForm from './users/CreateUserForm';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -15,6 +18,7 @@ const UsersPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreateUserSheetOpen, setIsCreateUserSheetOpen] = useState(false);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -46,19 +50,44 @@ const UsersPanel: React.FC = () => {
       setError(null);
       
       // Buscar todos os perfis da tabela
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
 
-      if (error) throw error;
+      if (profilesError) throw profilesError;
       
-      console.log('Perfis obtidos:', data);
+      // Now get the emails from auth.users
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error('Erro ao buscar usuários auth:', authError);
+        // Continue with just the profiles
+      }
+      
+      // Map emails to profiles if auth data is available
+      let enrichedProfiles = profilesData || [];
+      
+      if (authData && authData.users) {
+        // Create a map of user IDs to emails
+        const userEmailMap = new Map();
+        authData.users.forEach(user => {
+          if (user.id && user.email) {
+            userEmailMap.set(user.id, user.email);
+          }
+        });
+        
+        // Add emails to profiles
+        enrichedProfiles = enrichedProfiles.map(profile => ({
+          ...profile,
+          email: userEmailMap.get(profile.id) || profile.email || null
+        }));
+      }
+      
+      console.log('Perfis obtidos:', enrichedProfiles);
       
       // Atualizar o estado com os dados obtidos
-      if (data) {
-        setProfiles(data);
-        setFilteredProfiles(data);
-      }
+      setProfiles(enrichedProfiles);
+      setFilteredProfiles(enrichedProfiles);
     } catch (error: any) {
       console.error('Erro ao buscar perfis:', error);
       setError(error.message || 'Erro ao carregar usuários');
@@ -73,21 +102,47 @@ const UsersPanel: React.FC = () => {
     }
   };
 
+  const handleCreateUser = async () => {
+    await fetchProfiles();
+    setIsCreateUserSheetOpen(false);
+    toast({
+      title: 'Usuário criado',
+      description: 'O novo usuário foi criado com sucesso.',
+    });
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="text-xl font-semibold">Manage Users</h2>
+        <h2 className="text-xl font-semibold">Gerenciar Usuários</h2>
         
         <div className="flex w-full sm:w-auto gap-2">
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search users..."
+              placeholder="Buscar usuários..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 w-full sm:w-[300px]"
             />
           </div>
+          
+          <Sheet open={isCreateUserSheetOpen} onOpenChange={setIsCreateUserSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>Criar Novo Usuário</SheetTitle>
+                <SheetDescription>
+                  Adicione um novo usuário ao sistema
+                </SheetDescription>
+              </SheetHeader>
+              <CreateUserForm onUserCreated={handleCreateUser} />
+            </SheetContent>
+          </Sheet>
           
           <Button 
             variant="outline" 
@@ -102,7 +157,7 @@ const UsersPanel: React.FC = () => {
       
       {error && (
         <Alert variant="destructive" className="mb-4">
-          <AlertTitle>Error loading users</AlertTitle>
+          <AlertTitle>Erro ao carregar usuários</AlertTitle>
           <AlertDescription>
             <p>{error}</p>
             <Button 
@@ -111,7 +166,7 @@ const UsersPanel: React.FC = () => {
               onClick={fetchProfiles}
               className="mt-2"
             >
-              Try again
+              Tentar novamente
             </Button>
           </AlertDescription>
         </Alert>
@@ -140,7 +195,7 @@ const UsersPanel: React.FC = () => {
       </div>
       
       <div className="mt-4 text-sm text-gray-500">
-        Total users: {profiles.length}
+        Total de usuários: {profiles.length}
       </div>
     </div>
   );
