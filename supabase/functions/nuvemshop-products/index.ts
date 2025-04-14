@@ -19,6 +19,8 @@ serve(async (req) => {
       throw new Error('Missing store ID');
     }
 
+    console.log(`Fetching products for store ID: ${storeId}`);
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -32,8 +34,11 @@ serve(async (req) => {
       .single();
 
     if (storeError || !store) {
-      throw new Error('Store not found');
+      console.error('Store not found:', storeError);
+      throw new Error('Store not found or access token missing');
     }
+
+    console.log('Found store, fetching products from Nuvemshop API');
 
     // Fetch products from Nuvemshop
     const productsResponse = await fetch(`https://api.tiendanube.com/v1/${storeId}/products`, {
@@ -44,10 +49,13 @@ serve(async (req) => {
     });
 
     if (!productsResponse.ok) {
-      throw new Error('Failed to fetch products');
+      const errorText = await productsResponse.text();
+      console.error('Failed to fetch products:', errorText);
+      throw new Error(`Failed to fetch products: ${productsResponse.status} ${productsResponse.statusText}`);
     }
 
     const products = await productsResponse.json();
+    console.log(`Successfully fetched ${products.length} products`);
 
     return new Response(
       JSON.stringify({ products }),
@@ -55,6 +63,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
+    console.error('Error in nuvemshop-products function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

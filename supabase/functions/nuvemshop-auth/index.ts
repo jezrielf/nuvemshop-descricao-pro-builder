@@ -26,6 +26,8 @@ serve(async (req) => {
       throw new Error('Missing required parameters');
     }
 
+    console.log('Processing Nuvemshop auth with code and state');
+
     // Validate state from database to prevent CSRF attacks
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -39,8 +41,11 @@ serve(async (req) => {
       .single();
 
     if (stateError || !authState) {
+      console.error('Invalid state parameter:', stateError);
       throw new Error('Invalid state parameter');
     }
+
+    console.log('State validated, exchanging code for token');
 
     // Exchange code for access token
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
@@ -58,10 +63,16 @@ serve(async (req) => {
     });
 
     if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      console.error('Failed to exchange code for token:', errorText);
       throw new Error('Failed to exchange code for token');
     }
 
     const authData: NuvemshopAuthResponse = await tokenResponse.json();
+    console.log('Received auth data from Nuvemshop', { 
+      store_id: authData.store_id,
+      scope: authData.scope
+    });
 
     // Get store information
     const storeResponse = await fetch(`https://api.tiendanube.com/v1/${authData.store_id}/store`, {
@@ -72,10 +83,16 @@ serve(async (req) => {
     });
 
     if (!storeResponse.ok) {
+      const errorText = await storeResponse.text();
+      console.error('Failed to fetch store information:', errorText);
       throw new Error('Failed to fetch store information');
     }
 
     const storeData = await storeResponse.json();
+    console.log('Retrieved store data', { 
+      name: storeData.name,
+      url: storeData.url
+    });
 
     // Save store connection
     const { error: insertError } = await supabaseClient
@@ -90,8 +107,11 @@ serve(async (req) => {
       });
 
     if (insertError) {
+      console.error('Failed to save store connection:', insertError);
       throw new Error('Failed to save store connection');
     }
+
+    console.log('Store connection saved successfully');
 
     // Clean up used state
     await supabaseClient
@@ -105,6 +125,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
+    console.error('Error in nuvemshop-auth function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

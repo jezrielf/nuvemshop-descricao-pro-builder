@@ -5,15 +5,25 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { Store } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
+// Make sure this matches your actual Nuvemshop App ID
 const NUVEMSHOP_CLIENT_ID = "7437";
 const NUVEMSHOP_SCOPES = "products";
 
 export const NuvemshopConnect: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const handleConnect = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para conectar sua loja.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       // Generate and save state for CSRF protection
@@ -30,6 +40,11 @@ export const NuvemshopConnect: React.FC = () => {
       window.location.href = url.toString();
     } catch (error) {
       console.error('Error initiating Nuvemshop connection:', error);
+      toast({
+        title: "Erro de conexão",
+        description: "Não foi possível iniciar a conexão com a Nuvemshop.",
+        variant: "destructive",
+      });
     }
   };
 
