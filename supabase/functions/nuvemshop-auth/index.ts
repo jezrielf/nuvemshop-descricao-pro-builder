@@ -47,7 +47,7 @@ serve(async (req) => {
 
     console.log('State validated, exchanging code for token');
 
-    // Exchange code for token using the POST endpoint
+    // Exchange code for token using the POST endpoint with correct format
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
       method: 'POST',
       headers: {
@@ -56,8 +56,8 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         client_id: "17194",
-        client_secret: Deno.env.get('NUVEMSHOP_CLIENT_SECRET'),
-        grant_type: 'authorization_code',
+        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b",
+        grant_type: "authorization_code",
         code
       })
     });
@@ -65,7 +65,7 @@ serve(async (req) => {
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('Failed to exchange code for token:', errorText);
-      throw new Error('Failed to exchange code for token');
+      throw new Error(`Failed to exchange code for token: ${tokenResponse.status} ${errorText}`);
     }
 
     const authData: NuvemshopAuthResponse = await tokenResponse.json();

@@ -39,8 +39,8 @@ export const NuvemshopConnect: React.FC = () => {
         throw stateError;
       }
 
-      // Redirect to Nuvemshop OAuth authorization page
-      const redirectUrl = `https://www.tiendanube.com/apps/authorize/token?client_id=${NUVEMSHOP_CLIENT_ID}&state=${state}&scope=${NUVEMSHOP_SCOPES}&response_type=code`;
+      // Redirect to Nuvemshop OAuth authorization page - using the correct URL format
+      const redirectUrl = `https://www.tiendanube.com/apps/authorize?client_id=${NUVEMSHOP_CLIENT_ID}&state=${state}&scope=${NUVEMSHOP_SCOPES}&response_type=code`;
       
       console.log('Redirecting to Nuvemshop OAuth page:', redirectUrl);
       window.location.href = redirectUrl;
