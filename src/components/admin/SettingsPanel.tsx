@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const SettingsPanel: React.FC = () => {
   const { toast } = useToast();
@@ -30,6 +30,11 @@ const SettingsPanel: React.FC = () => {
     enableApiAccess: false,
     apiRateLimit: 100,
     corsOrigins: ''
+  });
+  
+  const [nuvemshopSettings, setNuvemshopSettings] = useState({
+    clientId: "17194",
+    clientSecret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b"
   });
   
   const handleGeneralSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,12 +77,46 @@ const SettingsPanel: React.FC = () => {
     });
   };
   
+  const handleNuvemshopSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNuvemshopSettings({
+      ...nuvemshopSettings,
+      [name]: value
+    });
+  };
+  
   const handleSaveSettings = (settingType: string) => {
     // In a real application, this would save to the database
     toast({
       title: 'Configurações salvas',
       description: `As configurações de ${settingType} foram atualizadas com sucesso.`
     });
+  };
+
+  const handleUpdateNuvemshopSettings = async () => {
+    try {
+      // Update the settings in Supabase edge function secrets
+      const { error } = await supabase.functions.invoke('update-nuvemshop-settings', {
+        body: {
+          clientId: nuvemshopSettings.clientId,
+          clientSecret: nuvemshopSettings.clientSecret
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Configurações atualizadas',
+        description: 'As configurações da Nuvemshop foram atualizadas com sucesso.'
+      });
+    } catch (error) {
+      console.error('Error updating Nuvemshop settings:', error);
+      toast({
+        title: 'Erro ao atualizar',
+        description: 'Não foi possível atualizar as configurações da Nuvemshop.',
+        variant: 'destructive'
+      });
+    }
   };
   
   return (
@@ -89,6 +128,7 @@ const SettingsPanel: React.FC = () => {
           <TabsTrigger value="general">Geral</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="integration">Integrações</TabsTrigger>
+          <TabsTrigger value="nuvemshop">Nuvemshop</TabsTrigger>
         </TabsList>
         
         <TabsContent value="general">
@@ -286,6 +326,48 @@ const SettingsPanel: React.FC = () => {
               
               <Button className="mt-4" onClick={() => handleSaveSettings('Integração')}>
                 Salvar Configurações
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="nuvemshop">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configurações da Nuvemshop</CardTitle>
+              <CardDescription>
+                Configure as credenciais da API da Nuvemshop
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="clientId">Client ID</Label>
+                  <Input 
+                    id="clientId" 
+                    name="clientId" 
+                    value={nuvemshopSettings.clientId} 
+                    onChange={handleNuvemshopSettingChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="clientSecret">Client Secret</Label>
+                  <Input 
+                    id="clientSecret" 
+                    name="clientSecret" 
+                    type="password"
+                    value={nuvemshopSettings.clientSecret} 
+                    onChange={handleNuvemshopSettingChange}
+                  />
+                </div>
+              </div>
+              
+              <Button 
+                className="mt-4" 
+                onClick={handleUpdateNuvemshopSettings}
+              >
+                Atualizar Configurações
               </Button>
             </CardContent>
           </Card>
