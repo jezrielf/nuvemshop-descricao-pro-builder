@@ -21,16 +21,16 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ score }) => {
 
   return (
     <div className="text-center">
-      <div className="text-lg font-bold mb-2">
+      <div className="text-base font-medium mb-1">
         Pontuação SEO
       </div>
-      <div className={`text-4xl font-bold ${getScoreColor(score)}`}>
+      <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
         {score}/100
       </div>
       <Progress 
         value={score} 
         max={100} 
-        className={`h-2 mt-2 ${getProgressColor(score)}`} 
+        className={`h-1.5 mt-1.5 ${getProgressColor(score)}`} 
       />
     </div>
   );

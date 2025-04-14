@@ -25,7 +25,7 @@ export const AnalyzerDialogContent: React.FC<AnalyzerDialogContentProps> = ({
   disabled
 }) => {
   return (
-    <div className="py-4 flex-1 flex flex-col h-full overflow-hidden">
+    <div className="py-3 flex-1 flex flex-col h-full overflow-hidden">
       <KeywordInput 
         keyword={keyword}
         setKeyword={setKeyword}
@@ -35,7 +35,7 @@ export const AnalyzerDialogContent: React.FC<AnalyzerDialogContentProps> = ({
       />
       
       {results ? (
-        <div className="space-y-6 overflow-y-auto flex-grow pr-2 mt-4">
+        <div className="space-y-4 overflow-y-auto flex-grow mt-3">
           <ScoreDisplay score={results.score} />
           <RecommendationsList recommendations={results.recommendations} />
           <KeywordsList keywords={results.keywords} />

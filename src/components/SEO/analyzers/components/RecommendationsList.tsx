@@ -11,17 +11,19 @@ interface RecommendationsListProps {
 export const RecommendationsList: React.FC<RecommendationsListProps> = ({ recommendations }) => {
   return (
     <div>
-      <h3 className="text-lg font-medium mb-2">Recomendações</h3>
-      <ul className="space-y-2">
-        {recommendations.map((rec, index) => (
-          <li key={index} className="flex items-start gap-2">
-            {rec.type === 'success' && <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />}
-            {rec.type === 'warning' && <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />}
-            {rec.type === 'error' && <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />}
-            <span>{rec.text}</span>
-          </li>
-        ))}
-      </ul>
+      <h3 className="text-base font-medium mb-1.5">Recomendações</h3>
+      <ScrollArea className="h-[200px]">
+        <ul className="space-y-1.5 pr-2">
+          {recommendations.map((rec, index) => (
+            <li key={index} className="flex items-start gap-1.5">
+              {rec.type === 'success' && <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />}
+              {rec.type === 'warning' && <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />}
+              {rec.type === 'error' && <XCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />}
+              <span className="text-sm">{rec.text}</span>
+            </li>
+          ))}
+        </ul>
+      </ScrollArea>
     </div>
   );
 };

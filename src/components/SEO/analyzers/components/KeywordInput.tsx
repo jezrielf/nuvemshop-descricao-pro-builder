@@ -20,19 +20,21 @@ export const KeywordInput: React.FC<KeywordInputProps> = ({
   disabled 
 }) => {
   return (
-    <div className="flex gap-2 mb-4">
+    <div className="flex gap-2 mb-3">
       <Input
         placeholder="Digite sua palavra-chave principal..."
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
+        className="text-sm h-9"
       />
       <Button 
         onClick={onAnalyze} 
         disabled={analyzing || disabled}
+        className="text-sm h-9"
       >
         {analyzing ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
             Analisando...
           </>
         ) : (
