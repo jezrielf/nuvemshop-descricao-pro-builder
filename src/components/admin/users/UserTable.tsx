@@ -17,7 +17,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { UserTableProps, UserFormValues } from './types';
 import UserRoleBadge from './UserRoleBadge';
 import UserEditForm from './UserEditForm';
-import { getRoles } from '@/utils/roleUtils';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
@@ -25,30 +24,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
 
   const openEditSheet = (profile: Profile) => {
     setEditingUser(profile);
-  };
-
-  const updateUserRole = async (userId: string, newRole: string) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId);
-        
-      if (error) throw error;
-      
-      toast({
-        title: 'Perfil atualizado',
-        description: 'O papel do usuário foi atualizado com sucesso.',
-      });
-      
-      onRefresh();
-    } catch (error: any) {
-      toast({
-        title: 'Erro ao atualizar perfil',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
   };
 
   const updateUserProfile = async (values: UserFormValues) => {
@@ -121,7 +96,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
         <TableHeader>
           <TableRow>
             <TableHead>Nome</TableHead>
-            <TableHead>ID</TableHead>
+            <TableHead>Email</TableHead>
             <TableHead>Papel</TableHead>
             <TableHead>Data de Criação</TableHead>
             <TableHead>Ações</TableHead>
@@ -132,7 +107,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
             profiles.map((profile) => (
               <TableRow key={profile.id}>
                 <TableCell className="font-medium">{profile.nome || 'Sem nome'}</TableCell>
-                <TableCell className="text-xs truncate max-w-[150px]">{profile.id}</TableCell>
+                <TableCell>{profile.email || 'N/A'}</TableCell>
                 <TableCell>
                   <UserRoleBadge role={profile.role} />
                 </TableCell>
@@ -154,7 +129,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                         <UserEditForm 
                           profile={profile}
                           onUpdateProfile={updateUserProfile}
-                          onUpdateRole={updateUserRole}
                         />
                       </SheetContent>
                     </Sheet>

@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getRoles } from '@/utils/roleUtils';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -30,11 +29,8 @@ const UsersPanel: React.FC = () => {
       const filtered = profiles.filter(profile => 
         (profile.nome && profile.nome.toLowerCase().includes(lowercasedSearch)) || 
         profile.id.toLowerCase().includes(lowercasedSearch) ||
-        (profile.role && (
-          typeof profile.role === 'string' 
-            ? profile.role.toLowerCase().includes(lowercasedSearch)
-            : profile.role.some(r => r.toLowerCase().includes(lowercasedSearch))
-        ))
+        (profile.email && profile.email.toLowerCase().includes(lowercasedSearch)) ||
+        (profile.role && profile.role.toLowerCase().includes(lowercasedSearch))
       );
       setFilteredProfiles(filtered);
     }
@@ -45,19 +41,31 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Obter todos os perfis da tabela profiles
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('criado_em', { ascending: false });
-        
-      if (error) throw error;
+
+      if (profilesError) throw profilesError;
+
+      // Get auth users data to get their emails
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
       
-      console.log('Perfis obtidos (total):', data?.length);
+      if (authError) throw authError;
+
+      // Merge profiles with auth data to get emails
+      const mergedProfiles = profilesData.map(profile => {
+        const authUser = authData.users.find(user => user.id === profile.id);
+        return {
+          ...profile,
+          email: authUser?.email || null
+        };
+      });
       
-      // Definir os perfis
-      setProfiles(data as Profile[] || []);
-      setFilteredProfiles(data as Profile[] || []);
+      console.log('Perfis obtidos (total):', mergedProfiles.length);
+      
+      setProfiles(mergedProfiles);
+      setFilteredProfiles(mergedProfiles);
     } catch (error: any) {
       console.error('Erro ao buscar perfis:', error);
       setError(error.message);

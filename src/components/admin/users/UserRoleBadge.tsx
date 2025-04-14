@@ -1,27 +1,40 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Crown, Star, User } from 'lucide-react';
 
 interface UserRoleBadgeProps {
   role: string | string[] | null;
 }
 
 const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
-  // Handle case when role is an array
-  const primaryRole = Array.isArray(role) ? role[0] : role;
-  
-  // Determine variant based on the primary role
-  const getVariant = () => {
-    if (primaryRole === 'admin') return 'default';
-    if (primaryRole === 'premium') return 'outline';
-    return 'secondary';
+  const getRoleBadge = () => {
+    switch (role) {
+      case 'admin':
+        return (
+          <Badge variant="default" className="flex items-center gap-1">
+            <Crown className="w-3 h-3" />
+            Admin
+          </Badge>
+        );
+      case 'premium':
+        return (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Star className="w-3 h-3" />
+            Premium
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <User className="w-3 h-3" />
+            Usuário
+          </Badge>
+        );
+    }
   };
   
-  return (
-    <Badge variant={getVariant()}>
-      {primaryRole || 'user'}
-    </Badge>
-  );
+  return getRoleBadge();
 };
 
 export default UserRoleBadge;
