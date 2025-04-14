@@ -4,6 +4,7 @@ import { useTemplates } from '@/hooks/templates/useTemplates';
 import { TemplateList } from './TemplateList';
 import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TemplateDialogs } from './dialogs';
 
 export const TemplatesView = () => {
   const { 
@@ -32,6 +33,9 @@ export const TemplatesView = () => {
       <ScrollArea className="h-[calc(100vh-220px)]">
         <TemplateList templates={filteredTemplates} />
       </ScrollArea>
+      
+      {/* Template Dialogs */}
+      <TemplateDialogs />
     </div>
   );
 };
