@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
 import AddBlock from './AddBlock';
@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AIDescriptionGenerator from './AIGenerator/AIDescriptionGenerator';
 import SEOTools from './SEO/SEOTools';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -23,9 +22,15 @@ const Editor: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  // Log the role information for debugging
-  console.log("Editor component - isPremium:", isPremium());
-  console.log("Editor component - isBusiness:", isBusiness());
+  // Calculate these values once per render
+  const isPremiumUser = isPremium();
+  const isBusinessUser = isBusiness();
+  
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Editor component - isPremium:", isPremiumUser);
+    console.log("Editor component - isBusiness:", isBusinessUser);
+  }
   
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -41,6 +46,14 @@ const Editor: React.FC = () => {
   const handleUpgradePlan = () => {
     navigate('/plans');
   };
+  
+  // Memoize the SEO tools component to prevent unnecessary re-renders
+  const seoToolsComponent = useMemo(() => {
+    if (description && (isPremiumUser || isBusinessUser)) {
+      return <SEOTools description={description} />;
+    }
+    return null;
+  }, [description, isPremiumUser, isBusinessUser]);
   
   if (!description) {
     return (
@@ -70,7 +83,7 @@ const Editor: React.FC = () => {
               <p className="text-sm text-gray-500">Deixe nossa IA criar uma descrição completa para você</p>
             </div>
             <div className="p-4 flex justify-center">
-              {isPremium() || isBusiness() ? (
+              {isPremiumUser || isBusinessUser ? (
                 <Button 
                   onClick={() => setIsAIGeneratorOpen(true)}
                   className="border-yellow-400 bg-gradient-to-r from-yellow-50 to-white"
@@ -103,7 +116,7 @@ const Editor: React.FC = () => {
     <div className="h-full flex flex-col">
       <div className="p-3 sm:p-4 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-2">
         <TemplateSelector />
-        {description && (isPremium() || isBusiness()) && <SEOTools description={description} />}
+        {seoToolsComponent}
       </div>
       
       <ScrollArea className="flex-1 p-3 sm:p-4 h-[calc(100%-60px)]">

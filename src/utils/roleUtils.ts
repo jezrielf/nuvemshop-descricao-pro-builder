@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for handling user roles
  */
@@ -32,6 +31,13 @@ export const getRoles = (role: string | string[] | null): string[] => {
  * @returns boolean indicating if the user has the role
  */
 export const hasRole = (role: string | string[] | null, roleToCheck: string): boolean => {
+  // Fast path: if role is null and checking for 'user'
+  if (!role && roleToCheck === 'user') return true;
+  
+  // Fast path: if role is the exact string we're checking
+  if (typeof role === 'string' && role === roleToCheck) return true;
+  
+  // Otherwise, get the full roles array and check
   const roles = getRoles(role);
   return roles.includes(roleToCheck);
 };
@@ -42,6 +48,9 @@ export const hasRole = (role: string | string[] | null, roleToCheck: string): bo
  * @returns boolean indicating if the user is an admin
  */
 export const isAdmin = (role: string | string[] | null): boolean => {
+  // Fast path check for exact match
+  if (typeof role === 'string' && role === 'admin') return true;
+  
   return hasRole(role, 'admin');
 };
 
@@ -51,7 +60,14 @@ export const isAdmin = (role: string | string[] | null): boolean => {
  * @returns boolean indicating if the user is premium
  */
 export const isPremium = (role: string | string[] | null): boolean => {
-  return hasRole(role, 'premium') || isAdmin(role); // Admin also has premium privileges
+  // Fast path: direct match for premium
+  if (typeof role === 'string' && role === 'premium') return true;
+  
+  // Fast path: admin is always premium
+  if (typeof role === 'string' && role === 'admin') return true;
+  
+  // Otherwise, check more thoroughly
+  return hasRole(role, 'premium') || isAdmin(role);
 };
 
 /**
@@ -60,7 +76,13 @@ export const isPremium = (role: string | string[] | null): boolean => {
  * @returns boolean indicating if the user is business
  */
 export const isBusiness = (role: string | string[] | null): boolean => {
-  // Premium users should also have business privileges
+  // Fast path: direct match for business
+  if (typeof role === 'string' && role === 'business') return true;
+  
+  // Fast path: premium users should also have business privileges
+  if (typeof role === 'string' && (role === 'premium' || role === 'admin')) return true;
+  
+  // Otherwise, check more thoroughly
   return hasRole(role, 'business') || isPremium(role);
 };
 

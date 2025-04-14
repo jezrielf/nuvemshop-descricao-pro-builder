@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Lock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,16 +12,23 @@ const AIGeneratorButton: React.FC = () => {
   const { isPremium, isBusiness } = useAuth();
   const navigate = useNavigate();
   
-  // Now premium users can use AI too
-  const canUseAI = isPremium() || isBusiness();
+  // Calculate this once per render, don't call the functions repeatedly
+  const isPremiumUser = isPremium();
+  const isBusinessUser = isBusiness();
+  const canUseAI = isPremiumUser || isBusinessUser;
   
-  console.log("AIGeneratorButton - isPremium:", isPremium());
-  console.log("AIGeneratorButton - isBusiness:", isBusiness());
-  console.log("AIGeneratorButton - canUseAI:", canUseAI);
+  // Only log these values once during development, not in production
+  if (process.env.NODE_ENV === 'development') {
+    console.log("AIGeneratorButton - isPremium:", isPremiumUser);
+    console.log("AIGeneratorButton - isBusiness:", isBusinessUser);
+    console.log("AIGeneratorButton - canUseAI:", canUseAI);
+  }
   
-  const tooltipText = canUseAI 
-    ? "Gerar descrição completa com IA" 
-    : "Recurso exclusivo: Assine o plano Premium ou Empresarial para usar IA";
+  const tooltipText = useMemo(() => {
+    return canUseAI 
+      ? "Gerar descrição completa com IA" 
+      : "Recurso exclusivo: Assine o plano Premium ou Empresarial para usar IA";
+  }, [canUseAI]);
   
   const handleClick = () => {
     if (canUseAI) {

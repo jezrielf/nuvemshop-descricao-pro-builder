@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
@@ -18,21 +18,34 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
   const auth = useAuth();
-  const { isPremium, isBusiness, isSubscribed, descriptionCount, canCreateMoreDescriptions, subscriptionTier } = auth;
+  const { 
+    isPremium, 
+    isBusiness, 
+    isSubscribed, 
+    descriptionCount, 
+    canCreateMoreDescriptions, 
+    subscriptionTier 
+  } = auth;
   const isMobile = useIsMobile();
   
-  // Set auth context in the store when component mounts
+  // Calculate these values once
+  const isPremiumUser = isPremium();
+  const isBusinessUser = isBusiness();
+  const isSubscribedUser = isSubscribed();
+  const canCreateMore = canCreateMoreDescriptions();
+  
+  // Set auth context in the store when component mounts or auth changes
   useEffect(() => {
     setAuthContext(auth);
   }, [auth, setAuthContext]);
   
+  // Load saved descriptions when component mounts or subscription changes
   useEffect(() => {
-    // Load saved descriptions when component mounts or subscription changes
     loadSavedDescriptions();
   }, [loadSavedDescriptions, subscriptionTier]);
 
-  // Determine which badge to render based on subscription tier
-  const renderSubscriptionBadge = () => {
+  // Memoize the subscription badge to prevent unnecessary re-renders
+  const subscriptionBadge = useMemo(() => {
     if (subscriptionTier === 'free') {
       return (
         <Badge variant="outline" className="ml-2 bg-yellow-50 text-yellow-700 border-yellow-300">
@@ -61,7 +74,7 @@ const Header: React.FC = () => {
     }
     
     return <div className="h-6 w-0 ml-2" aria-hidden="true"></div>;
-  };
+  }, [subscriptionTier, descriptionCount]);
   
   return (
     <header className="border-b bg-white shadow-sm px-3 sm:px-6 py-4 w-full">
@@ -76,10 +89,10 @@ const Header: React.FC = () => {
             </span>
           )}
           
-          {renderSubscriptionBadge()}
+          {subscriptionBadge}
           
           {/* Só mostra o link para planos se não for premium ou business */}
-          {!isPremium() && !isBusiness() && (
+          {!isPremiumUser && !isBusinessUser && (
             <Link to="/plans" className="text-xs sm:text-sm text-blue-500 hover:text-blue-700 underline">
               Ver planos
             </Link>
@@ -100,7 +113,7 @@ const Header: React.FC = () => {
             canCreateMoreDescriptions={canCreateMoreDescriptions}
           />
           
-          {isPremium() && (
+          {isPremiumUser && (
             <SavedDescriptionsDialog 
               isPremium={isPremium}
               descriptionCount={descriptionCount}
@@ -110,7 +123,7 @@ const Header: React.FC = () => {
           
           {description && <HtmlOutputDialog />}
           
-          {description && (isPremium() || isBusiness()) && <SEOAnalyzer description={description} />}
+          {description && (isPremiumUser || isBusinessUser) && <SEOAnalyzer description={description} />}
           
           <AIGeneratorButton />
           

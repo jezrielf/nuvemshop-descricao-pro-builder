@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -10,13 +10,13 @@ export const useAuthSession = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [profileFetched, setProfileFetched] = useState(false);
+  const profileFetchedRef = useRef<boolean>(false);
   const { toast } = useToast();
 
   // Memoize fetchProfile to prevent recreating this function on each render
   const fetchProfile = useCallback(async (userId: string) => {
     // Skip if we've already fetched the profile for this session to prevent loops
-    if (profileFetched) {
+    if (profileFetchedRef.current) {
       console.log('Profile already fetched, skipping');
       return;
     }
@@ -35,12 +35,19 @@ export const useAuthSession = () => {
       }
 
       setProfile(data as Profile);
-      setProfileFetched(true);
+      profileFetchedRef.current = true;
       console.log("Perfil carregado:", data);
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
     }
-  }, [profileFetched]);
+  }, []);
+
+  useEffect(() => {
+    // Reset profileFetchedRef when component unmounts
+    return () => {
+      profileFetchedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     const setupAuth = async () => {
@@ -55,14 +62,15 @@ export const useAuthSession = () => {
               
               // Reset profileFetched when auth state changes
               if (authSession?.user) {
-                setProfileFetched(false);
+                profileFetchedRef.current = false;
+                // Use setTimeout to prevent blocking the auth state change handler
                 setTimeout(() => fetchProfile(authSession.user.id), 0);
               }
             } else if (_event === 'SIGNED_OUT') {
               setSession(null);
               setUser(null);
               setProfile(null);
-              setProfileFetched(false);
+              profileFetchedRef.current = false;
             }
           }
         );
@@ -72,7 +80,7 @@ export const useAuthSession = () => {
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
         
-        if (initialSession?.user && !profileFetched) {
+        if (initialSession?.user && !profileFetchedRef.current) {
           await fetchProfile(initialSession.user.id);
         }
         

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
@@ -38,10 +38,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     incrementDescriptionCount
   } = useDescriptionCount(user?.id);
 
+  // Prevent infinite loops by adding dependency array for profile fetch
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session?.user) {
+          // Use setTimeout to prevent blocking the auth state change handler
           setTimeout(() => fetchProfile(session.user.id), 0);
         }
       }
@@ -50,49 +52,66 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  // Update subscription tier based on user role - once per profile change
+  // Only update subscription tier when profile or tier actually changes
   useEffect(() => {
-    if (profile?.role) {
-      if (isPremium(profile.role) && subscriptionTier !== 'premium') {
+    if (!profile?.role) return;
+    
+    const shouldUpdateTier = 
+      (isPremium(profile.role) && subscriptionTier !== 'premium') ||
+      (isAdmin(profile.role) && subscriptionTier !== 'admin') ||
+      (isBusiness(profile.role) && subscriptionTier !== 'business');
+    
+    if (shouldUpdateTier) {
+      if (isPremium(profile.role)) {
         setSubscriptionTier('premium');
-      } else if (isAdmin(profile.role) && subscriptionTier !== 'admin') {
+      } else if (isAdmin(profile.role)) {
         setSubscriptionTier('admin');
-      } else if (isBusiness(profile.role) && subscriptionTier !== 'business') {
+      } else if (isBusiness(profile.role)) {
         setSubscriptionTier('business');
       }
     }
-  }, [profile, setSubscriptionTier, subscriptionTier]);
+  }, [profile?.role, setSubscriptionTier, subscriptionTier]);
 
-  // Memoize role check functions to prevent rerenders
+  // Memoize these values to prevent unnecessary re-renders
   const isAdminUser = useMemo(() => {
-    return isAdmin(profile?.role);
+    return Boolean(profile?.role && isAdmin(profile.role));
   }, [profile?.role]);
 
   const isPremiumUser = useMemo(() => {
-    return isPremium(profile?.role) || 
-           isAdminUser || 
-           subscriptionTier?.toLowerCase() === 'premium' || 
-           subscriptionTier?.toLowerCase() === 'admin';
+    return Boolean(
+      (profile?.role && isPremium(profile.role)) || 
+      isAdminUser || 
+      subscriptionTier === 'premium' || 
+      subscriptionTier === 'admin'
+    );
   }, [profile?.role, isAdminUser, subscriptionTier]);
 
   const isBusinessUser = useMemo(() => {
-    return isBusiness(profile?.role) || 
-           isPremiumUser || // Premium users get business features too
-           subscriptionTier?.toLowerCase() === 'business';
+    return Boolean(
+      (profile?.role && isBusiness(profile.role)) || 
+      isPremiumUser || 
+      subscriptionTier === 'business'
+    );
   }, [profile?.role, isPremiumUser, subscriptionTier]);
 
-  const isSubscribed = useMemo(() => {
-    return subscriptionTier && subscriptionTier.toLowerCase() !== 'free';
+  const isSubscribedUser = useMemo(() => {
+    return Boolean(subscriptionTier && subscriptionTier.toLowerCase() !== 'free');
   }, [subscriptionTier]);
 
-  const canCreateMoreDescriptions = useMemo(() => {
-    if (isSubscribed) {
+  const canCreateMoreDescriptionsValue = useMemo(() => {
+    if (isSubscribedUser) {
       return true;
     }
     return descriptionCount < 3;
-  }, [isSubscribed, descriptionCount]);
+  }, [isSubscribedUser, descriptionCount]);
 
-  const value = {
+  // Create stable function references with useCallback
+  const hasRoleCallback = useCallback((role: string) => {
+    return hasRole(profile?.role, role);
+  }, [profile?.role]);
+
+  // Create a stable context value with useMemo
+  const value = useMemo(() => ({
     session,
     user,
     profile,
@@ -100,19 +119,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signUp,
     signOut,
     loading,
-    hasRole: (role: string) => hasRole(profile?.role, role),
+    hasRole: hasRoleCallback,
     isAdmin: () => isAdminUser,
     isPremium: () => isPremiumUser,
     isBusiness: () => isBusinessUser,
-    isSubscribed: () => isSubscribed,
+    isSubscribed: () => isSubscribedUser,
     subscriptionTier,
     subscriptionEnd,
     refreshSubscription,
     openCustomerPortal,
     descriptionCount,
     incrementDescriptionCount,
-    canCreateMoreDescriptions: () => canCreateMoreDescriptions
-  };
+    canCreateMoreDescriptions: () => canCreateMoreDescriptionsValue
+  }), [
+    session, 
+    user, 
+    profile, 
+    loading, 
+    signIn, 
+    signUp, 
+    signOut, 
+    hasRoleCallback,
+    isAdminUser, 
+    isPremiumUser, 
+    isBusinessUser, 
+    isSubscribedUser,
+    subscriptionTier, 
+    subscriptionEnd, 
+    refreshSubscription,
+    openCustomerPortal,
+    descriptionCount,
+    incrementDescriptionCount,
+    canCreateMoreDescriptionsValue
+  ]);
 
   return (
     <AuthContext.Provider value={value}>
