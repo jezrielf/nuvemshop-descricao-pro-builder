@@ -24,6 +24,11 @@ const AdminTemplates: React.FC = () => {
     setLoading(false);
   }, [navigate]);
   
+  useEffect(() => {
+    // Log de diagnóstico
+    console.log("AdminTemplates montado. isAuthenticated:", isAuthenticated);
+  }, [isAuthenticated]);
+  
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Carregando...</div>;
   }

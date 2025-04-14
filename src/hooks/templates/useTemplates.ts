@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Template } from '@/types/editor';
 import { useTemplateStore } from './useTemplateStore';
 import { useTemplateFilters } from './useTemplateFilters';
@@ -63,6 +63,12 @@ export function useTemplates() {
     console.log("Displayed templates:", displayedTemplates.length);
   }, [allTemplates, displayedTemplates]);
 
+  const viewTemplate = useCallback((template: Template) => {
+    console.log("Viewing template:", template.name);
+    setSelectedTemplate(template);
+    return handleViewTemplate(template);
+  }, [handleViewTemplate]);
+
   return {
     allTemplates,
     displayedTemplates,
@@ -79,11 +85,7 @@ export function useTemplates() {
     categories,
     currentPage,
     totalPages,
-    handleViewTemplate: (template: Template) => {
-      console.log("Viewing template:", template.name);
-      setSelectedTemplate(template);
-      return handleViewTemplate(template);
-    },
+    handleViewTemplate: viewTemplate,
     handleCreateTemplate,
     handleDeleteTemplate,
     handleUpdateTemplate,

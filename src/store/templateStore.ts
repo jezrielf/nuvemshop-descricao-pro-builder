@@ -23,19 +23,27 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   selectedCategory: null,
   
   loadTemplates: () => {
-    // Carrega todos os templates
-    const allTemplates = getAllTemplates();
-    console.log('Loading templates from store, total count:', allTemplates.length);
-    
-    // Extrai categorias únicas dos templates
-    const uniqueCategories = Array.from(
-      new Set(allTemplates.map(template => template.category))
-    );
-    
-    set({
-      templates: allTemplates,
-      categories: uniqueCategories
-    });
+    try {
+      // Carrega todos os templates
+      const allTemplates = getAllTemplates();
+      console.log('Loading templates from store, total count:', allTemplates.length);
+      
+      // Extrai categorias únicas dos templates
+      const uniqueCategories = Array.from(
+        new Set(allTemplates.map(template => template.category))
+      );
+      
+      set({
+        templates: allTemplates,
+        categories: uniqueCategories
+      });
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      set({
+        templates: [],
+        categories: []
+      });
+    }
   },
   
   selectCategory: (category) => {

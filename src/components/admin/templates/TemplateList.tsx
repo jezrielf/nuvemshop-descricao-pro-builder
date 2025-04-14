@@ -28,6 +28,9 @@ const TemplateList: React.FC<TemplateListProps> = ({
   onDelete,
   getCategoryName
 }) => {
+  // Verificação adicional para garantir que templates é um array válido
+  const validTemplates = Array.isArray(templates) ? templates : [];
+  
   return (
     <Table>
       <TableCaption>Lista de todos os templates disponíveis no sistema</TableCaption>
@@ -40,14 +43,14 @@ const TemplateList: React.FC<TemplateListProps> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {templates.length === 0 ? (
+        {validTemplates.length === 0 ? (
           <TableRow>
             <TableCell colSpan={4} className="h-24 text-center">
               Nenhum template encontrado.
             </TableCell>
           </TableRow>
         ) : (
-          templates.map((template) => (
+          validTemplates.map((template) => (
             <TableRow key={template.id}>
               <TableCell className="font-medium">{template.name}</TableCell>
               <TableCell>
@@ -55,7 +58,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
                   {getCategoryName(template.category)}
                 </Badge>
               </TableCell>
-              <TableCell>{template.blocks.length}</TableCell>
+              <TableCell>{template.blocks ? template.blocks.length : 0}</TableCell>
               <TableCell className="text-right">
                 <TemplateActions 
                   template={template}

@@ -88,14 +88,14 @@ const TemplateDialogs: React.FC<TemplateDialogsProps> = ({
   return (
     <>
       <TemplatePreviewDialog
-        isOpen={dialogState.isPreviewOpen}
+        isOpen={dialogState.isPreviewOpen && selectedTemplate !== null}
         onOpenChange={() => toggleDialog('isPreviewOpen')}
         template={selectedTemplate}
         getCategoryName={getCategoryName}
       />
 
       <TemplateEditDialog
-        isOpen={dialogState.isEditDialogOpen}
+        isOpen={dialogState.isEditDialogOpen && editedTemplate !== null}
         onOpenChange={() => toggleDialog('isEditDialogOpen')}
         template={editedTemplate}
         onTemplateChange={(template) => setEditedTemplate(template as Template)}
@@ -103,7 +103,7 @@ const TemplateDialogs: React.FC<TemplateDialogsProps> = ({
       />
 
       <TemplateDeleteDialog
-        isOpen={dialogState.isDeleteDialogOpen}
+        isOpen={dialogState.isDeleteDialogOpen && selectedTemplate !== null}
         onOpenChange={() => toggleDialog('isDeleteDialogOpen')}
         template={selectedTemplate}
         onConfirm={handleDeleteConfirm}

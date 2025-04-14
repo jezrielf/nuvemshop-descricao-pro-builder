@@ -23,8 +23,7 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
   template,
   getCategoryName
 }) => {
-  // Return early if template is null to prevent the error
-  if (!template) {
+  if (!isOpen || !template) {
     return null;
   }
 
