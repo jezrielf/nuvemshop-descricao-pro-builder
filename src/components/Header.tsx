@@ -31,6 +31,39 @@ const Header: React.FC = () => {
     // Load saved descriptions when component mounts or subscription changes
     loadSavedDescriptions();
   }, [loadSavedDescriptions, subscriptionTier]);
+
+  // Determine which badge to render based on subscription tier
+  const renderSubscriptionBadge = () => {
+    if (subscriptionTier === 'free') {
+      return (
+        <Badge variant="outline" className="ml-2 bg-yellow-50 text-yellow-700 border-yellow-300">
+          <BadgeAlert className="mr-1 h-3 w-3" />
+          Modo Grátis ({descriptionCount}/3)
+        </Badge>
+      );
+    }
+    
+    if (subscriptionTier === 'premium') {
+      return (
+        <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-300">
+          <BadgeCheck className="mr-1 h-3 w-3" />
+          Premium
+        </Badge>
+      );
+    }
+    
+    if (subscriptionTier === 'business') {
+      return (
+        <Badge variant="outline" className="ml-2 bg-purple-50 text-purple-700 border-purple-300">
+          <Crown className="mr-1 h-3 w-3" />
+          Empresarial
+        </Badge>
+      );
+    }
+    
+    // Return an empty placeholder badge with the same height but invisible to prevent layout shifts
+    return <div className="h-6 w-0 ml-2" aria-hidden="true"></div>;
+  };
   
   return (
     <header className="border-b bg-white shadow-sm px-6 py-4">
@@ -45,26 +78,8 @@ const Header: React.FC = () => {
             </span>
           )}
           
-          {subscriptionTier === 'free' && (
-            <Badge variant="outline" className="ml-2 bg-yellow-50 text-yellow-700 border-yellow-300">
-              <BadgeAlert className="mr-1 h-3 w-3" />
-              Modo Grátis ({descriptionCount}/3)
-            </Badge>
-          )}
-          
-          {subscriptionTier === 'premium' && (
-            <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-300">
-              <BadgeCheck className="mr-1 h-3 w-3" />
-              Premium
-            </Badge>
-          )}
-          
-          {subscriptionTier === 'business' && (
-            <Badge variant="outline" className="ml-2 bg-purple-50 text-purple-700 border-purple-300">
-              <Crown className="mr-1 h-3 w-3" />
-              Empresarial
-            </Badge>
-          )}
+          {/* Always render a badge container to prevent layout shifts */}
+          {renderSubscriptionBadge()}
           
           <Link to="/plans" className="text-sm text-blue-500 hover:text-blue-700 underline">
             Ver planos
