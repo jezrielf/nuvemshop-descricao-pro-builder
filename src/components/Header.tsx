@@ -1,5 +1,4 @@
-
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
@@ -15,8 +14,13 @@ import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
+import { NuvemshopConnect } from './nuvemshop/NuvemshopConnect';
+import { StoreSelector } from './nuvemshop/StoreSelector';
+import { ProductSelector } from './nuvemshop/ProductSelector';
 
 const Header: React.FC = () => {
+  const [selectedStoreId, setSelectedStoreId] = useState<number>();
+  const [selectedProductId, setSelectedProductId] = useState<number>();
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
   const auth = useAuth();
   const { 
@@ -101,6 +105,18 @@ const Header: React.FC = () => {
         
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
+            <NuvemshopConnect />
+            <StoreSelector 
+              value={selectedStoreId}
+              onSelect={setSelectedStoreId}
+            />
+            {selectedStoreId && (
+              <ProductSelector
+                storeId={selectedStoreId}
+                value={selectedProductId}
+                onSelect={setSelectedProductId}
+              />
+            )}
             <NewDescriptionDialog 
               isPremium={isPremium} 
               descriptionCount={descriptionCount}
