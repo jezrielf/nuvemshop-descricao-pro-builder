@@ -1,196 +1,181 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Check, CheckCircle, PackageCheck, Loader2 } from "lucide-react";
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
-import { Plan } from '@/components/admin/plans/types';
-import { mockPlans } from '@/components/admin/plans/mockData';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Check, CircleX, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { subscriptionService } from '@/services/subscriptionService';
+import { mockPlans } from '@/components/admin/plans/mockData';
 
 const Plans: React.FC = () => {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { isSubscribed, subscriptionTier, user, refreshSubscription } = useAuth();
+  const [loading, setLoading] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user, subscriptionTier, openCustomerPortal, refreshSubscription } = useAuth();
+  const { toast } = useToast();
+  
+  const formatPrice = (price: number) => {
+    if (price === 0) return 'Grátis';
+    return `R$ ${(price / 100).toFixed(2).replace('.', ',')}`;
+  };
 
-  // For now, we're using mock data (same as in PlansPanel)
-  useEffect(() => {
-    // Refresh subscription status when component mounts
-    if (user) {
-      refreshSubscription();
+  const handleSubscribe = async (planId: string) => {
+    if (!user) {
+      navigate('/auth');
+      toast({
+        title: 'Login necessário',
+        description: 'Faça login para assinar um plano',
+      });
+      return;
     }
     
-    // Only show active plans to customers
-    setPlans(mockPlans.filter(plan => plan.isActive));
-    setLoading(false);
-  }, [user, refreshSubscription]);
-
-  const handleSelectPlan = async (plan: Plan) => {
-    if (!user) {
-      toast({
-        title: "Login necessário",
-        description: "Faça login para assinar este plano",
-        variant: "default",
-      });
-      navigate('/auth');
-      return;
-    }
-
-    // Handle current subscribers
-    if (subscriptionTier !== 'free') {
-      openCustomerPortal();
-      return;
-    }
-
     try {
-      setCheckoutLoading(plan.id);
-      
-      let planId = '';
-      if (plan.name === 'Premium') {
-        planId = 'premium';
-      } else if (plan.name === 'Empresarial') {
-        planId = 'business';
-      } else {
-        return; // Free plan doesn't need checkout
-      }
-      
+      setLoading(planId);
       const checkoutUrl = await subscriptionService.createCheckout(planId);
       window.location.href = checkoutUrl;
     } catch (error: any) {
       toast({
-        title: "Erro ao processar pagamento",
-        description: error.message || "Ocorreu um erro ao processar seu pagamento",
-        variant: "destructive",
+        title: 'Erro ao processar assinatura',
+        description: error.message,
+        variant: 'destructive',
       });
-      setCheckoutLoading(null);
+    } finally {
+      setLoading(null);
     }
   };
 
-  const getPlanButtonText = (plan: Plan) => {
-    if (plan.price === 0) return 'Plano Atual';
-    
-    if (subscriptionTier === 'free') {
-      return `Assinar ${plan.name}`;
+  const handleManageSubscription = async () => {
+    if (!user || !isSubscribed()) {
+      toast({
+        title: 'Nenhuma assinatura ativa',
+        description: 'Você não possui uma assinatura ativa para gerenciar.',
+      });
+      return;
     }
     
-    if ((subscriptionTier === 'premium' && plan.name === 'Premium') || 
-        (subscriptionTier === 'business' && plan.name === 'Empresarial')) {
-      return 'Gerenciar Plano';
+    try {
+      setLoading('manage');
+      const portalUrl = await subscriptionService.openCustomerPortal();
+      window.location.href = portalUrl;
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao abrir portal de assinatura',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(null);
     }
-    
-    if (subscriptionTier === 'premium' && plan.name === 'Empresarial') {
-      return 'Fazer Upgrade';
-    }
-    
-    if (subscriptionTier === 'business' && plan.name === 'Premium') {
-      return 'Fazer Downgrade';
-    }
-    
-    return `Assinar ${plan.name}`;
   };
-
-  const isCurrentPlan = (plan: Plan) => {
-    if (plan.price === 0 && subscriptionTier === 'free') return true;
-    if (plan.name === 'Premium' && subscriptionTier === 'premium') return true;
-    if (plan.name === 'Empresarial' && subscriptionTier === 'business') return true;
-    return false;
-  };
-
-  const formatPrice = (price: number) => {
-    if (price === 0) return 'Grátis';
-    return `R$ ${(price / 100).toFixed(2)}/mês`;
-  };
-
-  if (loading) {
-    return (
-      <div className="container mx-auto py-16 px-4">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-2">Carregando planos...</h2>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="container mx-auto py-16 px-4">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl font-bold mb-2">Nossos Planos</h2>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Escolha o plano ideal para o seu negócio e comece a criar descrições incríveis para seus produtos
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {plans.map((plan) => (
-          <Card 
-            key={plan.id} 
-            className={`flex flex-col h-full ${
-              isCurrentPlan(plan) 
-                ? 'border-primary ring-2 ring-primary ring-opacity-50' 
-                : plan.isDefault ? 'border-primary' : ''
-            }`}
-          >
-            <CardHeader>
-              {plan.isDefault && (
-                <Badge className="self-start mb-2">Recomendado</Badge>
-              )}
-              {isCurrentPlan(plan) && (
-                <Badge className="self-start mb-2 bg-green-500">Seu Plano Atual</Badge>
-              )}
-              <CardTitle className="text-2xl">{plan.name}</CardTitle>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-2 text-center">Planos de Assinatura</h1>
+      <p className="text-center text-muted-foreground mb-12">
+        Escolha o plano ideal para suas necessidades
+      </p>
+      
+      {/* Current Subscription Info */}
+      {user && (
+        <div className="mb-12 max-w-md mx-auto">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>Seu Plano Atual</CardTitle>
               <CardDescription>
-                <span className="text-3xl font-bold">{formatPrice(plan.price)}</span>
+                {isSubscribed() 
+                  ? `Você tem uma assinatura ${subscriptionTier === 'premium' ? 'Premium' : 'Empresarial'} ativa.`
+                  : 'Você está usando o plano Gratuito.'}
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <ul className="space-y-2">
-                {plan.features.map((feature) => (
-                  <li key={feature.id} className="flex items-start">
-                    {feature.included ? (
-                      <>
-                        <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>{feature.name}</span>
-                      </>
-                    ) : (
-                      <span className="ml-7 text-muted-foreground">{feature.name}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                onClick={() => handleSelectPlan(plan)} 
-                className="w-full" 
-                variant={isCurrentPlan(plan) ? "secondary" : plan.isDefault ? "default" : "outline"}
-                disabled={checkoutLoading !== null || (plan.price === 0 && subscriptionTier === 'free')}
-              >
-                {checkoutLoading === plan.id ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processando...
-                  </>
-                ) : isCurrentPlan(plan) ? (
-                  <>
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    {getPlanButtonText(plan)}
-                  </>
-                ) : (
-                  <>
-                    <PackageCheck className="mr-2 h-4 w-4" />
-                    {getPlanButtonText(plan)}
-                  </>
-                )}
-              </Button>
-            </CardFooter>
+            {isSubscribed() && (
+              <CardFooter>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={handleManageSubscription}
+                  disabled={loading === 'manage'}
+                >
+                  {loading === 'manage' ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Carregando...
+                    </>
+                  ) : 'Gerenciar Assinatura'}
+                </Button>
+              </CardFooter>
+            )}
           </Card>
-        ))}
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {mockPlans.map((plan) => {
+          const isPlanActive = subscriptionTier === plan.id.split('-')[0];
+          
+          return (
+            <Card 
+              key={plan.id}
+              className={`flex flex-col ${isPlanActive ? 'border-primary border-2' : ''}`}
+            >
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  {plan.name}
+                  {isPlanActive && (
+                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
+                      Plano Atual
+                    </span>
+                  )}
+                </CardTitle>
+                <CardDescription className="text-2xl font-bold mt-2">
+                  {formatPrice(plan.price)}
+                  {plan.price > 0 && <span className="text-sm font-normal text-muted-foreground"> /mês</span>}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <ul className="space-y-2">
+                  {plan.features.map((feature) => (
+                    <li key={feature.id} className="flex items-start">
+                      {feature.included ? (
+                        <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                      ) : (
+                        <CircleX className="h-5 w-5 text-gray-300 mr-2 flex-shrink-0" />
+                      )}
+                      <span className={feature.included ? '' : 'text-muted-foreground'}>
+                        {feature.name}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                {plan.id === 'free-plan' ? (
+                  <Button variant="outline" className="w-full" disabled>
+                    Plano Atual
+                  </Button>
+                ) : (
+                  <Button 
+                    variant={isPlanActive ? "outline" : "default"}
+                    className="w-full" 
+                    disabled={loading === plan.id || isPlanActive}
+                    onClick={() => handleSubscribe(plan.id)}
+                  >
+                    {loading === plan.id ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processando...
+                      </>
+                    ) : isPlanActive ? (
+                      'Plano Atual'
+                    ) : (
+                      'Assinar'
+                    )}
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Helper logging function for enhanced debugging
+// Helper logging function for debugging
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
@@ -26,97 +26,95 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    // Parse request body
-    const { planId } = await req.json();
-    if (!planId) throw new Error("planId is required");
-    logStep("Request body parsed", { planId });
+    // Initialize Supabase client with the service role key to bypass RLS
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
 
-    // Get price information based on planId
-    let price_data: any;
-    let plan_name: string;
-    
-    switch(planId) {
-      case 'premium':
-        price_data = {
-          currency: "brl",
-          product_data: { name: "Plano Premium - Descrição Pro" },
-          unit_amount: 4990, // R$49.90
-          recurring: { interval: "month" },
-        };
-        plan_name = "Premium";
-        break;
-      case 'business':
-        price_data = {
-          currency: "brl",
-          product_data: { name: "Plano Empresarial - Descrição Pro" },
-          unit_amount: 9990, // R$99.90
-          recurring: { interval: "month" },
-        };
-        plan_name = "Empresarial";
-        break;
-      default:
-        throw new Error("Invalid planId");
-    }
-    logStep("Price data determined", { plan_name, price_data });
-
-    // Initialize Supabase client with the anon key
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-
-    // Get user from authorization header
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Authorization header is required");
+    if (!authHeader) throw new Error("No authorization header provided");
+    logStep("Authorization header found");
+
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    
-    if (userError) throw userError;
+    if (userError) throw new Error(`Authentication error: ${userError.message}`);
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // Initialize Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-
-    // Check if user already has a Stripe customer ID
+    
+    // Check if user already exists as a Stripe customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
-    
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
+      logStep("Found existing Stripe customer", { customerId });
     }
 
-    // Create checkout session
+    // Get plan ID from request body
+    const { planId } = await req.json();
+    if (!planId) throw new Error("No plan ID provided");
+    logStep("Plan ID found", { planId });
+
+    // Map plan IDs to Stripe prices (using hardcoded values for now)
+    // In a real app, you would store these in a database
+    let priceId;
+    let planName;
+    
+    switch (planId) {
+      case 'premium-plan':
+        priceId = 'price_premium'; // Replace with your actual Stripe price ID
+        planName = 'Premium';
+        break;
+      case 'business-plan':
+        priceId = 'price_business'; // Replace with your actual Stripe price ID
+        planName = 'Empresarial';
+        break;
+      default:
+        throw new Error(`Invalid plan ID: ${planId}`);
+    }
+    
+    // For demo purposes - using test price if actual price IDs not set
+    // You should replace this with your actual price IDs from Stripe
+    if (priceId === 'price_premium') {
+      priceId = 'price_1OtKmDLlcPBEICFiJEzgbh7H'; // Example test price ID
+    } else if (priceId === 'price_business') {
+      priceId = 'price_1OtKmTLlcPBEICFibCahnQ1V'; // Example test price ID
+    }
+    
+    logStep("Price ID determined", { priceId, planName });
+
+    // Create a Checkout Session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price_data,
-          quantity: 1,
-        },
+          price: priceId,
+          quantity: 1
+        }
       ],
-      mode: "subscription",
-      metadata: {
-        user_id: user.id,
-        plan_id: planId,
-        plan_name
-      },
+      mode: 'subscription',
       success_url: `${req.headers.get("origin")}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/plans`,
+      metadata: {
+        user_id: user.id,
+        user_email: user.email,
+        plan_id: planId
+      }
     });
 
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
-
+    logStep("Checkout session created", { sessionUrl: session.url });
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[CREATE-CHECKOUT] Error: ${errorMessage}`);
-    
+    console.error(`[CREATE-CHECKOUT] ERROR: ${errorMessage}`);
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

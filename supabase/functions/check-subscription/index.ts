@@ -20,11 +20,11 @@ serve(async (req) => {
   }
 
   // Use the service role key to perform writes (upsert) in Supabase
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-  const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  const supabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey, {
-    auth: { persistSession: false }
-  });
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
+  );
 
   try {
     logStep("Function started");
@@ -42,7 +42,6 @@ serve(async (req) => {
     
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
@@ -61,7 +60,6 @@ serve(async (req) => {
         subscription_end: null,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'email' });
-      
       return new Response(JSON.stringify({ 
         subscribed: false,
         subscription_tier: 'free',
@@ -80,9 +78,8 @@ serve(async (req) => {
       status: "active",
       limit: 1,
     });
-    
     const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionTier = "free";
+    let subscriptionTier = 'free';
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
@@ -92,15 +89,16 @@ serve(async (req) => {
       
       // Determine subscription tier from price
       const priceId = subscription.items.data[0].price.id;
-      const price = await stripe.prices.retrieve(priceId);
-      const amount = price.unit_amount || 0;
       
-      if (amount <= 4990) {
-        subscriptionTier = "premium";
-      } else {
-        subscriptionTier = "business";
+      // Map price IDs to subscription tiers
+      // Update these IDs with your actual Stripe price IDs
+      if (priceId === 'price_1OtKmDLlcPBEICFiJEzgbh7H') { // Example price ID for Premium
+        subscriptionTier = 'premium';
+      } else if (priceId === 'price_1OtKmTLlcPBEICFibCahnQ1V') { // Example price ID for Business
+        subscriptionTier = 'business';
       }
-      logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
+      
+      logStep("Determined subscription tier", { priceId, subscriptionTier });
     } else {
       logStep("No active subscription found");
     }
@@ -116,7 +114,6 @@ serve(async (req) => {
     }, { onConflict: 'email' });
 
     logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
-    
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_tier: subscriptionTier,
@@ -128,7 +125,6 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in check-subscription", { message: errorMessage });
-    
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
