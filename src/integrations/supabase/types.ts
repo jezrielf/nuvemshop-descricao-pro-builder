@@ -155,7 +155,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_nuvemshop_stores: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          access_token: string
+          connected_at: string
+          id: string
+          name: string
+          scope: string | null
+          store_id: number
+          url: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
