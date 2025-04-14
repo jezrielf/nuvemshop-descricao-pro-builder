@@ -12,6 +12,8 @@ import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
 import SEOAnalyzer from './SEO/analyzers/SEOAnalyzer';
 import AIGeneratorButton from './header/AIGeneratorButton';
+import NuvemshopIntegrationButton from './header/NuvemshopIntegrationButton';
+import ExportOptionsButton from './header/ExportOptionsButton';
 import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
@@ -90,11 +92,15 @@ const Header: React.FC = () => {
             />
           )}
           
+          {description && <ExportOptionsButton />}
+          
           {description && <HtmlOutputDialog />}
           
           {description && isBusiness() && <SEOAnalyzer description={description} />}
           
           {isBusiness() && <AIGeneratorButton />}
+          
+          {description && <NuvemshopIntegrationButton />}
           
           <TutorialManager />
           
