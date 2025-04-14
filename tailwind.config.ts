@@ -23,6 +23,9 @@ const config = {
       fontFamily: {
         sans: ["Inter", ...fontFamily.sans],
       },
+      screens: {
+        'xs': '475px',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

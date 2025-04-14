@@ -13,11 +13,13 @@ import TutorialManager from './tutorial/TutorialManager';
 import SEOAnalyzer from './SEO/analyzers/SEOAnalyzer';
 import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
   const auth = useAuth();
   const { isPremium, isBusiness, isSubscribed, descriptionCount, canCreateMoreDescriptions, subscriptionTier } = auth;
+  const isMobile = useIsMobile();
   
   // Set auth context in the store when component mounts
   useEffect(() => {
@@ -62,14 +64,14 @@ const Header: React.FC = () => {
   };
   
   return (
-    <header className="border-b bg-white shadow-sm px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <header className="border-b bg-white shadow-sm px-3 sm:px-6 py-4 w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           <Link to="/">
-            <h1 className="text-2xl font-bold text-brand-blue">Descrição Pro</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-brand-blue">Descrição Pro</h1>
           </Link>
           {description && (
-            <span className="text-sm text-gray-500">
+            <span className="text-xs sm:text-sm text-gray-500">
               Editando: <span className="font-medium text-gray-700">{description.name}</span>
             </span>
           )}
@@ -78,13 +80,13 @@ const Header: React.FC = () => {
           
           {/* Só mostra o link para planos se não for premium ou business */}
           {!isPremium() && !isBusiness() && (
-            <Link to="/plans" className="text-sm text-blue-500 hover:text-blue-700 underline">
+            <Link to="/plans" className="text-xs sm:text-sm text-blue-500 hover:text-blue-700 underline">
               Ver planos
             </Link>
           )}
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <NewDescriptionDialog 
             isPremium={isPremium} 
             descriptionCount={descriptionCount}

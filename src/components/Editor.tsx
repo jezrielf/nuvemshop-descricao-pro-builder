@@ -14,12 +14,14 @@ import AIDescriptionGenerator from './AIGenerator/AIDescriptionGenerator';
 import SEOTools from './SEO/SEOTools';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Editor: React.FC = () => {
   const { description, reorderBlocks } = useEditorStore();
   const { isPremium, isBusiness } = useAuth();
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Log the role information for debugging
   console.log("Editor component - isPremium:", isPremium());
@@ -42,7 +44,7 @@ const Editor: React.FC = () => {
   
   if (!description) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8">
+      <div className="flex flex-col items-center justify-center h-full p-4 sm:p-8 overflow-auto">
         <Alert className="max-w-md mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Nenhuma descrição selecionada</AlertTitle>
@@ -99,18 +101,19 @@ const Editor: React.FC = () => {
   
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+      <div className="p-3 sm:p-4 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-2">
         <TemplateSelector />
         {description && (isPremium() || isBusiness()) && <SEOTools description={description} />}
       </div>
       
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-3 sm:p-4 h-[calc(100%-60px)]">
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="blocks">
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
+                className="min-h-[200px]"
               >
                 {description && description.blocks.length > 0 ? (
                   description.blocks.map((block, index) => (
@@ -120,6 +123,7 @@ const Editor: React.FC = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
+                          className="mb-4"
                         >
                           <BlockRenderer block={block} />
                         </div>

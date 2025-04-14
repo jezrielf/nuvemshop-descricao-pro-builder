@@ -20,7 +20,7 @@ export const UserButton: React.FC = () => {
 
   if (!user) {
     return (
-      <Button variant="outline" asChild>
+      <Button variant="outline" asChild size="sm" className="h-8 text-xs sm:text-sm">
         <Link to="/auth">Entrar</Link>
       </Button>
     );
@@ -32,7 +32,7 @@ export const UserButton: React.FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
           <Avatar className="h-8 w-8">
             <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.nome || user.email || ''} />
             <AvatarFallback>{userInitial}</AvatarFallback>
@@ -65,7 +65,7 @@ export const UserButton: React.FC = () => {
             <DropdownMenuSeparator />
           </>
         )}
-        {/* Mostrar opção de gerenciamento de conta para usuários premium ou business */}
+        {/* Mostrar opção de gestão de conta para usuários premium ou business */}
         {isSubscribed && (
           <>
             <DropdownMenuItem onClick={openCustomerPortal}>

@@ -5,6 +5,7 @@ import Editor from '@/components/Editor';
 import Preview from '@/components/Preview';
 import { useTemplateStore } from '@/store/templateStore';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Adicionamos o diretório public/tutorial para as imagens do tutorial
 const placeholderImages = [
@@ -19,6 +20,7 @@ const placeholderImages = [
 const Index = () => {
   console.log("Index page renderizada");
   const { loadTemplates } = useTemplateStore();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Carrega os templates iniciais
@@ -33,18 +35,29 @@ const Index = () => {
   }, [loadTemplates]);
   
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
       
       <div className="flex-1 overflow-hidden">
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={50} minSize={30} className="editor-area">
+        <ResizablePanelGroup 
+          direction={isMobile ? "vertical" : "horizontal"}
+          className="h-full max-h-full"
+        >
+          <ResizablePanel 
+            defaultSize={isMobile ? 50 : 50} 
+            minSize={isMobile ? 30 : 30} 
+            className="editor-area h-full max-h-full overflow-hidden"
+          >
             <Editor />
           </ResizablePanel>
           
           <ResizableHandle withHandle />
           
-          <ResizablePanel defaultSize={50} minSize={30} className="preview-area">
+          <ResizablePanel 
+            defaultSize={isMobile ? 50 : 50} 
+            minSize={isMobile ? 30 : 30} 
+            className="preview-area h-full max-h-full overflow-hidden"
+          >
             <Preview />
           </ResizablePanel>
         </ResizablePanelGroup>

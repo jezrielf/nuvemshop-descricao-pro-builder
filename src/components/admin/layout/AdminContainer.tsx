@@ -12,7 +12,7 @@ const AdminContainer: React.FC<AdminContainerProps> = ({ children }) => {
 
   return (
     <div className={cn(
-      "min-h-screen transition-colors",
+      "min-h-screen max-h-screen overflow-hidden transition-colors",
       darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
     )}>
       {children}

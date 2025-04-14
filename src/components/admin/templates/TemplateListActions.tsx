@@ -42,30 +42,36 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({
   };
 
   return (
-    <div className="flex justify-end space-x-2">
+    <div className="flex justify-end space-x-1 sm:space-x-2">
       <Button 
         variant="outline" 
         size="sm"
         onClick={handleView}
         title="Visualizar"
+        className="h-8 w-8 p-0 sm:w-auto sm:px-2"
       >
         <Eye className="h-4 w-4" />
+        <span className="hidden sm:inline ml-1">Ver</span>
       </Button>
       <Button 
         variant="outline" 
         size="sm"
         onClick={handleEdit}
         title="Editar"
+        className="h-8 w-8 p-0 sm:w-auto sm:px-2"
       >
         <Edit className="h-4 w-4" />
+        <span className="hidden sm:inline ml-1">Editar</span>
       </Button>
       <Button 
         variant="outline" 
         size="sm"
         onClick={handleDelete}
         title="Excluir"
+        className="h-8 w-8 p-0 sm:w-auto sm:px-2"
       >
         <Trash className="h-4 w-4" />
+        <span className="hidden sm:inline ml-1">Excluir</span>
       </Button>
     </div>
   );

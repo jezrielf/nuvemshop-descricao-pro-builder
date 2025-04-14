@@ -5,11 +5,13 @@ import BlockRenderer from './blocks/BlockRenderer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Eye, Smartphone, Monitor } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Preview: React.FC = () => {
   const { description, getHtmlOutput } = useEditorStore();
   const [deviceView, setDeviceView] = React.useState<'desktop' | 'mobile'>('desktop');
   const [htmlOutput, setHtmlOutput] = useState<string>('');
+  const isMobile = useIsMobile();
   
   // Update HTML output whenever description changes
   useEffect(() => {
@@ -39,30 +41,32 @@ const Preview: React.FC = () => {
   
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b bg-gray-50 flex items-center justify-between">
-        <h2 className="font-medium">Pré-visualização</h2>
+      <div className="p-2 sm:p-4 border-b bg-gray-50 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-medium text-sm sm:text-base">Pré-visualização</h2>
         
         <div className="flex items-center space-x-2">
           <Button
             variant={deviceView === 'desktop' ? 'default' : 'outline'}
             size="sm"
+            className="text-xs sm:text-sm h-8"
             onClick={() => setDeviceView('desktop')}
           >
-            <Monitor className="h-4 w-4 mr-1" />
-            Desktop
+            <Monitor className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            <span className="hidden xs:inline">Desktop</span>
           </Button>
           <Button
             variant={deviceView === 'mobile' ? 'default' : 'outline'}
             size="sm"
+            className="text-xs sm:text-sm h-8"
             onClick={() => setDeviceView('mobile')}
           >
-            <Smartphone className="h-4 w-4 mr-1" />
-            Mobile
+            <Smartphone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            <span className="hidden xs:inline">Mobile</span>
           </Button>
         </div>
       </div>
       
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 h-[calc(100%-50px)]">
         <div className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}>
           {visibleBlocks.length > 0 ? (
             <div className="preview-container">
