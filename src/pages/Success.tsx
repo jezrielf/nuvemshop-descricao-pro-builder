@@ -4,12 +4,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Success: React.FC = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { refreshSubscription } = useAuth();
   const navigate = useNavigate();
   
@@ -17,11 +19,13 @@ const Success: React.FC = () => {
     const updateSubscription = async () => {
       try {
         setLoading(true);
+        setError(null);
         // Refresh subscription information
         await refreshSubscription();
         setLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error updating subscription status:', error);
+        setError(error.message || 'Erro ao atualizar informações da assinatura');
         setLoading(false);
       }
     };
@@ -50,9 +54,19 @@ const Success: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="mb-4">
-            Obrigado por assinar o Descrição Pro. Você agora tem acesso a todos os recursos do plano.
-          </p>
+          {error ? (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {error}. Os recursos Premium ainda podem estar disponíveis.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <p className="mb-4">
+              Obrigado por assinar o Descrição Pro. Você agora tem acesso a todos os recursos do plano.
+            </p>
+          )}
+          
           {loading ? (
             <p className="text-muted-foreground">Atualizando informações da sua conta...</p>
           ) : (

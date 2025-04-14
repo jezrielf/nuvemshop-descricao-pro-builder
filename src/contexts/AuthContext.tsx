@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Profile } from '@/types/auth';
 import { AuthContextProps } from '@/types/authContext';
+import { subscriptionService } from '@/services/subscriptionService';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -193,32 +195,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshSubscription = useCallback(async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      if (error) {
-        throw new Error(error.message);
-      }
-      setSubscriptionTier(data.subscription_tier);
-      setSubscriptionEnd(data.subscription_end);
+      const subscriptionInfo = await subscriptionService.checkSubscription();
+      setSubscriptionTier(subscriptionInfo.subscription_tier);
+      setSubscriptionEnd(subscriptionInfo.subscription_end);
+      return subscriptionInfo;
     } catch (error: any) {
       console.error('Error refreshing subscription:', error);
-      toast({
-        title: 'Erro ao verificar assinatura',
-        description: error.message,
-        variant: 'destructive',
-      });
-      // Optionally, set a default subscription tier in case of error
+      // Don't show a toast here, as this could be called frequently
+      // and would lead to too many error notifications
+      
+      // Ensure we have a valid default state
       setSubscriptionTier('free');
       setSubscriptionEnd(null);
+      
+      return {
+        subscribed: false,
+        subscription_tier: 'free',
+        subscription_end: null
+      };
     }
-  }, [toast]);
+  }, []);
 
   const openCustomerPortal = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-      if (error) {
-        throw new Error(error.message);
-      }
-      window.location.href = data.url;
+      const portalUrl = await subscriptionService.openCustomerPortal();
+      window.location.href = portalUrl;
     } catch (error: any) {
       toast({
         title: 'Erro ao abrir portal do cliente',
@@ -246,8 +247,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [descriptionCount, isSubscribed]);
 
   useEffect(() => {
+    // Only try to refresh subscription if user is logged in
     if (user) {
-      refreshSubscription();
+      refreshSubscription().catch(error => {
+        console.error('Failed to refresh subscription:', error);
+      });
+    } else {
+      // Reset subscription state when user is not logged in
+      setSubscriptionTier('free');
+      setSubscriptionEnd(null);
     }
   }, [user, refreshSubscription]);
 

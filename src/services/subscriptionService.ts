@@ -14,6 +14,7 @@ export const subscriptionService = {
       const { data, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
+        console.error('Error checking subscription:', error.message);
         throw new Error(error.message);
       }
       

@@ -70,7 +70,7 @@ postgres_capabilities_v2 = false
 functions_v2 = true
 
 [functions.check-subscription]
-verify_jwt = true
+verify_jwt = false
 
 [functions.create-checkout]
 verify_jwt = true
@@ -80,3 +80,4 @@ verify_jwt = true
 
 [functions.manage-plans]
 verify_jwt = true
+
