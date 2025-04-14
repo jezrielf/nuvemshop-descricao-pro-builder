@@ -32,11 +32,14 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     if (!editingUser) return;
     
     try {
+      // Ensure role is properly formatted for database
+      const roleValue = values.role;
+      
       const { error } = await supabase
         .from('profiles')
         .update({ 
           nome: values.nome,
-          role: values.role, // This now correctly accepts string | string[]
+          role: roleValue,
           atualizado_em: new Date().toISOString()
         })
         .eq('id', editingUser.id);
@@ -64,10 +67,13 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       console.log(`Atualizando papel do usuário ${userId} para ${JSON.stringify(newRole)}`);
       
+      // Ensure role is properly formatted for database
+      const roleValue = newRole;
+      
       const { error } = await supabase
         .from('profiles')
         .update({ 
-          role: newRole,
+          role: roleValue,
           atualizado_em: new Date().toISOString()
         })
         .eq('id', userId);

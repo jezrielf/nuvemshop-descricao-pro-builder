@@ -47,11 +47,16 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
       }
       
       // 2. Atualizar o perfil com o papel (role) especificado
+      // Convert role to string if it's an array
+      const roleValue = Array.isArray(values.role) 
+        ? values.role 
+        : values.role;
+        
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ 
           nome: values.nome,
-          role: values.role // This now correctly accepts string | string[]
+          role: roleValue
         })
         .eq('id', authData.user.id);
       
