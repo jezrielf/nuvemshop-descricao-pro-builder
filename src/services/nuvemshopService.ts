@@ -50,14 +50,15 @@ export const handleNuvemshopCallback = async (code: string): Promise<NuvemshopSt
 // Get connected stores for the current user
 export const getConnectedStores = async (): Promise<NuvemshopStore[]> => {
   try {
-    const { data, error } = await supabase
-      .from('nuvemshop_stores')
-      .select('*')
-      .order('connected_at', { ascending: false });
-
+    // Use the rpc method to access tables that are not in the TypeScript types yet
+    const { data, error } = await supabase.rpc('get_nuvemshop_stores');
+    
     if (error) throw error;
     
-    return data.map((store) => ({
+    if (!data) return [];
+    
+    // Map the raw data to our interface format
+    return data.map((store: any) => ({
       id: store.store_id,
       name: store.name,
       url: store.url,
