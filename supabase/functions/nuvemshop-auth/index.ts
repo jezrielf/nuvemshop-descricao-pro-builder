@@ -47,7 +47,7 @@ serve(async (req) => {
 
     console.log('State validated, exchanging code for token');
 
-    // Exchange code for access token
+    // Update with new client ID and endpoint
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
       method: 'POST',
       headers: {
@@ -55,10 +55,10 @@ serve(async (req) => {
         'User-Agent': 'Descrição Pro (contato@descricao.pro)'
       },
       body: JSON.stringify({
-        client_id: Deno.env.get('NUVEMSHOP_CLIENT_ID'),
+        client_id: "17194",
         client_secret: Deno.env.get('NUVEMSHOP_CLIENT_SECRET'),
         grant_type: 'authorization_code',
-        code: code
+        code
       })
     });
 

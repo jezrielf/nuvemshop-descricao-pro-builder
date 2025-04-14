@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Store } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Define Nuvemshop App ID and required scopes
-const NUVEMSHOP_CLIENT_ID = "7437";
+// Update with new client ID
+const NUVEMSHOP_CLIENT_ID = "17194";
 const NUVEMSHOP_SCOPES = "products";
 
 export const NuvemshopConnect: React.FC = () => {
