@@ -17,11 +17,13 @@ const placeholderImages = [
 ];
 
 const Index = () => {
+  console.log("Index page renderizada");
   const { loadTemplates } = useTemplateStore();
   
   useEffect(() => {
     // Carrega os templates iniciais
     loadTemplates();
+    console.log("Templates carregados");
     
     // Pré-carrega as imagens do tutorial
     placeholderImages.forEach(src => {
