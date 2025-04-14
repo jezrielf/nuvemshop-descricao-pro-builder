@@ -42,6 +42,72 @@ serve(async (req) => {
     }
     logStep("Stripe key verified");
 
+    // Parse request body with method and action
+    let method, action, data;
+    try {
+      const requestBody = await req.json();
+      method = requestBody.method;
+      action = requestBody.action;
+      data = requestBody.data;
+      logStep("Request parsed", { method, action });
+    } catch (parseError) {
+      logStep(`ERROR: Failed to parse request - ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+      return new Response(JSON.stringify({ 
+        error: "Failed to parse request body", 
+        success: false 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200, // Return 200 even for errors to prevent app disruption
+      });
+    }
+    
+    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    
+    // For the list-products action, we allow public access for displaying plans to users
+    if (method === "GET" && action === "list-products") {
+      try {
+        // List all products with their prices
+        const products = await stripe.products.list({
+          active: true,
+          expand: ['data.default_price'],
+          limit: 100,
+        });
+        
+        // Format the products into a more usable format
+        const formattedProducts = products.data.map(product => {
+          const defaultPrice = product.default_price as Stripe.Price;
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: defaultPrice ? (defaultPrice.unit_amount || 0) / 100 : 0,
+            priceId: defaultPrice ? defaultPrice.id : null,
+            isActive: product.active,
+            metadata: product.metadata,
+            features: product.metadata.features ? JSON.parse(product.metadata.features) : [],
+            isDefault: product.metadata.default === 'true',
+          };
+        });
+        
+        logStep("Products retrieved", { count: formattedProducts.length });
+        return new Response(JSON.stringify({ products: formattedProducts, success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      } catch (listError) {
+        logStep(`ERROR: Failed to list products - ${listError instanceof Error ? listError.message : String(listError)}`);
+        return new Response(JSON.stringify({ 
+          error: `Failed to list products: ${listError instanceof Error ? listError.message : String(listError)}`, 
+          success: false,
+          products: [] 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200, // Return 200 even for errors to prevent app disruption
+        });
+      }
+    }
+
+    // For admin actions, we require authentication
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       logStep("ERROR: No authorization header provided");
@@ -121,73 +187,6 @@ serve(async (req) => {
     }
     
     logStep("Admin user authenticated", { userId: user.id, email: user.email });
-
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-    
-    // Parse request with method and action
-    let method, action, data;
-    try {
-      const requestBody = await req.json();
-      method = requestBody.method;
-      action = requestBody.action;
-      data = requestBody.data;
-      logStep("Request parsed", { method, action });
-    } catch (parseError) {
-      logStep(`ERROR: Failed to parse request - ${parseError instanceof Error ? parseError.message : String(parseError)}`);
-      return new Response(JSON.stringify({ 
-        error: "Failed to parse request body", 
-        success: false 
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200, // Return 200 even for errors to prevent app disruption
-      });
-    }
-    
-    // GET methods
-    if (method === "GET") {
-      if (action === "list-products") {
-        try {
-          // List all products with their prices
-          const products = await stripe.products.list({
-            active: true,
-            expand: ['data.default_price'],
-            limit: 100,
-          });
-          
-          // Format the products into a more usable format
-          const formattedProducts = products.data.map(product => {
-            const defaultPrice = product.default_price as Stripe.Price;
-            return {
-              id: product.id,
-              name: product.name,
-              description: product.description,
-              price: defaultPrice ? (defaultPrice.unit_amount || 0) / 100 : 0,
-              priceId: defaultPrice ? defaultPrice.id : null,
-              isActive: product.active,
-              metadata: product.metadata,
-              features: product.metadata.features ? JSON.parse(product.metadata.features) : [],
-              isDefault: product.metadata.default === 'true',
-            };
-          });
-          
-          logStep("Products retrieved", { count: formattedProducts.length });
-          return new Response(JSON.stringify({ products: formattedProducts, success: true }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 200,
-          });
-        } catch (listError) {
-          logStep(`ERROR: Failed to list products - ${listError instanceof Error ? listError.message : String(listError)}`);
-          return new Response(JSON.stringify({ 
-            error: `Failed to list products: ${listError instanceof Error ? listError.message : String(listError)}`, 
-            success: false,
-            products: [] 
-          }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 200, // Return 200 even for errors to prevent app disruption
-          });
-        }
-      }
-    }
     
     // POST methods
     if (method === "POST") {

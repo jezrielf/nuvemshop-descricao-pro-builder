@@ -45,12 +45,27 @@ export const usePlansData = () => {
         try {
           // If features are already JSON parsed, use them directly
           if (Array.isArray(product.features)) {
-            features = product.features.map((feature: string, index: number) => {
-              const [name, included] = feature.split(':');
+            features = product.features.map((feature: any, index: number) => {
+              // Handle different feature formats
+              if (typeof feature === 'object' && 'name' in feature && 'included' in feature) {
+                return {
+                  id: `feature-${index}`,
+                  name: feature.name,
+                  included: feature.included
+                };
+              } else if (typeof feature === 'string') {
+                const [name, includedStr] = feature.split(':');
+                return {
+                  id: `feature-${index}`,
+                  name,
+                  included: includedStr === 'true'
+                };
+              }
+              
               return {
                 id: `feature-${index}`,
-                name,
-                included: included === 'true'
+                name: String(feature),
+                included: false
               };
             });
           } else {

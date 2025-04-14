@@ -36,6 +36,7 @@ const Plans: React.FC = () => {
       setLoadError(null);
       console.log("Fetching plans for public display...");
       
+      // For public plans display, we don't need admin access
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { method: 'GET', action: 'list-products' }
       });
@@ -58,7 +59,7 @@ const Plans: React.FC = () => {
           let transformedFeatures = [];
           
           if (Array.isArray(product.features)) {
-            transformedFeatures = product.features.map((feature: any) => {
+            transformedFeatures = product.features.map((feature: any, index: number) => {
               // If feature is already in the correct format, use it
               if (typeof feature === 'object' && 'name' in feature && 'included' in feature) {
                 return feature;
