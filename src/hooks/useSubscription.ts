@@ -16,25 +16,25 @@ export const useSubscription = () => {
       
       if (error) {
         console.error('Erro ao verificar assinatura:', error);
-        return { tier: 'free', end_date: null, error: error.message };
+        return { subscribed: false, subscription_tier: 'free', subscription_end: null, error: error.message };
       }
       
-      if (data && data.tier) {
+      if (data && data.subscription_tier) {
         console.log('Dados de assinatura recebidos:', data);
         // Prevent unnecessary state updates if the tier hasn't changed
-        if (data.tier !== subscriptionTier) {
-          setSubscriptionTier(data.tier);
+        if (data.subscription_tier !== subscriptionTier) {
+          setSubscriptionTier(data.subscription_tier);
         }
-        if (data.end_date !== subscriptionEnd) {
-          setSubscriptionEnd(data.end_date);
+        if (data.subscription_end !== subscriptionEnd) {
+          setSubscriptionEnd(data.subscription_end);
         }
         return data;
       }
       
-      return { tier: 'free', end_date: null };
+      return { subscribed: false, subscription_tier: 'free', subscription_end: null };
     } catch (error: any) {
       console.error('Erro ao verificar assinatura:', error);
-      return { tier: 'free', end_date: null, error: error.message };
+      return { subscribed: false, subscription_tier: 'free', subscription_end: null, error: error.message };
     } finally {
       setIsLoading(false);
     }
