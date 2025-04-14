@@ -1,6 +1,7 @@
 
 import { Session, User } from '@supabase/supabase-js';
 import { Profile } from './auth';
+import { SubscriptionInfo } from '@/services/subscriptionService';
 
 export interface AuthContextProps {
   session: Session | null;
@@ -17,7 +18,7 @@ export interface AuthContextProps {
   isSubscribed: () => boolean;
   subscriptionTier: string;
   subscriptionEnd: string | null;
-  refreshSubscription: () => Promise<void>;
+  refreshSubscription: () => Promise<SubscriptionInfo>;
   openCustomerPortal: () => Promise<void>;
   descriptionCount: number;
   incrementDescriptionCount: () => void;

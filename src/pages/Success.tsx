@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ArrowRight, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SubscriptionInfo } from '@/services/subscriptionService';
 
 const Success: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,8 @@ const Success: React.FC = () => {
         setLoading(true);
         setError(null);
         // Refresh subscription information
-        await refreshSubscription();
+        const subscriptionInfo: SubscriptionInfo = await refreshSubscription();
+        console.log('Updated subscription info:', subscriptionInfo);
         setLoading(false);
       } catch (error: any) {
         console.error('Error updating subscription status:', error);
