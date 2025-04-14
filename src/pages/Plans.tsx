@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +10,7 @@ import PlanCard from '@/components/plans/PlanCard';
 import { usePlanSubscription } from '@/components/plans/hooks/usePlanSubscription';
 import { supabase } from '@/integrations/supabase/client';
 
+// Updated interface to match the format expected by PlanCard
 interface StripePlan {
   id: string;
   name: string;
@@ -16,7 +18,7 @@ interface StripePlan {
   price: number;
   priceId: string;
   isActive: boolean;
-  features: string[];
+  features: Array<{ name: string; included: boolean }>;
   isDefault: boolean;
 }
 
@@ -49,8 +51,45 @@ const Plans: React.FC = () => {
       }
       
       const activePlans = data.products
-        .filter((product: StripePlan) => product.isActive)
-        .sort((a: StripePlan, b: StripePlan) => a.price - b.price);
+        .filter((product: any) => product.isActive)
+        .sort((a: any, b: any) => a.price - b.price)
+        .map((product: any) => {
+          // Transform the features array to match our StripePlan interface
+          let transformedFeatures = [];
+          
+          if (Array.isArray(product.features)) {
+            transformedFeatures = product.features.map((feature: any) => {
+              // If feature is already in the correct format, use it
+              if (typeof feature === 'object' && 'name' in feature && 'included' in feature) {
+                return feature;
+              }
+              // If feature is a string, parse it (assuming format like "Feature Name:true")
+              if (typeof feature === 'string') {
+                const [name, includedStr] = feature.split(':');
+                return {
+                  name: name,
+                  included: includedStr === 'true'
+                };
+              }
+              // Default fallback
+              return {
+                name: String(feature),
+                included: false
+              };
+            });
+          }
+          
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description || '',
+            price: product.price,
+            priceId: product.priceId,
+            isActive: product.isActive,
+            features: transformedFeatures,
+            isDefault: product.isDefault || false
+          };
+        });
       
       console.log("Retrieved active plans:", activePlans.length);
       setPlans(activePlans);
