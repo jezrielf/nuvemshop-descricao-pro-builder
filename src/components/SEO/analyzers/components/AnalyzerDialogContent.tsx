@@ -35,7 +35,7 @@ export const AnalyzerDialogContent: React.FC<AnalyzerDialogContentProps> = ({
       />
       
       {results ? (
-        <div className="space-y-4 overflow-y-auto flex-grow mt-3">
+        <div className="space-y-2 overflow-y-auto flex-grow mt-2">
           <ScoreDisplay score={results.score} />
           <RecommendationsList recommendations={results.recommendations} />
           <KeywordsList keywords={results.keywords} />
@@ -46,3 +46,4 @@ export const AnalyzerDialogContent: React.FC<AnalyzerDialogContentProps> = ({
     </div>
   );
 };
+
