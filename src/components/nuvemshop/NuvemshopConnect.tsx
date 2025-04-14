@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Store } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Nuvemshop client ID
 const NUVEMSHOP_CLIENT_ID = "17194";
 const NUVEMSHOP_SCOPES = "products";
 
@@ -39,8 +38,8 @@ export const NuvemshopConnect: React.FC = () => {
         throw stateError;
       }
 
-      // Redirect to Nuvemshop OAuth authorization page - using the correct URL format
-      const redirectUrl = `https://www.tiendanube.com/apps/authorize?client_id=${NUVEMSHOP_CLIENT_ID}&state=${state}&scope=${NUVEMSHOP_SCOPES}&response_type=code`;
+      // Redirect to Nuvemshop OAuth authorization page with the correct base URL
+      const redirectUrl = `https://www.tiendanube.com/apps/authorize/validate?client_id=${NUVEMSHOP_CLIENT_ID}&state=${state}&scope=${NUVEMSHOP_SCOPES}&response_type=code`;
       
       console.log('Redirecting to Nuvemshop OAuth page:', redirectUrl);
       window.location.href = redirectUrl;

@@ -47,7 +47,7 @@ serve(async (req) => {
 
     console.log('State validated, exchanging code for token');
 
-    // Exchange code for token using the POST endpoint with correct format
+    // Exchange code for token using the POST endpoint with correct headers and body
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
       method: 'POST',
       headers: {
