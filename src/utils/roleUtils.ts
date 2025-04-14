@@ -34,7 +34,9 @@ export const hasRole = (role: string | string[] | null, roleToCheck: string): bo
  * @returns boolean indicating if the user is an admin
  */
 export const isAdmin = (role: string | string[] | null): boolean => {
-  return hasRole(role, 'admin');
+  const isUserAdmin = hasRole(role, 'admin');
+  console.log('isAdmin check in roleUtils:', isUserAdmin, 'role:', role);
+  return isUserAdmin;
 };
 
 /**
@@ -43,7 +45,7 @@ export const isAdmin = (role: string | string[] | null): boolean => {
  * @returns boolean indicating if the user is premium
  */
 export const isPremium = (role: string | string[] | null): boolean => {
-  return hasRole(role, 'premium');
+  return hasRole(role, 'premium') || isAdmin(role); // Admin also has premium privileges
 };
 
 /**

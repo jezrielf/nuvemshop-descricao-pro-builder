@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
@@ -84,6 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       setSession(data.session);
       setUser(data.user);
+      await fetchProfile(data.user.id);
       toast({
         title: "Login realizado com sucesso!",
         description: `Bem-vindo(a) de volta!`,
@@ -172,10 +173,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Automatically update subscription tier based on role
       if (data && data.role) {
         const userRole = Array.isArray(data.role) ? data.role[0] : data.role;
+        console.log("Role detectado:", userRole);
         if (userRole === 'premium') {
           setSubscriptionTier('premium');
         } else if (userRole === 'admin') {
           setSubscriptionTier('admin');
+          console.log("Usuário é admin, configurando tier como admin");
+        } else {
+          setSubscriptionTier('free');
         }
       }
     } catch (error) {
@@ -191,11 +196,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const isAdmin = useCallback(() => {
-    return hasRole('admin');
+    const hasAdminRole = hasRole('admin');
+    console.log("isAdmin check:", hasAdminRole, "profile:", profile);
+    return hasAdminRole;
   }, [profile?.role]);
 
   const isPremium = useCallback(() => {
-    return hasRole('premium') || hasRole('admin') || subscriptionTier?.toLowerCase() === 'premium';
+    return hasRole('premium') || hasRole('admin') || subscriptionTier?.toLowerCase() === 'premium' || subscriptionTier?.toLowerCase() === 'admin';
   }, [profile?.role, subscriptionTier]);
 
   const isBusiness = useCallback(() => {

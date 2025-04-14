@@ -79,7 +79,8 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       
       toast({
         title: 'Papel atualizado',
-        description: 'O papel do usuário foi atualizado com sucesso.',
+        description: 'O papel do usuário foi atualizado com sucesso. Peça para o usuário fazer login novamente para aplicar as alterações.',
+        duration: 5000,
       });
       
       onRefresh();
