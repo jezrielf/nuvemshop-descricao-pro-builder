@@ -1,5 +1,4 @@
-
-import React, { useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import CurrentPlanCard from '@/components/plans/CurrentPlanCard';
 import PlanCard from '@/components/plans/PlanCard';
 import { usePlanSubscription } from '@/components/plans/hooks/usePlanSubscription';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StripePlan {
   id: string;
