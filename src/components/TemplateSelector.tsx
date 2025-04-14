@@ -15,7 +15,7 @@ const TemplateSelector: React.FC = () => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const { toast } = useToast();
   
-  // Aqui está a correção principal: obter todos os templates quando selectedCategory for null
+  // Obter todos os templates quando selectedCategory for null
   const displayedTemplates = React.useMemo(() => {
     return selectedCategory === null 
       ? templates  // Exibir todos os templates quando nenhuma categoria estiver selecionada
@@ -68,11 +68,6 @@ const TemplateSelector: React.FC = () => {
     }
   };
 
-  // Adicionado log para depuração
-  console.log('Templates totais:', templates.length);
-  console.log('Templates exibidos:', displayedTemplates.length);
-  console.log('Categoria selecionada:', selectedCategory);
-  
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
@@ -81,7 +76,7 @@ const TemplateSelector: React.FC = () => {
           Usar Template
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Escolha um Template</DialogTitle>
           <DialogDescription>
@@ -89,7 +84,7 @@ const TemplateSelector: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex flex-col h-full mt-4">
+        <div className="flex flex-col flex-grow h-full mt-4">
           <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === null ? "default" : "outline"}
@@ -111,59 +106,61 @@ const TemplateSelector: React.FC = () => {
             ))}
           </div>
           
-          <ScrollArea className="flex-1 pr-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {displayedTemplates.length > 0 ? (
-                displayedTemplates.map((template) => (
-                  <div
-                    key={template.id}
-                    className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
-                  >
-                    <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
-                      {isAdvancedTemplate(template.id) ? (
-                        <img 
-                          src={getTemplateThumbnail(template)} 
-                          alt={template.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-gray-400 text-sm">
-                          Preview do Template
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-4 flex flex-col flex-grow">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium">{template.name}</h3>
-                        {isAdvancedTemplate(template.id) && (
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+          <div className="overflow-y-auto flex-grow">
+            <ScrollArea className="h-[calc(60vh-120px)] pr-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+                {displayedTemplates.length > 0 ? (
+                  displayedTemplates.map((template) => (
+                    <div
+                      key={template.id}
+                      className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                    >
+                      <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
+                        {isAdvancedTemplate(template.id) ? (
+                          <img 
+                            src={getTemplateThumbnail(template)} 
+                            alt={template.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-sm">
+                            Preview do Template
+                          </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 mt-1 mb-3">
-                        {categoryNames[template.category] || template.category}
-                      </p>
-                      <div className="text-xs text-gray-500 mb-4">
-                        {template.blocks.length} blocos
-                      </div>
-                      <div className="mt-auto">
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => handleSelectTemplate(template)}
-                        >
-                          Usar este template
-                        </Button>
+                      <div className="p-4 flex flex-col flex-grow">
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-medium">{template.name}</h3>
+                          {isAdvancedTemplate(template.id) && (
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1 mb-3">
+                          {categoryNames[template.category] || template.category}
+                        </p>
+                        <div className="text-xs text-gray-500 mb-4">
+                          {template.blocks.length} blocos
+                        </div>
+                        <div className="mt-auto">
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => handleSelectTemplate(template)}
+                          >
+                            Usar este template
+                          </Button>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="col-span-2 text-center py-8">
+                    <p className="text-muted-foreground">Nenhum template encontrado.</p>
                   </div>
-                ))
-              ) : (
-                <div className="col-span-3 text-center py-8">
-                  <p className="text-muted-foreground">Nenhum template encontrado.</p>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
