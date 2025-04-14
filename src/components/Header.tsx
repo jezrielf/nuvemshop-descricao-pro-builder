@@ -1,9 +1,8 @@
-
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { BadgeAlert, BadgeCheck, Crown, Settings } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Settings, Plus, Save, Lock } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
@@ -14,6 +13,7 @@ import SEOAnalyzer from './SEO/analyzers/SEOAnalyzer';
 import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
 
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
@@ -91,7 +91,6 @@ const Header: React.FC = () => {
           
           {subscriptionBadge}
           
-          {/* Só mostra o link para planos se não for premium ou business */}
           {!isPremiumUser && !isBusinessUser && (
             <Link to="/plans" className="text-xs sm:text-sm text-blue-500 hover:text-blue-700 underline">
               Ver planos
@@ -100,36 +99,31 @@ const Header: React.FC = () => {
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
-          <NewDescriptionDialog 
-            isPremium={isPremium} 
-            descriptionCount={descriptionCount}
-            canCreateMoreDescriptions={canCreateMoreDescriptions}
-          />
-          
-          <SaveDescriptionButton 
-            isPremium={isPremium}
-            isSubscribed={isSubscribed}
-            hasDescription={!!description}
-            canCreateMoreDescriptions={canCreateMoreDescriptions}
-          />
-          
-          {isPremiumUser && (
-            <SavedDescriptionsDialog 
-              isPremium={isPremium}
+          <div className="flex items-center gap-2">
+            <NewDescriptionDialog 
+              isPremium={isPremium} 
               descriptionCount={descriptionCount}
-              savedDescriptions={savedDescriptions}
+              canCreateMoreDescriptions={canCreateMoreDescriptions}
             />
-          )}
-          
-          {description && <HtmlOutputDialog />}
-          
-          {description && (isPremiumUser || isBusinessUser) && <SEOAnalyzer description={description} />}
-          
-          <AIGeneratorButton />
-          
-          <TutorialManager />
-          
-          <UserButton />
+            
+            <SaveDescriptionButton 
+              isPremium={isPremium}
+              isSubscribed={isSubscribed}
+              hasDescription={!!description}
+              canCreateMoreDescriptions={canCreateMoreDescriptions}
+            />
+            
+            {/* Adicione os novos botões aqui */}
+            <div className="flex items-center gap-2">
+              {description && (isPremiumUser || isBusinessUser) && <SEOAnalyzer description={description} />}
+              
+              <AIGeneratorButton />
+              
+              <TutorialManager />
+              
+              <UserButton />
+            </div>
+          </div>
         </div>
       </div>
     </header>
