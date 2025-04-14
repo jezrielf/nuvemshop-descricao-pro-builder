@@ -25,6 +25,9 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
   const primaryRole = Array.isArray(profile.role) 
     ? profile.role[0] || 'user' 
     : profile.role || 'user';
+    
+  console.log('UserEditForm - profile:', profile);
+  console.log('UserEditForm - primaryRole:', primaryRole);
 
   const form = useForm<UserFormValues>({
     defaultValues: {
@@ -33,20 +36,25 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
     }
   });
 
+  const handleSubmit = async (values: UserFormValues) => {
+    console.log('Submitting form with values:', values);
+    await onUpdateProfile(values);
+  };
+
   return (
     <div className="mt-6 space-y-6">
-      <form onSubmit={form.handleSubmit(onUpdateProfile)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="nome">Name</Label>
+          <Label htmlFor="nome">Nome</Label>
           <Input
             id="nome"
             {...form.register('nome')}
-            placeholder="User name"
+            placeholder="Nome do usuário"
           />
         </div>
         
         <div className="space-y-2">
-          <h3 className="text-sm font-medium">User Type</h3>
+          <h3 className="text-sm font-medium">Tipo de Usuário</h3>
           <UserRoleSelector 
             watch={form.watch} 
             setValue={form.setValue} 
@@ -54,12 +62,12 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
         </div>
         
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="submit" size="sm">Save Changes</Button>
+          <Button type="submit" size="sm">Salvar Alterações</Button>
         </div>
       </form>
       
       <div className="border-t pt-4">
-        <h3 className="text-sm font-medium mb-2">Quick Role Change</h3>
+        <h3 className="text-sm font-medium mb-2">Mudança Rápida de Papel</h3>
         <UserQuickActions 
           profileId={profile.id}
           currentRole={primaryRole}

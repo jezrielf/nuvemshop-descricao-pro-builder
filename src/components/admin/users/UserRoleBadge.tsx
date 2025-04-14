@@ -12,19 +12,22 @@ const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
   const primaryRole = role ? 
     (Array.isArray(role) ? role[0] : role) : 
     'user';
+    
+  console.log('UserRoleBadge - role recebido:', role);
+  console.log('UserRoleBadge - primaryRole:', primaryRole);
 
   const getRoleBadge = (roleType: string) => {
     switch (roleType.toLowerCase()) {
       case 'admin':
         return (
-          <Badge variant="default" className="flex items-center gap-1">
+          <Badge variant="default" className="flex items-center gap-1 bg-red-500">
             <Crown className="w-3 h-3" />
             Admin
           </Badge>
         );
       case 'premium':
         return (
-          <Badge variant="secondary" className="flex items-center gap-1">
+          <Badge variant="secondary" className="flex items-center gap-1 bg-purple-500 text-white">
             <Star className="w-3 h-3" />
             Premium
           </Badge>
@@ -33,7 +36,7 @@ const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
         return (
           <Badge variant="outline" className="flex items-center gap-1">
             <User className="w-3 h-3" />
-            User
+            Usuário
           </Badge>
         );
     }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,28 +45,27 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch profiles from the profiles table
-      const { data: profilesData, error: profilesError } = await supabase
+      // Buscar todos os perfis da tabela
+      const { data, error } = await supabase
         .from('profiles')
-        .select('*')
-        .order('criado_em', { ascending: false });
+        .select('*');
 
-      if (profilesError) throw profilesError;
+      if (error) throw error;
       
-      console.log('Profiles fetched (total):', profilesData.length);
+      console.log('Perfis obtidos:', data);
       
-      // Instead of using admin API, enrich profiles with email data from other sources if needed
-      // For example, if email is stored in another table or in profile metadata
-      
-      setProfiles(profilesData);
-      setFilteredProfiles(profilesData);
+      // Atualizar o estado com os dados obtidos
+      if (data) {
+        setProfiles(data);
+        setFilteredProfiles(data);
+      }
     } catch (error: any) {
-      console.error('Error fetching profiles:', error);
-      setError(error.message || 'User not allowed');
+      console.error('Erro ao buscar perfis:', error);
+      setError(error.message || 'Erro ao carregar usuários');
       
       toast({
-        title: 'Error loading users',
-        description: error.message || 'Permission denied',
+        title: 'Erro ao carregar usuários',
+        description: error.message || 'Erro ao acessar os dados',
         variant: 'destructive',
       });
     } finally {

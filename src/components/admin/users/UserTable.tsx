@@ -21,15 +21,18 @@ import UserEditForm from './UserEditForm';
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const openEditSheet = (profile: Profile) => {
     setEditingUser(profile);
+    setIsSheetOpen(true);
   };
 
   const updateUserProfile = async (values: UserFormValues) => {
     if (!editingUser) return;
     
     try {
+      // Atualizar o perfil do usuário com os novos valores
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -42,15 +45,16 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       if (error) throw error;
       
       toast({
-        title: 'Profile updated',
-        description: 'User data has been updated successfully.',
+        title: 'Perfil atualizado',
+        description: 'Os dados do usuário foram atualizados com sucesso.',
       });
       
+      setIsSheetOpen(false);
       setEditingUser(null);
       onRefresh();
     } catch (error: any) {
       toast({
-        title: 'Error updating profile',
+        title: 'Erro ao atualizar perfil',
         description: error.message,
         variant: 'destructive',
       });
@@ -59,6 +63,9 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
+      console.log(`Atualizando papel do usuário ${userId} para ${newRole}`);
+      
+      // Atualizar o papel do usuário
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -67,17 +74,21 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
         })
         .eq('id', userId);
         
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar papel:', error);
+        throw error;
+      }
       
       toast({
-        title: 'Role updated',
-        description: 'User role has been updated successfully.',
+        title: 'Papel atualizado',
+        description: 'O papel do usuário foi atualizado com sucesso.',
       });
       
       onRefresh();
     } catch (error: any) {
+      console.error('Erro completo:', error);
       toast({
-        title: 'Error updating role',
+        title: 'Erro ao atualizar papel',
         description: error.message,
         variant: 'destructive',
       });
@@ -85,7 +96,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
   };
 
   const deleteUser = async (profileId: string) => {
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    if (!window.confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
       return;
     }
 
@@ -98,14 +109,14 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       if (error) throw error;
       
       toast({
-        title: 'User deleted',
-        description: 'The user has been deleted successfully.',
+        title: 'Usuário excluído',
+        description: 'O usuário foi excluído com sucesso.',
       });
       
       onRefresh();
     } catch (error: any) {
       toast({
-        title: 'Error deleting user',
+        title: 'Erro ao excluir usuário',
         description: error.message,
         variant: 'destructive',
       });
@@ -113,27 +124,27 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>Carregando...</p>;
   }
 
   return (
     <>
       <Table>
-        <TableCaption>List of all registered users in the system</TableCaption>
+        <TableCaption>Lista de todos os usuários registrados no sistema</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
+            <TableHead>Nome</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Registration Date</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Papel</TableHead>
+            <TableHead>Data de Registro</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {profiles.length > 0 ? (
             profiles.map((profile) => (
               <TableRow key={profile.id}>
-                <TableCell className="font-medium">{profile.nome || 'No name'}</TableCell>
+                <TableCell className="font-medium">{profile.nome || 'Sem nome'}</TableCell>
                 <TableCell>{profile.email || 'N/A'}</TableCell>
                 <TableCell>
                   <UserRoleBadge role={profile.role} />
@@ -141,23 +152,25 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                 <TableCell>{new Date(profile.criado_em).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Sheet>
+                    <Sheet open={isSheetOpen && editingUser?.id === profile.id} onOpenChange={setIsSheetOpen}>
                       <SheetTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Edit</Button>
+                        <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Editar</Button>
                       </SheetTrigger>
                       <SheetContent className="sm:max-w-md">
                         <SheetHeader>
-                          <SheetTitle>Edit User</SheetTitle>
+                          <SheetTitle>Editar Usuário</SheetTitle>
                           <SheetDescription>
-                            Edit information for user {profile.nome || 'No name'}
+                            Editar informações para usuário {profile.nome || 'Sem nome'}
                           </SheetDescription>
                         </SheetHeader>
                         
-                        <UserEditForm 
-                          profile={profile}
-                          onUpdateProfile={updateUserProfile}
-                          onUpdateRole={updateUserRole}
-                        />
+                        {editingUser && (
+                          <UserEditForm 
+                            profile={editingUser}
+                            onUpdateProfile={updateUserProfile}
+                            onUpdateRole={updateUserRole}
+                          />
+                        )}
                       </SheetContent>
                     </Sheet>
                     
@@ -166,7 +179,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                       size="sm"
                       onClick={() => deleteUser(profile.id)}
                     >
-                      Delete
+                      Excluir
                     </Button>
                   </div>
                 </TableCell>
@@ -175,7 +188,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                No users found
+                Nenhum usuário encontrado
               </TableCell>
             </TableRow>
           )}

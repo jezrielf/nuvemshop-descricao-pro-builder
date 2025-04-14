@@ -13,10 +13,15 @@ interface UserRoleSelectorProps {
 const UserRoleSelector: React.FC<UserRoleSelectorProps> = ({ watch, setValue }) => {
   const currentRole = watch('role');
   
+  console.log('UserRoleSelector - currentRole:', currentRole);
+  
   return (
     <RadioGroup
       defaultValue={currentRole}
-      onValueChange={(value) => setValue('role', value)}
+      onValueChange={(value) => {
+        console.log('RadioGroup - value changed to:', value);
+        setValue('role', value);
+      }}
       className="space-y-3"
     >
       <div className="flex items-center space-x-2">
