@@ -57,6 +57,33 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     }
   };
 
+  const updateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          role: newRole,
+          atualizado_em: new Date().toISOString()
+        })
+        .eq('id', userId);
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Papel atualizado',
+        description: 'O papel do usuário foi atualizado com sucesso.',
+      });
+      
+      onRefresh();
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao atualizar papel',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const deleteUser = async (profileId: string) => {
     if (!window.confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
       return;
@@ -129,6 +156,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                         <UserEditForm 
                           profile={profile}
                           onUpdateProfile={updateUserProfile}
+                          onUpdateRole={updateUserRole}
                         />
                       </SheetContent>
                     </Sheet>

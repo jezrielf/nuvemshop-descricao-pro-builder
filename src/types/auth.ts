@@ -6,4 +6,5 @@ export type Profile = {
   criado_em: string;
   atualizado_em: string;
   role: string | string[] | null; // Updated to support an array of roles
+  email?: string | null; // Added email property
 };

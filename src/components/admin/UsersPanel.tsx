@@ -30,7 +30,11 @@ const UsersPanel: React.FC = () => {
         (profile.nome && profile.nome.toLowerCase().includes(lowercasedSearch)) || 
         profile.id.toLowerCase().includes(lowercasedSearch) ||
         (profile.email && profile.email.toLowerCase().includes(lowercasedSearch)) ||
-        (profile.role && profile.role.toLowerCase().includes(lowercasedSearch))
+        (profile.role && (
+          typeof profile.role === 'string' 
+            ? profile.role.toLowerCase().includes(lowercasedSearch)
+            : profile.role.some(r => r.toLowerCase().includes(lowercasedSearch))
+        ))
       );
       setFilteredProfiles(filtered);
     }
