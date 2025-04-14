@@ -5,7 +5,7 @@ import { generateBlockHtml } from '@/utils/htmlGenerators';
 
 /**
  * Generates the complete HTML output for the product description
- * optimized for Nuvemshop compatibility
+ * without wrapper divs that can cause conflicts in Nuvemshop
  */
 export const generateCompleteHtml = (state: EditorState): string => {
   // Check if description exists and has blocks
@@ -25,9 +25,6 @@ export const generateCompleteHtml = (state: EditorState): string => {
   // Generate HTML for each block
   let blocksHtml = '';
   
-  // Add Nuvemshop-compatible CSS reset
-  blocksHtml += `<!-- Início da descrição gerada por Descrição Pro - Compatível com Nuvemshop -->\n`;
-  
   for (let i = 0; i < visibleBlocks.length; i++) {
     const block = visibleBlocks[i];
     try {
@@ -39,8 +36,8 @@ export const generateCompleteHtml = (state: EditorState): string => {
         ? 'margin-bottom: 0;' 
         : (i < visibleBlocks.length - 1 ? 'margin-bottom: 1.5rem;' : '');
       
-      // Add block HTML with Nuvemshop-compatible wrapper
-      blocksHtml += `<div style="${marginClass}" class="descricao-pro-block" data-block-id="${block.id}">\n`;
+      // Add block HTML with simplified wrapper
+      blocksHtml += `<div style="${marginClass}" id="product-block-${block.id}">\n`;
       blocksHtml += blockHtml + '\n';
       blocksHtml += '</div>\n';
     } catch (error) {
@@ -51,9 +48,8 @@ export const generateCompleteHtml = (state: EditorState): string => {
     }
   }
 
-  blocksHtml += `<!-- Fim da descrição gerada por Descrição Pro -->`;
+  console.log("HTML output gerado com " + visibleBlocks.length + " blocos visíveis");
   
-  console.log("HTML output gerado com " + visibleBlocks.length + " blocos visíveis - otimizado para Nuvemshop");
-  
+  // Return blocks HTML directly without the problematic wrapper
   return blocksHtml;
 }

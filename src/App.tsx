@@ -12,7 +12,6 @@ import Plans from "./pages/Plans";
 import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
-import NuvemshopCallback from "./pages/NuvemshopCallback";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -34,7 +33,6 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/success" element={<Success />} />
-            <Route path="/nuvemshop/callback" element={<NuvemshopCallback />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin-templates" element={<AdminTemplates />} />
             <Route path="/admin-auth" element={<AdminAuth />} />
