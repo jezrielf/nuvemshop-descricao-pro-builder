@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
@@ -50,22 +50,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
+  // Fix for infinite loop: Add dependency check to avoid updating state repeatedly
   useEffect(() => {
     if (profile?.role) {
+      console.log("Verificação de role:", profile.role);
+      
+      // Check if role is an array and use the first item, or use the role string directly
       const userRole = Array.isArray(profile.role) ? profile.role[0] : profile.role;
-      console.log("Role detectado:", userRole);
-      if (userRole === 'premium') {
+      
+      // Only update subscriptionTier if it's different from the current role
+      // This prevents the infinite loop of state updates
+      if (userRole === 'premium' && subscriptionTier !== 'premium') {
+        console.log("Atualizando tier para premium");
         setSubscriptionTier('premium');
-      } else if (userRole === 'admin') {
+      } else if (userRole === 'admin' && subscriptionTier !== 'admin') {
+        console.log("Atualizando tier para admin");
         setSubscriptionTier('admin');
-        console.log("Usuário é admin, configurando tier como admin");
       }
     }
-  }, [profile, setSubscriptionTier]);
+  }, [profile, setSubscriptionTier, subscriptionTier]);
 
   const isAdmin = () => {
     const hasAdminRole = hasRole(profile?.role, 'admin');
-    console.log("isAdmin check:", hasAdminRole, "profile:", profile);
     return hasAdminRole;
   };
 
