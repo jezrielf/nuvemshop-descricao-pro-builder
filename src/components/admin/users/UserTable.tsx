@@ -35,13 +35,20 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       // Ensure role is properly formatted for database
       const roleValue = values.role;
       
+      // TypeScript fix: Type the update object explicitly
+      const profileUpdate: {
+        nome: string;
+        role: string | string[];
+        atualizado_em: string;
+      } = {
+        nome: values.nome,
+        role: roleValue,
+        atualizado_em: new Date().toISOString()
+      };
+      
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          nome: values.nome,
-          role: roleValue,
-          atualizado_em: new Date().toISOString()
-        })
+        .update(profileUpdate)
         .eq('id', editingUser.id);
         
       if (error) throw error;
@@ -70,12 +77,18 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       // Ensure role is properly formatted for database
       const roleValue = newRole;
       
+      // TypeScript fix: Type the update object explicitly
+      const profileUpdate: {
+        role: string | string[];
+        atualizado_em: string;
+      } = {
+        role: roleValue,
+        atualizado_em: new Date().toISOString()
+      };
+      
       const { error } = await supabase
         .from('profiles')
-        .update({ 
-          role: roleValue,
-          atualizado_em: new Date().toISOString()
-        })
+        .update(profileUpdate)
         .eq('id', userId);
         
       if (error) {

@@ -52,12 +52,18 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
         ? values.role 
         : values.role;
         
+      // TypeScript fix: Type the update object explicitly
+      const profileUpdate: {
+        nome: string;
+        role: string | string[];
+      } = {
+        nome: values.nome,
+        role: roleValue
+      };
+      
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ 
-          nome: values.nome,
-          role: roleValue
-        })
+        .update(profileUpdate)
         .eq('id', authData.user.id);
       
       if (profileError) throw profileError;
