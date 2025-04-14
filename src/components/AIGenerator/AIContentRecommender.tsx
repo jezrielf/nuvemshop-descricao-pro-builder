@@ -6,7 +6,8 @@ import { Lightbulb, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProductDescription } from '@/types/editor';
 import { useEditorStore } from '@/store/editor';
-import { ColumnLayout } from '@/types/editor/base';
+import { BlockType, ColumnLayout } from '@/types/editor/base';
+import { v4 as uuidv4 } from 'uuid';
 
 interface AIContentRecommenderProps {
   description: ProductDescription | null;
@@ -16,7 +17,7 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<string[]>([]);
-  const { updateBlock } = useEditorStore();
+  const { addBlock, updateBlock } = useEditorStore();
   const { toast } = useToast();
 
   const generateRecommendations = async () => {
@@ -60,29 +61,79 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
   };
 
   const applyRecommendation = (recommendation: string) => {
-    // Basic implementation: Add a text block with the recommendation
-    const newBlock = {
-      id: Math.random().toString(36).substring(7),
-      type: 'text' as const, // Explicitly define as literal type
-      title: 'Recomendação IA',
-      columns: 1 as ColumnLayout, // Fixed: Explicitly type as ColumnLayout
-      visible: true,
-      content: `<p>${recommendation}</p>`
-    };
-
-    if (description) {
-      updateBlock(newBlock.id, newBlock);
-      toast({
-        title: "Recomendação aplicada",
-        description: "Um novo bloco de texto foi adicionado com a recomendação.",
-      });
-    } else {
+    // Fixed implementation: Add a text block with the recommendation
+    if (!description) {
       toast({
         title: "Erro ao aplicar recomendação",
         description: "Nenhuma descrição disponível para adicionar a recomendação.",
         variant: "destructive"
       });
+      return;
     }
+    
+    // Create a new block based on the recommendation content
+    const blockId = uuidv4();
+    
+    // Determine block type based on recommendation content
+    let blockType: BlockType = 'text';
+    let blockTitle = 'Recomendação IA';
+    let blockContent = recommendation;
+    
+    // Check content to determine if we should create a specialized block
+    if (recommendation.toLowerCase().includes('faq') || recommendation.toLowerCase().includes('perguntas')) {
+      blockType = 'faq';
+      blockTitle = 'Perguntas Frequentes';
+      // For FAQ blocks, we need to create a proper structure
+      addBlock({
+        id: blockId,
+        type: blockType,
+        title: blockTitle,
+        columns: 1 as ColumnLayout,
+        visible: true,
+        heading: 'Perguntas Frequentes',
+        questions: [
+          {
+            id: uuidv4(),
+            question: 'Qual é a garantia deste produto?',
+            answer: 'Oferecemos garantia de 12 meses para todos os nossos produtos.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Como funciona a entrega?',
+            answer: 'Enviamos para todo o Brasil via transportadoras e Correios.'
+          }
+        ]
+      });
+    } else {
+      // For standard text blocks
+      addBlock({
+        id: blockId,
+        type: blockType,
+        title: blockTitle,
+        columns: 1 as ColumnLayout,
+        visible: true,
+        heading: getHeadingFromRecommendation(recommendation),
+        content: `<p>${recommendation}</p>`
+      });
+    }
+
+    toast({
+      title: "Recomendação aplicada",
+      description: `Um novo bloco do tipo ${blockType} foi adicionado com a recomendação.`,
+    });
+    
+    // Close the dialog after applying
+    setOpen(false);
+  };
+  
+  // Helper function to generate a heading from the recommendation
+  const getHeadingFromRecommendation = (recommendation: string): string => {
+    // Extract first sentence or part of it as heading
+    const firstSentence = recommendation.split('.')[0];
+    if (firstSentence.length > 50) {
+      return firstSentence.substring(0, 50) + '...';
+    }
+    return firstSentence;
   };
 
   return (
@@ -113,9 +164,14 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
               {recommendations.length > 0 ? (
                 <ul className="list-disc pl-5 space-y-2">
                   {recommendations.map((rec, index) => (
-                    <li key={index} className="flex items-center justify-between">
-                      {rec}
-                      <Button variant="ghost" size="sm" onClick={() => applyRecommendation(rec)}>
+                    <li key={index} className="flex items-start justify-between group">
+                      <span className="mr-2">{rec}</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => applyRecommendation(rec)}
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                      >
                         Aplicar
                       </Button>
                     </li>

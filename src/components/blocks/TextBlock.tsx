@@ -26,7 +26,9 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
   
   // Handler para conteúdo gerado por IA
   const handleGeneratedContent = (content: string) => {
-    handleUpdateContent(content);
+    // Make sure the content has proper HTML formatting
+    const formattedContent = content.startsWith('<') ? content : `<p>${content}</p>`;
+    handleUpdateContent(formattedContent);
   };
 
   // Handler para título gerado por IA
