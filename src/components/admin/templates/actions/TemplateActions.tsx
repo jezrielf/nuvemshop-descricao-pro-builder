@@ -29,13 +29,13 @@ const TemplateActions: React.FC<TemplateActionsProps> = ({
   onAddBlock,
   onRemoveBlock
 }) => {
-  const { openNewTemplateDialog } = useDialogs();
+  const { toggleDialog } = useDialogs();
 
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold">Gerenciar Templates</h2>
-        <Button onClick={openNewTemplateDialog}>
+        <Button onClick={() => toggleDialog('isNewTemplateDialogOpen')}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Template
         </Button>
