@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
-export const NuvemshopCallback: React.FC = () => {
+const NuvemshopCallback: React.FC = () => {
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('Conectando à Nuvemshop...');
   const navigate = useNavigate();
@@ -19,7 +19,10 @@ export const NuvemshopCallback: React.FC = () => {
         const code = params.get('code');
         const state = params.get('state');
         
+        console.log('Processing Nuvemshop callback with code and state:', { code: !!code, state: !!state });
+        
         if (!code || !state) {
+          console.error('Missing required parameters');
           setStatus('error');
           setMessage('Parâmetros de autenticação inválidos.');
           return;
@@ -42,6 +45,7 @@ export const NuvemshopCallback: React.FC = () => {
           return;
         }
 
+        console.log('Nuvemshop auth successful:', data);
         setStatus('success');
         setMessage('Loja conectada com sucesso!');
         toast({

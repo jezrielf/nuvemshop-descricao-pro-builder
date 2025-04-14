@@ -10,6 +10,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface StoreSelectorProps {
   onSelect: (storeId: number) => void;
@@ -17,12 +18,23 @@ interface StoreSelectorProps {
 }
 
 export const StoreSelector: React.FC<StoreSelectorProps> = ({ onSelect, value }) => {
+  const { toast } = useToast();
   const { data: stores, isLoading, error } = useQuery({
     queryKey: ['nuvemshop-stores'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_nuvemshop_stores');
-      if (error) throw error;
-      return data || [];
+      try {
+        const { data, error } = await supabase.rpc('get_nuvemshop_stores');
+        if (error) throw error;
+        return data || [];
+      } catch (err) {
+        console.error('Error fetching stores:', err);
+        toast({
+          title: "Erro ao carregar lojas",
+          description: "Não foi possível carregar suas lojas Nuvemshop.",
+          variant: "destructive",
+        });
+        throw err;
+      }
     },
   });
 

@@ -16,12 +16,12 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NuvemshopCallback from "./components/nuvemshop/NuvemshopCallback";
 
-// Cria uma nova instância do QueryClient
+// Create a new QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1, // Reduz o número de retries para evitar ciclos
-      staleTime: 5 * 60 * 1000, // 5 minutos
+      retry: 1, // Reduce retry count to avoid cycles
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProductSelectorProps {
   storeId: number;
@@ -23,6 +23,8 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
   onSelect, 
   value 
 }) => {
+  const { toast } = useToast();
+  
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['nuvemshop-products', storeId],
     queryFn: async () => {
@@ -35,6 +37,11 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
         return data?.products || [];
       } catch (err) {
         console.error('Error fetching products:', err);
+        toast({
+          title: "Erro ao carregar produtos",
+          description: "Não foi possível carregar os produtos da loja selecionada.",
+          variant: "destructive",
+        });
         throw err;
       }
     },

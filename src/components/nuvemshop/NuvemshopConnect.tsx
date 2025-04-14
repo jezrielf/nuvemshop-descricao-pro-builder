@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Store } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Make sure this matches your actual Nuvemshop App ID
+// Define Nuvemshop App ID and required scopes
 const NUVEMSHOP_CLIENT_ID = "7437";
 const NUVEMSHOP_SCOPES = "products";
 
@@ -26,17 +26,26 @@ export const NuvemshopConnect: React.FC = () => {
     }
 
     try {
+      console.log('Initiating Nuvemshop connection for user:', user.id);
+      
       // Generate and save state for CSRF protection
       const state = uuidv4();
-      await supabase
+      const { error: stateError } = await supabase
         .from('nuvemshop_auth_states')
         .insert({ user_id: user.id, state });
+        
+      if (stateError) {
+        console.error('Error saving auth state:', stateError);
+        throw stateError;
+      }
 
       // Redirect to Nuvemshop OAuth page
       const url = new URL('https://www.tiendanube.com/apps/authorize/token');
       url.searchParams.append('client_id', NUVEMSHOP_CLIENT_ID);
       url.searchParams.append('state', state);
       url.searchParams.append('scope', NUVEMSHOP_SCOPES);
+      
+      console.log('Redirecting to Nuvemshop OAuth page:', url.toString());
       window.location.href = url.toString();
     } catch (error) {
       console.error('Error initiating Nuvemshop connection:', error);
