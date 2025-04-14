@@ -51,7 +51,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
         .from('profiles')
         .update({ 
           nome: values.nome,
-          role: values.role
+          role: values.role // This now correctly accepts string | string[]
         })
         .eq('id', authData.user.id);
       

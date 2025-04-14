@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 interface UserQuickActionsProps {
   profileId: string;
   currentRole: string | string[] | null;
-  onUpdateRole: (userId: string, newRole: string) => Promise<void>;
+  onUpdateRole: (userId: string, newRole: string | string[]) => Promise<void>;
 }
 
 const UserQuickActions: React.FC<UserQuickActionsProps> = ({ 
@@ -28,11 +28,11 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
         if (newRoles.length === 0) {
           newRoles.push('user');
         }
-        await onUpdateRole(profileId, newRoles.length === 1 ? newRoles[0] : JSON.stringify(newRoles));
+        await onUpdateRole(profileId, newRoles.length === 1 ? newRoles[0] : newRoles);
       } else if (!roles.includes(role)) {
         // Add the role to the current roles
         const newRoles = [...roles, role];
-        await onUpdateRole(profileId, newRoles.length === 1 ? newRoles[0] : JSON.stringify(newRoles));
+        await onUpdateRole(profileId, newRoles.length === 1 ? newRoles[0] : newRoles);
       }
     } catch (error) {
       console.error(`Erro ao alterar papel para ${role}:`, error);

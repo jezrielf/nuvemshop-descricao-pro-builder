@@ -12,7 +12,7 @@ import UserQuickActions from './UserQuickActions';
 interface UserEditFormProps {
   profile: Profile;
   onUpdateProfile: (values: UserFormValues) => Promise<void>;
-  onUpdateRole: (userId: string, newRole: string) => Promise<void>;
+  onUpdateRole: (userId: string, newRole: string | string[]) => Promise<void>;
 }
 
 const UserEditForm: React.FC<UserEditFormProps> = ({ 
@@ -31,7 +31,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
   const form = useForm<UserFormValues>({
     defaultValues: {
       nome: profile.nome || '',
-      role: primaryRole
+      role: profile.role || 'user'
     }
   });
 
@@ -69,7 +69,7 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
         <h3 className="text-sm font-medium mb-2">Mudança Rápida de Papel</h3>
         <UserQuickActions 
           profileId={profile.id}
-          currentRole={primaryRole}
+          currentRole={profile.role}
           onUpdateRole={onUpdateRole}
         />
       </div>

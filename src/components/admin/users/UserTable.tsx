@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Profile } from '@/types/auth';
 import { 
@@ -35,7 +36,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
         .from('profiles')
         .update({ 
           nome: values.nome,
-          role: values.role,
+          role: values.role, // This now correctly accepts string | string[]
           atualizado_em: new Date().toISOString()
         })
         .eq('id', editingUser.id);
@@ -59,9 +60,9 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: string) => {
+  const updateUserRole = async (userId: string, newRole: string | string[]) => {
     try {
-      console.log(`Atualizando papel do usuário ${userId} para ${newRole}`);
+      console.log(`Atualizando papel do usuário ${userId} para ${JSON.stringify(newRole)}`);
       
       const { error } = await supabase
         .from('profiles')
@@ -166,7 +167,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                           <UserEditForm 
                             profile={editingUser}
                             onUpdateProfile={updateUserProfile}
-                            onUpdateRole={updateUserRole}
+                            onUpdateRole={(userId, newRole) => updateUserRole(userId, newRole)}
                           />
                         )}
                       </SheetContent>
