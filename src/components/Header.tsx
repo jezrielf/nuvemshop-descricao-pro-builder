@@ -25,7 +25,7 @@ const Header: React.FC = () => {
   }, [auth, setAuthContext]);
   
   useEffect(() => {
-    // Load saved descriptions when component mounts
+    // Load saved descriptions when component mounts or subscription changes
     loadSavedDescriptions();
   }, [loadSavedDescriptions, subscriptionTier]);
   
