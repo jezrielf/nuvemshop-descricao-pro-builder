@@ -1,8 +1,9 @@
+
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { BadgeAlert, BadgeCheck, Crown, Settings, Plus, Save, Lock } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Settings, Plus, Save, Lock, ListTodo } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
@@ -113,7 +114,16 @@ const Header: React.FC = () => {
               canCreateMoreDescriptions={canCreateMoreDescriptions}
             />
             
-            {/* Adicione os novos botões aqui */}
+            {isPremiumUser && (
+              <SavedDescriptionsDialog 
+                isPremium={isPremium}
+                descriptionCount={descriptionCount}
+                savedDescriptions={savedDescriptions}
+              />
+            )}
+            
+            {description && <HtmlOutputDialog />}
+            
             <div className="flex items-center gap-2">
               {description && (isPremiumUser || isBusinessUser) && <SEOAnalyzer description={description} />}
               
