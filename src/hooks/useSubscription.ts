@@ -16,7 +16,8 @@ export const useSubscription = () => {
       
       if (error) {
         console.error('Erro ao verificar assinatura:', error);
-        return { subscribed: false, subscription_tier: 'free', subscription_end: null, error: error.message };
+        // Return a valid SubscriptionInfo object without the error property
+        return { subscribed: false, subscription_tier: 'free', subscription_end: null };
       }
       
       if (data && data.subscription_tier) {
@@ -34,7 +35,8 @@ export const useSubscription = () => {
       return { subscribed: false, subscription_tier: 'free', subscription_end: null };
     } catch (error: any) {
       console.error('Erro ao verificar assinatura:', error);
-      return { subscribed: false, subscription_tier: 'free', subscription_end: null, error: error.message };
+      // Return a valid SubscriptionInfo object without the error property
+      return { subscribed: false, subscription_tier: 'free', subscription_end: null };
     } finally {
       setIsLoading(false);
     }
