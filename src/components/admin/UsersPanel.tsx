@@ -57,9 +57,12 @@ const UsersPanel: React.FC = () => {
       
       if (authError) throw authError;
 
+      // Make sure authData and authData.users exist and is an array before using find()
+      const users = authData?.users || [];
+      
       // Merge profiles with auth data to get emails
       const mergedProfiles = profilesData.map(profile => {
-        const authUser = authData.users.find(user => user.id === profile.id);
+        const authUser = users.find(user => user && user.id === profile.id);
         return {
           ...profile,
           email: authUser?.email || null
