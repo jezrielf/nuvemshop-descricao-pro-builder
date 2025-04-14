@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
-import { Template, BlockType } from '@/types/editor';
+import React from 'react';
+import { Template } from '@/types/editor';
+import { BlockType } from '@/types/editor';
 import TemplateActions from './TemplateActions';
-import { DialogProvider } from '../dialogs/DialogProvider';
-import { useToast } from '@/hooks/use-toast';
+import DialogProvider from '../dialogs/DialogProvider';
 
 interface TemplateActionsProviderProps {
   editedTemplate: Template | null;
@@ -18,10 +18,7 @@ interface TemplateActionsProviderProps {
 }
 
 const TemplateActionsProvider: React.FC<TemplateActionsProviderProps> = (props) => {
-  // We don't need to use these variables if TemplateActions doesn't expect them
-  // Remove the state and function that aren't needed by TemplateActions
-  const { toast } = useToast();
-
+  // Wrap the TemplateActions component with the DialogProvider
   return (
     <DialogProvider>
       <TemplateActions {...props} />

@@ -19,6 +19,7 @@ export function useTemplates() {
 
   // Carregar templates quando o componente montar
   useEffect(() => {
+    console.log("Loading templates...");
     loadTemplates();
   }, [loadTemplates]);
 
@@ -56,6 +57,12 @@ export function useTemplates() {
     handleRemoveBlock
   } = useTemplateEditor();
 
+  // Add debug logs
+  useEffect(() => {
+    console.log("Templates loaded in useTemplates hook:", allTemplates.length);
+    console.log("Displayed templates:", displayedTemplates.length);
+  }, [allTemplates, displayedTemplates]);
+
   return {
     allTemplates,
     displayedTemplates,
@@ -72,7 +79,11 @@ export function useTemplates() {
     categories,
     currentPage,
     totalPages,
-    handleViewTemplate,
+    handleViewTemplate: (template: Template) => {
+      console.log("Viewing template:", template.name);
+      setSelectedTemplate(template);
+      return handleViewTemplate(template);
+    },
     handleCreateTemplate,
     handleDeleteTemplate,
     handleUpdateTemplate,

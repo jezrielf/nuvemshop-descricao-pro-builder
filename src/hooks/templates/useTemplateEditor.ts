@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
-import { Template, BlockType } from '@/types/editor';
-import { ProductCategory } from '@/types/editor';
+import { Template, Block, BlockType } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 import { createBlock } from '@/utils/blockCreators';
 
 export function useTemplateEditor() {
@@ -9,37 +9,40 @@ export function useTemplateEditor() {
   const [editedTemplate, setEditedTemplate] = useState<Template | null>(null);
   const [newTemplate, setNewTemplate] = useState<Partial<Template> | null>({
     name: '',
-    category: 'other' as ProductCategory,
+    category: 'supplements',
     blocks: []
   });
 
-  const handleAddBlock = useCallback((blockType: BlockType) => {
-    const block = createBlock(blockType, 1);
-    if (block) {
-      if (editedTemplate) {
-        setEditedTemplate({
-          ...editedTemplate,
-          blocks: [...editedTemplate.blocks, block]
-        });
-      } else if (newTemplate) {
-        setNewTemplate({
-          ...newTemplate,
-          blocks: [...(newTemplate.blocks || []), block]
-        });
-      }
+  const handleAddBlock = useCallback((type: BlockType) => {
+    if (editedTemplate) {
+      // Add block to edited template
+      const newBlock = createBlock(type);
+      setEditedTemplate({
+        ...editedTemplate,
+        blocks: [...editedTemplate.blocks, newBlock]
+      });
+    } else if (newTemplate) {
+      // Add block to new template
+      const newBlock = createBlock(type);
+      setNewTemplate({
+        ...newTemplate,
+        blocks: [...(newTemplate.blocks || []), newBlock]
+      });
     }
   }, [editedTemplate, newTemplate]);
 
   const handleRemoveBlock = useCallback((blockId: string) => {
     if (editedTemplate) {
+      // Remove block from edited template
       setEditedTemplate({
         ...editedTemplate,
         blocks: editedTemplate.blocks.filter(block => block.id !== blockId)
       });
-    } else if (newTemplate && newTemplate.blocks) {
+    } else if (newTemplate) {
+      // Remove block from new template
       setNewTemplate({
         ...newTemplate,
-        blocks: newTemplate.blocks.filter(block => block.id !== blockId)
+        blocks: (newTemplate.blocks || []).filter(block => block.id !== blockId)
       });
     }
   }, [editedTemplate, newTemplate]);

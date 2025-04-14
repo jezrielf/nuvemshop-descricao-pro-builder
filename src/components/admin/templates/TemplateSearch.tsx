@@ -1,16 +1,15 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Search, Filter } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ProductCategory } from '@/types/editor';
+import { Search } from 'lucide-react';
 import { CategorySelector } from './CategorySelector';
+import { ProductCategory } from '@/types/editor';
 
 interface TemplateSearchProps {
   searchTerm: string;
-  onSearchChange: (value: string) => void;
+  onSearchChange: (term: string) => void;
   selectedCategory: string | null;
-  onCategoryChange: (value: string | null) => void;
+  onCategoryChange: (category: string | null) => void;
   categories: string[];
   getCategoryName: (category: ProductCategory) => string;
 }
@@ -24,36 +23,22 @@ const TemplateSearch: React.FC<TemplateSearchProps> = ({
   getCategoryName
 }) => {
   return (
-    <div className="flex flex-col lg:flex-row gap-4 items-center">
-      <SearchInput 
-        searchTerm={searchTerm} 
-        onSearchChange={onSearchChange} 
-      />
+    <div className="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 mb-6">
+      <div className="relative w-full sm:w-64">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar template..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-8"
+        />
+      </div>
       
-      <CategorySelector 
+      <CategorySelector
         selectedCategory={selectedCategory}
         onCategoryChange={onCategoryChange}
-        categories={categories}
+        categories={categories || []}
         getCategoryName={getCategoryName}
-      />
-    </div>
-  );
-};
-
-interface SearchInputProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-}
-
-const SearchInput: React.FC<SearchInputProps> = ({ searchTerm, onSearchChange }) => {
-  return (
-    <div className="relative w-full lg:w-auto flex-1">
-      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-      <Input
-        placeholder="Buscar templates..."
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="pl-8"
       />
     </div>
   );

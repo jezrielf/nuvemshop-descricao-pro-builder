@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Template, ProductCategory } from '@/types/editor';
@@ -22,30 +23,47 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
   template,
   getCategoryName
 }) => {
-  if (!template) return null;
+  // Return early if template is null to prevent the error
+  if (!template) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Visualizar Template</DialogTitle>
-        </DialogHeader>
-        <div className="mt-4 max-h-[60vh] overflow-y-auto">
-          <div className="flex items-center gap-2 mb-4">
-            <h3 className="font-bold text-lg">{template.name}</h3>
+          <DialogTitle>Visualização do Template</DialogTitle>
+          <DialogDescription className="flex items-center gap-2">
+            <span>{template.name}</span>
             <Badge variant="outline">
               {getCategoryName(template.category)}
             </Badge>
-          </div>
-          <div className="space-y-4">
-            {template.blocks.map(block => (
-              <div key={block.id} className="border rounded p-4">
-                <h4 className="font-medium mb-2">{block.type}: {block.title}</h4>
-                <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">
-                  {JSON.stringify(block, null, 2)}
-                </pre>
-              </div>
-            ))}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="mt-4 space-y-4">
+          <div className="border rounded-md p-4">
+            <h3 className="font-medium mb-2">Estrutura de Blocos</h3>
+            <ul className="space-y-2">
+              {template.blocks.map((block, index) => (
+                <li key={block.id} className="flex items-center">
+                  <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">
+                    {index + 1}
+                  </span>
+                  <span className="font-medium">{block.type}</span>
+                  {block.title && (
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      {block.title}
+                    </span>
+                  )}
+                </li>
+              ))}
+              {template.blocks.length === 0 && (
+                <li className="text-muted-foreground">
+                  Este template não possui blocos.
+                </li>
+              )}
+            </ul>
           </div>
         </div>
       </DialogContent>
