@@ -56,14 +56,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("Verificação de role:", profile.role);
       
       // Check if role is an array and use the first item, or use the role string directly
-      const userRole = Array.isArray(profile.role) ? profile.role[0] : profile.role;
+      const roles = Array.isArray(profile.role) ? profile.role : [profile.role];
       
-      // Only update subscriptionTier if it's different from the current role
-      // This prevents the infinite loop of state updates
-      if (userRole === 'premium' && subscriptionTier !== 'premium') {
+      if (roles.includes('premium') && subscriptionTier !== 'premium') {
         console.log("Atualizando tier para premium");
         setSubscriptionTier('premium');
-      } else if (userRole === 'admin' && subscriptionTier !== 'admin') {
+      } else if (roles.includes('admin') && subscriptionTier !== 'admin') {
         console.log("Atualizando tier para admin");
         setSubscriptionTier('admin');
       }
@@ -71,8 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [profile, setSubscriptionTier, subscriptionTier]);
 
   const isAdmin = () => {
-    const hasAdminRole = hasRole(profile?.role, 'admin');
-    return hasAdminRole;
+    return hasRole(profile?.role, 'admin');
   };
 
   const isPremium = () => {

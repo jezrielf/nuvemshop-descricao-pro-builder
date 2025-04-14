@@ -4,8 +4,8 @@
  */
 
 /**
- * Get user roles as an array
- * @param role string or string[] representing user roles
+ * Get user roles as an array from either the profiles table or user_roles table
+ * @param role string or string[] representing user roles from profiles table
  * @returns array of roles
  */
 export const getRoles = (role: string | string[] | null): string[] => {
@@ -46,6 +46,15 @@ export const isAdmin = (role: string | string[] | null): boolean => {
  */
 export const isPremium = (role: string | string[] | null): boolean => {
   return hasRole(role, 'premium') || isAdmin(role); // Admin also has premium privileges
+};
+
+/**
+ * Check if a user has business role
+ * @param role string or string[] representing user roles
+ * @returns boolean indicating if the user is business
+ */
+export const isBusiness = (role: string | string[] | null): boolean => {
+  return hasRole(role, 'business');
 };
 
 /**
