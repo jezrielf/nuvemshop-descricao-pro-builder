@@ -48,12 +48,19 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   
   selectCategory: (category) => {
     set({ selectedCategory: category });
+    console.log('Categoria selecionada:', category); // Log para debug
   },
   
   getTemplatesByCategory: (category) => {
     const { templates } = get();
-    if (!category) return templates;
-    return templates.filter(template => template.category === category);
+    // Corrigido: Se category for null, retorna todos os templates
+    if (!category) {
+      console.log('Retornando todos os templates:', templates.length);
+      return templates;
+    }
+    const filteredTemplates = templates.filter(template => template.category === category);
+    console.log(`Retornando templates da categoria ${category}:`, filteredTemplates.length);
+    return filteredTemplates;
   },
   
   searchTemplates: (searchTerm, category) => {

@@ -10,11 +10,18 @@ import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType } from '@/types/editor';
 
 const TemplateSelector: React.FC = () => {
-  const { templates, categories, selectCategory, getTemplatesByCategory, selectedCategory } = useTemplateStore();
+  const { templates, categories, selectCategory, selectedCategory } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const { toast } = useToast();
   
+  // Aqui está a correção principal: obter todos os templates quando selectedCategory for null
+  const displayedTemplates = React.useMemo(() => {
+    return selectedCategory === null 
+      ? templates  // Exibir todos os templates quando nenhuma categoria estiver selecionada
+      : templates.filter(template => template.category === selectedCategory);
+  }, [templates, selectedCategory]);
+
   const handleSelectTemplate = (template: TemplateType) => {
     loadTemplate(template);
     setDialogOpen(false);
@@ -35,8 +42,6 @@ const TemplateSelector: React.FC = () => {
     other: 'Outros'
   };
   
-  const displayedTemplates = getTemplatesByCategory(selectedCategory);
-
   // Verifica se é um template avançado pelo ID
   const isAdvancedTemplate = (id: string) => id.startsWith('adv-');
   
@@ -62,6 +67,11 @@ const TemplateSelector: React.FC = () => {
         return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
     }
   };
+
+  // Adicionado log para depuração
+  console.log('Templates totais:', templates.length);
+  console.log('Templates exibidos:', displayedTemplates.length);
+  console.log('Categoria selecionada:', selectedCategory);
   
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -103,49 +113,55 @@ const TemplateSelector: React.FC = () => {
           
           <ScrollArea className="flex-1 pr-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {displayedTemplates.map((template) => (
-                <div
-                  key={template.id}
-                  className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
-                >
-                  <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
-                    {isAdvancedTemplate(template.id) ? (
-                      <img 
-                        src={getTemplateThumbnail(template)} 
-                        alt={template.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm">
-                        Preview do Template
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-4 flex flex-col flex-grow">
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-medium">{template.name}</h3>
-                      {isAdvancedTemplate(template.id) && (
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              {displayedTemplates.length > 0 ? (
+                displayedTemplates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                  >
+                    <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
+                      {isAdvancedTemplate(template.id) ? (
+                        <img 
+                          src={getTemplateThumbnail(template)} 
+                          alt={template.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-400 text-sm">
+                          Preview do Template
+                        </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 mb-3">
-                      {categoryNames[template.category]}
-                    </p>
-                    <div className="text-xs text-gray-500 mb-4">
-                      {template.blocks.length} blocos
-                    </div>
-                    <div className="mt-auto">
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleSelectTemplate(template)}
-                      >
-                        Usar este template
-                      </Button>
+                    <div className="p-4 flex flex-col flex-grow">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-medium">{template.name}</h3>
+                        {isAdvancedTemplate(template.id) && (
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1 mb-3">
+                        {categoryNames[template.category] || template.category}
+                      </p>
+                      <div className="text-xs text-gray-500 mb-4">
+                        {template.blocks.length} blocos
+                      </div>
+                      <div className="mt-auto">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => handleSelectTemplate(template)}
+                        >
+                          Usar este template
+                        </Button>
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-8">
+                  <p className="text-muted-foreground">Nenhum template encontrado.</p>
                 </div>
-              ))}
+              )}
             </div>
           </ScrollArea>
         </div>
