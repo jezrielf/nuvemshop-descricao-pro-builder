@@ -13,6 +13,12 @@ export interface AuthContextProps {
   hasRole: (role: string) => boolean;
   isAdmin: () => boolean;
   isPremium: () => boolean;
+  isBusiness: () => boolean;
+  isSubscribed: () => boolean;
+  subscriptionTier: string;
+  subscriptionEnd: string | null;
+  refreshSubscription: () => Promise<void>;
+  openCustomerPortal: () => Promise<void>;
   descriptionCount: number;
   incrementDescriptionCount: () => void;
   canCreateMoreDescriptions: () => boolean;

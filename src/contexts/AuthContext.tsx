@@ -1,9 +1,10 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { authService } from '@/services/authService';
 import { useAuthProvider } from '@/hooks/useAuthProvider';
 import { hasRole, isAdmin, isPremium } from '@/utils/roleUtils';
 import { AuthContextProps } from '@/types/authContext';
+import { subscriptionService } from '@/services/subscriptionService';
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -15,7 +16,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading, 
     descriptionCount, 
     setLoading, 
-    setDescriptionCount, 
+    setDescriptionCount,
+    subscriptionTier,
+    setSubscriptionTier,
+    subscriptionEnd,
+    setSubscriptionEnd,
     toast, 
     navigate 
   } = useAuthProvider();
@@ -29,7 +34,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const checkIsPremium = (): boolean => {
-    return isPremium(profile?.role);
+    // Check both role and subscription
+    return isPremium(profile?.role) || subscriptionTier === 'premium' || subscriptionTier === 'business';
+  };
+
+  const checkIsBusiness = (): boolean => {
+    // Check if user has business/enterprise plan
+    return subscriptionTier === 'business';
+  };
+
+  const checkIsSubscribed = (): boolean => {
+    // Check if user has any paid plan
+    return subscriptionTier === 'premium' || subscriptionTier === 'business';
   };
 
   const incrementDescriptionCount = () => {
@@ -45,8 +61,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const canCreateMoreDescriptions = () => {
-    if (checkIsPremium()) return true; // Premium users have unlimited descriptions
+    if (checkIsSubscribed()) return true; // Paid users have unlimited descriptions
     return descriptionCount < 3; // Free users can create up to 3 descriptions
+  };
+
+  const refreshSubscription = async () => {
+    if (!user) return;
+    
+    try {
+      const subInfo = await subscriptionService.checkSubscription();
+      setSubscriptionTier(subInfo.subscription_tier);
+      setSubscriptionEnd(subInfo.subscription_end);
+    } catch (error) {
+      console.error('Failed to refresh subscription info:', error);
+    }
+  };
+
+  // Check subscription status on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      refreshSubscription();
+    } else {
+      // Reset to free tier when logged out
+      setSubscriptionTier('free');
+      setSubscriptionEnd(null);
+    }
+  }, [user]);
+
+  const openCustomerPortal = async () => {
+    try {
+      setLoading(true);
+      const url = await subscriptionService.openCustomerPortal();
+      window.location.href = url;
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao abrir portal',
+        description: error.message || 'Não foi possível abrir o portal de gerenciamento',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signIn = async (email: string, password: string) => {
@@ -134,6 +189,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasRole: checkHasRole,
         isAdmin: checkIsAdmin,
         isPremium: checkIsPremium,
+        isBusiness: checkIsBusiness,
+        isSubscribed: checkIsSubscribed,
+        subscriptionTier,
+        subscriptionEnd,
+        refreshSubscription,
+        openCustomerPortal,
         descriptionCount,
         incrementDescriptionCount,
         canCreateMoreDescriptions,

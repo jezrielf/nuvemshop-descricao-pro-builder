@@ -12,6 +12,8 @@ export const useAuthProvider = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [descriptionCount, setDescriptionCount] = useState(0);
+  const [subscriptionTier, setSubscriptionTier] = useState<string>('free');
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -88,8 +90,12 @@ export const useAuthProvider = () => {
     profile,
     loading,
     descriptionCount,
+    subscriptionTier,
+    subscriptionEnd,
     setLoading,
     setDescriptionCount,
+    setSubscriptionTier,
+    setSubscriptionEnd,
     fetchProfile,
     toast,
     navigate

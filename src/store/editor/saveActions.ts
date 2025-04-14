@@ -27,7 +27,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           return false;
         }
         
-        // Check if user is premium or has saved less than 3 descriptions
+        // Check if user is premium/business or has saved less than 3 descriptions
         if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
           return false;
         }
@@ -76,6 +76,12 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         // Check if auth context is available
         if (!authContext) {
           console.warn('Auth context not available for loading descriptions');
+          return;
+        }
+        
+        // Only premium/business users can load saved descriptions
+        if (!authContext.isPremium()) {
+          set({ savedDescriptions: [] });
           return;
         }
         
