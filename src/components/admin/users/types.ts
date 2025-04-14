@@ -9,7 +9,7 @@ export interface UserTableProps {
 
 export interface UserFormValues {
   nome: string;
-  role: string;
+  role: string | string[];
 }
 
 export interface CreateUserFormValues extends UserFormValues {
