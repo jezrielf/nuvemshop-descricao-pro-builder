@@ -110,7 +110,7 @@ export const useAuthSession = () => {
       }
       setSession(data.session);
       setUser(data.user);
-      setProfileFetched(false);
+      profileFetchedRef.current = false;
       await fetchProfile(data.user.id);
       toast({
         title: "Login realizado com sucesso!",
@@ -166,7 +166,7 @@ export const useAuthSession = () => {
       setSession(null);
       setUser(null);
       setProfile(null);
-      setProfileFetched(false);
+      profileFetchedRef.current = false;
       toast({
         title: "Logout realizado com sucesso!",
         description: "Você foi desconectado(a) com segurança.",
