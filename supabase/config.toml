@@ -1,17 +1,28 @@
 
+# A string used to distinguish different Supabase projects on the same host. Defaults to the project ID.
 project_id = "zeiodratpawnnbgnflvi"
 
 [api]
 enabled = true
 port = 54321
-schemas = []
-extra_search_path = ["extensions"]
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
 [db]
 port = 54322
 shadow_port = 54320
 major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[realtime]
+enabled = true
 
 [studio]
 enabled = true
@@ -21,6 +32,8 @@ api_url = "http://localhost"
 [inbucket]
 enabled = true
 port = 54324
+smtp_port = 54325
+pop3_port = 54326
 
 [storage]
 enabled = true
@@ -37,21 +50,12 @@ enable_signup = true
 
 [auth.email]
 enable_signup = true
-double_confirm_changes = true
 enable_confirmations = false
-
-[auth.external.apple]
-enabled = false
-client_id = ""
-secret = ""
-scopes = ""
-
-[auth.external.github]
-enabled = false
-client_id = ""
-secret = ""
-redirect_uri = ""
-scopes = ""
+template_create_user = """
+<h2>Welcome to our Application</h2>
+<p>You can log in using the following code:</p>
+<p>{{ .Token }}</p>
+"""
 
 [analytics]
 enabled = false
@@ -59,15 +63,20 @@ port = 54327
 vector_port = 54328
 backend = "postgres"
 
-# Enable functions to run the Edge Functions we've added
-[functions]
-allowed_imports = ["https://esm.sh/stripe@14.21.0"]
-
-[functions.create-checkout]
-verify_jwt = true
+[experimental]
+# Enable the postgres_v2 module (beta)
+postgres_capabilities_v2 = false
+# Enable edge functions (don't need this, since we're already working with edge functions)
+functions_v2 = true
 
 [functions.check-subscription]
 verify_jwt = true
 
+[functions.create-checkout]
+verify_jwt = true
+
 [functions.customer-portal]
+verify_jwt = true
+
+[functions.manage-plans]
 verify_jwt = true

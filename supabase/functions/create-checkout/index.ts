@@ -54,38 +54,25 @@ serve(async (req) => {
       logStep("Found existing Stripe customer", { customerId });
     }
 
-    // Get plan ID from request body
+    // Get product ID from request body
     const { planId } = await req.json();
     if (!planId) throw new Error("No plan ID provided");
     logStep("Plan ID found", { planId });
 
-    // Map plan IDs to Stripe prices (using hardcoded values for now)
-    // In a real app, you would store these in a database
-    let priceId;
-    let planName;
+    // Retrieve the product to get its default price
+    const product = await stripe.products.retrieve(planId, {
+      expand: ['default_price']
+    });
     
-    switch (planId) {
-      case 'premium-plan':
-        priceId = 'price_premium'; // Replace with your actual Stripe price ID
-        planName = 'Premium';
-        break;
-      case 'business-plan':
-        priceId = 'price_business'; // Replace with your actual Stripe price ID
-        planName = 'Empresarial';
-        break;
-      default:
-        throw new Error(`Invalid plan ID: ${planId}`);
+    if (!product.default_price) {
+      throw new Error("Product has no default price");
     }
     
-    // For demo purposes - using test price if actual price IDs not set
-    // You should replace this with your actual price IDs from Stripe
-    if (priceId === 'price_premium') {
-      priceId = 'price_1OtKmDLlcPBEICFiJEzgbh7H'; // Example test price ID
-    } else if (priceId === 'price_business') {
-      priceId = 'price_1OtKmTLlcPBEICFibCahnQ1V'; // Example test price ID
-    }
+    const priceId = typeof product.default_price === 'string' 
+      ? product.default_price 
+      : product.default_price.id;
     
-    logStep("Price ID determined", { priceId, planName });
+    logStep("Price ID determined", { priceId, productName: product.name });
 
     // Create a Checkout Session
     const session = await stripe.checkout.sessions.create({

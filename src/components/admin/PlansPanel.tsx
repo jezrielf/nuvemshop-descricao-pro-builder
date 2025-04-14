@@ -8,12 +8,11 @@ import PlanDetailsDialog from './plans/PlanDetailsDialog';
 import DeletePlanDialog from './plans/DeletePlanDialog';
 import PlanFormDialog from './plans/PlanFormDialog';
 import { Plan } from './plans/types';
-import { mockPlans } from './plans/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const PlansPanel: React.FC = () => {
-  const [plans, setPlans] = useState<Plan[]>(mockPlans);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -22,35 +21,50 @@ const PlansPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  // Uncomment and implement this when you have a real plans API
-  // const fetchPlans = async () => {
-  //   try {
-  //     setLoading(true);
-  //     // Here you would call your API to get the plans from Stripe
-  //     // const { data, error } = await supabase.functions.invoke('get-plans');
-  //     // if (error) throw error;
-  //     // setPlans(data);
-  //     
-  //     // For now, we'll just use the mock data
-  //     setPlans([...mockPlans]);
-  //     toast({
-  //       title: "Planos atualizados",
-  //       description: "Lista de planos atualizada com sucesso.",
-  //     });
-  //   } catch (error: any) {
-  //     toast({
-  //       title: "Erro ao carregar planos",
-  //       description: error.message,
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const fetchPlans = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.functions.invoke('manage-plans', {
+        body: { method: 'GET', action: 'list-products' }
+      });
+      
+      if (error) throw error;
+      
+      // Transform Stripe products into our Plan format
+      const stripePlans: Plan[] = data.products.map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        features: product.features.map((feature: string, index: number) => ({
+          id: `feature-${index}`,
+          name: feature.split(':')[0],
+          included: feature.split(':')[1] === 'true'
+        })),
+        isActive: product.isActive,
+        isDefault: product.isDefault,
+        priceId: product.priceId
+      }));
+      
+      setPlans(stripePlans);
+      toast({
+        title: "Planos atualizados",
+        description: "Lista de planos atualizada com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar planos",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.error("Error fetching plans:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
-  // useEffect(() => {
-  //   fetchPlans();
-  // }, []);
+  useEffect(() => {
+    fetchPlans();
+  }, []);
 
   const handleViewPlan = (plan: Plan) => {
     setSelectedPlan(plan);
@@ -72,14 +86,16 @@ const PlansPanel: React.FC = () => {
     
     try {
       setLoading(true);
+      const { error } = await supabase.functions.invoke('manage-plans', {
+        body: { 
+          method: 'POST', 
+          action: 'delete-product',
+          data: { id: selectedPlan.id }
+        }
+      });
       
-      // In a real app, this would call an API to delete the plan in Stripe
-      // const { error } = await supabase.functions.invoke('delete-plan', {
-      //   body: { planId: selectedPlan.id }
-      // });
-      // if (error) throw error;
+      if (error) throw error;
       
-      // For now, we'll just remove it from our state
       setPlans(plans.filter(p => p.id !== selectedPlan.id));
       setIsDeleteDialogOpen(false);
 
@@ -102,20 +118,44 @@ const PlansPanel: React.FC = () => {
     try {
       setLoading(true);
       
-      // In a real app, this would call an API to create the plan in Stripe
-      // const { data, error } = await supabase.functions.invoke('create-plan', {
-      //   body: newPlan
-      // });
-      // if (error) throw error;
-      // const createdPlan = data;
+      // Transform features for Stripe format
+      const stripeFeatures = newPlan.features.map(feature => 
+        `${feature.name}:${feature.included ? 'true' : 'false'}`
+      );
       
-      // For now, we'll just add it to our state with a mock ID
-      const planWithId: Plan = {
-        ...newPlan,
-        id: `plan-${Date.now()}`, // Generate a unique ID
+      const { data, error } = await supabase.functions.invoke('manage-plans', {
+        body: { 
+          method: 'POST', 
+          action: 'create-product',
+          data: {
+            name: newPlan.name,
+            description: `Plano ${newPlan.name}`,
+            price: newPlan.price,
+            features: stripeFeatures,
+            isActive: newPlan.isActive,
+            isDefault: newPlan.isDefault
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      const createdPlan = data.product;
+      const formattedPlan: Plan = {
+        id: createdPlan.id,
+        name: createdPlan.name,
+        price: createdPlan.price,
+        features: createdPlan.features.map((feature: string, index: number) => ({
+          id: `feature-${index}`,
+          name: feature.split(':')[0],
+          included: feature.split(':')[1] === 'true'
+        })),
+        isActive: createdPlan.isActive,
+        isDefault: createdPlan.isDefault,
+        priceId: createdPlan.priceId
       };
 
-      setPlans([...plans, planWithId]);
+      setPlans([...plans, formattedPlan]);
       setIsCreateDialogOpen(false);
 
       toast({
@@ -137,13 +177,31 @@ const PlansPanel: React.FC = () => {
     try {
       setLoading(true);
       
-      // In a real app, this would call an API to update the plan in Stripe
-      // const { data, error } = await supabase.functions.invoke('update-plan', {
-      //   body: updatedPlan
-      // });
-      // if (error) throw error;
+      // Transform features for Stripe format
+      const stripeFeatures = updatedPlan.features.map(feature => 
+        `${feature.name}:${feature.included ? 'true' : 'false'}`
+      );
       
-      // For now, we'll just update it in our state
+      const { error } = await supabase.functions.invoke('manage-plans', {
+        body: { 
+          method: 'POST', 
+          action: 'update-product',
+          data: {
+            id: updatedPlan.id,
+            name: updatedPlan.name,
+            description: `Plano ${updatedPlan.name}`,
+            price: updatedPlan.price,
+            features: stripeFeatures,
+            isActive: updatedPlan.isActive,
+            isDefault: updatedPlan.isDefault,
+            priceId: updatedPlan.priceId
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Update locally
       setPlans(plans.map(p => p.id === updatedPlan.id ? updatedPlan : p));
       setIsEditDialogOpen(false);
 
@@ -162,22 +220,6 @@ const PlansPanel: React.FC = () => {
     }
   };
 
-  const refreshPlans = () => {
-    setLoading(true);
-    // In a real app, this would call fetchPlans()
-    
-    // For now, we'll just simulate a refresh
-    setTimeout(() => {
-      setPlans([...mockPlans]);
-      setLoading(false);
-      
-      toast({
-        title: "Planos atualizados",
-        description: "Lista de planos atualizada com sucesso.",
-      });
-    }, 1000);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -187,7 +229,7 @@ const PlansPanel: React.FC = () => {
             <Plus className="mr-2 h-4 w-4" />
             Novo Plano
           </Button>
-          <Button variant="outline" onClick={refreshPlans} disabled={loading}>
+          <Button variant="outline" onClick={fetchPlans} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
@@ -224,7 +266,7 @@ const PlansPanel: React.FC = () => {
         onOpenChange={setIsEditDialogOpen}
         onSubmit={(data) => {
           if (selectedPlan) {
-            handleUpdatePlan({ ...data, id: selectedPlan.id });
+            handleUpdatePlan({ ...data, id: selectedPlan.id, priceId: selectedPlan.priceId });
           }
         }}
         title="Editar Plano"

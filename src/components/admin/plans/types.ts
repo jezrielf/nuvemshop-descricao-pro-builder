@@ -12,4 +12,5 @@ export interface Plan {
   features: PlanFeature[];
   isActive: boolean;
   isDefault: boolean;
+  priceId?: string;
 }

@@ -77,6 +77,7 @@ serve(async (req) => {
       customer: customerId,
       status: "active",
       limit: 1,
+      expand: ['data.items.data.price.product']
     });
     const hasActiveSub = subscriptions.data.length > 0;
     let subscriptionTier = 'free';
@@ -87,18 +88,35 @@ serve(async (req) => {
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
       
-      // Determine subscription tier from price
-      const priceId = subscription.items.data[0].price.id;
+      // Get the product associated with the subscription
+      const price = subscription.items.data[0].price;
+      const product = price.product;
       
-      // Map price IDs to subscription tiers
-      // Update these IDs with your actual Stripe price IDs
-      if (priceId === 'price_1OtKmDLlcPBEICFiJEzgbh7H') { // Example price ID for Premium
-        subscriptionTier = 'premium';
-      } else if (priceId === 'price_1OtKmTLlcPBEICFibCahnQ1V') { // Example price ID for Business
-        subscriptionTier = 'business';
+      if (typeof product !== 'string') {
+        // Get the product name as subscription tier
+        subscriptionTier = product.name.toLowerCase();
+        logStep("Determined subscription tier", { subscriptionTier });
+      } else {
+        // Fallback if product was not expanded
+        logStep("Product not expanded, using price ID to determine tier");
+        const priceId = price.id;
+        
+        // Fallback mapping if needed
+        if (priceId === 'price_1OtKmDLlcPBEICFiJEzgbh7H') {
+          subscriptionTier = 'premium';
+        } else if (priceId === 'price_1OtKmTLlcPBEICFibCahnQ1V') {
+          subscriptionTier = 'business';
+        } else {
+          // Try to get the product details
+          const priceDetails = await stripe.prices.retrieve(priceId, {
+            expand: ['product']
+          });
+          
+          if (priceDetails.product && typeof priceDetails.product !== 'string') {
+            subscriptionTier = priceDetails.product.name.toLowerCase();
+          }
+        }
       }
-      
-      logStep("Determined subscription tier", { priceId, subscriptionTier });
     } else {
       logStep("No active subscription found");
     }
