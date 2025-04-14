@@ -8,8 +8,13 @@ interface UserRoleBadgeProps {
 }
 
 const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
-  const getRoleBadge = () => {
-    switch (role) {
+  // Get the primary role for display
+  const primaryRole = role ? 
+    (Array.isArray(role) ? role[0] : role) : 
+    'user';
+
+  const getRoleBadge = (roleType: string) => {
+    switch (roleType.toLowerCase()) {
       case 'admin':
         return (
           <Badge variant="default" className="flex items-center gap-1">
@@ -28,13 +33,13 @@ const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
         return (
           <Badge variant="outline" className="flex items-center gap-1">
             <User className="w-3 h-3" />
-            Usuário
+            User
           </Badge>
         );
     }
   };
   
-  return getRoleBadge();
+  return getRoleBadge(primaryRole);
 };
 
 export default UserRoleBadge;

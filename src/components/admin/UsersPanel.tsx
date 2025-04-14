@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -45,41 +46,28 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      // Fetch profiles from the profiles table
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('criado_em', { ascending: false });
 
       if (profilesError) throw profilesError;
-
-      // Get auth users data to get their emails
-      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
       
-      if (authError) throw authError;
-
-      // Make sure authData and authData.users exist and is an array before using find()
-      const users = authData?.users || [];
+      console.log('Profiles fetched (total):', profilesData.length);
       
-      // Merge profiles with auth data to get emails
-      const mergedProfiles = profilesData.map(profile => {
-        const authUser = users.find(user => user && user.id === profile.id);
-        return {
-          ...profile,
-          email: authUser?.email || null
-        };
-      });
+      // Instead of using admin API, enrich profiles with email data from other sources if needed
+      // For example, if email is stored in another table or in profile metadata
       
-      console.log('Perfis obtidos (total):', mergedProfiles.length);
-      
-      setProfiles(mergedProfiles);
-      setFilteredProfiles(mergedProfiles);
+      setProfiles(profilesData);
+      setFilteredProfiles(profilesData);
     } catch (error: any) {
-      console.error('Erro ao buscar perfis:', error);
-      setError(error.message);
+      console.error('Error fetching profiles:', error);
+      setError(error.message || 'User not allowed');
       
       toast({
-        title: 'Erro ao carregar perfis',
-        description: error.message,
+        title: 'Error loading users',
+        description: error.message || 'Permission denied',
         variant: 'destructive',
       });
     } finally {
@@ -90,13 +78,13 @@ const UsersPanel: React.FC = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="text-xl font-semibold">Gerenciar Usuários</h2>
+        <h2 className="text-xl font-semibold">Manage Users</h2>
         
         <div className="flex w-full sm:w-auto gap-2">
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Buscar usuários..."
+              placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 w-full sm:w-[300px]"
@@ -115,18 +103,20 @@ const UsersPanel: React.FC = () => {
       </div>
       
       {error && (
-        <div className="border border-red-200 bg-red-50 text-red-700 p-4 rounded-md mb-4">
-          <p className="font-medium">Erro ao carregar usuários</p>
-          <p className="text-sm">{error}</p>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={fetchProfiles}
-            className="mt-2"
-          >
-            Tentar novamente
-          </Button>
-        </div>
+        <Alert variant="destructive" className="mb-4">
+          <AlertTitle>Error loading users</AlertTitle>
+          <AlertDescription>
+            <p>{error}</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={fetchProfiles}
+              className="mt-2"
+            >
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
       
       <div className="border rounded-lg overflow-hidden">
@@ -152,7 +142,7 @@ const UsersPanel: React.FC = () => {
       </div>
       
       <div className="mt-4 text-sm text-gray-500">
-        Total de usuários: {profiles.length}
+        Total users: {profiles.length}
       </div>
     </div>
   );

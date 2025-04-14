@@ -42,15 +42,15 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       if (error) throw error;
       
       toast({
-        title: 'Perfil atualizado',
-        description: 'Os dados do usuário foram atualizados com sucesso.',
+        title: 'Profile updated',
+        description: 'User data has been updated successfully.',
       });
       
       setEditingUser(null);
       onRefresh();
     } catch (error: any) {
       toast({
-        title: 'Erro ao atualizar perfil',
+        title: 'Error updating profile',
         description: error.message,
         variant: 'destructive',
       });
@@ -70,14 +70,14 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       if (error) throw error;
       
       toast({
-        title: 'Papel atualizado',
-        description: 'O papel do usuário foi atualizado com sucesso.',
+        title: 'Role updated',
+        description: 'User role has been updated successfully.',
       });
       
       onRefresh();
     } catch (error: any) {
       toast({
-        title: 'Erro ao atualizar papel',
+        title: 'Error updating role',
         description: error.message,
         variant: 'destructive',
       });
@@ -85,7 +85,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
   };
 
   const deleteUser = async (profileId: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       return;
     }
 
@@ -98,14 +98,14 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       if (error) throw error;
       
       toast({
-        title: 'Usuário excluído',
-        description: 'O usuário foi excluído com sucesso.',
+        title: 'User deleted',
+        description: 'The user has been deleted successfully.',
       });
       
       onRefresh();
     } catch (error: any) {
       toast({
-        title: 'Erro ao excluir usuário',
+        title: 'Error deleting user',
         description: error.message,
         variant: 'destructive',
       });
@@ -113,27 +113,27 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
   };
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return <p>Loading...</p>;
   }
 
   return (
     <>
       <Table>
-        <TableCaption>Lista de todos os usuários registrados no sistema</TableCaption>
+        <TableCaption>List of all registered users in the system</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Nome</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Papel</TableHead>
-            <TableHead>Data de Criação</TableHead>
-            <TableHead>Ações</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Registration Date</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {profiles.length > 0 ? (
             profiles.map((profile) => (
               <TableRow key={profile.id}>
-                <TableCell className="font-medium">{profile.nome || 'Sem nome'}</TableCell>
+                <TableCell className="font-medium">{profile.nome || 'No name'}</TableCell>
                 <TableCell>{profile.email || 'N/A'}</TableCell>
                 <TableCell>
                   <UserRoleBadge role={profile.role} />
@@ -143,13 +143,13 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                   <div className="flex space-x-2">
                     <Sheet>
                       <SheetTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Editar</Button>
+                        <Button variant="outline" size="sm" onClick={() => openEditSheet(profile)}>Edit</Button>
                       </SheetTrigger>
                       <SheetContent className="sm:max-w-md">
                         <SheetHeader>
-                          <SheetTitle>Editar Usuário</SheetTitle>
+                          <SheetTitle>Edit User</SheetTitle>
                           <SheetDescription>
-                            Altere as informações do usuário {profile.nome || 'Sem nome'}
+                            Edit information for user {profile.nome || 'No name'}
                           </SheetDescription>
                         </SheetHeader>
                         
@@ -166,7 +166,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
                       size="sm"
                       onClick={() => deleteUser(profile.id)}
                     >
-                      Excluir
+                      Delete
                     </Button>
                   </div>
                 </TableCell>
@@ -175,7 +175,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                Nenhum usuário encontrado
+                No users found
               </TableCell>
             </TableRow>
           )}
