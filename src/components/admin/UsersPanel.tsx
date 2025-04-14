@@ -1,16 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import UserTable from './users';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, RefreshCw, Plus } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import CreateUserForm from './users/CreateUserForm';
+import UserPanelHeader from './users/panels/UserPanelHeader';
+import UserPanelContent from './users/panels/UserPanelContent';
 
 interface AuthUser {
   id: string;
@@ -118,86 +111,22 @@ const UsersPanel: React.FC = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="text-xl font-semibold">Gerenciar Usuários</h2>
-        
-        <div className="flex w-full sm:w-auto gap-2">
-          <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Buscar usuários..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 w-full sm:w-[300px]"
-            />
-          </div>
-          
-          <Sheet open={isCreateUserSheetOpen} onOpenChange={setIsCreateUserSheetOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="sm:max-w-md">
-              <SheetHeader>
-                <SheetTitle>Criar Novo Usuário</SheetTitle>
-                <SheetDescription>
-                  Adicione um novo usuário ao sistema
-                </SheetDescription>
-              </SheetHeader>
-              <CreateUserForm onUserCreated={handleCreateUser} />
-            </SheetContent>
-          </Sheet>
-          
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={fetchProfiles}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-      </div>
+      <UserPanelHeader
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onRefresh={fetchProfiles}
+        loading={loading}
+        isCreateUserSheetOpen={isCreateUserSheetOpen}
+        setIsCreateUserSheetOpen={setIsCreateUserSheetOpen}
+        handleCreateUser={handleCreateUser}
+      />
       
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertTitle>Erro ao carregar usuários</AlertTitle>
-          <AlertDescription>
-            <p>{error}</p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={fetchProfiles}
-              className="mt-2"
-            >
-              Tentar novamente
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      <div className="border rounded-lg overflow-hidden">
-        {loading ? (
-          <div className="p-6 space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <UserTable 
-            profiles={filteredProfiles} 
-            loading={loading}
-            onRefresh={fetchProfiles}
-          />
-        )}
-      </div>
+      <UserPanelContent
+        loading={loading}
+        error={error}
+        profiles={filteredProfiles}
+        onRefresh={fetchProfiles}
+      />
       
       <div className="mt-4 text-sm text-gray-500">
         Total de usuários: {profiles.length}
