@@ -39,7 +39,7 @@ export const usePlanActions = (
       setLoading(true);
       console.log("Deleting plan:", selectedPlan.id);
       
-      const { error } = await supabase.functions.invoke('manage-plans', {
+      const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { 
           method: 'POST', 
           action: 'delete-product',
@@ -47,7 +47,15 @@ export const usePlanActions = (
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Stripe API error:", error);
+        throw new Error(error.message || "Failed to delete plan");
+      }
+      
+      if (data && !data.success) {
+        console.error("Delete plan error:", data.error);
+        throw new Error(data.error || "Failed to delete plan");
+      }
       
       // Update local state
       setPlans(plans.filter(p => p.id !== selectedPlan.id));
@@ -64,7 +72,7 @@ export const usePlanActions = (
       console.error("Error deleting plan:", error);
       toast({
         title: "Erro ao excluir plano",
-        description: error.message,
+        description: error.message || "Houve um erro ao excluir o plano.",
         variant: "destructive",
       });
     } finally {
@@ -97,7 +105,15 @@ export const usePlanActions = (
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Stripe API error:", error);
+        throw new Error(error.message || "Failed to create plan");
+      }
+      
+      if (data && !data.success) {
+        console.error("Create plan error:", data.error);
+        throw new Error(data.error || "Failed to create plan");
+      }
       
       const createdPlan = data.product;
       const formattedPlan: Plan = {
@@ -129,7 +145,7 @@ export const usePlanActions = (
       console.error("Error creating plan:", error);
       toast({
         title: "Erro ao criar plano",
-        description: error.message,
+        description: error.message || "Houve um erro ao criar o plano.",
         variant: "destructive",
       });
     } finally {
@@ -147,7 +163,7 @@ export const usePlanActions = (
         `${feature.name}:${feature.included ? 'true' : 'false'}`
       );
       
-      const { error } = await supabase.functions.invoke('manage-plans', {
+      const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { 
           method: 'POST', 
           action: 'update-product',
@@ -164,7 +180,15 @@ export const usePlanActions = (
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Stripe API error:", error);
+        throw new Error(error.message || "Failed to update plan");
+      }
+      
+      if (data && !data.success) {
+        console.error("Update plan error:", data.error);
+        throw new Error(data.error || "Failed to update plan");
+      }
       
       // Update locally
       setPlans(plans.map(p => p.id === updatedPlan.id ? updatedPlan : p));
@@ -181,7 +205,7 @@ export const usePlanActions = (
       console.error("Error updating plan:", error);
       toast({
         title: "Erro ao atualizar plano",
-        description: error.message,
+        description: error.message || "Houve um erro ao atualizar o plano.",
         variant: "destructive",
       });
     } finally {

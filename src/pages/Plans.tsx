@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Check, CircleX, Loader2, RefreshCw, Lock } from 'lucide-react';
+import { Check, CircleX, Loader2, RefreshCw, Lock, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { subscriptionService } from '@/services/subscriptionService';
 import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface StripePlan {
   id: string;
@@ -25,6 +26,7 @@ const Plans: React.FC = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [plans, setPlans] = useState<StripePlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -32,13 +34,28 @@ const Plans: React.FC = () => {
   const fetchPlans = useCallback(async () => {
     try {
       setPlansLoading(true);
+      setLoadError(null);
       console.log("Fetching plans for public display...");
       
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { method: 'GET', action: 'list-products' }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Stripe API error:", error);
+        throw new Error(error.message || "Erro ao carregar planos");
+      }
+      
+      if (data && !data.success) {
+        console.error("Fetch plans error:", data.error);
+        throw new Error(data.error || "Erro ao carregar planos");
+      }
+      
+      if (!data.products) {
+        console.log("No plans data returned");
+        setPlans([]);
+        return;
+      }
       
       // Only show active plans
       const activePlans = data.products
@@ -49,11 +66,13 @@ const Plans: React.FC = () => {
       setPlans(activePlans);
     } catch (error: any) {
       console.error("Error fetching plans:", error);
+      setLoadError(error.message || "Erro ao carregar planos");
       toast({
         title: 'Erro ao carregar planos',
-        description: error.message,
+        description: error.message || "Não foi possível carregar os planos disponíveis.",
         variant: 'destructive',
       });
+      setPlans([]);
     } finally {
       setPlansLoading(false);
     }
@@ -85,7 +104,7 @@ const Plans: React.FC = () => {
     } catch (error: any) {
       toast({
         title: 'Erro ao processar assinatura',
-        description: error.message,
+        description: error.message || "Não foi possível iniciar o processo de assinatura.",
         variant: 'destructive',
       });
     } finally {
@@ -109,7 +128,7 @@ const Plans: React.FC = () => {
     } catch (error: any) {
       toast({
         title: 'Erro ao abrir portal de assinatura',
-        description: error.message,
+        description: error.message || "Não foi possível abrir o portal de gerenciamento.",
         variant: 'destructive',
       });
     } finally {
@@ -158,10 +177,19 @@ const Plans: React.FC = () => {
           </p>
         </div>
         <Button variant="outline" onClick={handleRefreshPlans} size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Atualizar
         </Button>
       </div>
+      
+      {loadError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {loadError}. Tente atualizar a página ou tente novamente mais tarde.
+          </AlertDescription>
+        </Alert>
+      )}
       
       {/* Current Subscription Info */}
       {user && (
@@ -196,94 +224,107 @@ const Plans: React.FC = () => {
         </div>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {plans.map((plan) => {
-          // Determine if this is the user's current plan
-          const isPlanActive = plan.price === 0 
-            ? !isSubscribed() 
-            : subscriptionTier?.toLowerCase() === plan.name.toLowerCase();
-          
-          // Parse the features from the Stripe format
-          const planFeatures = plan.features.map(feature => {
-            const [name, included] = feature.split(':');
-            return { name, included: included === 'true' };
-          });
+      {plans.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {plans.map((plan) => {
+            // Determine if this is the user's current plan
+            const isPlanActive = plan.price === 0 
+              ? !isSubscribed() 
+              : subscriptionTier?.toLowerCase() === plan.name.toLowerCase();
+            
+            // Parse the features from the Stripe format
+            const planFeatures = plan.features.map(feature => {
+              const [name, included] = feature.split(':');
+              return { name, included: included === 'true' };
+            });
 
-          // Get plan description
-          const planDescription = getPlanDescription(plan.name);
-          
-          return (
-            <Card 
-              key={plan.id}
-              className={`flex flex-col ${isPlanActive ? 'border-primary border-2' : ''}`}
-            >
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  {plan.name}
-                  {isPlanActive && (
-                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
-                      Plano Atual
-                    </span>
-                  )}
-                </CardTitle>
-                <CardDescription className="mt-2">
-                  {planDescription}
-                </CardDescription>
-                <div className="text-2xl font-bold mt-3">
-                  {formatPrice(plan.price)}
-                  {plan.price > 0 && <span className="text-sm font-normal text-muted-foreground"> /mês</span>}
-                </div>
-              </CardHeader>
-              
-              <CardContent className="flex-grow">
-                <ul className="space-y-3">
-                  {planFeatures.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      {feature.included ? (
-                        <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                      ) : (
-                        <CircleX className="h-5 w-5 text-gray-300 mr-2 flex-shrink-0" />
-                      )}
-                      <span className={feature.included ? '' : 'text-muted-foreground'}>
-                        {feature.name}
-                        {!feature.included && plan.price === 0 && (
-                          <Lock className="h-3 w-3 inline ml-1 text-yellow-500" />
-                        )}
+            // Get plan description
+            const planDescription = getPlanDescription(plan.name);
+            
+            return (
+              <Card 
+                key={plan.id}
+                className={`flex flex-col ${isPlanActive ? 'border-primary border-2' : ''}`}
+              >
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    {plan.name}
+                    {isPlanActive && (
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
+                        Plano Atual
                       </span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              
-              <CardFooter className="pt-4">
-                {plan.price === 0 ? (
-                  <Button variant="outline" className="w-full" disabled>
-                    Plano Gratuito
-                  </Button>
-                ) : (
-                  <Button 
-                    variant={isPlanActive ? "outline" : "default"}
-                    className="w-full" 
-                    disabled={loading === plan.id || isPlanActive}
-                    onClick={() => handleSubscribe(plan.id)}
-                  >
-                    {loading === plan.id ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processando...
-                      </>
-                    ) : isPlanActive ? (
-                      'Plano Atual'
-                    ) : (
-                      'Assinar'
                     )}
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
+                  </CardTitle>
+                  <CardDescription className="mt-2">
+                    {planDescription}
+                  </CardDescription>
+                  <div className="text-2xl font-bold mt-3">
+                    {formatPrice(plan.price)}
+                    {plan.price > 0 && <span className="text-sm font-normal text-muted-foreground"> /mês</span>}
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="flex-grow">
+                  <ul className="space-y-3">
+                    {planFeatures.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        {feature.included ? (
+                          <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                        ) : (
+                          <CircleX className="h-5 w-5 text-gray-300 mr-2 flex-shrink-0" />
+                        )}
+                        <span className={feature.included ? '' : 'text-muted-foreground'}>
+                          {feature.name}
+                          {!feature.included && plan.price === 0 && (
+                            <Lock className="h-3 w-3 inline ml-1 text-yellow-500" />
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                
+                <CardFooter className="pt-4">
+                  {plan.price === 0 ? (
+                    <Button variant="outline" className="w-full" disabled>
+                      Plano Gratuito
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant={isPlanActive ? "outline" : "default"}
+                      className="w-full" 
+                      disabled={loading === plan.id || isPlanActive}
+                      onClick={() => handleSubscribe(plan.id)}
+                    >
+                      {loading === plan.id ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processando...
+                        </>
+                      ) : isPlanActive ? (
+                        'Plano Atual'
+                      ) : (
+                        'Assinar'
+                      )}
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
+      ) : !loadError ? (
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold mb-4">Nenhum plano disponível no momento</h3>
+          <p className="text-muted-foreground mb-6">
+            Não encontramos planos disponíveis. Tente novamente mais tarde.
+          </p>
+          <Button variant="outline" onClick={handleRefreshPlans}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar Novamente
+          </Button>
+        </div>
+      ) : null}
       
       {!user && (
         <div className="mt-10 text-center">

@@ -79,5 +79,5 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.manage-plans]
-verify_jwt = true
+verify_jwt = false
 
