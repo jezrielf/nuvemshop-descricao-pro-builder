@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plan } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -9,9 +9,11 @@ export const usePlansData = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     try {
       setLoading(true);
+      console.log("Fetching plans from Stripe...");
+      
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { method: 'GET', action: 'list-products' }
       });
@@ -33,26 +35,27 @@ export const usePlansData = () => {
         priceId: product.priceId
       }));
       
+      console.log("Plans fetched successfully:", stripePlans.length);
       setPlans(stripePlans);
       toast({
         title: "Planos atualizados",
         description: "Lista de planos atualizada com sucesso.",
       });
     } catch (error: any) {
+      console.error("Error fetching plans:", error);
       toast({
         title: "Erro ao carregar planos",
         description: error.message,
         variant: "destructive",
       });
-      console.error("Error fetching plans:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchPlans();
-  }, []);
+  }, [fetchPlans]);
 
   return {
     plans,

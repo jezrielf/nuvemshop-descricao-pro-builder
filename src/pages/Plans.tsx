@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Check, CircleX, Loader2 } from 'lucide-react';
+import { Check, CircleX, Loader2, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { subscriptionService } from '@/services/subscriptionService';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,36 +29,39 @@ const Plans: React.FC = () => {
   const { toast } = useToast();
   
   // Fetch plans from Stripe
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        setPlansLoading(true);
-        const { data, error } = await supabase.functions.invoke('manage-plans', {
-          body: { method: 'GET', action: 'list-products' }
-        });
-        
-        if (error) throw error;
-        
-        // Only show active plans
-        const activePlans = data.products
-          .filter((product: StripePlan) => product.isActive)
-          .sort((a: StripePlan, b: StripePlan) => a.price - b.price);
-        
-        setPlans(activePlans);
-      } catch (error: any) {
-        console.error("Error fetching plans:", error);
-        toast({
-          title: 'Erro ao carregar planos',
-          description: error.message,
-          variant: 'destructive',
-        });
-      } finally {
-        setPlansLoading(false);
-      }
-    };
-    
-    fetchPlans();
+  const fetchPlans = useCallback(async () => {
+    try {
+      setPlansLoading(true);
+      console.log("Fetching plans for public display...");
+      
+      const { data, error } = await supabase.functions.invoke('manage-plans', {
+        body: { method: 'GET', action: 'list-products' }
+      });
+      
+      if (error) throw error;
+      
+      // Only show active plans
+      const activePlans = data.products
+        .filter((product: StripePlan) => product.isActive)
+        .sort((a: StripePlan, b: StripePlan) => a.price - b.price);
+      
+      console.log("Retrieved active plans:", activePlans.length);
+      setPlans(activePlans);
+    } catch (error: any) {
+      console.error("Error fetching plans:", error);
+      toast({
+        title: 'Erro ao carregar planos',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setPlansLoading(false);
+    }
   }, [toast]);
+  
+  useEffect(() => {
+    fetchPlans();
+  }, [fetchPlans]);
   
   const formatPrice = (price: number) => {
     if (price === 0) return 'Grátis';
@@ -114,6 +117,13 @@ const Plans: React.FC = () => {
     }
   };
 
+  const handleRefreshPlans = () => {
+    fetchPlans();
+    if (user) {
+      refreshSubscription();
+    }
+  };
+
   if (plansLoading) {
     return (
       <div className="container mx-auto py-8 px-4 flex justify-center items-center min-h-[50vh]">
@@ -127,10 +137,18 @@ const Plans: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-2 text-center">Planos de Assinatura</h1>
-      <p className="text-center text-muted-foreground mb-12">
-        Escolha o plano ideal para suas necessidades
-      </p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-center">Planos de Assinatura</h1>
+          <p className="text-center text-muted-foreground">
+            Escolha o plano ideal para suas necessidades
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleRefreshPlans} size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Atualizar
+        </Button>
+      </div>
       
       {/* Current Subscription Info */}
       {user && (

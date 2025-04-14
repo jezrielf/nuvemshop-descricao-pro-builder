@@ -1,10 +1,15 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Plan } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.SetStateAction<Plan[]>>, setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+export const usePlanActions = (
+  plans: Plan[], 
+  setPlans: React.Dispatch<React.SetStateAction<Plan[]>>, 
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  fetchPlans: () => Promise<void>
+) => {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -32,6 +37,8 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
     
     try {
       setLoading(true);
+      console.log("Deleting plan:", selectedPlan.id);
+      
       const { error } = await supabase.functions.invoke('manage-plans', {
         body: { 
           method: 'POST', 
@@ -42,6 +49,7 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
       
       if (error) throw error;
       
+      // Update local state
       setPlans(plans.filter(p => p.id !== selectedPlan.id));
       setIsDeleteDialogOpen(false);
 
@@ -49,7 +57,11 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
         title: "Plano excluído",
         description: `O plano ${selectedPlan.name} foi excluído com sucesso.`,
       });
+      
+      // Fetch fresh data from Stripe
+      await fetchPlans();
     } catch (error: any) {
+      console.error("Error deleting plan:", error);
       toast({
         title: "Erro ao excluir plano",
         description: error.message,
@@ -60,9 +72,10 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
     }
   };
 
-  const handleCreatePlan = async (newPlan: Omit<Plan, 'id'>) => {
+  const handleCreatePlan = useCallback(async (newPlan: Omit<Plan, 'id'>) => {
     try {
       setLoading(true);
+      console.log("Creating new plan:", newPlan.name);
       
       // Transform features for Stripe format
       const stripeFeatures = newPlan.features.map(feature => 
@@ -101,6 +114,7 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
         priceId: createdPlan.priceId
       };
 
+      // Update local state
       setPlans([...plans, formattedPlan]);
       setIsCreateDialogOpen(false);
 
@@ -108,7 +122,11 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
         title: "Plano criado",
         description: `O plano ${newPlan.name} foi criado com sucesso.`,
       });
+      
+      // Fetch fresh data from Stripe
+      await fetchPlans();
     } catch (error: any) {
+      console.error("Error creating plan:", error);
       toast({
         title: "Erro ao criar plano",
         description: error.message,
@@ -117,11 +135,12 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchPlans, plans, setIsCreateDialogOpen, setLoading, setPlans, toast]);
 
-  const handleUpdatePlan = async (updatedPlan: Plan) => {
+  const handleUpdatePlan = useCallback(async (updatedPlan: Plan) => {
     try {
       setLoading(true);
+      console.log("Updating plan:", updatedPlan.id);
       
       // Transform features for Stripe format
       const stripeFeatures = updatedPlan.features.map(feature => 
@@ -155,7 +174,11 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
         title: "Plano atualizado",
         description: `O plano ${updatedPlan.name} foi atualizado com sucesso.`,
       });
+      
+      // Fetch fresh data from Stripe
+      await fetchPlans();
     } catch (error: any) {
+      console.error("Error updating plan:", error);
       toast({
         title: "Erro ao atualizar plano",
         description: error.message,
@@ -164,7 +187,7 @@ export const usePlanActions = (plans: Plan[], setPlans: React.Dispatch<React.Set
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchPlans, plans, setIsEditDialogOpen, setLoading, setPlans, toast]);
 
   return {
     selectedPlan,

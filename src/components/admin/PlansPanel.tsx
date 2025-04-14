@@ -25,7 +25,7 @@ const PlansPanel: React.FC = () => {
     handleDeleteConfirm,
     handleCreatePlan,
     handleUpdatePlan
-  } = usePlanActions(plans, setPlans, setLoading);
+  } = usePlanActions(plans, setPlans, setLoading, fetchPlans);
 
   return (
     <div className="space-y-6">
