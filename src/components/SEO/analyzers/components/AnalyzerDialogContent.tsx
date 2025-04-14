@@ -46,4 +46,3 @@ export const AnalyzerDialogContent: React.FC<AnalyzerDialogContentProps> = ({
     </div>
   );
 };
-

@@ -12,7 +12,7 @@ export const RecommendationsList: React.FC<RecommendationsListProps> = ({ recomm
   return (
     <div>
       <h3 className="text-base font-medium mb-1.5">Recomendações</h3>
-      <ScrollArea className="h-[200px]">
+      <ScrollArea className="h-[150px]">
         <ul className="space-y-1.5 pr-2">
           {recommendations.map((rec, index) => (
             <li key={index} className="flex items-start gap-1.5">
