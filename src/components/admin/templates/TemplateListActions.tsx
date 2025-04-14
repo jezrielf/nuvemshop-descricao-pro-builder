@@ -23,12 +23,30 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({
     return null;
   }
 
+  const handleView = () => {
+    if (template && template.id) {
+      onView(template);
+    }
+  };
+
+  const handleEdit = () => {
+    if (template && template.id) {
+      onEdit(template);
+    }
+  };
+
+  const handleDelete = () => {
+    if (template && template.id) {
+      onDelete(template);
+    }
+  };
+
   return (
     <div className="flex justify-end space-x-2">
       <Button 
         variant="outline" 
         size="sm"
-        onClick={() => onView(template)}
+        onClick={handleView}
         title="Visualizar"
       >
         <Eye className="h-4 w-4" />
@@ -36,7 +54,7 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({
       <Button 
         variant="outline" 
         size="sm"
-        onClick={() => onEdit(template)}
+        onClick={handleEdit}
         title="Editar"
       >
         <Edit className="h-4 w-4" />
@@ -44,7 +62,7 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({
       <Button 
         variant="outline" 
         size="sm"
-        onClick={() => onDelete(template)}
+        onClick={handleDelete}
         title="Excluir"
       >
         <Trash className="h-4 w-4" />

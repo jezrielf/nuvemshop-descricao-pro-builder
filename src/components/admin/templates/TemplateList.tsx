@@ -40,6 +40,8 @@ const TemplateList: React.FC<TemplateListProps> = ({
     template.category
   );
   
+  console.log("TemplateList - Templates válidos:", safeTemplates.length);
+  
   return (
     <Table>
       <TableCaption>Lista de todos os templates disponíveis no sistema</TableCaption>

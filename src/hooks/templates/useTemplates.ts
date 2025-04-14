@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Template } from '@/types/editor';
 import { useTemplateStore } from './useTemplateStore';
 import { useTemplateFilters } from './useTemplateFilters';
@@ -16,11 +16,17 @@ export function useTemplates() {
   } = useTemplateStore();
   
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  
+  // Usar useRef para controlar se a carga já aconteceu
+  const templatesLoaded = useRef(false);
 
-  // Carregar templates quando o componente montar
+  // Carregar templates apenas uma vez quando o componente montar
   useEffect(() => {
-    console.log("Loading templates...");
-    loadTemplates();
+    if (!templatesLoaded.current) {
+      console.log("Loading templates...");
+      loadTemplates();
+      templatesLoaded.current = true;
+    }
   }, [loadTemplates]);
 
   // Use specialized hooks for different functionalities
@@ -38,7 +44,7 @@ export function useTemplates() {
   } = useTemplateFilters(allTemplates);
 
   const {
-    handleViewTemplate,
+    handleViewTemplate: storeViewTemplate,
     handleCreateTemplate,
     handleDeleteTemplate,
     handleUpdateTemplate
@@ -69,16 +75,16 @@ export function useTemplates() {
     }
   }, [allTemplates, displayedTemplates]);
 
-  const viewTemplate = useCallback((template: Template) => {
-    if (!template || !template.name) {
+  const handleViewTemplate = useCallback((template: Template) => {
+    if (!template || !template.id || !template.name) {
       console.error("Tentativa de visualizar template inválido:", template);
-      return null;
+      return;
     }
     
     console.log("Viewing template:", template.name);
     setSelectedTemplate(template);
-    return handleViewTemplate(template);
-  }, [handleViewTemplate]);
+    return storeViewTemplate(template);
+  }, [storeViewTemplate]);
 
   return {
     allTemplates,
@@ -96,7 +102,7 @@ export function useTemplates() {
     categories,
     currentPage,
     totalPages,
-    handleViewTemplate: viewTemplate,
+    handleViewTemplate,
     handleCreateTemplate,
     handleDeleteTemplate,
     handleUpdateTemplate,
