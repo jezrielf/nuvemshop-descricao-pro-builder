@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
   const auth = useAuth();
-  const { isPremium, isBusiness, descriptionCount, canCreateMoreDescriptions, subscriptionTier } = auth;
+  const { isPremium, isBusiness, isSubscribed, descriptionCount, canCreateMoreDescriptions, subscriptionTier } = auth;
   
   // Set auth context in the store when component mounts
   useEffect(() => {
@@ -77,7 +77,9 @@ const Header: React.FC = () => {
           
           <SaveDescriptionButton 
             isPremium={isPremium}
+            isSubscribed={isSubscribed}
             hasDescription={!!description}
+            canCreateMoreDescriptions={canCreateMoreDescriptions}
           />
           
           {isPremium() && (
