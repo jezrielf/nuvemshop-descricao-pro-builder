@@ -32,7 +32,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     if (!editingUser) return;
     
     try {
-      // Atualizar o perfil do usuário com os novos valores
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -65,7 +64,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       console.log(`Atualizando papel do usuário ${userId} para ${newRole}`);
       
-      // Atualizar o papel do usuário
       const { error } = await supabase
         .from('profiles')
         .update({ 
