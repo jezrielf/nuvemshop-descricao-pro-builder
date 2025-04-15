@@ -15,12 +15,6 @@ export const useAuthSession = () => {
 
   // Memoize fetchProfile to prevent recreating this function on each render
   const fetchProfile = useCallback(async (userId: string) => {
-    // Skip if we've already fetched the profile for this session to prevent loops
-    if (profileFetchedRef.current) {
-      console.log('Profile already fetched, skipping');
-      return;
-    }
-    
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
@@ -41,6 +35,14 @@ export const useAuthSession = () => {
       console.error('Erro ao buscar perfil:', error);
     }
   }, []);
+  
+  const refreshProfile = useCallback(async () => {
+    if (user) {
+      profileFetchedRef.current = false;
+      return fetchProfile(user.id);
+    }
+    return Promise.resolve();
+  }, [user, fetchProfile]);
 
   useEffect(() => {
     // Reset profileFetchedRef when component unmounts
@@ -191,6 +193,7 @@ export const useAuthSession = () => {
     signUp,
     signOut,
     fetchProfile,
+    refreshProfile,
     setProfile
   };
 };

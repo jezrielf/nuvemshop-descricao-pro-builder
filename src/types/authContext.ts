@@ -23,4 +23,5 @@ export interface AuthContextProps {
   descriptionCount: number;
   incrementDescriptionCount: () => void;
   canCreateMoreDescriptions: () => boolean;
+  refreshProfile: () => Promise<void>;
 }

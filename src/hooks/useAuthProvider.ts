@@ -67,6 +67,7 @@ export const useAuthProvider = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user ID:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -78,10 +79,18 @@ export const useAuthProvider = () => {
         return;
       }
 
+      console.log('Profile data received:', data);
       setProfile(data as Profile);
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
     }
+  };
+  
+  const refreshProfile = async () => {
+    if (user) {
+      return fetchProfile(user.id);
+    }
+    return Promise.resolve();
   };
 
   return {
@@ -97,6 +106,7 @@ export const useAuthProvider = () => {
     setSubscriptionTier,
     setSubscriptionEnd,
     fetchProfile,
+    refreshProfile,
     toast,
     navigate
   };

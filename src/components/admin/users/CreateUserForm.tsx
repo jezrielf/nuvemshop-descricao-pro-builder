@@ -6,9 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { CreateUserFormValues } from './types';
 import CreateUserRoleSelector from './CreateUserRoleSelector';
+import { authService } from '@/services/authService';
 
 interface CreateUserFormProps {
   onUserCreated: () => void;
@@ -30,52 +30,46 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
     try {
       setLoading(true);
       
-      // 1. Criar o usuário na autenticação
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: values.email,
-        password: values.password,
-        email_confirm: true,
-        user_metadata: {
-          nome: values.nome
+      // Prepare role data
+      const roleValue = Array.isArray(values.role) 
+        ? values.role 
+        : [values.role];
+      
+      // Create the user with admin privileges
+      const { data: userData, error: createError } = await authService.adminCreateUser(
+        values.email,
+        values.password,
+        {
+          nome: values.nome,
+          role: roleValue
         }
-      });
+      );
       
-      if (authError) throw authError;
+      if (createError) throw createError;
       
-      if (!authData.user) {
+      if (!userData?.user) {
         throw new Error('Falha ao criar usuário. Nenhum usuário retornado.');
       }
       
-      // 2. Atualizar o perfil com o papel (role) especificado
-      // Convert role to string if it's an array
-      const roleValue = Array.isArray(values.role) 
-        ? values.role.join(',') // Convert array to comma-separated string
-        : values.role;
-        
-      // TypeScript fix: Type the update object explicitly and use roleValue as string
-      const profileUpdate: {
-        nome: string;
-        role: string;
-        atualizado_em: string;
-      } = {
-        nome: values.nome,
-        role: roleValue,
-        atualizado_em: new Date().toISOString()
-      };
+      // Update the user's profile with role
+      const { error: updateError } = await authService.updateUserRole(
+        userData.user.id,
+        roleValue
+      );
       
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update(profileUpdate)
-        .eq('id', authData.user.id);
+      if (updateError) throw updateError;
       
-      if (profileError) throw profileError;
+      toast({
+        title: 'Usuário criado com sucesso',
+        description: `O usuário ${values.nome} foi criado com o email ${values.email}`,
+      });
       
       onUserCreated();
     } catch (error: any) {
       console.error('Erro ao criar usuário:', error);
       toast({
         title: 'Erro ao criar usuário',
-        description: error.message,
+        description: error.message || 'Ocorreu um erro ao criar o usuário',
         variant: 'destructive',
       });
     } finally {
