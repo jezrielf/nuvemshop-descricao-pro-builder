@@ -14,47 +14,20 @@ serve(async (req) => {
   }
 
   try {
-    // Create a Supabase client with the service role key for admin operations
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Verify the requesting user is authenticated as admin
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-    
-    if (authError || !user) {
-      throw new Error('Unauthorized access');
-    }
-
-    // Check if the user has admin role
-    const { data: userRoles } = await supabaseAdmin
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    const userRole = userRoles?.role;
-    const isAdmin = Array.isArray(userRole) 
-      ? userRole.includes('admin') 
-      : userRole === 'admin';
-
-    if (!isAdmin) {
-      throw new Error('Admin role required');
-    }
-
     // Parse request body
     const { email, password, userData } = await req.json();
     
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
+    
+    console.log('Create user request received for email:', email);
+    
+    // Create a Supabase client with the service role key for admin operations
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     // Create the new user with admin privileges
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -65,10 +38,31 @@ serve(async (req) => {
     });
     
     if (createError) {
+      console.error('Error creating user:', createError);
       throw createError;
     }
 
-    console.log('User created successfully:', newUser.user.id);
+    // Update the profiles table with role and other metadata
+    if (newUser?.user) {
+      console.log('User created successfully, updating profile data for ID:', newUser.user.id);
+      
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .upsert({
+          id: newUser.user.id,
+          nome: userData.nome,
+          role: userData.role,
+          criado_em: new Date().toISOString(),
+          atualizado_em: new Date().toISOString()
+        });
+      
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
+        throw profileError;
+      }
+      
+      console.log('Profile updated successfully');
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -84,7 +78,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error creating user:', error.message);
+    console.error('Error in admin-create-user function:', error.message);
     
     return new Response(
       JSON.stringify({

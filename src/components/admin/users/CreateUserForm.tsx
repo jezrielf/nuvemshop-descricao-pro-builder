@@ -29,6 +29,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
   const handleSubmit = async (values: CreateUserFormValues) => {
     try {
       setLoading(true);
+      console.log('Creating user with values:', values);
       
       // Prepare user data
       const userData = {
@@ -36,24 +37,28 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
         role: values.role
       };
       
-      // Create the user with admin privileges using Edge Function
-      const { data: userData1, error: createError } = await authService.adminCreateUser(
+      // Create the user using the admin edge function
+      const { data, error } = await authService.adminCreateUser(
         values.email,
         values.password,
         userData
       );
       
-      if (createError) {
-        throw new Error(createError.message || 'Failed to create user');
+      if (error) {
+        console.error('Error response from adminCreateUser:', error);
+        throw new Error(error.message || 'Failed to create user');
       }
       
-      if (!userData1?.user) {
+      if (!data?.user) {
+        console.error('No user returned from adminCreateUser');
         throw new Error('User creation failed. No user returned.');
       }
       
+      console.log('User created successfully:', data.user);
+      
       toast({
-        title: 'User created successfully',
-        description: `User ${values.nome} was created with email ${values.email}`,
+        title: 'Usuário criado com sucesso',
+        description: `Usuário ${values.nome} foi criado com email ${values.email}`,
       });
       
       onUserCreated();
@@ -61,8 +66,8 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
-        title: 'Error creating user',
-        description: error.message || 'An error occurred while creating the user',
+        title: 'Erro ao criar usuário',
+        description: error.message || 'Ocorreu um erro ao criar o usuário',
         variant: 'destructive',
       });
     } finally {

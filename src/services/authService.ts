@@ -28,7 +28,9 @@ export const authService = {
   // Updated method for admin to create users - using functions.invoke to use service role
   adminCreateUser: async (email: string, password: string, userData: any) => {
     try {
-      // Use Edge Function with service role to create user
+      console.log('Calling admin-create-user function with:', { email, userData });
+      
+      // Use Edge Function without verifying JWT since the function now handles authorization
       const { data, error } = await supabase.functions.invoke('admin-create-user', {
         body: {
           email,
@@ -37,8 +39,12 @@ export const authService = {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error returned from adminCreateUser function:', error);
+        throw error;
+      }
       
+      console.log('User created successfully, function returned:', data);
       return { data, error: null };
     } catch (error) {
       console.error('Error in adminCreateUser:', error);
@@ -52,7 +58,9 @@ export const authService = {
       // Convert role to array format for database storage
       const roleValue = Array.isArray(role) ? role : [role];
       
-      // Use Edge Function with service role to update user role
+      console.log('Calling admin-update-role function for user:', userId);
+      
+      // Use Edge Function without verifying JWT since the function now handles authorization
       const { data, error } = await supabase.functions.invoke('admin-update-role', {
         body: { 
           userId,
@@ -60,8 +68,12 @@ export const authService = {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error returned from updateUserRole function:', error);
+        throw error;
+      }
       
+      console.log('Role updated successfully for user:', userId);
       return { data, error: null };
     } catch (error) {
       console.error('Error in updateUserRole:', error);

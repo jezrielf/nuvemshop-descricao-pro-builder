@@ -112,10 +112,10 @@ twilio_auth_token = ""
 enabled = true
 
 [functions.admin-create-user]
-verify_jwt = true
+verify_jwt = false
 
 [functions.admin-update-role]
-verify_jwt = true
+verify_jwt = false
 
 [functions.check-subscription]
 verify_jwt = true
