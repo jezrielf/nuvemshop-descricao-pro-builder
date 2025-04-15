@@ -28,11 +28,11 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
         if (newRoles.length === 0) {
           newRoles.push('user');
         }
-        await onUpdateRole(profileId, newRoles.length === 1 ? newRoles[0] : newRoles);
+        await onUpdateRole(profileId, newRoles);
       } else if (!roles.includes(role)) {
         // Add the role to the current roles
         const newRoles = [...roles, role];
-        await onUpdateRole(profileId, newRoles.length === 1 ? newRoles[0] : newRoles);
+        await onUpdateRole(profileId, newRoles);
       }
     } catch (error) {
       console.error(`Erro ao alterar papel para ${role}:`, error);

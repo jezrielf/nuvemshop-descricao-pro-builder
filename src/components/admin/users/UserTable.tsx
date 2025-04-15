@@ -74,6 +74,8 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       setUpdatingUser(userId);
       
+      console.log('Atualizando papel do usuário:', userId, 'para:', newRole);
+      
       const { error } = await authService.updateUserRole(userId, newRole);
         
       if (error) {

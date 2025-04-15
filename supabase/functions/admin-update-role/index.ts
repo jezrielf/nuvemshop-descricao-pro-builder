@@ -22,6 +22,7 @@ serve(async (req) => {
     }
     
     console.log('Role update request received for user:', userId);
+    console.log('New role value:', role);
     
     // Create a Supabase client with the service role key for admin operations
     const supabaseAdmin = createClient(
@@ -45,6 +46,7 @@ serve(async (req) => {
     }
 
     console.log('User role updated successfully for user:', userId);
+    console.log('Updated data:', data);
 
     return new Response(
       JSON.stringify({ 

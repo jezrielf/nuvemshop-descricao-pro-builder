@@ -63,16 +63,13 @@ export const authService = {
   // Add a method to update user role
   updateUserRole: async (userId: string, role: string | string[]) => {
     try {
-      // Convert role to array format for database storage
-      const roleValue = Array.isArray(role) ? role : [role];
-      
-      console.log('Calling admin-update-role function for user:', userId);
+      console.log('Calling admin-update-role function for user:', userId, 'with role:', role);
       
       // Use Edge Function without verifying JWT since the function now handles authorization
       const { data, error } = await supabase.functions.invoke('admin-update-role', {
         body: { 
           userId,
-          role: roleValue
+          role
         }
       });
       
@@ -82,6 +79,7 @@ export const authService = {
       }
       
       console.log('Role updated successfully for user:', userId);
+      console.log('Response data:', data);
       return { data, error: null };
     } catch (error) {
       console.error('Error in updateUserRole:', error);
