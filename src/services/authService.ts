@@ -41,7 +41,15 @@ export const authService = {
       
       if (error) {
         console.error('Error returned from adminCreateUser function:', error);
-        throw error;
+        return { data: null, error };
+      }
+      
+      if (!data?.user) {
+        console.error('No user returned from adminCreateUser function');
+        return { 
+          data: null, 
+          error: new Error('User creation failed. No user returned.') 
+        };
       }
       
       console.log('User created successfully, function returned:', data);
