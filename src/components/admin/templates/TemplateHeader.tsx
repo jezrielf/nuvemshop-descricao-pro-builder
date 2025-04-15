@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Search } from 'lucide-react';
 import { ProductCategory } from '@/types/editor';
 import { getCategoryName } from './utils';
-import { useTemplateStore } from '@/store/templateStore';
+import { useTemplateStore } from '@/store/templates';
 import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';

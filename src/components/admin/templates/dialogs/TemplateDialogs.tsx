@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
-import { useTemplateStore } from '@/store/templateStore';
+import { useTemplateStore } from '@/store/templates';
 import { NewTemplateDialog } from './NewTemplateDialog';
 import { EditTemplateDialog } from './EditTemplateDialog';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';

@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Template } from '@/types/editor';
-import { useTemplateStore } from '@/store/templateStore';
+import { useTemplateStore } from '@/store/templates';
 
 export function useTemplates() {
   const { templates, loadTemplates, searchTemplates, categories } = useTemplateStore();
@@ -36,3 +35,4 @@ export function useTemplates() {
     filteredTemplates
   };
 }
+

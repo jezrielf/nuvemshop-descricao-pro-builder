@@ -1,5 +1,5 @@
 
-import { useTemplateStore as useZustandTemplateStore } from '@/store/templateStore';
+import { useTemplateStore as useZustandTemplateStore } from '@/store/templates';
 import { useEffect } from 'react';
 import { Template } from '@/types/editor';
 
