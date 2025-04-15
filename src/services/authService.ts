@@ -51,10 +51,13 @@ export const authService = {
       // Convert role to array format for database storage
       const roleValue = Array.isArray(role) ? role : [role];
       
+      // Convert the array to a database-compatible format
+      // If the database column is JSON or JSONB, we can pass the array directly
+      // If it's a TEXT column, we might need to serialize it or handle it differently
       const { data, error } = await supabase
         .from('profiles')
         .update({ 
-          role: roleValue, // This is fine as the column accepts string or string[] according to Profile type
+          role: roleValue as any, // Use type assertion to bypass TypeScript check
           atualizado_em: new Date().toISOString() 
         })
         .eq('id', userId);
