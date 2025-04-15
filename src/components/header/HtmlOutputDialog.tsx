@@ -1,127 +1,31 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { FileText, Copy, AlertCircle, Upload, CheckCircle2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { FileText } from 'lucide-react';
 import { useEditorStore } from '@/store/editor';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { NuvemshopConnect } from '@/components/nuvemshop/NuvemshopConnect';
-import { StoreSelector } from '@/components/nuvemshop/StoreSelector';
-import { ProductSelector } from '@/components/nuvemshop/ProductSelector';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { supabase } from '@/integrations/supabase/client';
-import { ProductList } from '@/components/nuvemshop/ProductList';
+import { HtmlOutputTab } from './HtmlOutputTab';
+import { ProductsTab } from './ProductsTab';
+import { useNuvemshopProducts } from '@/hooks/useNuvemshopProducts';
 
 const HtmlOutputDialog: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'copy' | 'update'>('copy');
+  const [viewType, setViewType] = useState<'html' | 'products'>('html');
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
-  const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
-  const [isUpdating, setIsUpdating] = useState(false);
   const { getHtmlOutput } = useEditorStore();
-  const { toast } = useToast();
   
+  const {
+    products,
+    isLoading,
+    error
+  } = useNuvemshopProducts(selectedStoreId);
+
   const htmlOutput = getHtmlOutput();
-  
-  const copyHtmlToClipboard = () => {
-    navigator.clipboard.writeText(htmlOutput);
-    toast({
-      title: "HTML copiado!",
-      description: "O código HTML foi copiado para a área de transferência.",
-    });
-  };
 
   const handleStoreSelect = (storeId: number) => {
     setSelectedStoreId(storeId);
-    setSelectedProductIds([]);
   };
-
-  const handleProductSelect = (productId: number) => {
-    if (selectedProductIds.includes(productId)) {
-      setSelectedProductIds(prev => prev.filter(id => id !== productId));
-    } else {
-      setSelectedProductIds(prev => [...prev, productId]);
-    }
-  };
-
-  const updateNuvemshopProducts = async () => {
-    if (!selectedStoreId || selectedProductIds.length === 0) {
-      toast({
-        title: "Nenhum produto selecionado",
-        description: "Selecione pelo menos um produto para atualizar.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsUpdating(true);
-    
-    try {
-      // Atualizar cada produto selecionado
-      for (const productId of selectedProductIds) {
-        const { data, error } = await supabase.functions.invoke('nuvemshop-update-product', {
-          body: {
-            storeId: selectedStoreId,
-            productId,
-            description: htmlOutput
-          }
-        });
-        
-        if (error) {
-          console.error(`Erro ao atualizar produto ${productId}:`, error);
-          toast({
-            title: "Erro na atualização",
-            description: `Não foi possível atualizar o produto ${productId}.`,
-            variant: "destructive"
-          });
-        }
-      }
-      
-      toast({
-        title: "Produtos atualizados!",
-        description: `${selectedProductIds.length} produtos foram atualizados com sucesso.`,
-      });
-    } catch (error) {
-      console.error('Erro ao atualizar produtos:', error);
-      toast({
-        title: "Erro na atualização",
-        description: "Ocorreu um erro ao atualizar os produtos.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  // Add new state for products view
-  const [viewType, setViewType] = useState<'html' | 'products'>('html');
-
-  const { useQuery } = require('@tanstack/react-query');
-  const { data: products, isLoading, error } = useQuery({
-    queryKey: ['nuvemshop-products', selectedStoreId],
-    queryFn: async () => {
-      try {
-        if (!selectedStoreId) return [];
-        const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
-          body: { storeId: selectedStoreId }
-        });
-        
-        if (error) throw error;
-        return data?.products || [];
-      } catch (err) {
-        console.error('Error fetching products:', err);
-        toast({
-          title: "Erro ao carregar produtos",
-          description: "Não foi possível carregar os produtos da loja selecionada.",
-          variant: "destructive",
-        });
-        throw err;
-      }
-    },
-    enabled: !!selectedStoreId,
-  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -147,54 +51,15 @@ const HtmlOutputDialog: React.FC = () => {
           </TabsList>
           
           <TabsContent value="html">
-            <Alert variant="default">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Este HTML é 100% compatível com a Nuvemshop, usando apenas HTML e CSS inline (sem JavaScript).
-                Cole o código completo sem alterações ou recortes para evitar tags HTML não fechadas.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="relative">
-              <Textarea
-                className="min-h-[300px] font-mono text-xs"
-                readOnly
-                value={htmlOutput}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute right-2 top-2"
-                onClick={copyHtmlToClipboard}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
+            <HtmlOutputTab htmlOutput={htmlOutput} />
           </TabsContent>
           
           <TabsContent value="products">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 mb-4">
-                <StoreSelector onSelect={handleStoreSelect} value={selectedStoreId || undefined} />
-                <NuvemshopConnect />
-              </div>
-              
-              {isLoading && (
-                <div className="text-center py-4 text-muted-foreground">
-                  Carregando produtos...
-                </div>
-              )}
-              
-              {error && (
-                <div className="text-center py-4 text-red-500">
-                  Erro ao carregar produtos
-                </div>
-              )}
-              
-              {selectedStoreId && !isLoading && !error && (
-                <ProductList products={products || []} />
-              )}
-            </div>
+            <ProductsTab 
+              selectedStoreId={selectedStoreId}
+              onStoreSelect={handleStoreSelect}
+              products={products || []}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
