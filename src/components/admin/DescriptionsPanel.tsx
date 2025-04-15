@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { ProductDescription } from '@/types/editor';
@@ -25,6 +24,7 @@ import {
 import { Eye, Trash, Copy, Edit } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import SEODashboard from './seo/SEODashboard';
 
 const DescriptionsPanel: React.FC = () => {
   const [descriptions, setDescriptions] = useState<ProductDescription[]>([]);
@@ -32,6 +32,7 @@ const DescriptionsPanel: React.FC = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<'list' | 'seo'>('list');
 
   // Load all descriptions from localStorage for demonstration
   // In a real application, this would come from the database
@@ -89,82 +90,102 @@ const DescriptionsPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Gerenciar Descrições</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Gerenciar Descrições</h2>
+        <div className="flex gap-2">
+          <Button
+            variant={view === 'list' ? 'default' : 'outline'}
+            onClick={() => setView('list')}
+          >
+            Lista
+          </Button>
+          <Button
+            variant={view === 'seo' ? 'default' : 'outline'}
+            onClick={() => setView('seo')}
+          >
+            Dashboard SEO
+          </Button>
+        </div>
+      </div>
       
-      <Card className="p-6">
-        {loading ? (
-          <p>Carregando descrições...</p>
-        ) : descriptions.length > 0 ? (
-          <Table>
-            <TableCaption>Lista de todas as descrições de produtos no sistema</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead>Blocos</TableHead>
-                <TableHead>Criado em</TableHead>
-                <TableHead>Atualizado em</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {descriptions.map((description) => (
-                <TableRow key={description.id}>
-                  <TableCell className="font-medium">{truncateText(description.name)}</TableCell>
-                  <TableCell className="text-xs truncate max-w-[100px]">{description.id}</TableCell>
-                  <TableCell>{description.blocks.length}</TableCell>
-                  <TableCell>
-                    {formatDistanceToNow(new Date(description.createdAt), { 
-                      addSuffix: true,
-                      locale: ptBR
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    {formatDistanceToNow(new Date(description.updatedAt), { 
-                      addSuffix: true,
-                      locale: ptBR
-                    })}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleViewDescription(description)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleDeleteClick(description)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+      {view === 'list' ? (
+        <Card className="p-6">
+          {loading ? (
+            <p>Carregando descrições...</p>
+          ) : descriptions.length > 0 ? (
+            <Table>
+              <TableCaption>Lista de todas as descrições de produtos no sistema</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Blocos</TableHead>
+                  <TableHead>Criado em</TableHead>
+                  <TableHead>Atualizado em</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-center py-8 text-muted-foreground">
-            Nenhuma descrição encontrada no sistema.
-          </p>
-        )}
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {descriptions.map((description) => (
+                  <TableRow key={description.id}>
+                    <TableCell className="font-medium">{truncateText(description.name)}</TableCell>
+                    <TableCell className="text-xs truncate max-w-[100px]">{description.id}</TableCell>
+                    <TableCell>{description.blocks.length}</TableCell>
+                    <TableCell>
+                      {formatDistanceToNow(new Date(description.createdAt), { 
+                        addSuffix: true,
+                        locale: ptBR
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      {formatDistanceToNow(new Date(description.updatedAt), { 
+                        addSuffix: true,
+                        locale: ptBR
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewDescription(description)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteClick(description)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center py-8 text-muted-foreground">
+              Nenhuma descrição encontrada no sistema.
+            </p>
+          )}
+        </Card>
+      ) : (
+        <SEODashboard />
+      )}
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
