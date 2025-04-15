@@ -25,15 +25,16 @@ export const authService = {
     return await supabase.auth.signOut();
   },
   
-  // Add a new method for admin to create users
+  // Updated method for admin to create users - using functions.invoke to use service role
   adminCreateUser: async (email: string, password: string, userData: any) => {
     try {
-      // Create user with the admin API (requires service role)
-      const { data, error } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true, // Auto confirm email
-        user_metadata: userData
+      // Use Edge Function with service role to create user
+      const { data, error } = await supabase.functions.invoke('admin-create-user', {
+        body: {
+          email,
+          password,
+          userData
+        }
       });
       
       if (error) throw error;
@@ -51,16 +52,13 @@ export const authService = {
       // Convert role to array format for database storage
       const roleValue = Array.isArray(role) ? role : [role];
       
-      // Convert the array to a database-compatible format
-      // If the database column is JSON or JSONB, we can pass the array directly
-      // If it's a TEXT column, we might need to serialize it or handle it differently
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ 
-          role: roleValue as any, // Use type assertion to bypass TypeScript check
-          atualizado_em: new Date().toISOString() 
-        })
-        .eq('id', userId);
+      // Use Edge Function with service role to update user role
+      const { data, error } = await supabase.functions.invoke('admin-update-role', {
+        body: { 
+          userId,
+          role: roleValue
+        }
+      });
       
       if (error) throw error;
       

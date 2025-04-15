@@ -30,46 +30,39 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
     try {
       setLoading(true);
       
-      // Prepare role data
-      const roleValue = Array.isArray(values.role) 
-        ? values.role 
-        : [values.role];
+      // Prepare user data
+      const userData = {
+        nome: values.nome,
+        role: values.role
+      };
       
-      // Create the user with admin privileges
-      const { data: userData, error: createError } = await authService.adminCreateUser(
+      // Create the user with admin privileges using Edge Function
+      const { data: userData1, error: createError } = await authService.adminCreateUser(
         values.email,
         values.password,
-        {
-          nome: values.nome,
-          role: roleValue
-        }
+        userData
       );
       
-      if (createError) throw createError;
-      
-      if (!userData?.user) {
-        throw new Error('Falha ao criar usuário. Nenhum usuário retornado.');
+      if (createError) {
+        throw new Error(createError.message || 'Failed to create user');
       }
       
-      // Update the user's profile with role
-      const { error: updateError } = await authService.updateUserRole(
-        userData.user.id,
-        roleValue
-      );
-      
-      if (updateError) throw updateError;
+      if (!userData1?.user) {
+        throw new Error('User creation failed. No user returned.');
+      }
       
       toast({
-        title: 'Usuário criado com sucesso',
-        description: `O usuário ${values.nome} foi criado com o email ${values.email}`,
+        title: 'User created successfully',
+        description: `User ${values.nome} was created with email ${values.email}`,
       });
       
       onUserCreated();
+      form.reset();
     } catch (error: any) {
-      console.error('Erro ao criar usuário:', error);
+      console.error('Error creating user:', error);
       toast({
-        title: 'Erro ao criar usuário',
-        description: error.message || 'Ocorreu um erro ao criar o usuário',
+        title: 'Error creating user',
+        description: error.message || 'An error occurred while creating the user',
         variant: 'destructive',
       });
     } finally {
@@ -84,7 +77,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
         <Input
           id="email"
           type="email"
-          placeholder="email@exemplo.com"
+          placeholder="email@example.com"
           {...form.register('email', { required: true })}
         />
       </div>
