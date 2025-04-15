@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,7 @@ const HtmlOutputDialog: React.FC = () => {
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [updateSuccess, setUpdateSuccess<number[]>([]);
+  const [updateSuccess, setUpdateSuccess] = useState<number[]>([]);
   const { getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
   
