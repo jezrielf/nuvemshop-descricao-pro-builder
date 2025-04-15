@@ -40,11 +40,11 @@ serve(async (req) => {
 
     console.log('Found store, fetching products from Nuvemshop API');
 
-    // Fetch products from Nuvemshop
+    // Fetch products from Nuvemshop with updated headers
     const productsResponse = await fetch(`https://api.tiendanube.com/v1/${storeId}/products?per_page=200&page=1`, {
       headers: {
         'Authentication': `bearer ${store.access_token}`,
-        'User-Agent': 'Descrição Pro (contato@descricao.pro)'
+        'User-Agent': 'Descricao PRO (comercial@weethub.com.br)'
       }
     });
 
@@ -73,4 +73,3 @@ serve(async (req) => {
     );
   }
 });
-

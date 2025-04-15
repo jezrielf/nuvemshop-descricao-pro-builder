@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -16,7 +15,6 @@ serve(async (req) => {
   try {
     const { storeId, productId, description } = await req.json();
     
-    // Validate required parameters
     if (!storeId) {
       throw new Error('Missing store ID');
     }
@@ -51,11 +49,11 @@ serve(async (req) => {
     console.log('Found store, updating product on Nuvemshop API');
 
     try {
-      // Fetch current product data first
+      // Fetch current product data first with updated headers
       const productResponse = await fetch(`https://api.tiendanube.com/v1/${storeId}/products/${productId}`, {
         headers: {
           'Authentication': `bearer ${store.access_token}`,
-          'User-Agent': 'Descrição Pro (contato@descricao.pro)',
+          'User-Agent': 'Descricao PRO (comercial@weethub.com.br)',
           'Content-Type': 'application/json'
         }
       });
@@ -68,7 +66,6 @@ serve(async (req) => {
 
       const product = await productResponse.json();
       
-      // Check if the product has a description object
       if (!product.description || typeof product.description !== 'object') {
         console.error('Product has invalid description format:', product);
         throw new Error('Product has invalid description format');
@@ -86,12 +83,12 @@ serve(async (req) => {
         updateData.description[lang] = description;
       });
 
-      // Update the product on Nuvemshop
+      // Update the product on Nuvemshop with updated headers
       const updateResponse = await fetch(`https://api.tiendanube.com/v1/${storeId}/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Authentication': `bearer ${store.access_token}`,
-          'User-Agent': 'Descrição Pro (contato@descricao.pro)',
+          'User-Agent': 'Descricao PRO (comercial@weethub.com.br)',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(updateData)
@@ -123,7 +120,6 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (apiError) {
-      // Capture specific API errors and provide better messages
       console.error('Nuvemshop API error:', apiError);
       return new Response(
         JSON.stringify({ 
