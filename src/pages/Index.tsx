@@ -1,9 +1,8 @@
-
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
 import Preview from '@/components/Preview';
-import { useTemplateStore } from '@/store/templateStore';
+import { useTemplateStore } from '@/store/templates';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';

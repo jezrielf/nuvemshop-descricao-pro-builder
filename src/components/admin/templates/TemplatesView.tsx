@@ -1,6 +1,5 @@
-
 import React, { useEffect } from 'react';
-import { useTemplateStore } from '@/store/templateStore';
+import { useTemplateStore } from '@/store/templates';
 import { TemplateList } from './TemplateList';
 import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';

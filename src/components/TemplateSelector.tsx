@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { useTemplateStore } from '@/store/templateStore';
+import { useTemplateStore } from '@/store/templates';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
