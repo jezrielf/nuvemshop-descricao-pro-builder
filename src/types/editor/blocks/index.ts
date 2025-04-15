@@ -38,3 +38,18 @@ export type Block =
   | FAQBlock
   | CTABlock
   | VideoBlock;
+
+// Define BlockType as a union of all possible block type literals
+export type BlockType = 
+  | 'hero'
+  | 'text'
+  | 'features'
+  | 'benefits'
+  | 'specifications'
+  | 'image'
+  | 'gallery'
+  | 'imageText'
+  | 'textImage'
+  | 'faq'
+  | 'cta'
+  | 'video';

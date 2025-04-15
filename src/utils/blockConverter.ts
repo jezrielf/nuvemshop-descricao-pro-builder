@@ -1,20 +1,19 @@
 
-import { Block as IndexBlock } from '@/types/editor/blocks';
-import { Block as BaseBlock } from '@/types/editor/base';
+import { Block } from '@/types/editor';
 import { ensureBlockType } from './typeConversion';
 
 /**
- * Converts blocks between different module import types
+ * Parses template blocks to ensure they have all required properties
+ * for their specific block type.
  */
-export function convertBlocks<T extends IndexBlock[] | BaseBlock[]>(blocks: T): any[] {
-  return blocks.map(block => ({
-    ...block
-  }));
+export function parseTemplateBlocks(blocks: any[]): Block[] {
+  return blocks.map(block => ensureBlockType(block));
 }
 
 /**
- * Safely parse Template blocks to ensure they match the expected type
+ * Converts blocks to ensure they conform to the Block type
+ * Used when adding blocks to templates or when loading templates
  */
-export function parseTemplateBlocks(blocks: any[]): IndexBlock[] {
-  return blocks.map(ensureBlockType);
+export function convertBlocks(blocks: any[]): Block[] {
+  return parseTemplateBlocks(blocks);
 }

@@ -52,7 +52,8 @@ export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoe
 
 // Import block types from the blocks directory
 import { Block, BlockType } from './blocks';
-export { Block, BlockType };
+// Use export type when re-exporting for 'isolatedModules' mode
+export type { Block, BlockType };
 
 export type ColumnLayout = 1 | 2 | 3 | 4;
 
