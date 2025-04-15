@@ -20,17 +20,17 @@ export function useTemplateStore() {
   }, [loadTemplates]);
 
   // Wrapper para criar um template com log
-  const createTemplateWithLog = (templateData: Omit<Template, "id">) => {
+  const createTemplateWithLog = async (templateData: Omit<Template, "id">) => {
     console.log("Creating template:", templateData);
-    const result = createTemplate(templateData);
+    const result = await createTemplate(templateData);
     console.log("Template created with ID:", result.id);
     return result;
   };
 
   // Wrapper para atualizar um template com log
-  const updateTemplateWithLog = (id: string, templateData: Partial<Template>) => {
+  const updateTemplateWithLog = async (id: string, templateData: Partial<Template>) => {
     console.log("Updating template:", id, templateData);
-    const result = updateTemplate(id, templateData);
+    const result = await updateTemplate(id, templateData);
     console.log("Template updated:", result);
     return result;
   };

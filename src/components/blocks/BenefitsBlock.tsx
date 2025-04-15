@@ -24,7 +24,7 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
   };
   
   const handleAddBenefit = () => {
-    const newBenefits = [...(block.benefits || []), { id: uuidv4(), title: 'Novo Benefício', description: 'Descrição do benefício' }];
+    const newBenefits = [...(block.benefits || []), { id: uuidv4(), title: 'Novo Benefício', description: 'Descrição do benefício', icon: '✓' }];
     updateBlock(block.id, { benefits: newBenefits });
   };
   
@@ -51,12 +51,14 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
     try {
       let benefitsArray = JSON.parse(content);
       
-      // Garantir que cada benefício tem um ID
+      // Garantir que cada benefício tem um ID e um icon (padrão) se não tiver
       benefitsArray = benefitsArray.map((benefit: any) => {
-        if (!benefit.id) {
-          return { ...benefit, id: uuidv4() };
-        }
-        return benefit;
+        return { 
+          id: benefit.id || uuidv4(), 
+          title: benefit.title,
+          description: benefit.description,
+          icon: benefit.icon || '✓'  // Add default icon if missing
+        };
       });
       
       updateBlock(block.id, { benefits: benefitsArray });

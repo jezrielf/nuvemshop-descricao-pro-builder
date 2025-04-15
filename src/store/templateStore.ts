@@ -4,7 +4,7 @@ import { Template, ProductCategory, Block } from '@/types/editor';
 import { getAllTemplates } from '@/utils/templates';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
-import { SupabaseRealtimePayload } from '@supabase/supabase-js';
+// Removing the SupabaseRealtimePayload import as it's not needed
 
 // Define the Supabase template data structure
 interface SupabaseTemplate {
@@ -40,6 +40,11 @@ const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Template => 
     category: supaTemplate.category,
     blocks: Array.isArray(supaTemplate.blocks) ? supaTemplate.blocks : []
   };
+};
+
+// Helper to serialize blocks for Supabase storage
+const serializeBlocks = (blocks: Block[]): any => {
+  return JSON.parse(JSON.stringify(blocks));
 };
 
 export const useTemplateStore = create<TemplateState>((set, get) => ({
@@ -142,109 +147,102 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
     
     return filtered;
   },
-
+  
   createTemplate: async (templateData) => {
-    const newTemplate: Template = {
-      id: uuidv4(),
-      ...templateData
-    };
-
     try {
-      // Save to Supabase - serialize blocks to ensure they're saved as JSON
-      const { data, error } = await supabase
-        .from('templates')
-        .insert({
-          id: newTemplate.id,
-          name: newTemplate.name,
-          category: newTemplate.category,
-          blocks: JSON.stringify(newTemplate.blocks)
-        })
-        .select()
-        .single();
+      const newTemplate: Template = {
+        ...templateData,
+        id: uuidv4()
+      };
       
-      if (error) {
-        console.error('Error creating template in database:', error);
-      } else {
-        console.log('Template created in database:', data);
+      console.log('Creating new template:', newTemplate);
+      
+      // Add to Supabase if possible
+      try {
+        const { data, error } = await supabase
+          .from('templates')
+          .insert({
+            id: newTemplate.id,
+            name: newTemplate.name,
+            category: newTemplate.category,
+            blocks: serializeBlocks(newTemplate.blocks)
+          });
+        
+        if (error) {
+          console.error('Error saving template to database:', error);
+        } else {
+          console.log('Template successfully saved to database');
+        }
+      } catch (dbError) {
+        console.error('Database operation failed:', dbError);
       }
       
-      // Update local state
+      // Update local state regardless of DB success
       set(state => ({
         templates: [...state.templates, newTemplate]
       }));
-
-      console.log('Template created:', newTemplate.name);
+      
       return newTemplate;
     } catch (error) {
       console.error('Error in createTemplate:', error);
-      // Still update local state even if db save fails
-      set(state => ({
-        templates: [...state.templates, newTemplate]
-      }));
-      return newTemplate;
+      throw error;
     }
   },
-
+  
   updateTemplate: async (id, templateData) => {
-    let updatedTemplate: Template | null = null;
-
     try {
-      set(state => {
-        const updatedTemplates = state.templates.map(template => {
-          if (template.id === id) {
-            updatedTemplate = { ...template, ...templateData };
-            return updatedTemplate;
-          }
-          return template;
-        });
-
-        return { templates: updatedTemplates };
-      });
-
-      if (updatedTemplate) {
-        // Save to Supabase - serialize blocks for JSON storage
-        const { error } = await supabase
+      const { templates } = get();
+      const templateIndex = templates.findIndex(t => t.id === id);
+      
+      if (templateIndex === -1) {
+        console.error('Template not found:', id);
+        return null;
+      }
+      
+      const updatedTemplate: Template = {
+        ...templates[templateIndex],
+        ...templateData
+      };
+      
+      // Update in Supabase if possible
+      try {
+        const { data, error } = await supabase
           .from('templates')
           .update({
             name: updatedTemplate.name,
             category: updatedTemplate.category,
-            blocks: JSON.stringify(updatedTemplate.blocks)
+            blocks: serializeBlocks(updatedTemplate.blocks)
           })
           .eq('id', id);
         
         if (error) {
           console.error('Error updating template in database:', error);
         } else {
-          console.log('Template updated in database:', updatedTemplate.name);
+          console.log('Template successfully updated in database');
         }
+      } catch (dbError) {
+        console.error('Database update operation failed:', dbError);
       }
-
-      console.log('Template updated:', updatedTemplate?.name);
+      
+      // Update local state regardless of DB success
+      const newTemplates = [...templates];
+      newTemplates[templateIndex] = updatedTemplate;
+      
+      set({
+        templates: newTemplates
+      });
+      
       return updatedTemplate;
     } catch (error) {
       console.error('Error in updateTemplate:', error);
-      return updatedTemplate;
+      return null;
     }
   },
-
+  
   deleteTemplate: async (id) => {
-    let success = false;
-
     try {
-      set(state => {
-        const filteredTemplates = state.templates.filter(template => {
-          if (template.id === id) {
-            success = true;
-            return false;
-          }
-          return true;
-        });
-
-        return { templates: filteredTemplates };
-      });
-
-      if (success) {
-        // Delete from Supabase
+      // Try to delete from Supabase
+      try {
         const { error } = await supabase
           .from('templates')
           .delete()
@@ -253,52 +251,42 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         if (error) {
           console.error('Error deleting template from database:', error);
         } else {
-          console.log('Template deleted from database:', id);
+          console.log('Template successfully deleted from database');
         }
+      } catch (dbError) {
+        console.error('Database delete operation failed:', dbError);
       }
-
-      console.log('Template deleted, success:', success);
-      return success;
+      
+      // Update local state regardless of DB success
+      set(state => ({
+        templates: state.templates.filter(template => template.id !== id)
+      }));
+      
+      return true;
     } catch (error) {
       console.error('Error in deleteTemplate:', error);
-      return success;
+      return false;
     }
   },
   
   addCustomCategory: async (category) => {
-    if (!category.trim()) return false;
-    
     try {
-      // Add to Supabase
-      const { error } = await supabase
+      // Try to add to Supabase
+      const { data, error } = await supabase
         .from('template_categories')
-        .insert({ name: category.trim() });
+        .insert({ name: category });
       
       if (error) {
-        console.error('Error adding custom category to database:', error);
+        console.error('Error adding category to database:', error);
         return false;
       }
       
       // Update local state
-      set(state => {
-        const updatedCategories = [...state.categories];
-        const updatedCustomCategories = [...state.customCategories];
-        
-        if (!updatedCategories.includes(category)) {
-          updatedCategories.push(category);
-        }
-        
-        if (!updatedCustomCategories.includes(category)) {
-          updatedCustomCategories.push(category);
-        }
-        
-        return { 
-          categories: updatedCategories,
-          customCategories: updatedCustomCategories
-        };
-      });
+      set(state => ({
+        categories: [...state.categories, category],
+        customCategories: [...state.customCategories, category]
+      }));
       
-      console.log('Custom category added:', category);
       return true;
     } catch (error) {
       console.error('Error in addCustomCategory:', error);

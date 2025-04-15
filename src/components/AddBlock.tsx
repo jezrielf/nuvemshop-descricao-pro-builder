@@ -25,8 +25,16 @@ const AddBlock: React.FC = () => {
       const blockData = createBlock(selectedType, columns);
       
       if (blockData) {
-        // Since blockData is already properly typed from createBlock, we can safely add it
-        addBlock(blockData);
+        // Convert this block to the expected type for addBlock
+        const blockToAdd = {
+          ...blockData,
+          type: selectedType,
+          title: blockData.title,
+          columns: columns,
+          visible: true
+        };
+        
+        addBlock(blockToAdd);
         
         toast({
           title: "Bloco adicionado",
