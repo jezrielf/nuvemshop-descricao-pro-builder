@@ -33,19 +33,38 @@ interface TemplateState {
 
 // Utility function to convert Supabase template format to our Template type
 const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Template => {
-  // Ensure blocks is always an array
-  const blocks = Array.isArray(supaTemplate.blocks) 
-    ? supaTemplate.blocks 
-    : (typeof supaTemplate.blocks === 'object' && supaTemplate.blocks !== null)
-      ? Object.values(supaTemplate.blocks)
-      : [];
-      
-  return {
-    id: supaTemplate.id,
-    name: supaTemplate.name,
-    category: supaTemplate.category,
-    blocks: blocks
-  };
+  try {
+    // Ensure blocks is always an array
+    let blocks = [];
+    
+    if (Array.isArray(supaTemplate.blocks)) {
+      blocks = supaTemplate.blocks;
+    } else if (typeof supaTemplate.blocks === 'object' && supaTemplate.blocks !== null) {
+      blocks = Object.values(supaTemplate.blocks);
+    }
+    
+    // Log for debugging
+    console.log(`Converting template: ${supaTemplate.name}, blocks type:`, 
+      typeof supaTemplate.blocks, 
+      'isArray:', Array.isArray(supaTemplate.blocks), 
+      'length:', blocks.length);
+    
+    return {
+      id: supaTemplate.id,
+      name: supaTemplate.name,
+      category: supaTemplate.category,
+      blocks: blocks
+    };
+  } catch (error) {
+    console.error('Error converting template:', error, supaTemplate);
+    // Return a minimal valid template to prevent app crashes
+    return {
+      id: supaTemplate.id || uuidv4(),
+      name: supaTemplate.name || 'Error Template',
+      category: supaTemplate.category || 'other',
+      blocks: []
+    };
+  }
 };
 
 // Helper to serialize blocks for Supabase storage
@@ -61,27 +80,36 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   
   loadTemplates: async () => {
     try {
+      console.log('Starting template loading process...');
+      
       // First load templates from utils (default templates)
       const defaultTemplates = getAllTemplates();
-      console.log('Loading default templates, total count:', defaultTemplates.length);
+      console.log('Default templates loaded, count:', defaultTemplates.length);
       
       // Then try to load user templates from Supabase
       const { data: userTemplatesData, error } = await supabase
         .from('templates')
-        .select('*');
+        .select('*')
+        .order('updated_at', { ascending: false });
       
       if (error) {
         console.error('Error loading templates from database:', error);
+        throw error;
       }
       
       console.log('User templates from database:', userTemplatesData?.length || 0);
       
       // Convert Supabase templates to our Template format
-      const userTemplates: Template[] = (userTemplatesData || []).map(template => {
-        const converted = convertSupabaseToTemplate(template as SupabaseTemplate);
-        console.log(`Converting template: ${template.name}, blocks:`, 
-          Array.isArray(template.blocks) ? template.blocks.length : 'non-array');
-        return converted;
+      const userTemplates: Template[] = [];
+      
+      // Process templates safely
+      (userTemplatesData || []).forEach(template => {
+        try {
+          const converted = convertSupabaseToTemplate(template as SupabaseTemplate);
+          userTemplates.push(converted);
+        } catch (conversionError) {
+          console.error(`Failed to convert template ${template.id}:`, conversionError);
+        }
       });
       
       // Combine default templates with user templates
@@ -90,7 +118,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         ...userTemplates
       ];
       
-      console.log('Total templates loaded:', allTemplates.length);
+      console.log('Total templates loaded successfully:', allTemplates.length);
       
       // Extract categories from templates
       const templateCategories = Array.from(
@@ -120,11 +148,15 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         categories: allCategories,
         customCategories: customCategories
       });
+      
+      console.log('Template store updated successfully');
     } catch (error) {
-      console.error('Error in loadTemplates:', error);
+      console.error('Critical error in loadTemplates:', error);
+      // Still set any default templates we have to prevent complete failure
+      const defaultTemplates = getAllTemplates();
       set({
-        templates: [],
-        categories: [],
+        templates: defaultTemplates,
+        categories: Array.from(new Set(defaultTemplates.map(t => t.category))),
         customCategories: []
       });
     }
@@ -219,6 +251,8 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         ...templateData
       };
       
+      console.log('Updating template:', id, updatedTemplate);
+      
       // Update in Supabase if possible
       try {
         const { data, error } = await supabase
@@ -226,7 +260,8 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
           .update({
             name: updatedTemplate.name,
             category: updatedTemplate.category,
-            blocks: serializeBlocks(updatedTemplate.blocks)
+            blocks: serializeBlocks(updatedTemplate.blocks),
+            updated_at: new Date().toISOString()
           })
           .eq('id', id);
         
@@ -256,6 +291,8 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   
   deleteTemplate: async (id) => {
     try {
+      console.log('Deleting template:', id);
+      
       // Try to delete from Supabase
       try {
         const { error } = await supabase

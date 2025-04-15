@@ -6,7 +6,8 @@ import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TemplateDialogs } from './dialogs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export const TemplatesView = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -17,26 +18,36 @@ export const TemplatesView = () => {
   const { toast } = useToast();
   
   // Load templates when component mounts
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      console.log("TemplatesView - carregando templates");
+      await loadTemplates();
+      console.log("TemplatesView - templates carregados com sucesso");
+      toast({
+        title: 'Templates carregados',
+        description: `${templates.length} templates disponíveis`,
+      });
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      toast({
+        title: 'Erro',
+        description: 'Ocorreu um erro ao carregar os templates',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const load = async () => {
-      try {
-        console.log("TemplatesView - carregando templates");
-        await loadTemplates();
-        console.log("TemplatesView - templates carregados com sucesso");
-      } catch (error) {
-        console.error('Error loading templates:', error);
-        toast({
-          title: 'Erro',
-          description: 'Ocorreu um erro ao carregar os templates',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    load();
-  }, [loadTemplates, toast]);
+    loadData();
+  }, []);
+  
+  // Function to manually refresh templates
+  const handleRefresh = () => {
+    loadData();
+  };
   
   // Filter templates based on search query and selected category
   const filteredTemplates = searchTemplates(searchQuery, selectedCategory);
@@ -53,12 +64,24 @@ export const TemplatesView = () => {
 
   return (
     <div className="space-y-6">
-      <TemplateHeader
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-      />
+      <div className="flex justify-between items-center">
+        <TemplateHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          className="ml-2"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Atualizar
+        </Button>
+      </div>
       
       <ScrollArea className="h-[calc(100vh-220px)]">
         <TemplateList templates={filteredTemplates} />

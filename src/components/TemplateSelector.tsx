@@ -1,11 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTemplateStore } from '@/store/templateStore';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText, Star } from 'lucide-react';
+import { FileText, Star, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType } from '@/types/editor';
 
@@ -13,12 +13,53 @@ const TemplateSelector: React.FC = () => {
   const { templates, categories, selectCategory, selectedCategory, loadTemplates } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
-  // Load templates when the component mounts
+  // Load templates when the component mounts or dialog opens
   useEffect(() => {
-    loadTemplates();
-  }, [loadTemplates]);
+    const fetchTemplates = async () => {
+      if (dialogOpen) {
+        setIsLoading(true);
+        try {
+          await loadTemplates();
+          console.log('Templates loaded in TemplateSelector, count:', templates.length);
+        } catch (error) {
+          console.error('Error loading templates in TemplateSelector:', error);
+          toast({
+            title: "Erro ao carregar templates",
+            description: "Não foi possível carregar os templates. Tente novamente.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    fetchTemplates();
+  }, [dialogOpen, loadTemplates]);
+  
+  // Refresh templates manually
+  const handleRefreshTemplates = async () => {
+    setIsLoading(true);
+    try {
+      await loadTemplates();
+      toast({
+        title: "Templates atualizados",
+        description: "Os templates foram atualizados com sucesso.",
+      });
+    } catch (error) {
+      console.error('Error refreshing templates:', error);
+      toast({
+        title: "Erro ao atualizar templates",
+        description: "Não foi possível atualizar os templates. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // Obter todos os templates quando selectedCategory for null
   const displayedTemplates = React.useMemo(() => {
@@ -90,89 +131,108 @@ const TemplateSelector: React.FC = () => {
           <DialogTitle>Escolha um Template</DialogTitle>
           <DialogDescription>
             Selecione um template para iniciar rapidamente sua descrição de produto.
-            {templates.length === 0 && (
+            {templates.length === 0 && !isLoading && (
               <div className="mt-2 text-yellow-600 text-sm">
-                Carregando templates... Se nenhum template aparecer, tente fechar e abrir este diálogo novamente.
+                Nenhum template encontrado. Tente atualizar a lista de templates.
               </div>
             )}
           </DialogDescription>
         </DialogHeader>
         
         <div className="flex flex-col flex-grow h-full mt-4">
-          <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
-            <Button
-              variant={selectedCategory === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => selectCategory(null)}
-            >
-              Todos
-            </Button>
-            
-            {categories.map((category) => (
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex space-x-2 overflow-x-auto pb-2">
               <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
+                variant={selectedCategory === null ? "default" : "outline"}
                 size="sm"
-                onClick={() => selectCategory(category)}
+                onClick={() => selectCategory(null)}
               >
-                {categoryNames[category] || category}
+                Todos
               </Button>
-            ))}
+              
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => selectCategory(category)}
+                >
+                  {categoryNames[category] || category}
+                </Button>
+              ))}
+            </div>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRefreshTemplates}
+              disabled={isLoading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
           </div>
           
           <div className="overflow-y-auto flex-grow">
             <ScrollArea className="h-[calc(60vh-120px)] pr-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
-                {displayedTemplates.length > 0 ? (
-                  displayedTemplates.map((template) => (
-                    <div
-                      key={template.id}
-                      className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
-                    >
-                      <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
-                        {isAdvancedTemplate(template.id) ? (
-                          <img 
-                            src={getTemplateThumbnail(template)} 
-                            alt={template.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-gray-400 text-sm">
-                            Preview do Template
-                          </span>
-                        )}
-                      </div>
-                      <div className="p-4 flex flex-col flex-grow">
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-medium">{template.name}</h3>
-                          {isAdvancedTemplate(template.id) && (
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              {isLoading ? (
+                <div className="flex justify-center items-center h-32">
+                  <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2">Carregando templates...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+                  {displayedTemplates.length > 0 ? (
+                    displayedTemplates.map((template) => (
+                      <div
+                        key={template.id}
+                        className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                      >
+                        <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
+                          {isAdvancedTemplate(template.id) ? (
+                            <img 
+                              src={getTemplateThumbnail(template)} 
+                              alt={template.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-gray-400 text-sm">
+                              Preview do Template
+                            </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mt-1 mb-3">
-                          {categoryNames[template.category] || template.category}
-                        </p>
-                        <div className="text-xs text-gray-500 mb-4">
-                          {template.blocks.length} blocos
-                        </div>
-                        <div className="mt-auto">
-                          <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => handleSelectTemplate(template)}
-                          >
-                            Usar este template
-                          </Button>
+                        <div className="p-4 flex flex-col flex-grow">
+                          <div className="flex justify-between items-center">
+                            <h3 className="font-medium">{template.name}</h3>
+                            {isAdvancedTemplate(template.id) && (
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-500 mt-1 mb-3">
+                            {categoryNames[template.category] || template.category}
+                          </p>
+                          <div className="text-xs text-gray-500 mb-4">
+                            {template.blocks.length} blocos
+                          </div>
+                          <div className="mt-auto">
+                            <Button
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => handleSelectTemplate(template)}
+                            >
+                              Usar este template
+                            </Button>
+                          </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 text-center py-8">
+                      <p className="text-muted-foreground">Nenhum template encontrado.</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-2 text-center py-8">
-                    <p className="text-muted-foreground">Nenhum template encontrado.</p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </ScrollArea>
           </div>
         </div>

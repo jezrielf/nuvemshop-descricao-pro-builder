@@ -6,6 +6,7 @@ import Preview from '@/components/Preview';
 import { useTemplateStore } from '@/store/templateStore';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useToast } from '@/hooks/use-toast';
 
 // Adicionamos o diretório public/tutorial para as imagens do tutorial
 const placeholderImages = [
@@ -21,25 +22,44 @@ const Index = () => {
   console.log("Index page renderizada");
   const { loadTemplates } = useTemplateStore();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   
   useEffect(() => {
     // Carrega os templates iniciais
     const initializeTemplates = async () => {
       try {
+        console.log("Iniciando carregamento de templates na página inicial");
         await loadTemplates();
         console.log("Templates carregados na inicialização");
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
+        toast({
+          title: "Erro ao carregar templates",
+          description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
+          variant: "destructive",
+        });
       }
     };
     
     initializeTemplates();
+    
+    // Configura um intervalo para verificar atualizações de templates a cada 5 minutos
+    const templateRefreshInterval = setInterval(() => {
+      loadTemplates()
+        .then(() => console.log("Templates atualizados no background"))
+        .catch(err => console.error("Erro ao atualizar templates no background:", err));
+    }, 5 * 60 * 1000); // 5 minutos
     
     // Pré-carrega as imagens do tutorial
     placeholderImages.forEach(src => {
       const img = new Image();
       img.src = src;
     });
+    
+    // Limpar o intervalo quando o componente for desmontado
+    return () => {
+      clearInterval(templateRefreshInterval);
+    };
   }, [loadTemplates]);
   
   return (
