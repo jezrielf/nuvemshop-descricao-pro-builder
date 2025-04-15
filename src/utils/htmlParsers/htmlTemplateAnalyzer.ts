@@ -180,10 +180,14 @@ const processHeroSection = (section: Element, blocks: Block[]): void => {
 // Process a section with multiple images as a gallery
 const processGallerySection = (section: Element, images: NodeListOf<HTMLImageElement>, blocks: Block[]): void => {
   // Ensure columns is a valid ColumnLayout value (1, 2, 3, or 4)
-  const columns = Math.min(4, images.length) as ColumnLayout;
+  const columns = Math.min(4, Math.max(1, images.length)) as ColumnLayout;
   const galleryBlock = createBlock('gallery', columns) as GalleryBlock;
   
-  galleryBlock.heading = extractHeading(section) || 'Gallery';
+  // Instead of setting the heading property directly, update the title property
+  // which is part of the BlockBase interface that GalleryBlock extends
+  const headingText = extractHeading(section) || 'Gallery';
+  galleryBlock.title = headingText;
+  
   galleryBlock.images = Array.from(images).map((img, index) => {
     // Try to find a caption for this image
     let caption = '';
