@@ -9,8 +9,8 @@ const corsHeaders = {
 
 interface NuvemshopAuthResponse {
   access_token: string;
+  token_type: string;
   scope: string;
-  store_id: number;
   user_id: number;
 }
 
@@ -47,16 +47,16 @@ serve(async (req) => {
 
     console.log('State validated, exchanging code for token');
 
-    // Exchange code for token using the POST endpoint with correct headers and body
+    // Use the token exchange endpoint with the exact format shown in the instructions
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Descrição Pro (contato@descricao.pro)'
+        'User-Agent': 'Descricao PRO (comercial@weethub.com.br)'
       },
       body: JSON.stringify({
-        client_id: "17194",
-        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b",
+        client_id: "17194", // As specified in the requirements
+        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b", // As specified in the requirements
         grant_type: "authorization_code",
         code
       })
@@ -70,15 +70,15 @@ serve(async (req) => {
 
     const authData: NuvemshopAuthResponse = await tokenResponse.json();
     console.log('Received auth data from Nuvemshop', { 
-      store_id: authData.store_id,
+      user_id: authData.user_id,
       scope: authData.scope
     });
 
     // Get store information
-    const storeResponse = await fetch(`https://api.tiendanube.com/v1/${authData.store_id}/store`, {
+    const storeResponse = await fetch(`https://api.tiendanube.com/v1/${authData.user_id}/store`, {
       headers: {
         'Authentication': `bearer ${authData.access_token}`,
-        'User-Agent': 'Descrição Pro (contato@descricao.pro)'
+        'User-Agent': 'Descricao PRO (comercial@weethub.com.br)'
       }
     });
 
@@ -99,7 +99,7 @@ serve(async (req) => {
       .from('nuvemshop_stores')
       .insert({
         user_id: authState.user_id,
-        store_id: authData.store_id,
+        store_id: authData.user_id, // The user_id from Nuvemshop is actually the store_id
         name: storeData.name,
         url: storeData.url,
         access_token: authData.access_token,

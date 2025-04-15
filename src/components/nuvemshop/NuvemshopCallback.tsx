@@ -28,7 +28,7 @@ const NuvemshopCallback: React.FC = () => {
           return;
         }
 
-        // Call our edge function to handle OAuth exchange
+        // We need to exchange the code for an access token quickly as it expires in 30 seconds
         const { data, error } = await supabase.functions.invoke('nuvemshop-auth', {
           body: { code, state }
         });

@@ -23,9 +23,9 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 const NUVEMSHOP_CLIENT_ID = "17194";
-const NUVEMSHOP_SCOPES = "products";
+const NUVEMSHOP_SCOPES = "products"; // Scope needed for product operations
 
-// Schema para validação do domínio da loja
+// Schema for store domain validation
 const storeFormSchema = z.object({
   storeDomain: z.string()
     .min(1, { message: "O domínio da loja é obrigatório" })
@@ -83,7 +83,8 @@ export const NuvemshopConnect: React.FC = () => {
         throw stateError;
       }
 
-      // Build direct store app authorization URL
+      // Following the exact URL format from the instructions
+      // Use the direct store admin app authorization URL
       const redirectUrl = `https://${domain}/admin/apps/${NUVEMSHOP_CLIENT_ID}/authorize?state=${state}`;
       
       console.log('Redirecting to Nuvemshop OAuth page:', redirectUrl);
