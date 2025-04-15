@@ -1,8 +1,32 @@
 
 project_id = "zeiodratpawnnbgnflvi"
 
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[storage]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+port = 54324
+
+[realtime]
+enabled = true
+port = 54325
+
+[studio]
+enabled = true
+port = 54326
+
 [functions.nuvemshop-auth]
 verify_jwt = false
 
-[functions.nuvemshop-products]
-verify_jwt = true
+[functions.create-template-tables]
+verify_jwt = false

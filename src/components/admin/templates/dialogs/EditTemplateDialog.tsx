@@ -14,6 +14,7 @@ import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ChevronUp, ChevronDown, Plus, Trash2, Edit, Save } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
+import { useTemplateStore } from '@/store/templateStore';
 
 interface EditTemplateDialogProps {
   open: boolean;
@@ -29,12 +30,12 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   onUpdate,
 }) => {
   const [name, setName] = useState(template.name);
-  const [category, setCategory] = useState<ProductCategory>(template.category);
+  const [category, setCategory] = useState<string>(template.category);
   const [blocks, setBlocks] = useState<Block[]>([...template.blocks]);
   const [activeTab, setActiveTab] = useState('info');
   
   const { toast } = useToast();
-  const categories = ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other'];
+  const { categories } = useTemplateStore();
 
   // Blocos disponíveis para adição
   const blockTypes = [
@@ -148,14 +149,14 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
               
               <div className="space-y-2">
                 <Label htmlFor="edit-category">Categoria</Label>
-                <Select value={category} onValueChange={(value) => setCategory(value as ProductCategory)}>
+                <Select value={category} onValueChange={(value) => setCategory(value)}>
                   <SelectTrigger id="edit-category">
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((cat) => (
                       <SelectItem key={cat} value={cat}>
-                        {getCategoryName(cat as ProductCategory)}
+                        {getCategoryName(cat)}
                       </SelectItem>
                     ))}
                   </SelectContent>

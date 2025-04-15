@@ -24,7 +24,7 @@ interface NewTemplateDialogProps {
 
 export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onClose }) => {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<ProductCategory>('other');
+  const [category, setCategory] = useState<string>('other');
   const [htmlInput, setHtmlInput] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
@@ -34,7 +34,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
   const [showBlocksTab, setShowBlocksTab] = useState(false);
 
   const { toast } = useToast();
-  const { createTemplate } = useTemplateStore();
+  const { categories, createTemplate } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   
   const categories = ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other'];
@@ -275,14 +275,14 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
             
             <div className="space-y-2">
               <Label htmlFor="category">Categoria</Label>
-              <Select value={category} onValueChange={(value) => setCategory(value as ProductCategory)}>
+              <Select value={category} onValueChange={(value) => setCategory(value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
-                      {getCategoryName(cat as ProductCategory)}
+                      {getCategoryName(cat)}
                     </SelectItem>
                   ))}
                 </SelectContent>
