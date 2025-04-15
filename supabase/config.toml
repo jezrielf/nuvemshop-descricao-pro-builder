@@ -12,7 +12,7 @@ port = 54321
 schemas = ["public", "storage", "graphql_public"]
 # Extra schemas to add to the search_path of every request. public is always included.
 extra_search_path = ["public", "extensions"]
-# Maximum rows returns in a single REST request.
+# Maximum rows returns in a single response
 max_rows = 1000
 
 [db]
@@ -21,7 +21,7 @@ port = 54322
 # Port used by db diff command to initialize the shadow database.
 shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
-# server_version` on the remote database to check.
+# server_version;` on the remote database to check.
 major_version = 15
 
 [db.pooler]
@@ -29,17 +29,12 @@ enabled = false
 # Port to use for the local connection pooler.
 port = 54329
 # Specifies when a server connection can be reused by other clients.
-# Configure one of the supported pooler modes: `transaction`, `session`.
+# Configure one of the supported pooler modes: `transaction`, `session`
 pool_mode = "transaction"
 # How many server connections to allow per user/database pair.
 default_pool_size = 20
 # Maximum number of client connections allowed.
 max_client_conn = 100
-
-[realtime]
-enabled = true
-# Bind realtime via either IPv4 or IPv6. (default: IPv6)
-ipv6 = true
 
 [studio]
 enabled = true
@@ -89,60 +84,40 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 
+# Configure one of the supported auth providers.
+[auth.external.github]
+enabled = false
+client_id = ""
+secret = ""
+# Overrides the default auth redirectUrl.
+redirect_uri = ""
+# Overrides the default auth provider URL. Used to support self-hosted GitLab.
+url = ""
+
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+# Overrides the default auth redirectUrl.
+redirect_uri = ""
+
 [analytics]
 enabled = false
 port = 54327
 vector_port = 54328
-# Configure one of the supported backends: `postgres`, `bigquery`
+# Configure one of the supported backends: postgres, bigquery, snowflake
 backend = "postgres"
 
 [experimental]
-# Enable experimental features. These features are likely to change between patch versions.
-multi_schema = false
+# Configures Postgres storage engine to use OrioleDB (S3)
+orioledb_version = ""
 
-# Configure one of the supported SMS providers: `twilio`, `messagebird`, `vonage`.
-[sms]
-enabled = false
-provider = "twilio"
-twilio_account_sid = ""
-twilio_message_service_sid = ""
-twilio_auth_token = ""
-
-[functions]
-enabled = true
-
+# Disable JWT verification for these functions
 [functions.admin-create-user]
 verify_jwt = false
 
 [functions.admin-update-role]
 verify_jwt = false
 
-[functions.check-subscription]
-verify_jwt = true
-
-[functions.create-checkout]
-verify_jwt = true
-
-[functions.create-template-tables]
-verify_jwt = true
-
-[functions.create-template-categories-table]
-verify_jwt = true
-
-[functions.customer-portal]
-verify_jwt = true
-
-[functions.manage-plans]
-verify_jwt = true
-
-[functions.nuvemshop-auth]
-verify_jwt = true
-
-[functions.nuvemshop-products]
-verify_jwt = true
-
-[functions.nuvemshop-update-product]
-verify_jwt = true
-
-[functions.update-nuvemshop-settings]
-verify_jwt = true
+[functions.admin-list-users]
+verify_jwt = false

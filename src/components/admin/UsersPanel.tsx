@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +8,8 @@ import UserPanelContent from './users/panels/UserPanelContent';
 
 interface AuthUser {
   id: string;
-  email?: string;
+  email: string;
+  created_at: string;
 }
 
 const UsersPanel: React.FC = () => {
@@ -47,47 +49,60 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Buscar todos os perfis da tabela
+      // First, get users from auth.users through the admin API
+      const { data: authUsers, error: authError } = await supabase.functions.invoke('admin-list-users', {
+        body: {}
+      });
+      
+      if (authError) {
+        console.error('Error fetching auth users:', authError);
+        throw authError;
+      }
+      
+      console.log('Auth users fetched:', authUsers);
+      
+      // Now get profiles data
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
 
-      if (profilesError) throw profilesError;
-      
-      // Now get the emails from auth.users
-      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-      
-      if (authError) {
-        console.error('Erro ao buscar usuários auth:', authError);
-        // Continue with just the profiles
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
       }
       
-      // Map emails to profiles if auth data is available
-      let enrichedProfiles = profilesData || [];
+      // Create a map of profiles by ID for faster lookup
+      const profilesMap = new Map<string, Profile>();
+      profilesData?.forEach((profile: Profile) => {
+        profilesMap.set(profile.id, profile);
+      });
       
-      if (authData && authData.users) {
-        // Create a map of user IDs to emails
-        const userEmailMap = new Map<string, string>();
-        authData.users.forEach((user: AuthUser) => {
-          if (user.id && user.email) {
-            userEmailMap.set(user.id, user.email);
-          }
-        });
+      // Map auth users to profiles and enrich with email
+      const enrichedProfiles: Profile[] = [];
+      
+      authUsers?.users?.forEach((user: AuthUser) => {
+        const profile = profilesMap.get(user.id) || {
+          id: user.id,
+          nome: null,
+          avatar_url: null,
+          criado_em: user.created_at,
+          atualizado_em: user.created_at,
+          role: 'user',
+        };
         
-        // Add emails to profiles
-        enrichedProfiles = enrichedProfiles.map(profile => ({
+        // Add email from auth user to profile
+        enrichedProfiles.push({
           ...profile,
-          email: userEmailMap.get(profile.id) || null
-        }));
-      }
+          email: user.email
+        });
+      });
       
-      console.log('Perfis obtidos:', enrichedProfiles);
+      console.log('Enriched profiles:', enrichedProfiles);
       
-      // Atualizar o estado com os dados obtidos
       setProfiles(enrichedProfiles);
       setFilteredProfiles(enrichedProfiles);
     } catch (error: any) {
-      console.error('Erro ao buscar perfis:', error);
+      console.error('Error fetching users:', error);
       setError(error.message || 'Erro ao carregar usuários');
       
       toast({
