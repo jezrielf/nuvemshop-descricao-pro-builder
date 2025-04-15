@@ -11,6 +11,7 @@ import { BlockType } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ensureBlocksArray, ensureBlockType } from '@/utils/typeConversion';
+import { convertBlocks, parseTemplateBlocks } from '@/utils/blockConverter';
 
 interface PreviewTemplateDialogProps {
   open: boolean;
@@ -58,7 +59,7 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
     const newBlock = createBlock(type);
     setEditableTemplate(prev => ({
       ...prev,
-      blocks: ensureBlocksArray([...prev.blocks, newBlock])
+      blocks: convertBlocks([...prev.blocks, newBlock])
     }));
     setEdited(true);
     toast({

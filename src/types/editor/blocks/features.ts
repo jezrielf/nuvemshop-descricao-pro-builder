@@ -8,6 +8,6 @@ export interface FeaturesBlock extends BlockBase {
     id: string;
     title: string;
     description: string;
-    icon?: string;
+    icon: string; // Required
   }[];
 }

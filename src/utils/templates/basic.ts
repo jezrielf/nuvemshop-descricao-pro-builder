@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
 
@@ -41,19 +42,19 @@ export const basicTemplate: Template = {
           id: uuidv4(),
           title: "Recurso 1",
           description: "Descrição do recurso 1",
-          icon: "URL_DO_ICONE"
+          icon: "✓" // Ensure icon is provided
         },
         {
           id: uuidv4(),
           title: "Recurso 2",
           description: "Descrição do recurso 2",
-          icon: "URL_DO_ICONE"
+          icon: "✓" // Ensure icon is provided
         },
         {
           id: uuidv4(),
           title: "Recurso 3",
           description: "Descrição do recurso 3",
-          icon: "URL_DO_ICONE"
+          icon: "✓" // Ensure icon is provided
         }
       ],
       style: {}

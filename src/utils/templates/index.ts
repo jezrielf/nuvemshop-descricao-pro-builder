@@ -1,23 +1,26 @@
 
 import { Template } from '@/types/editor';
-import { basicTemplates } from './basic';
-import { supplementsTemplate } from './supplements';
-import { shoesTemplate } from './shoes';
-import { electronicsTemplate } from './electronics';
-import { healthTemplate } from './health';
-import { fashionTemplate } from './fashion';
-import { accessoriesTemplate } from './accessories';
-import { hauteCoutureTemplate } from './hauteCouture';
+import { basicTemplate } from './basic';
+import { supplementsTemplates } from './supplements';
+import { shoesTemplates } from './shoes';
+import { electronicsTemplates } from './electronics';
+import { healthTemplates } from './health';
+import { fashionTemplates } from './fashion';
+import { accessoriesTemplates } from './accessories';
+import { hauteCoutureTemplates } from './hauteCouture';
+
+// Combining all templates
+export const basicTemplates = [basicTemplate];
 
 // Combining all templates
 export const advancedTemplates: Template[] = [
-  supplementsTemplate,
-  shoesTemplate,
-  electronicsTemplate,
-  healthTemplate,
-  fashionTemplate,
-  accessoriesTemplate,
-  hauteCoutureTemplate
+  ...supplementsTemplates,
+  ...shoesTemplates,
+  ...electronicsTemplates,
+  ...healthTemplates,
+  ...fashionTemplates,
+  ...accessoriesTemplates,
+  ...hauteCoutureTemplates
 ];
 
 export const getAllTemplates = (): Template[] => {

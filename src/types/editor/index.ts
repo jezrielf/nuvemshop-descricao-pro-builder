@@ -1,5 +1,5 @@
 
-// Re-export from base only what's not in blocks
+// Re-export from base
 export type { 
   BaseBlock, 
   BlockBase,
@@ -8,14 +8,8 @@ export type {
   Template,
   ProductCategory,
   ColumnLayout,
-  BlockType
+  BlockSpacing
 } from './base';
 
-// Re-export from blocks directory
+// Re-export from blocks directory - this will be our canonical source for Block types
 export * from './blocks';
-
-// Export BlockSpacing for styleConverter.ts
-export interface BlockSpacing {
-  margin?: string;
-  padding?: string;
-}

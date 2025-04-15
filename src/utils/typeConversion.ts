@@ -26,7 +26,18 @@ export function ensureBlockType(block: BaseBlock | Block): Block {
     }
   }
   
-  return typedBlock;
+  if (typedBlock.type === 'features') {
+    // Make sure all features have an icon
+    const featuresBlock = typedBlock as any;
+    if (featuresBlock.features) {
+      featuresBlock.features = featuresBlock.features.map((feature: any) => ({
+        ...feature,
+        icon: feature.icon || '✓' // Set default icon if missing
+      }));
+    }
+  }
+  
+  return typedBlock as Block;
 }
 
 /**
