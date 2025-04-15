@@ -8,10 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useTemplateStore } from '@/store/templateStore';
-import { Template, ProductCategory } from '@/types/editor';
+import { Template, ProductCategory, Block, BlockType } from '@/types/editor';
 import { useEditorStore } from '@/store/editor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getCategoryName } from '../utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { createBlock } from '@/utils/blockCreators/createBlock';
+import { ChevronUp, ChevronDown, Plus, Trash2, Image, Code } from 'lucide-react';
+import BlockRenderer from '@/components/blocks/BlockRenderer';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -23,15 +27,33 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
   const [category, setCategory] = useState<ProductCategory>('other');
   const [htmlInput, setHtmlInput] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [activeTab, setActiveTab] = useState('html');
+  const [activeTab, setActiveTab] = useState('basic');
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestedTemplate, setSuggestedTemplate] = useState<Template | null>(null);
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [showBlocksTab, setShowBlocksTab] = useState(false);
 
   const { toast } = useToast();
   const { createTemplate } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   
   const categories = ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other'];
+
+  // Blocos disponíveis para adição
+  const blockTypes = [
+    { type: 'hero', name: 'Banner Principal' },
+    { type: 'text', name: 'Texto' },
+    { type: 'features', name: 'Recursos' },
+    { type: 'benefits', name: 'Benefícios' },
+    { type: 'specifications', name: 'Especificações' },
+    { type: 'image', name: 'Imagem' },
+    { type: 'gallery', name: 'Galeria' },
+    { type: 'imageText', name: 'Imagem + Texto' },
+    { type: 'textImage', name: 'Texto + Imagem' },
+    { type: 'faq', name: 'Perguntas Frequentes' },
+    { type: 'cta', name: 'Chamada para Ação' },
+    { type: 'video', name: 'Vídeo' },
+  ];
 
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -54,6 +76,17 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
         toast({
           title: "Template criado",
           description: "O template foi criado com sucesso.",
+        });
+      } else if (blocks.length > 0) {
+        // Criando a partir dos blocos adicionados manualmente
+        const newTemplate = createTemplate({
+          name,
+          category,
+          blocks: blocks,
+        });
+        toast({
+          title: "Template criado",
+          description: "O template foi criado com sucesso com os blocos personalizados.",
         });
       } else {
         // Criar um template básico vazio
@@ -124,9 +157,12 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
       };
       
       setSuggestedTemplate(exampleTemplate);
+      setBlocks(exampleTemplate.blocks);
+      setShowBlocksTab(true);
+      setActiveTab('blocks');
       toast({
         title: "Template sugerido gerado",
-        description: "Um template foi gerado baseado no seu HTML. Revise e confirme para criar.",
+        description: "Um template foi gerado baseado no seu HTML. Você pode editar os blocos antes de criar.",
       });
     } catch (error) {
       console.error("Erro ao gerar template:", error);
@@ -191,9 +227,12 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
       };
       
       setSuggestedTemplate(exampleTemplate);
+      setBlocks(exampleTemplate.blocks);
+      setShowBlocksTab(true);
+      setActiveTab('blocks');
       toast({
         title: "Template sugerido gerado",
-        description: "Um template foi gerado baseado na sua imagem. Revise e confirme para criar.",
+        description: "Um template foi gerado baseado na sua imagem. Você pode editar os blocos antes de criar.",
       });
     } catch (error) {
       console.error("Erro ao gerar template da imagem:", error);
@@ -207,14 +246,52 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
     }
   };
 
+  const handleAddBlock = (type: string) => {
+    const newBlock = createBlock(type as BlockType, 1);
+    setBlocks([...blocks, newBlock]);
+    setShowBlocksTab(true);
+    
+    toast({
+      title: "Bloco adicionado",
+      description: `Um novo bloco de tipo "${type}" foi adicionado ao template.`,
+    });
+  };
+
+  const handleRemoveBlock = (id: string) => {
+    setBlocks(blocks.filter(block => block.id !== id));
+    
+    toast({
+      title: "Bloco removido",
+      description: "O bloco foi removido do template.",
+    });
+  };
+
+  const handleMoveBlockUp = (id: string) => {
+    const index = blocks.findIndex(block => block.id === id);
+    if (index <= 0) return;
+    
+    const newBlocks = [...blocks];
+    [newBlocks[index], newBlocks[index - 1]] = [newBlocks[index - 1], newBlocks[index]];
+    setBlocks(newBlocks);
+  };
+
+  const handleMoveBlockDown = (id: string) => {
+    const index = blocks.findIndex(block => block.id === id);
+    if (index === -1 || index === blocks.length - 1) return;
+    
+    const newBlocks = [...blocks];
+    [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+    setBlocks(newBlocks);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Criar Novo Template</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nome do Template</Label>
@@ -242,93 +319,211 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
               </Select>
             </div>
           </div>
+        </div>
           
-          {!suggestedTemplate ? (
-            <Tabs defaultValue="html" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-2 mb-4">
-                <TabsTrigger value="html">Usar HTML</TabsTrigger>
-                <TabsTrigger value="image">Usar Imagem</TabsTrigger>
-              </TabsList>
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className={`grid ${showBlocksTab ? 'grid-cols-4' : 'grid-cols-3'} mb-4`}>
+            <TabsTrigger value="basic">Básico</TabsTrigger>
+            <TabsTrigger value="html">Usar HTML</TabsTrigger>
+            <TabsTrigger value="image">Usar Imagem</TabsTrigger>
+            {showBlocksTab && <TabsTrigger value="blocks">Editar Blocos</TabsTrigger>}
+          </TabsList>
+          
+          <TabsContent value="basic" className="flex-1">
+            <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+              <div className="lg:col-span-2 border rounded-md p-3">
+                <h3 className="text-sm font-medium mb-2">Blocos Disponíveis</h3>
+                <ScrollArea className="h-[300px]">
+                  <div className="space-y-2">
+                    {blockTypes.map((type) => (
+                      <Button 
+                        key={type.type} 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full justify-start text-left"
+                        onClick={() => handleAddBlock(type.type)}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {type.name}
+                      </Button>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
               
-              <TabsContent value="html" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="html-input">Cole seu HTML para análise</Label>
-                  <Textarea 
-                    id="html-input" 
-                    value={htmlInput} 
-                    onChange={(e) => setHtmlInput(e.target.value)}
-                    placeholder="Cole o código HTML aqui..."
-                    className="min-h-[200px] font-mono text-sm"
-                  />
-                </div>
-                <Button 
-                  onClick={generateFromHtml} 
-                  disabled={isGenerating || !htmlInput.trim()}
-                  className="w-full"
-                >
-                  {isGenerating ? "Analisando..." : "Gerar Template do HTML"}
-                </Button>
-              </TabsContent>
-              
-              <TabsContent value="image" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="image-url">URL da imagem de referência</Label>
-                  <Input 
-                    id="image-url" 
-                    value={imageUrl} 
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://exemplo.com/imagem.jpg"
-                  />
-                  {imageUrl && (
-                    <div className="mt-4 border rounded-md overflow-hidden">
-                      <img 
-                        src={imageUrl} 
-                        alt="Preview" 
-                        className="w-full h-auto max-h-[200px] object-contain"
-                        onError={(e) => {
-                          e.currentTarget.src = "/placeholder.svg";
-                          toast({
-                            title: "Erro ao carregar imagem",
-                            description: "Verifique se a URL está correta.",
-                            variant: "destructive",
-                          });
-                        }}
-                      />
-                    </div>
+              <div className="lg:col-span-5">
+                <h3 className="text-sm font-medium mb-2">Informações</h3>
+                <div className="p-4 border rounded-md bg-muted/10">
+                  <p className="text-sm text-muted-foreground">
+                    Você pode criar um template de várias formas:
+                  </p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1 text-sm text-muted-foreground">
+                    <li>Adicione blocos manualmente usando a lista à esquerda</li>
+                    <li>Forneça um código HTML para criar automaticamente um template (aba "Usar HTML")</li>
+                    <li>Forneça uma imagem de referência para gerar um layout (aba "Usar Imagem")</li>
+                  </ul>
+                  <p className="mt-3 text-sm">
+                    Quantidade de blocos adicionados: <strong>{blocks.length}</strong>
+                  </p>
+                  
+                  {blocks.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3"
+                      onClick={() => setActiveTab('blocks')}
+                    >
+                      Editar Blocos
+                    </Button>
                   )}
                 </div>
-                <Button 
-                  onClick={generateFromImage} 
-                  disabled={isGenerating || !imageUrl.trim()}
-                  className="w-full"
-                >
-                  {isGenerating ? "Analisando..." : "Gerar Template da Imagem"}
-                </Button>
-              </TabsContent>
-            </Tabs>
-          ) : (
-            <div className="space-y-4 border p-4 rounded-lg bg-muted/30">
-              <h3 className="font-medium">Template Sugerido</h3>
-              <p>Blocos gerados: {suggestedTemplate.blocks.length}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {suggestedTemplate.blocks.map((block) => (
-                  <div key={block.id} className="p-2 bg-background rounded border text-sm">
-                    {block.title} ({block.type})
-                  </div>
-                ))}
               </div>
-              <Button 
-                variant="outline" 
-                onClick={() => setSuggestedTemplate(null)}
-                size="sm"
-              >
-                Voltar à criação manual
-              </Button>
             </div>
+          </TabsContent>
+              
+          <TabsContent value="html" className="space-y-4 flex-1">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Code className="h-5 w-5" />
+                <Label htmlFor="html-input">Cole seu HTML para análise</Label>
+              </div>
+              <Textarea 
+                id="html-input" 
+                value={htmlInput} 
+                onChange={(e) => setHtmlInput(e.target.value)}
+                placeholder="Cole o código HTML aqui..."
+                className="min-h-[200px] font-mono text-sm"
+              />
+            </div>
+            <Button 
+              onClick={generateFromHtml} 
+              disabled={isGenerating || !htmlInput.trim()}
+              className="w-full"
+            >
+              {isGenerating ? "Analisando..." : "Gerar Template do HTML"}
+            </Button>
+          </TabsContent>
+              
+          <TabsContent value="image" className="space-y-4 flex-1">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Image className="h-5 w-5" />
+                <Label htmlFor="image-url">URL da imagem de referência</Label>
+              </div>
+              <Input 
+                id="image-url" 
+                value={imageUrl} 
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://exemplo.com/imagem.jpg"
+              />
+              {imageUrl && (
+                <div className="mt-4 border rounded-md overflow-hidden">
+                  <img 
+                    src={imageUrl} 
+                    alt="Preview" 
+                    className="w-full h-auto max-h-[200px] object-contain"
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder.svg";
+                      toast({
+                        title: "Erro ao carregar imagem",
+                        description: "Verifique se a URL está correta.",
+                        variant: "destructive",
+                      });
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            <Button 
+              onClick={generateFromImage} 
+              disabled={isGenerating || !imageUrl.trim()}
+              className="w-full"
+            >
+              {isGenerating ? "Analisando..." : "Gerar Template da Imagem"}
+            </Button>
+          </TabsContent>
+          
+          {showBlocksTab && (
+            <TabsContent value="blocks" className="flex-1 overflow-hidden">
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium">Blocos do Template</h3>
+                
+                <Tabs defaultValue="list">
+                  <TabsList className="grid grid-cols-2 w-auto mb-4">
+                    <TabsTrigger value="list">Lista</TabsTrigger>
+                    <TabsTrigger value="preview">Visualização</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="list">
+                    <ScrollArea className="h-[300px] border rounded-md p-2">
+                      {blocks.length > 0 ? (
+                        <div className="space-y-2">
+                          {blocks.map((block, index) => (
+                            <div key={block.id} className="border rounded-md p-3 bg-muted/10">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <span className="font-medium">{block.title}</span>
+                                  <span className="text-xs text-muted-foreground ml-2">
+                                    ({block.type})
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    disabled={index === 0}
+                                    onClick={() => handleMoveBlockUp(block.id)}
+                                  >
+                                    <ChevronUp className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    disabled={index === blocks.length - 1}
+                                    onClick={() => handleMoveBlockDown(block.id)}
+                                  >
+                                    <ChevronDown className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => handleRemoveBlock(block.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <p className="text-muted-foreground">
+                            Nenhum bloco adicionado. Volte à aba Básico para adicionar blocos.
+                          </p>
+                        </div>
+                      )}
+                    </ScrollArea>
+                  </TabsContent>
+                  
+                  <TabsContent value="preview">
+                    <ScrollArea className="h-[300px] border rounded-md">
+                      <div className="space-y-6 p-4">
+                        {blocks.map((block) => (
+                          <div key={block.id} className="preview-block border rounded-md overflow-hidden">
+                            <BlockRenderer block={block} isPreview={true} />
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </TabsContent>
           )}
-        </div>
+        </Tabs>
         
-        <DialogFooter>
+        <DialogFooter className="pt-4">
           <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
