@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,6 @@ const HtmlOutputDialog: React.FC = () => {
   const [selectedStoreId, setSelectedStoreId] = useState<number | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [updateSuccess, setUpdateSuccess] = useState<number[]>([]);
   const { getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
   
@@ -38,7 +36,6 @@ const HtmlOutputDialog: React.FC = () => {
   const handleStoreSelect = (storeId: number) => {
     setSelectedStoreId(storeId);
     setSelectedProductIds([]);
-    setUpdateSuccess([]);
   };
 
   const handleProductSelect = (productId: number) => {
@@ -47,8 +44,6 @@ const HtmlOutputDialog: React.FC = () => {
     } else {
       setSelectedProductIds(prev => [...prev, productId]);
     }
-    // Reset success state when selection changes
-    setUpdateSuccess([]);
   };
 
   const updateNuvemshopProducts = async () => {
@@ -64,8 +59,6 @@ const HtmlOutputDialog: React.FC = () => {
     setIsUpdating(true);
     
     try {
-      const updatedProducts = [];
-      
       // Atualizar cada produto selecionado
       for (const productId of selectedProductIds) {
         const { data, error } = await supabase.functions.invoke('nuvemshop-update-product', {
@@ -83,18 +76,13 @@ const HtmlOutputDialog: React.FC = () => {
             description: `Não foi possível atualizar o produto ${productId}.`,
             variant: "destructive"
           });
-        } else {
-          updatedProducts.push(productId);
-          setUpdateSuccess(prev => [...prev, productId]);
         }
       }
       
-      if (updatedProducts.length > 0) {
-        toast({
-          title: "Produtos atualizados!",
-          description: `${updatedProducts.length} produtos foram atualizados com sucesso.`,
-        });
-      }
+      toast({
+        title: "Produtos atualizados!",
+        description: `${selectedProductIds.length} produtos foram atualizados com sucesso.`,
+      });
     } catch (error) {
       console.error('Erro ao atualizar produtos:', error);
       toast({
@@ -143,6 +131,7 @@ const HtmlOutputDialog: React.FC = () => {
           Ver HTML
         </Button>
       </DialogTrigger>
+      
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Visualização do Produto na Nuvemshop</DialogTitle>
@@ -185,19 +174,24 @@ const HtmlOutputDialog: React.FC = () => {
           
           <TabsContent value="products">
             <div className="space-y-4">
-              <Alert variant="default">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Visualize todos os produtos disponíveis na sua loja Nuvemshop.
-                </AlertDescription>
-              </Alert>
-              
               <div className="flex items-center gap-4 mb-4">
                 <StoreSelector onSelect={handleStoreSelect} value={selectedStoreId || undefined} />
                 <NuvemshopConnect />
               </div>
               
-              {selectedStoreId && (
+              {isLoading && (
+                <div className="text-center py-4 text-muted-foreground">
+                  Carregando produtos...
+                </div>
+              )}
+              
+              {error && (
+                <div className="text-center py-4 text-red-500">
+                  Erro ao carregar produtos
+                </div>
+              )}
+              
+              {selectedStoreId && !isLoading && !error && (
                 <ProductList products={products || []} />
               )}
             </div>
