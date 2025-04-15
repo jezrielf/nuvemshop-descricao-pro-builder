@@ -54,7 +54,7 @@ export const authService = {
       const { data, error } = await supabase
         .from('profiles')
         .update({ 
-          role: roleValue,
+          role: roleValue, // This is fine as the column accepts string or string[] according to Profile type
           atualizado_em: new Date().toISOString() 
         })
         .eq('id', userId);
