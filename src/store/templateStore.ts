@@ -4,7 +4,6 @@ import { Template, ProductCategory, Block } from '@/types/editor';
 import { getAllTemplates } from '@/utils/templates';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
-// Removing the SupabaseRealtimePayload import as it's not needed
 
 // Define the Supabase template data structure
 interface SupabaseTemplate {
@@ -34,11 +33,18 @@ interface TemplateState {
 
 // Utility function to convert Supabase template format to our Template type
 const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Template => {
+  // Ensure blocks is always an array
+  const blocks = Array.isArray(supaTemplate.blocks) 
+    ? supaTemplate.blocks 
+    : (typeof supaTemplate.blocks === 'object' && supaTemplate.blocks !== null)
+      ? Object.values(supaTemplate.blocks)
+      : [];
+      
   return {
     id: supaTemplate.id,
     name: supaTemplate.name,
     category: supaTemplate.category,
-    blocks: Array.isArray(supaTemplate.blocks) ? supaTemplate.blocks : []
+    blocks: blocks
   };
 };
 
@@ -68,8 +74,15 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         console.error('Error loading templates from database:', error);
       }
       
+      console.log('User templates from database:', userTemplatesData?.length || 0);
+      
       // Convert Supabase templates to our Template format
-      const userTemplates: Template[] = (userTemplatesData || []).map(convertSupabaseToTemplate);
+      const userTemplates: Template[] = (userTemplatesData || []).map(template => {
+        const converted = convertSupabaseToTemplate(template as SupabaseTemplate);
+        console.log(`Converting template: ${template.name}, blocks:`, 
+          Array.isArray(template.blocks) ? template.blocks.length : 'non-array');
+        return converted;
+      });
       
       // Combine default templates with user templates
       const allTemplates = [
@@ -83,6 +96,8 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       const templateCategories = Array.from(
         new Set(allTemplates.map(template => template.category))
       );
+      
+      console.log('Template categories found:', templateCategories);
       
       // Also load custom categories from Supabase
       const { data: customCats, error: catError } = await supabase

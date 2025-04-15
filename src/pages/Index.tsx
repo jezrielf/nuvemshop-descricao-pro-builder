@@ -24,8 +24,16 @@ const Index = () => {
   
   useEffect(() => {
     // Carrega os templates iniciais
-    loadTemplates();
-    console.log("Templates carregados");
+    const initializeTemplates = async () => {
+      try {
+        await loadTemplates();
+        console.log("Templates carregados na inicialização");
+      } catch (error) {
+        console.error("Erro ao carregar templates:", error);
+      }
+    };
+    
+    initializeTemplates();
     
     // Pré-carrega as imagens do tutorial
     placeholderImages.forEach(src => {

@@ -20,7 +20,9 @@ export const TemplatesView = () => {
   useEffect(() => {
     const load = async () => {
       try {
+        console.log("TemplatesView - carregando templates");
         await loadTemplates();
+        console.log("TemplatesView - templates carregados com sucesso");
       } catch (error) {
         console.error('Error loading templates:', error);
         toast({
@@ -38,6 +40,8 @@ export const TemplatesView = () => {
   
   // Filter templates based on search query and selected category
   const filteredTemplates = searchTemplates(searchQuery, selectedCategory);
+  
+  console.log(`TemplatesView - Mostrando ${filteredTemplates.length} templates de um total de ${templates.length}`);
 
   if (isLoading) {
     return (

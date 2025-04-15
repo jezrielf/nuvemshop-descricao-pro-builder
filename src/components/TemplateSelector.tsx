@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTemplateStore } from '@/store/templateStore';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
@@ -10,13 +10,19 @@ import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType } from '@/types/editor';
 
 const TemplateSelector: React.FC = () => {
-  const { templates, categories, selectCategory, selectedCategory } = useTemplateStore();
+  const { templates, categories, selectCategory, selectedCategory, loadTemplates } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const { toast } = useToast();
   
+  // Load templates when the component mounts
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
+  
   // Obter todos os templates quando selectedCategory for null
   const displayedTemplates = React.useMemo(() => {
+    console.log('Displaying templates. Total available:', templates.length);
     return selectedCategory === null 
       ? templates  // Exibir todos os templates quando nenhuma categoria estiver selecionada
       : templates.filter(template => template.category === selectedCategory);
@@ -39,7 +45,8 @@ const TemplateSelector: React.FC = () => {
     shoes: 'Calçados',
     electronics: 'Eletrônicos',
     energy: 'Energéticos',
-    other: 'Outros'
+    other: 'Outros',
+    'Casa e decoração': 'Casa e decoração'
   };
   
   // Verifica se é um template avançado pelo ID
@@ -63,6 +70,8 @@ const TemplateSelector: React.FC = () => {
         return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
       case 'accessories':
         return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
+      case 'Casa e decoração':
+        return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92';
       default:
         return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
     }
@@ -81,6 +90,11 @@ const TemplateSelector: React.FC = () => {
           <DialogTitle>Escolha um Template</DialogTitle>
           <DialogDescription>
             Selecione um template para iniciar rapidamente sua descrição de produto.
+            {templates.length === 0 && (
+              <div className="mt-2 text-yellow-600 text-sm">
+                Carregando templates... Se nenhum template aparecer, tente fechar e abrir este diálogo novamente.
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
         
