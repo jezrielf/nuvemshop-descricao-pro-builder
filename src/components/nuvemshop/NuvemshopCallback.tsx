@@ -19,7 +19,7 @@ const NuvemshopCallback: React.FC = () => {
         const code = params.get('code');
         const state = params.get('state');
         
-        console.log('Processing Nuvemshop callback with code and state:', { code: !!code, state: !!state });
+        console.log('Processing Nuvemshop callback with code:', code?.substring(0, 8) + '...');
         
         if (!code || !state) {
           console.error('Missing required parameters');
