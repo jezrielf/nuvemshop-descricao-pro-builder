@@ -47,7 +47,7 @@ serve(async (req) => {
 
     console.log('State validated, exchanging code for token');
 
-    // Use the token exchange endpoint with the exact format shown in the instructions
+    // Exchange code for access token using the exact format from the documentation
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
       method: 'POST',
       headers: {
@@ -55,8 +55,8 @@ serve(async (req) => {
         'User-Agent': 'Descricao PRO (comercial@weethub.com.br)'
       },
       body: JSON.stringify({
-        client_id: "17194", // As specified in the requirements
-        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b", // As specified in the requirements
+        client_id: "17194",
+        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b",
         grant_type: "authorization_code",
         code
       })
@@ -99,7 +99,7 @@ serve(async (req) => {
       .from('nuvemshop_stores')
       .insert({
         user_id: authState.user_id,
-        store_id: authData.user_id, // The user_id from Nuvemshop is actually the store_id
+        store_id: authData.user_id,
         name: storeData.name,
         url: storeData.url,
         access_token: authData.access_token,
