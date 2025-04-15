@@ -1,10 +1,10 @@
 
-import { Block, BlockType, Template } from '@/types/editor';
+import { Block, BlockType, ColumnLayout, Template, ProductCategory, TextBlock, HeroBlock, GalleryBlock, FeaturesBlock, FAQBlock, CTABlock, ImageTextBlock, TextImageBlock } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import { createBlock } from '../blockCreators/createBlock';
 
 // Parses HTML and creates template blocks
-export const analyzeHtmlForTemplate = (htmlInput: string, category: string): Template => {
+export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCategory): Template => {
   const parsedBlocks: Block[] = [];
   let doc: Document;
 
@@ -22,14 +22,14 @@ export const analyzeHtmlForTemplate = (htmlInput: string, category: string): Tem
 
     // If no blocks were detected, create a default text block with the HTML content
     if (parsedBlocks.length === 0) {
-      const textBlock = createBlock('text', 1);
+      const textBlock = createBlock('text', 1) as TextBlock;
       textBlock.content = sanitizeHtmlContent(htmlInput);
       parsedBlocks.push(textBlock);
     }
   } catch (error) {
     console.error('Error parsing HTML:', error);
     // Fallback: create a text block with the raw HTML
-    const textBlock = createBlock('text', 1);
+    const textBlock = createBlock('text', 1) as TextBlock;
     textBlock.content = sanitizeHtmlContent(htmlInput);
     parsedBlocks.push(textBlock);
   }
@@ -37,7 +37,7 @@ export const analyzeHtmlForTemplate = (htmlInput: string, category: string): Tem
   return {
     id: uuidv4(),
     name: 'Template from HTML',
-    category: category,
+    category,
     blocks: parsedBlocks
   };
 };
@@ -128,7 +128,7 @@ const analyzeContent = (element: Element, blocks: Block[]): void => {
     }
   } else if (element.querySelectorAll('li').length > 3) {
     // List-heavy content could be features or specifications
-    const listBlock = createBlock('features', 1);
+    const listBlock = createBlock('features', 1) as FeaturesBlock;
     listBlock.heading = extractHeading(element) || 'Features';
     listBlock.features = Array.from(element.querySelectorAll('li')).map((item, index) => ({
       id: uuidv4(),
@@ -139,7 +139,7 @@ const analyzeContent = (element: Element, blocks: Block[]): void => {
     blocks.push(listBlock);
   } else {
     // Default to a text block
-    const textBlock = createBlock('text', 1);
+    const textBlock = createBlock('text', 1) as TextBlock;
     textBlock.heading = extractHeading(element) || '';
     textBlock.content = sanitizeHtmlContent(element.innerHTML);
     blocks.push(textBlock);
@@ -148,7 +148,7 @@ const analyzeContent = (element: Element, blocks: Block[]): void => {
 
 // Process a section that looks like a hero/banner
 const processHeroSection = (section: Element, blocks: Block[]): void => {
-  const heroBlock = createBlock('hero', 1);
+  const heroBlock = createBlock('hero', 1) as HeroBlock;
   
   // Extract heading, subheading, and button
   const h1 = section.querySelector('h1');
@@ -179,7 +179,9 @@ const processHeroSection = (section: Element, blocks: Block[]): void => {
 
 // Process a section with multiple images as a gallery
 const processGallerySection = (section: Element, images: NodeListOf<HTMLImageElement>, blocks: Block[]): void => {
-  const galleryBlock = createBlock('gallery', Math.min(4, images.length));
+  // Ensure columns is a valid ColumnLayout value (1, 2, 3, or 4)
+  const columns = Math.min(4, images.length) as ColumnLayout;
+  const galleryBlock = createBlock('gallery', columns) as GalleryBlock;
   
   galleryBlock.heading = extractHeading(section) || 'Gallery';
   galleryBlock.images = Array.from(images).map((img, index) => {
@@ -213,7 +215,7 @@ const processFeatureSection = (section: Element, blocks: Block[]): void => {
   const blockType: BlockType = isBenefits ? 'benefits' : 'features';
   const featureBlock = createBlock(blockType, 3); // Default to 3 columns
   
-  featureBlock.heading = extractHeading(section) || (isBenefits ? 'Benefits' : 'Features');
+  (featureBlock as FeaturesBlock).heading = extractHeading(section) || (isBenefits ? 'Benefits' : 'Features');
   
   // Try to identify individual feature items
   const featureItems = section.querySelectorAll('.feature, .benefit, .item, .card, li');
@@ -234,7 +236,7 @@ const processFeatureSection = (section: Element, blocks: Block[]): void => {
     if (blockType === 'benefits') {
       (featureBlock as any).benefits = items;
     } else {
-      (featureBlock as any).features = items;
+      (featureBlock as FeaturesBlock).features = items;
     }
   }
   
@@ -243,7 +245,7 @@ const processFeatureSection = (section: Element, blocks: Block[]): void => {
 
 // Process a section that looks like FAQs
 const processFAQSection = (section: Element, blocks: Block[]): void => {
-  const faqBlock = createBlock('faq', 1);
+  const faqBlock = createBlock('faq', 1) as FAQBlock;
   
   faqBlock.heading = extractHeading(section) || 'Frequently Asked Questions';
   
@@ -287,7 +289,7 @@ const processFAQSection = (section: Element, blocks: Block[]): void => {
 
 // Process a section that looks like a CTA
 const processCTASection = (section: Element, blocks: Block[]): void => {
-  const ctaBlock = createBlock('cta', 1);
+  const ctaBlock = createBlock('cta', 1) as CTABlock;
   
   ctaBlock.heading = extractHeading(section) || 'Take Action';
   
@@ -314,7 +316,7 @@ const processImageTextSection = (section: Element, image: HTMLImageElement, bloc
   // If image is in the first half, it's an image+text, otherwise text+image
   const blockType: BlockType = imageIndex < totalElements / 2 ? 'imageText' : 'textImage';
   
-  const mediaBlock = createBlock(blockType, 1);
+  const mediaBlock = createBlock(blockType, 1) as ImageTextBlock | TextImageBlock;
   
   mediaBlock.heading = extractHeading(section) || 'Image and Text';
   
@@ -334,10 +336,9 @@ const processImageTextSection = (section: Element, image: HTMLImageElement, bloc
   }
   
   // Set image properties
-  (mediaBlock as any).image = {
+  mediaBlock.image = {
     src: image.src,
-    alt: image.alt || 'Product image',
-    caption: ''
+    alt: image.alt || 'Product image'
   };
   
   blocks.push(mediaBlock);
