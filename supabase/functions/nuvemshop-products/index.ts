@@ -41,7 +41,7 @@ serve(async (req) => {
     console.log('Found store, fetching products from Nuvemshop API');
 
     // Fetch products from Nuvemshop
-    const productsResponse = await fetch(`https://api.tiendanube.com/v1/${storeId}/products`, {
+    const productsResponse = await fetch(`https://api.tiendanube.com/v1/${storeId}/products?per_page=200&page=1`, {
       headers: {
         'Authentication': `bearer ${store.access_token}`,
         'User-Agent': 'Descrição Pro (contato@descricao.pro)'
@@ -73,3 +73,4 @@ serve(async (req) => {
     );
   }
 });
+
