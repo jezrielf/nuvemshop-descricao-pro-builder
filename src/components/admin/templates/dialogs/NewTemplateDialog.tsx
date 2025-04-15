@@ -34,10 +34,13 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
   const [showBlocksTab, setShowBlocksTab] = useState(false);
 
   const { toast } = useToast();
-  const { categories, createTemplate } = useTemplateStore();
+  const { categories: storeCategories, createTemplate } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   
-  const categories = ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other'];
+  // We'll use the categories from the store if available, otherwise fall back to these defaults
+  const availableCategories = storeCategories.length > 0 
+    ? storeCategories 
+    : ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'other'];
 
   // Blocos disponíveis para adição
   const blockTypes = [
@@ -178,7 +181,8 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
             subheading: 'Design baseado na estética da sua imagem',
             buttonText: 'Saiba Mais',
             buttonUrl: '#',
-            backgroundImage: imageUrl
+            backgroundImage: imageUrl,
+            style: {}
           },
           {
             id: 'image-features',
@@ -191,7 +195,8 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
               { id: 'feat1', title: 'Característica 1', description: 'Descrição da característica 1', icon: 'Star' },
               { id: 'feat2', title: 'Característica 2', description: 'Descrição da característica 2', icon: 'Heart' },
               { id: 'feat3', title: 'Característica 3', description: 'Descrição da característica 3', icon: 'Shield' }
-            ]
+            ],
+            style: {}
           }
         ]
       };
@@ -280,7 +285,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
+                  {availableCategories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {getCategoryName(cat)}
                     </SelectItem>

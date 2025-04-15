@@ -1,9 +1,35 @@
+
 export interface BaseBlock {
   id: string;
   type: string;
   title: string;
   columns: number;
   visible: boolean;
+}
+
+// Adding missing BlockBase and BlockStyle interfaces
+export interface BlockBase extends BaseBlock {
+  id: string;
+  type: string;
+  title: string;
+  columns: ColumnLayout;
+  visible: boolean;
+  style?: BlockStyle;
+}
+
+export interface BlockStyle {
+  backgroundColor?: string;
+  textColor?: string;
+  padding?: string;
+  margin?: string;
+  borderRadius?: string;
+  borderWidth?: string;
+  borderColor?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  textAlign?: string;
+  boxShadow?: string;
+  [key: string]: any; // For other custom styles
 }
 
 export interface ProductDescription {
@@ -183,5 +209,6 @@ export interface VideoBlock extends BaseBlock {
   type: 'video';
   videoUrl: string;
   description: string;
+  autoplay?: boolean;
   style?: Record<string, string>;
 }

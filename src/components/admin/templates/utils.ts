@@ -1,6 +1,5 @@
 
 import { ProductCategory } from '@/types/editor';
-import { useTemplateStore } from '@/store/templateStore';
 
 // Function to get a human-readable name for a category
 export const getCategoryName = (category: ProductCategory | string): string => {
@@ -14,7 +13,6 @@ export const getCategoryName = (category: ProductCategory | string): string => {
     other: 'Outros',
   };
 
-  // Return the mapped name or the original if not found
+  // Return the mapped name or the original if not found (for custom categories)
   return categoryMap[category] || category;
 };
-
