@@ -51,9 +51,10 @@ export interface Template {
 export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoes' | 'electronics' | 'energy' | 'other' | string;
 
 // Import block types from the blocks directory
-import { Block, BlockType } from './blocks';
-// Use export type when re-exporting for 'isolatedModules' mode
-export type { Block, BlockType };
+import { Block } from './blocks';
+
+// Note: BlockType is now exported from blocks/index.ts
+export type { Block };
 
 export type ColumnLayout = 1 | 2 | 3 | 4;
 

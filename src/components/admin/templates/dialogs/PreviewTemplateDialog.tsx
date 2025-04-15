@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Template } from '@/types/editor';
+import { Template, Block } from '@/types/editor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { useEditorStore } from '@/store/editor';
-import { Plus, Edit } from 'lucide-react';
+import { Plus, Edit, Code } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { BlockType } from '@/types/editor';
+import { BlockType } from '@/types/editor/blocks';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ensureBlocksArray, ensureBlockType } from '@/utils/typeConversion';
-import { convertBlocks, parseTemplateBlocks } from '@/utils/blockConverter';
+import { convertBlocks } from '@/utils/blockConverter';
+import { generateTemplatePreview } from '@/utils/htmlParsers/htmlPreviewGenerator';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PreviewTemplateDialogProps {
   open: boolean;
@@ -27,8 +29,17 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
   const [activeTab, setActiveTab] = useState('preview');
   const [editableTemplate, setEditableTemplate] = useState<Template>({...template});
   const [edited, setEdited] = useState(false);
+  const [htmlPreview, setHtmlPreview] = useState('');
   const { loadTemplate } = useEditorStore();
   const { toast } = useToast();
+
+  useEffect(() => {
+    setEditableTemplate({...template});
+    
+    // Gerar o HTML quando o componente for montado
+    const html = generateTemplatePreview(template);
+    setHtmlPreview(html);
+  }, [template]);
 
   // Blocos disponíveis para adição
   const availableBlocks: { type: BlockType; name: string }[] = [
@@ -57,11 +68,22 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
 
   const handleAddBlock = (type: BlockType) => {
     const newBlock = createBlock(type);
+    const updatedBlocks = convertBlocks([...editableTemplate.blocks, newBlock]);
+    
     setEditableTemplate(prev => ({
       ...prev,
-      blocks: convertBlocks([...prev.blocks, newBlock])
+      blocks: updatedBlocks
     }));
+    
     setEdited(true);
+    
+    // Atualizar o HTML após adicionar o bloco
+    const html = generateTemplatePreview({
+      ...editableTemplate,
+      blocks: updatedBlocks
+    });
+    setHtmlPreview(html);
+    
     toast({
       title: "Bloco adicionado",
       description: `Um novo bloco do tipo ${type} foi adicionado ao template.`,
@@ -69,11 +91,22 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
   };
 
   const handleRemoveBlock = (blockId: string) => {
+    const updatedBlocks = editableTemplate.blocks.filter(block => block.id !== blockId);
+    
     setEditableTemplate(prev => ({
       ...prev,
-      blocks: prev.blocks.filter(block => block.id !== blockId)
+      blocks: updatedBlocks
     }));
+    
     setEdited(true);
+    
+    // Atualizar o HTML após remover o bloco
+    const html = generateTemplatePreview({
+      ...editableTemplate,
+      blocks: updatedBlocks
+    });
+    setHtmlPreview(html);
+    
     toast({
       title: "Bloco removido",
       description: "O bloco foi removido do template.",
@@ -94,10 +127,19 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
       setEdited(true);
     }
 
-    setEditableTemplate(prev => ({
-      ...prev,
-      blocks: newBlocks
-    }));
+    if (setEdited) {
+      setEditableTemplate(prev => ({
+        ...prev,
+        blocks: newBlocks
+      }));
+      
+      // Atualizar o HTML após mover o bloco
+      const html = generateTemplatePreview({
+        ...editableTemplate,
+        blocks: newBlocks
+      });
+      setHtmlPreview(html);
+    }
   };
 
   return (
@@ -108,9 +150,10 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid grid-cols-2 mb-4">
+          <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="preview">Visualizar</TabsTrigger>
             <TabsTrigger value="edit">Editar Blocos</TabsTrigger>
+            <TabsTrigger value="html">Código HTML</TabsTrigger>
           </TabsList>
           
           <TabsContent value="preview" className="flex-1 overflow-hidden">
@@ -243,6 +286,20 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
                 </ScrollArea>
               </div>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="html" className="flex-1 overflow-hidden">
+            <div className="mb-2 flex items-center">
+              <Code className="mr-2 h-4 w-4" />
+              <h3 className="text-sm font-medium">Código HTML gerado a partir do template</h3>
+            </div>
+            <ScrollArea className="h-[60vh] border rounded-md">
+              <Textarea
+                className="font-mono text-sm h-full min-h-[60vh] p-4"
+                value={htmlPreview}
+                readOnly
+              />
+            </ScrollArea>
           </TabsContent>
         </Tabs>
         

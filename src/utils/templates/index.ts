@@ -2,7 +2,7 @@
 import { Template } from '@/types/editor';
 import { basicTemplate } from './basic';
 import { supplementsTemplates } from './supplements';
-// Import with the correct names
+// Import templates individually
 import { shoesTemplateA, shoesTemplateB } from './shoes';
 import { electronicsTemplate } from './electronics';
 import { healthTemplate } from './health';
@@ -14,12 +14,12 @@ import { hauteCoutureTemplate } from './hauteCouture';
 export const basicTemplates = [basicTemplate];
 
 // Create arrays for templates that are exported as single objects
-const shoesTemplates = [shoesTemplateA, shoesTemplateB];
-const electronicsTemplates = [electronicsTemplate];
-const healthTemplates = [healthTemplate];
-const fashionTemplates = [fashionTemplate];
-const accessoriesTemplates = [accessoriesTemplate];
-const hauteCoutureTemplates = [hauteCoutureTemplate];
+export const shoesTemplates = [shoesTemplateA, shoesTemplateB];
+export const electronicsTemplates = [electronicsTemplate];
+export const healthTemplates = [healthTemplate];
+export const fashionTemplates = [fashionTemplate];
+export const accessoriesTemplates = [accessoriesTemplate];
+export const hauteCoutureTemplates = [hauteCoutureTemplate];
 
 // Combining all templates
 export const advancedTemplates: Template[] = [
@@ -44,6 +44,3 @@ export * from './health';
 export * from './fashion';
 export * from './accessories';
 export * from './hauteCouture';
-
-// Export the arrays for use in other files
-export { shoesTemplates, electronicsTemplates, healthTemplates, fashionTemplates, accessoriesTemplates, hauteCoutureTemplates };
