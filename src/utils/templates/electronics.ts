@@ -1,122 +1,95 @@
-
-import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
+import { Template } from '@/types/editor';
 
-// Template para Eletrônicos
 export const electronicsTemplate: Template = {
-  id: 'adv-electronics-1',
-  name: 'Smartphone Premium',
-  category: 'electronics',
+  id: uuidv4(),
+  name: "Template de Eletrônicos",
+  category: "electronics",
   blocks: [
     {
       id: uuidv4(),
-      type: 'hero',
-      title: 'Hero',
+      type: "hero",
+      title: "Banner Principal",
       columns: 1,
       visible: true,
-      heading: 'UltraPhone Pro X',
-      subheading: 'Redefina o conceito de smartphone com a mais avançada tecnologia disponível',
-      buttonText: 'Explorar Recursos',
-      buttonUrl: '#'
+      heading: "Descubra a Última Geração de Eletrônicos",
+      subheading: "Inovação e Tecnologia ao Seu Alcance",
+      buttonText: "Ver Produtos",
+      buttonUrl: "#produtos",
+      backgroundImage: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZWxlY3Ryb25pY3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+      style: {}
     },
     {
       id: uuidv4(),
-      type: 'gallery',
-      title: 'Galeria',
-      columns: 3,
-      visible: true,
-      images: [
-        { id: uuidv4(), src: 'https://images.unsplash.com/photo-1560617544-b4f287789e24', alt: 'Vista frontal', caption: 'Tela Infinita' },
-        { id: uuidv4(), src: 'https://images.unsplash.com/photo-1552056739-d4c85c9cd997', alt: 'Câmera', caption: 'Sistema de câmeras profissionais' },
-        { id: uuidv4(), src: 'https://images.unsplash.com/photo-1585060544812-6b45742d762f', alt: 'Interface', caption: 'Interface fluida e intuitiva' }
-      ]
-    },
-    {
-      id: uuidv4(),
-      type: 'specifications',
-      title: 'Especificações',
+      type: "text",
+      title: "Descrição Geral",
       columns: 1,
       visible: true,
-      heading: 'Ficha Técnica',
-      specs: [
-        { id: uuidv4(), name: 'Processador', value: 'OctaCore 3.2GHz' },
-        { id: uuidv4(), name: 'Memória RAM', value: '12GB LPDDR5' },
-        { id: uuidv4(), name: 'Armazenamento', value: '256GB/512GB UFS 3.1' },
-        { id: uuidv4(), name: 'Tela', value: 'AMOLED 6.7" 120Hz HDR10+' },
-        { id: uuidv4(), name: 'Resolução', value: '3200 x 1440 pixels' },
-        { id: uuidv4(), name: 'Câmera principal', value: 'Quádrupla 108MP + 48MP + 12MP + 5MP' },
-        { id: uuidv4(), name: 'Câmera frontal', value: '32MP com autofoco' },
-        { id: uuidv4(), name: 'Bateria', value: '5000mAh com carregamento rápido 65W' },
-        { id: uuidv4(), name: 'Sistema', value: 'UltraOS 13 baseado em Android 13' },
-        { id: uuidv4(), name: 'Resistência', value: 'IP68 (água e poeira)' },
-        { id: uuidv4(), name: 'Dimensões', value: '158.3 x 73.4 x 8.1 mm' },
-        { id: uuidv4(), name: 'Peso', value: '189g' }
-      ]
+      heading: "Por que Escolher Nossos Eletrônicos?",
+      content: "Nossos produtos são cuidadosamente selecionados para oferecer o melhor em tecnologia, durabilidade e custo-benefício. Encontre desde smartphones de última geração até acessórios inovadores que facilitam o seu dia a dia.",
+      style: {}
     },
     {
       id: uuidv4(),
-      type: 'imageText',
-      title: 'Imagem e Texto',
-      columns: 1,
-      visible: true,
-      heading: 'Fotografia Profissional em suas Mãos',
-      content: 'O sistema de câmeras do UltraPhone Pro X foi desenvolvido em parceria com especialistas em fotografia. A câmera principal de 108MP captura detalhes impressionantes mesmo em condições de pouca luz. Com estabilização óptica avançada e inteligência artificial, suas fotos e vídeos terão qualidade profissional em qualquer situação.',
-      image: {
-        src: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0',
-        alt: 'Sistema de câmeras'
-      }
-    },
-    {
-      id: uuidv4(),
-      type: 'features',
-      title: 'Recursos',
+      type: "benefits",
+      title: "Benefícios",
       columns: 2,
       visible: true,
-      heading: 'Recursos Exclusivos',
-      features: [
-        { id: uuidv4(), title: 'UltraDisplay', description: 'Tela AMOLED de 120Hz com HDR10+ e brilho de 1500 nits' },
-        { id: uuidv4(), title: 'UltraCharge', description: 'Carregamento completo em apenas 35 minutos' },
-        { id: uuidv4(), title: 'UltraSound', description: 'Sistema de áudio estéreo com Dolby Atmos' },
-        { id: uuidv4(), title: 'UltraSecure', description: 'Leitor de digital na tela e reconhecimento facial avançado' }
-      ]
+      heading: "Características Principais",
+      benefits: [
+        {
+          id: uuidv4(),
+          title: "Alta Durabilidade",
+          description: "Construído com materiais de alta qualidade para durar anos",
+          icon: "⭐"
+        },
+        {
+          id: uuidv4(),
+          title: "Tecnologia Avançada",
+          description: "Utiliza os componentes mais recentes do mercado",
+          icon: "💻"
+        },
+        {
+          id: uuidv4(),
+          title: "Baixo Consumo",
+          description: "Design eficiente que economiza energia",
+          icon: "🔋"
+        },
+        {
+          id: uuidv4(),
+          title: "Garantia Estendida",
+          description: "Garantia de 2 anos em todos os produtos",
+          icon: "✅"
+        }
+      ],
+      style: {}
     },
     {
       id: uuidv4(),
-      type: 'textImage',
-      title: 'Texto e Imagem',
+      type: "specifications",
+      title: "Especificações",
       columns: 1,
       visible: true,
-      heading: 'Desempenho Sem Limites',
-      content: 'O processador OctaCore de última geração combinado com 12GB de RAM garante que você possa executar múltiplas tarefas simultaneamente sem qualquer lentidão. Jogos, edição de vídeo, multitarefa pesada - o UltraPhone Pro X lida com tudo isso e muito mais com extrema fluidez.',
-      image: {
-        src: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb',
-        alt: 'Desempenho gráfico'
-      }
+      heading: "Especificações Técnicas",
+      specs: [
+        { id: uuidv4(), name: "Processador", value: "Octa-Core 2.8GHz" },
+        { id: uuidv4(), name: "Memória RAM", value: "8GB" },
+        { id: uuidv4(), name: "Armazenamento", value: "256GB SSD" },
+        { id: uuidv4(), name: "Tela", value: "AMOLED 6.5 polegadas" }
+      ],
+      style: {}
     },
     {
       id: uuidv4(),
-      type: 'faq',
-      title: 'FAQ',
+      type: "cta",
+      title: "Chamada para Ação",
       columns: 1,
       visible: true,
-      heading: 'Perguntas Frequentes',
-      questions: [
-        { id: uuidv4(), question: 'O UltraPhone Pro X suporta 5G?', answer: 'Sim, o aparelho é compatível com redes 5G em todas as bandas disponíveis no Brasil.' },
-        { id: uuidv4(), question: 'Qual a duração média da bateria?', answer: 'Com uso moderado, a bateria de 5000mAh pode durar facilmente mais de um dia inteiro.' },
-        { id: uuidv4(), question: 'O aparelho vem com carregador?', answer: 'Sim, o UltraPhone Pro X inclui o carregador UltraCharge de 65W na caixa.' },
-        { id: uuidv4(), question: 'Quantos anos de atualizações são garantidos?', answer: 'Garantimos 4 anos de atualizações de sistema e 5 anos de patches de segurança.' }
-      ]
-    },
-    {
-      id: uuidv4(),
-      type: 'cta',
-      title: 'CTA',
-      columns: 1,
-      visible: true,
-      heading: 'Transforme sua Experiência Mobile',
-      content: 'Não se contente com menos do que a excelência. O UltraPhone Pro X redefine o conceito de smartphone premium.',
-      buttonText: 'Comprar Agora',
-      buttonUrl: '#'
+      heading: "Não Perca Tempo!",
+      content: "Aproveite nossas ofertas exclusivas e garanta já o seu eletrônico de última geração.",
+      buttonText: "Comprar Agora",
+      buttonUrl: "#comprar",
+      style: {}
     }
   ]
 };

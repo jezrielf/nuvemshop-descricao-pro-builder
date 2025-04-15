@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Check, RotateCcw, Sparkles } from 'lucide-react';
 import { ProductDescription, Block } from '@/types/editor';
 import BlockRenderer from '../blocks/BlockRenderer';
+import { ensureBlockType } from '@/utils/typeConversion';
 
 interface AIGeneratorResultProps {
   description: ProductDescription;
@@ -58,7 +58,7 @@ const AIGeneratorResult: React.FC<AIGeneratorResultProps> = ({
                       {block.title || block.type}
                     </div>
                     <div className="p-3">
-                      <BlockRenderer block={block} isPreview={true} />
+                      <BlockRenderer block={ensureBlockType(block)} isPreview={true} />
                     </div>
                   </div>
                 ))}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,7 @@ import { ChevronUp, ChevronDown, Plus, Trash2, Edit, Save } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { useTemplateStore } from '@/store/templateStore';
+import { ensureBlocksArray } from '@/utils/typeConversion';
 
 interface EditTemplateDialogProps {
   open: boolean;
@@ -31,7 +31,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
 }) => {
   const [name, setName] = useState(template.name);
   const [category, setCategory] = useState<string>(template.category);
-  const [blocks, setBlocks] = useState<Block[]>([...template.blocks]);
+  const [blocks, setBlocks] = useState<Block[]>(ensureBlocksArray([...template.blocks]));
   const [activeTab, setActiveTab] = useState('info');
   
   const { toast } = useToast();

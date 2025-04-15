@@ -1,4 +1,3 @@
-
 export interface BaseBlock {
   id: string;
   type: string;
@@ -213,7 +212,8 @@ export interface CTABlock extends BaseBlock {
 export interface VideoBlock extends BaseBlock {
   type: 'video';
   videoUrl: string;
-  description: string;
-  autoplay?: boolean;
+  autoplay: boolean; // Making autoplay required
+  title: string;
+  description?: string;
   style?: BlockStyle;
 }

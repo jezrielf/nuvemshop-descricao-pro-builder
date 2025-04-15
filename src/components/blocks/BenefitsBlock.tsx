@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BenefitsBlock as BenefitsBlockType } from '@/types/editor';
+import { BenefitsBlock as BenefitsBlockType } from '@/types/editor/blocks/benefits';
 import BlockWrapper from './BlockWrapper';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,13 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
   };
   
   const handleAddBenefit = () => {
-    const newBenefits = [...(block.benefits || []), { id: uuidv4(), title: 'Novo Benefício', description: 'Descrição do benefício', icon: '✓' }];
+    // Ensure icon is included when adding a new benefit
+    const newBenefits = [...(block.benefits || []), { 
+      id: uuidv4(), 
+      title: 'Novo Benefício', 
+      description: 'Descrição do benefício', 
+      icon: '✓' 
+    }];
     updateBlock(block.id, { benefits: newBenefits });
   };
   
@@ -46,7 +52,7 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
     updateBlock(block.id, { benefits: newBenefits });
   };
   
-  // Handler para benefícios gerados por IA
+  // Handler for benefícios gerados por IA
   const handleGeneratedBenefits = (content: string) => {
     try {
       let benefitsArray = JSON.parse(content);
@@ -57,7 +63,7 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
           id: benefit.id || uuidv4(), 
           title: benefit.title,
           description: benefit.description,
-          icon: benefit.icon || '✓'  // Add default icon if missing
+          icon: benefit.icon || '✓'  // Ensure icon is always provided
         };
       });
       

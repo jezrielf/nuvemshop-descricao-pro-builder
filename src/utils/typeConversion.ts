@@ -1,0 +1,37 @@
+
+import { Block } from '@/types/editor/blocks';
+import { Block as BaseBlock } from '@/types/editor/base';
+
+/**
+ * Ensures a block from any source is properly typed according to the blocks/index.ts type definitions
+ * This helps resolve inconsistencies between types from different modules
+ */
+export function ensureBlockType(block: BaseBlock | Block): Block {
+  // Clone the block to avoid reference issues
+  const typedBlock = { ...block } as Block;
+  
+  // Handle special cases for specific block types
+  if (typedBlock.type === 'video' && typedBlock.autoplay === undefined) {
+    typedBlock.autoplay = true; // Set default value if missing
+  }
+  
+  if (typedBlock.type === 'benefits') {
+    // Make sure all benefits have an icon
+    const benefitsBlock = typedBlock as any;
+    if (benefitsBlock.benefits) {
+      benefitsBlock.benefits = benefitsBlock.benefits.map((benefit: any) => ({
+        ...benefit,
+        icon: benefit.icon || '✓' // Set default icon if missing
+      }));
+    }
+  }
+  
+  return typedBlock;
+}
+
+/**
+ * Convert an array of blocks to ensure they're all properly typed
+ */
+export function ensureBlocksArray(blocks: (BaseBlock | Block)[]): Block[] {
+  return blocks.map(ensureBlockType);
+}

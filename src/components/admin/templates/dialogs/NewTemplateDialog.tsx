@@ -16,6 +16,7 @@ import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ChevronUp, ChevronDown, Plus, Trash2, Image, Code } from 'lucide-react';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { analyzeHtmlForTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
+import { ensureBlocksArray, ensureBlockType } from '@/utils/typeConversion';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -130,7 +131,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
       const analyzedTemplate = analyzeHtmlForTemplate(htmlInput, category);
       
       setSuggestedTemplate(analyzedTemplate);
-      setBlocks(analyzedTemplate.blocks);
+      setBlocks(ensureBlocksArray(analyzedTemplate.blocks));
       setShowBlocksTab(true);
       setActiveTab('blocks');
       toast({
@@ -202,7 +203,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
       };
       
       setSuggestedTemplate(exampleTemplate);
-      setBlocks(exampleTemplate.blocks);
+      setBlocks(ensureBlocksArray(exampleTemplate.blocks));
       setShowBlocksTab(true);
       setActiveTab('blocks');
       toast({
@@ -223,7 +224,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
 
   const handleAddBlock = (type: string) => {
     const newBlock = createBlock(type as BlockType, 1);
-    setBlocks([...blocks, newBlock]);
+    setBlocks([...blocks, ensureBlockType(newBlock)]);
     setShowBlocksTab(true);
     
     toast({

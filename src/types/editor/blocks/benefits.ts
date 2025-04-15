@@ -8,6 +8,6 @@ export interface BenefitsBlock extends BlockBase {
     id: string;
     title: string;
     description: string;
-    icon?: string; // Make icon optional
+    icon: string; // Making icon required
   }[];
 }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { BlockType } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ensureBlocksArray, ensureBlockType } from '@/utils/typeConversion';
 
 interface PreviewTemplateDialogProps {
   open: boolean;
@@ -58,7 +58,7 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
     const newBlock = createBlock(type);
     setEditableTemplate(prev => ({
       ...prev,
-      blocks: [...prev.blocks, newBlock]
+      blocks: ensureBlocksArray([...prev.blocks, newBlock])
     }));
     setEdited(true);
     toast({
