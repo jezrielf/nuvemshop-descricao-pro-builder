@@ -129,7 +129,7 @@ const analyzeContent = (element: Element, blocks: Block[]): void => {
   } else if (element.querySelectorAll('li').length > 3) {
     // List-heavy content could be features or specifications
     const listBlock = createBlock('features', 1) as FeaturesBlock;
-    listBlock.heading = extractHeading(element) || 'Features';
+    listBlock.title = extractHeading(element) || 'Features';
     listBlock.features = Array.from(element.querySelectorAll('li')).map((item, index) => ({
       id: uuidv4(),
       title: `Feature ${index + 1}`,
@@ -140,7 +140,7 @@ const analyzeContent = (element: Element, blocks: Block[]): void => {
   } else {
     // Default to a text block
     const textBlock = createBlock('text', 1) as TextBlock;
-    textBlock.heading = extractHeading(element) || '';
+    textBlock.title = extractHeading(element) || '';
     textBlock.content = sanitizeHtmlContent(element.innerHTML);
     blocks.push(textBlock);
   }
@@ -155,7 +155,7 @@ const processHeroSection = (section: Element, blocks: Block[]): void => {
   const headings = section.querySelectorAll('h1, h2');
   const buttons = section.querySelectorAll('a.button, .btn, button, a[class*="button"], a[class*="btn"]');
   
-  heroBlock.heading = h1 ? h1.textContent || 'Heading' : extractHeading(section) || 'Heading';
+  heroBlock.title = h1 ? h1.textContent || 'Heading' : extractHeading(section) || 'Heading';
   
   // Look for subheading text
   if (headings.length > 1) {
@@ -217,9 +217,9 @@ const processFeatureSection = (section: Element, blocks: Block[]): void => {
     section.innerHTML.toLowerCase().includes('advantage');
   
   const blockType: BlockType = isBenefits ? 'benefits' : 'features';
-  const featureBlock = createBlock(blockType, 3); // Default to 3 columns
+  const featureBlock = createBlock(blockType, 3) as FeaturesBlock; // Default to 3 columns
   
-  (featureBlock as FeaturesBlock).heading = extractHeading(section) || (isBenefits ? 'Benefits' : 'Features');
+  featureBlock.title = extractHeading(section) || (isBenefits ? 'Benefits' : 'Features');
   
   // Try to identify individual feature items
   const featureItems = section.querySelectorAll('.feature, .benefit, .item, .card, li');
@@ -251,7 +251,7 @@ const processFeatureSection = (section: Element, blocks: Block[]): void => {
 const processFAQSection = (section: Element, blocks: Block[]): void => {
   const faqBlock = createBlock('faq', 1) as FAQBlock;
   
-  faqBlock.heading = extractHeading(section) || 'Frequently Asked Questions';
+  faqBlock.title = extractHeading(section) || 'Frequently Asked Questions';
   
   // Look for question/answer pairs
   const questionItems = section.querySelectorAll('details, .faq-item, .accordion-item, dt, .question');
@@ -295,7 +295,7 @@ const processFAQSection = (section: Element, blocks: Block[]): void => {
 const processCTASection = (section: Element, blocks: Block[]): void => {
   const ctaBlock = createBlock('cta', 1) as CTABlock;
   
-  ctaBlock.heading = extractHeading(section) || 'Take Action';
+  ctaBlock.title = extractHeading(section) || 'Take Action';
   
   const paragraphs = section.querySelectorAll('p');
   if (paragraphs.length > 0) {
@@ -322,7 +322,7 @@ const processImageTextSection = (section: Element, image: HTMLImageElement, bloc
   
   const mediaBlock = createBlock(blockType, 1) as ImageTextBlock | TextImageBlock;
   
-  mediaBlock.heading = extractHeading(section) || 'Image and Text';
+  mediaBlock.title = extractHeading(section) || 'Image and Text';
   
   // Extract text content
   const paragraphs = section.querySelectorAll('p');
