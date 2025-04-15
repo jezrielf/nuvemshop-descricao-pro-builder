@@ -121,3 +121,6 @@ verify_jwt = false
 
 [functions.admin-list-users]
 verify_jwt = false
+
+[functions.nuvemshop-auth]
+verify_jwt = false
