@@ -1,7 +1,15 @@
 
 import React, { useState } from 'react';
 import { Profile } from '@/types/auth';
-import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { 
+  Table, 
+  TableBody, 
+  TableCaption, 
+  TableHead, 
+  TableHeader, 
+  TableRow,
+  TableCell 
+} from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { UserTableProps, UserFormValues } from './types';
 import { authService } from '@/services/authService';
