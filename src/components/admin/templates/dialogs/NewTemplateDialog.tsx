@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ChevronUp, ChevronDown, Plus, Trash2, Image, Code } from 'lucide-react';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
+import { analyzeHtmlForTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -123,52 +123,22 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
 
     setIsGenerating(true);
     try {
-      // Simulação de processamento - aqui você implementaria a chamada real para a API
-      // que analisa o HTML e sugere um template
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Use our HTML analyzer to generate blocks from HTML
+      const analyzedTemplate = analyzeHtmlForTemplate(htmlInput, category);
       
-      // Template de exemplo baseado no HTML
-      const exampleTemplate: Template = {
-        id: 'suggested-template',
-        name: 'Template Sugerido',
-        category: category,
-        blocks: [
-          {
-            id: 'header-block',
-            type: 'hero',
-            title: 'Cabeçalho',
-            columns: 1,
-            visible: true,
-            heading: 'Título Principal',
-            subheading: 'Subtítulo gerado a partir do seu HTML',
-            buttonText: 'Comprar Agora',
-            buttonUrl: '#'
-          },
-          {
-            id: 'content-block',
-            type: 'text',
-            title: 'Conteúdo',
-            columns: 1,
-            visible: true,
-            heading: 'Título do Texto',
-            content: 'Conteúdo extraído do seu HTML...'
-          }
-        ]
-      };
-      
-      setSuggestedTemplate(exampleTemplate);
-      setBlocks(exampleTemplate.blocks);
+      setSuggestedTemplate(analyzedTemplate);
+      setBlocks(analyzedTemplate.blocks);
       setShowBlocksTab(true);
       setActiveTab('blocks');
       toast({
-        title: "Template sugerido gerado",
-        description: "Um template foi gerado baseado no seu HTML. Você pode editar os blocos antes de criar.",
+        title: "Template gerado com sucesso",
+        description: `Foram identificados ${analyzedTemplate.blocks.length} blocos no HTML. Você pode editar os blocos antes de criar o template.`,
       });
     } catch (error) {
-      console.error("Erro ao gerar template:", error);
+      console.error("Erro ao analisar HTML:", error);
       toast({
-        title: "Erro na geração",
-        description: "Não foi possível gerar um template a partir do HTML fornecido.",
+        title: "Erro na análise do HTML",
+        description: "Não foi possível analisar o HTML fornecido. Verifique se o HTML é válido.",
         variant: "destructive",
       });
     } finally {
