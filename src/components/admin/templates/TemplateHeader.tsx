@@ -73,14 +73,14 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
         
         <div className="flex gap-2 w-full sm:w-auto">
           <Select
-            value={selectedCategory || ""}
-            onValueChange={(value) => onCategoryChange(value === "" ? null : value)}
+            value={selectedCategory || "all"}
+            onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
           >
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Todas as categorias" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas as categorias</SelectItem>
+              <SelectItem value="all">Todas as categorias</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
                   {getCategoryName(category as ProductCategory)}

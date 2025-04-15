@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -88,7 +89,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
                 <SelectItem value="accessories">Acessórios</SelectItem>
                 <SelectItem value="shoes">Calçados</SelectItem>
                 <SelectItem value="electronics">Eletrônicos</SelectItem>
-                 <SelectItem value="energy">Energia</SelectItem>
+                <SelectItem value="energy">Energia</SelectItem>
                 <SelectItem value="other">Outro</SelectItem>
               </SelectContent>
             </Select>
