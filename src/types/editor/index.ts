@@ -8,7 +8,8 @@ export type {
   Template,
   ProductCategory,
   ColumnLayout,
-  BlockSpacing
+  BlockSpacing,
+  BlockType  // Add this line
 } from './base';
 
 // Re-export from blocks directory - this will be our canonical source for Block types

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Lightbulb, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProductDescription } from '@/types/editor';
 import { useEditorStore } from '@/store/editor';
-import { BlockType, ColumnLayout } from '@/types/editor/base';
+import { BlockType, ColumnLayout } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
 interface AIContentRecommenderProps {

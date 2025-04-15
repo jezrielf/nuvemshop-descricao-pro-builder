@@ -1,4 +1,3 @@
-
 export interface BaseBlock {
   id: string;
   type: string;
@@ -52,6 +51,7 @@ export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoe
 
 // Import block types from the blocks directory
 import { Block } from './blocks';
+import { BlockType } from './blocks';
 
 // Note: BlockType is now exported from blocks/index.ts
 export type { Block };
@@ -63,3 +63,5 @@ export interface BlockSpacing {
   margin?: string;
   padding?: string;
 }
+
+export { BlockType };
