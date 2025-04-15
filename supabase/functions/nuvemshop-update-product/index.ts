@@ -8,6 +8,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -15,6 +16,7 @@ serve(async (req) => {
   try {
     const { storeId, productId, description } = await req.json();
     
+    // Validate required parameters
     if (!storeId) {
       throw new Error('Missing store ID');
     }
@@ -113,7 +115,11 @@ serve(async (req) => {
       console.log(`Successfully updated product ${productId} for store ${storeId}`);
 
       return new Response(
-        JSON.stringify({ success: true, productId }),
+        JSON.stringify({ 
+          success: true, 
+          productId,
+          message: 'Product description updated successfully'
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (apiError) {
@@ -122,7 +128,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: apiError.message,
-          type: 'api_error'
+          type: 'api_error',
+          details: 'Error occurred while communicating with Nuvemshop API'
         }),
         { 
           status: 422,
@@ -134,7 +141,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in nuvemshop-update-product function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        type: 'general_error'
+      }),
       { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
