@@ -1,24 +1,46 @@
 
 import { create } from 'zustand';
-import { Template, ProductCategory } from '@/types/editor';
+import { Template, ProductCategory, Block } from '@/types/editor';
 import { getAllTemplates } from '@/utils/templates';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
+import { SupabaseRealtimePayload } from '@supabase/supabase-js';
+
+// Define the Supabase template data structure
+interface SupabaseTemplate {
+  id: string;
+  name: string;
+  category: string;
+  blocks: any; // This will be stored as JSON
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string;
+}
 
 interface TemplateState {
   templates: Template[];
   categories: string[];
   selectedCategory: string | null;
   customCategories: string[];
-  loadTemplates: () => void;
+  loadTemplates: () => Promise<void>;
   selectCategory: (category: string | null) => void;
   getTemplatesByCategory: (category: string | null) => Template[];
   searchTemplates: (searchTerm: string, category: string | null) => Template[];
-  createTemplate: (template: Omit<Template, "id">) => Template;
-  updateTemplate: (id: string, template: Partial<Template>) => Template | null;
-  deleteTemplate: (id: string) => boolean;
-  addCustomCategory: (category: string) => boolean;
+  createTemplate: (template: Omit<Template, "id">) => Promise<Template>;
+  updateTemplate: (id: string, template: Partial<Template>) => Promise<Template | null>;
+  deleteTemplate: (id: string) => Promise<boolean>;
+  addCustomCategory: (category: string) => Promise<boolean>;
 }
+
+// Utility function to convert Supabase template format to our Template type
+const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Template => {
+  return {
+    id: supaTemplate.id,
+    name: supaTemplate.name,
+    category: supaTemplate.category,
+    blocks: Array.isArray(supaTemplate.blocks) ? supaTemplate.blocks : []
+  };
+};
 
 export const useTemplateStore = create<TemplateState>((set, get) => ({
   templates: [],
@@ -33,7 +55,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       console.log('Loading default templates, total count:', defaultTemplates.length);
       
       // Then try to load user templates from Supabase
-      const { data: userTemplates, error } = await supabase
+      const { data: userTemplatesData, error } = await supabase
         .from('templates')
         .select('*');
       
@@ -41,10 +63,13 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         console.error('Error loading templates from database:', error);
       }
       
+      // Convert Supabase templates to our Template format
+      const userTemplates: Template[] = (userTemplatesData || []).map(convertSupabaseToTemplate);
+      
       // Combine default templates with user templates
       const allTemplates = [
         ...defaultTemplates,
-        ...(userTemplates || [])
+        ...userTemplates
       ];
       
       console.log('Total templates loaded:', allTemplates.length);
@@ -125,21 +150,20 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
     };
 
     try {
-      // Save to Supabase
+      // Save to Supabase - serialize blocks to ensure they're saved as JSON
       const { data, error } = await supabase
         .from('templates')
         .insert({
           id: newTemplate.id,
           name: newTemplate.name,
           category: newTemplate.category,
-          blocks: newTemplate.blocks
+          blocks: JSON.stringify(newTemplate.blocks)
         })
         .select()
         .single();
       
       if (error) {
         console.error('Error creating template in database:', error);
-        // Continue with local state update even if db save fails
       } else {
         console.log('Template created in database:', data);
       }
@@ -153,8 +177,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       return newTemplate;
     } catch (error) {
       console.error('Error in createTemplate:', error);
-      // Still return the template even if db save fails
-      // Update local state
+      // Still update local state even if db save fails
       set(state => ({
         templates: [...state.templates, newTemplate]
       }));
@@ -179,15 +202,15 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       });
 
       if (updatedTemplate) {
-        // Save to Supabase
+        // Save to Supabase - serialize blocks for JSON storage
         const { error } = await supabase
           .from('templates')
-          .upsert({
-            id: updatedTemplate.id,
+          .update({
             name: updatedTemplate.name,
             category: updatedTemplate.category,
-            blocks: updatedTemplate.blocks
-          });
+            blocks: JSON.stringify(updatedTemplate.blocks)
+          })
+          .eq('id', id);
         
         if (error) {
           console.error('Error updating template in database:', error);

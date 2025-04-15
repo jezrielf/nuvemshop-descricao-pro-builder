@@ -3,11 +3,12 @@ export interface BaseBlock {
   id: string;
   type: string;
   title: string;
-  columns: number;
+  columns: ColumnLayout;
   visible: boolean;
+  style?: BlockStyle;
 }
 
-// Adding missing BlockBase and BlockStyle interfaces
+// Adding BlockBase and BlockStyle interfaces
 export interface BlockBase extends BaseBlock {
   id: string;
   type: string;
@@ -84,10 +85,14 @@ export interface HeroBlock extends BaseBlock {
   type: 'hero';
   heading: string;
   subheading: string;
-  buttonText: string;
-  buttonUrl: string;
+  buttonText?: string;
+  buttonUrl?: string;
   backgroundImage?: string;
-  style?: Record<string, string>;
+  image?: {
+    src: string;
+    alt: string;
+  };
+  style?: BlockStyle;
 }
 
 // Text Block
@@ -95,7 +100,7 @@ export interface TextBlock extends BaseBlock {
   type: 'text';
   heading: string;
   content: string;
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Features Block
@@ -108,7 +113,7 @@ export interface FeaturesBlock extends BaseBlock {
     description: string;
     icon: string;
   }[];
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Benefits Block
@@ -121,7 +126,7 @@ export interface BenefitsBlock extends BaseBlock {
     description: string;
     icon: string;
   }[];
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Specifications Block
@@ -133,7 +138,7 @@ export interface SpecificationsBlock extends BaseBlock {
     name: string;
     value: string;
   }[];
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Image Block
@@ -142,7 +147,7 @@ export interface ImageBlock extends BaseBlock {
   src: string;
   alt: string;
   caption?: string;
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Gallery Block
@@ -154,7 +159,7 @@ export interface GalleryBlock extends BaseBlock {
     alt: string;
     caption?: string;
   }[];
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Image + Text Block
@@ -166,7 +171,7 @@ export interface ImageTextBlock extends BaseBlock {
   };
   heading: string;
   content: string;
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // Text + Image Block
@@ -178,7 +183,7 @@ export interface TextImageBlock extends BaseBlock {
   };
   heading: string;
   content: string;
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // FAQ Block
@@ -190,18 +195,18 @@ export interface FAQBlock extends BaseBlock {
     question: string;
     answer: string;
   }[];
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }
 
 // CTA Block
 export interface CTABlock extends BaseBlock {
   type: 'cta';
   heading: string;
-  subheading: string;
+  subheading?: string;
   content: string;
   buttonText: string;
-  buttonUrl: string;
-  style?: Record<string, string>;
+  buttonUrl?: string;
+  style?: BlockStyle;
 }
 
 // Video Block
@@ -210,5 +215,5 @@ export interface VideoBlock extends BaseBlock {
   videoUrl: string;
   description: string;
   autoplay?: boolean;
-  style?: Record<string, string>;
+  style?: BlockStyle;
 }

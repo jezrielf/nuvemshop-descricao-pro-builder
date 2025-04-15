@@ -14,12 +14,17 @@ export const updateBlockImage = (
   if (!block) return;
   
   // Handle different image types based on the block type
-  if (imageType === 'src' && block.type === 'image') {
+  if (imageType === 'src' && block.type === 'image' && 'src' in block) {
     updateBlock(blockId, { src: newImageUrl });
   } 
   else if (imageType === 'image' && 
            (block.type === 'hero' || block.type === 'imageText' || block.type === 'textImage')) {
-    if ('image' in block && block.image) {
+    if (block.type === 'hero' && 'image' in block && block.image) {
+      updateBlock(blockId, { 
+        image: { ...block.image, src: newImageUrl }
+      });
+    } else if ((block.type === 'imageText' || block.type === 'textImage') && 
+               'image' in block && block.image) {
       updateBlock(blockId, { 
         image: { ...block.image, src: newImageUrl }
       });
@@ -54,7 +59,7 @@ export const extractImagesFromDescription = (description: ProductDescription | n
         type: 'src',
         url: block.src,
         alt: 'alt' in block ? block.alt || '' : '',
-        title: 'title' in block ? block.title : ''
+        title: block.title || ''
       });
     } 
     else if (block.type === 'hero' && 'image' in block && block.image?.src) {
@@ -63,7 +68,7 @@ export const extractImagesFromDescription = (description: ProductDescription | n
         type: 'image',
         url: block.image.src,
         alt: block.image.alt || '',
-        title: 'title' in block ? block.title : ''
+        title: block.title || ''
       });
     }
     else if ((block.type === 'imageText' || block.type === 'textImage') && 
@@ -73,7 +78,7 @@ export const extractImagesFromDescription = (description: ProductDescription | n
         type: 'image',
         url: block.image.src,
         alt: block.image.alt || '',
-        title: 'title' in block ? block.title : ''
+        title: block.title || ''
       });
     }
     else if (block.type === 'gallery' && 'images' in block && block.images) {
@@ -84,7 +89,7 @@ export const extractImagesFromDescription = (description: ProductDescription | n
             type: `gallery-${index}`,
             url: img.src,
             alt: img.alt || '',
-            title: `${'title' in block ? block.title : ''} - Imagem ${index + 1}`
+            title: `${block.title || ''} - Imagem ${index + 1}`
           });
         }
       });

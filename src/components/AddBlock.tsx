@@ -25,6 +25,7 @@ const AddBlock: React.FC = () => {
       const blockData = createBlock(selectedType, columns);
       
       if (blockData) {
+        // Since blockData is already properly typed from createBlock, we can safely add it
         addBlock(blockData);
         
         toast({
