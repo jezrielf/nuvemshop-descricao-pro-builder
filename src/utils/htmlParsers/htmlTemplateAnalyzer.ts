@@ -2,8 +2,8 @@
 import { Template, ProductCategory, TextBlock } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import { createBlock } from '../blockCreators/createBlock';
-import { analyzeDocument } from './modules/documentAnalyzer';
-import { sanitizeHtmlContent } from './modules/utils';
+import { analyzeDocument } from './analyzers/documentAnalyzer';
+import { sanitizeHtmlContent } from './analyzers/utils';
 
 export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCategory): Template => {
   const parsedBlocks = [];
@@ -37,4 +37,3 @@ export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCateg
     blocks: parsedBlocks
   };
 };
-
