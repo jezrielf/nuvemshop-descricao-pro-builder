@@ -22,7 +22,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signUp,
     signOut,
-    fetchProfile
+    fetchProfile,
+    refreshProfile
   } = useAuthSession();
 
   const {
@@ -130,7 +131,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     openCustomerPortal,
     descriptionCount,
     incrementDescriptionCount,
-    canCreateMoreDescriptions: () => canCreateMoreDescriptionsValue
+    canCreateMoreDescriptions: () => canCreateMoreDescriptionsValue,
+    refreshProfile
   }), [
     session, 
     user, 
@@ -150,7 +152,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     openCustomerPortal,
     descriptionCount,
     incrementDescriptionCount,
-    canCreateMoreDescriptionsValue
+    canCreateMoreDescriptionsValue,
+    refreshProfile
   ]);
 
   return (

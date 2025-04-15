@@ -48,7 +48,7 @@ export const authService = {
   // Add a method to update user role
   updateUserRole: async (userId: string, role: string | string[]) => {
     try {
-      // Convert role to string format for database storage
+      // Convert role to array format for database storage
       const roleValue = Array.isArray(role) ? role : [role];
       
       const { data, error } = await supabase
