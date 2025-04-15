@@ -64,4 +64,4 @@ export interface BlockSpacing {
   padding?: string;
 }
 
-export { BlockType };
+export type { BlockType };
