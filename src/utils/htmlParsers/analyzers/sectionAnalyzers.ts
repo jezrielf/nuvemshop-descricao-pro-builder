@@ -1,4 +1,3 @@
-
 import { Block, BlockType, ColumnLayout, Template, ProductCategory, TextBlock, HeroBlock, GalleryBlock, FeaturesBlock, FAQBlock, CTABlock, ImageTextBlock, TextImageBlock } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import { createBlock } from '@/utils/blockCreators/createBlock';
@@ -152,11 +151,13 @@ export const processCTASection = (section: Element, blocks: Block[]): void => {
   blocks.push(ctaBlock);
 };
 
-export const processImageTextSection = (section: Element, image: HTMLImageElement, blocks: Block[]): void => {
-  const imageIndex = Array.from(section.children).findIndex(el => el.contains(image));
-  const totalElements = section.children.length;
-  
-  const blockType: BlockType = imageIndex < totalElements / 2 ? 'imageText' : 'textImage';
+export const processImageTextSection = (
+  section: Element, 
+  image: HTMLImageElement, 
+  blocks: Block[],
+  textFirst: boolean = false
+): void => {
+  const blockType: BlockType = textFirst ? 'textImage' : 'imageText';
   
   const mediaBlock = createBlock(blockType, 1) as ImageTextBlock | TextImageBlock;
   
@@ -182,4 +183,3 @@ export const processImageTextSection = (section: Element, image: HTMLImageElemen
   
   blocks.push(mediaBlock);
 };
-
