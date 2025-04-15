@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,8 @@ import { createBlock } from '@/utils/blockCreators/createBlock';
 import { BlockType } from '@/types/editor/blocks';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
+import { ImportHtmlSection } from './ImportHtmlSection';
+import { ProductCategory } from '@/types/editor';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -128,6 +129,13 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
     setPreviewBlockId(null);
   };
 
+  const handleTemplateFromHtml = (generatedTemplate: Template) => {
+    setName(generatedTemplate.name);
+    setCategory(generatedTemplate.category as string);
+    setBlocks(convertBlocks(generatedTemplate.blocks));
+    setActiveTab('blocks');
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -142,15 +150,16 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Novo Template</DialogTitle>
           <DialogDescription>
-            Crie um novo template adicionando informações básicas e blocos de conteúdo
+            Crie um novo template adicionando informações básicas e blocos de conteúdo, ou importe de um HTML existente
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="basic">Informações Básicas</TabsTrigger>
               <TabsTrigger value="blocks">Adicionar Blocos</TabsTrigger>
+              <TabsTrigger value="import">Importar HTML</TabsTrigger>
             </TabsList>
             
             <TabsContent value="basic" className="space-y-4 py-4">
@@ -282,6 +291,13 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                   </ScrollArea>
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="import" className="py-4">
+              <ImportHtmlSection 
+                onTemplateGenerated={handleTemplateFromHtml}
+                selectedCategory={category as ProductCategory}
+              />
             </TabsContent>
           </Tabs>
           
