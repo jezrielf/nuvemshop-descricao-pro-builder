@@ -11,6 +11,7 @@ export const createImageBlock = (columns: ColumnLayout): Block => {
     visible: true,
     src: 'https://via.placeholder.com/800x600',
     alt: 'Descrição da imagem',
-    caption: 'Legenda da imagem (opcional)'
+    caption: 'Legenda da imagem (opcional)',
+    style: {}
   } as Block;
 };

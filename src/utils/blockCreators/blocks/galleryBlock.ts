@@ -21,13 +21,8 @@ export const createGalleryBlock = (columns: ColumnLayout): Block => {
         src: 'https://via.placeholder.com/800x600',
         alt: 'Imagem 2',
         caption: 'Legenda 2'
-      },
-      {
-        id: uuidv4(),
-        src: 'https://via.placeholder.com/800x600',
-        alt: 'Imagem 3',
-        caption: 'Legenda 3'
       }
-    ]
+    ],
+    style: {}
   } as Block;
 };

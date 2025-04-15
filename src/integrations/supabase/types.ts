@@ -150,6 +150,57 @@ export type Database = {
         }
         Relationships: []
       }
+      template_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      templates: {
+        Row: {
+          blocks: Json
+          category: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          blocks?: Json
+          category: string
+          created_at?: string
+          id: string
+          name: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          blocks?: Json
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -176,6 +227,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_template_categories_table: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_templates_table: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_nuvemshop_stores: {
         Args: Record<PropertyKey, never>
         Returns: {

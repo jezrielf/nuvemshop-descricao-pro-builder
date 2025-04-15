@@ -60,13 +60,16 @@ export interface HeroBlock extends BaseBlock {
   subheading: string;
   buttonText: string;
   buttonUrl: string;
-  backgroundImage: string;
+  backgroundImage?: string;
+  style?: Record<string, string>;
 }
 
 // Text Block
 export interface TextBlock extends BaseBlock {
   type: 'text';
+  heading: string;
   content: string;
+  style?: Record<string, string>;
 }
 
 // Features Block
@@ -79,6 +82,7 @@ export interface FeaturesBlock extends BaseBlock {
     description: string;
     icon: string;
   }[];
+  style?: Record<string, string>;
 }
 
 // Benefits Block
@@ -91,24 +95,28 @@ export interface BenefitsBlock extends BaseBlock {
     description: string;
     icon: string;
   }[];
+  style?: Record<string, string>;
 }
 
 // Specifications Block
 export interface SpecificationsBlock extends BaseBlock {
   type: 'specifications';
   heading: string;
-  specifications: {
+  specs: {
     id: string;
     name: string;
     value: string;
   }[];
+  style?: Record<string, string>;
 }
 
 // Image Block
 export interface ImageBlock extends BaseBlock {
   type: 'image';
-  imageUrl: string;
-  altText: string;
+  src: string;
+  alt: string;
+  caption?: string;
+  style?: Record<string, string>;
 }
 
 // Gallery Block
@@ -116,35 +124,47 @@ export interface GalleryBlock extends BaseBlock {
   type: 'gallery';
   images: {
     id: string;
-    imageUrl: string;
-    altText: string;
+    src: string;
+    alt: string;
+    caption?: string;
   }[];
+  style?: Record<string, string>;
 }
 
 // Image + Text Block
 export interface ImageTextBlock extends BaseBlock {
   type: 'imageText';
-  imageUrl: string;
-  altText: string;
+  image: {
+    src: string;
+    alt: string;
+  };
+  heading: string;
   content: string;
+  style?: Record<string, string>;
 }
 
 // Text + Image Block
 export interface TextImageBlock extends BaseBlock {
   type: 'textImage';
-  imageUrl: string;
-  altText: string;
+  image: {
+    src: string;
+    alt: string;
+  };
+  heading: string;
   content: string;
+  style?: Record<string, string>;
 }
 
 // FAQ Block
 export interface FAQBlock extends BaseBlock {
   type: 'faq';
+  heading: string;
   questions: {
     id: string;
     question: string;
     answer: string;
   }[];
+  style?: Record<string, string>;
 }
 
 // CTA Block
@@ -152,8 +172,10 @@ export interface CTABlock extends BaseBlock {
   type: 'cta';
   heading: string;
   subheading: string;
+  content: string;
   buttonText: string;
   buttonUrl: string;
+  style?: Record<string, string>;
 }
 
 // Video Block
@@ -161,4 +183,5 @@ export interface VideoBlock extends BaseBlock {
   type: 'video';
   videoUrl: string;
   description: string;
+  style?: Record<string, string>;
 }

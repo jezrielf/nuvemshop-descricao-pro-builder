@@ -13,5 +13,6 @@ export const createHeroBlock = (columns: ColumnLayout): Block => {
     subheading: 'Subtítulo ou chamada secundária para o seu produto',
     buttonText: 'Saiba Mais',
     buttonUrl: '#',
+    style: {}
   } as Block;
 };

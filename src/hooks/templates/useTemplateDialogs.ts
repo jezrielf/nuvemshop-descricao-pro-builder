@@ -10,7 +10,7 @@ interface TemplateDialogState {
   isPreviewDialogOpen: boolean;
   isEditDialogOpen: boolean;
   isDeleteDialogOpen: boolean;
-  openNewTemplateDialog: () => void;
+  openNewDialog: () => void;
   openPreviewDialog: (template: Template) => void;
   openEditDialog: (template: Template) => void;
   openDeleteDialog: (template: Template) => void;
@@ -26,7 +26,7 @@ export const useTemplateDialogs = create<TemplateDialogState>((set) => ({
   isEditDialogOpen: false,
   isDeleteDialogOpen: false,
 
-  openNewTemplateDialog: () => set({ isNewDialogOpen: true }),
+  openNewDialog: () => set({ isNewDialogOpen: true }),
   
   openPreviewDialog: (template) => set({ 
     previewTemplate: template,
