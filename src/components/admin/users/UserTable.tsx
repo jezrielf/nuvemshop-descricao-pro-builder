@@ -1,23 +1,13 @@
 
 import React, { useState } from 'react';
 import { Profile } from '@/types/auth';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { UserTableProps, UserFormValues } from './types';
-import UserRoleBadge from './UserRoleBadge';
-import UserEditForm from './UserEditForm';
 import { authService } from '@/services/authService';
 import { supabase } from '@/integrations/supabase/client';
+import UserTableRow from './table/UserTableRow';
+import UserEditSheet from './edit/UserEditSheet';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
@@ -36,7 +26,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       setUpdatingUser(editingUser.id);
       
-      // Update the profile
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -47,7 +36,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
         
       if (error) throw error;
       
-      // Update the role separately
       const { error: roleError } = await authService.updateUserRole(
         editingUser.id,
         values.role
@@ -77,8 +65,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
   const updateUserRole = async (userId: string, newRole: string | string[]) => {
     try {
       setUpdatingUser(userId);
-      console.log(`Atualizando papel do usuário ${userId} para:`, 
-        Array.isArray(newRole) ? newRole : [newRole]);
       
       const { error } = await authService.updateUserRole(userId, newRole);
         
@@ -114,7 +100,6 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       setUpdatingUser(profileId);
       
-      // First, we delete the auth user (this will cascade delete the profile due to RLS)
       const { error } = await supabase.auth.admin.deleteUser(profileId);
         
       if (error) throw error;
@@ -156,55 +141,13 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
         <TableBody>
           {profiles.length > 0 ? (
             profiles.map((profile) => (
-              <TableRow key={profile.id}>
-                <TableCell className="font-medium">{profile.nome || 'Sem nome'}</TableCell>
-                <TableCell>{profile.email || 'N/A'}</TableCell>
-                <TableCell>
-                  <UserRoleBadge role={profile.role} />
-                </TableCell>
-                <TableCell>{new Date(profile.criado_em).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Sheet open={isSheetOpen && editingUser?.id === profile.id} onOpenChange={setIsSheetOpen}>
-                      <SheetTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => openEditSheet(profile)}
-                          disabled={updatingUser === profile.id}
-                        >
-                          Editar
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent className="sm:max-w-md">
-                        <SheetHeader>
-                          <SheetTitle>Editar Usuário</SheetTitle>
-                          <SheetDescription>
-                            Editar informações para usuário {profile.nome || 'Sem nome'}
-                          </SheetDescription>
-                        </SheetHeader>
-                        
-                        {editingUser && (
-                          <UserEditForm 
-                            profile={editingUser}
-                            onUpdateProfile={updateUserProfile}
-                            onUpdateRole={(userId, newRole) => updateUserRole(userId, newRole)}
-                          />
-                        )}
-                      </SheetContent>
-                    </Sheet>
-                    
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => deleteUser(profile.id)}
-                      disabled={updatingUser === profile.id}
-                    >
-                      Excluir
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <UserTableRow
+                key={profile.id}
+                profile={profile}
+                updatingUser={updatingUser}
+                onEdit={openEditSheet}
+                onDelete={deleteUser}
+              />
             ))
           ) : (
             <TableRow>
@@ -215,6 +158,14 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
           )}
         </TableBody>
       </Table>
+
+      <UserEditSheet
+        isOpen={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        editingUser={editingUser}
+        onUpdateProfile={updateUserProfile}
+        onUpdateRole={updateUserRole}
+      />
     </>
   );
 };
