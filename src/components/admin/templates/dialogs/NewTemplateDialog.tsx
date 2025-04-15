@@ -106,13 +106,10 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
             title: 'Cabeçalho',
             columns: 1,
             visible: true,
-            content: {
-              heading: 'Título Principal',
-              subheading: 'Subtítulo gerado a partir do seu HTML',
-              image: '',
-              buttonText: 'Comprar Agora',
-              buttonUrl: '#'
-            }
+            heading: 'Título Principal',
+            subheading: 'Subtítulo gerado a partir do seu HTML',
+            buttonText: 'Comprar Agora',
+            buttonUrl: '#'
           },
           {
             id: 'content-block',
@@ -120,9 +117,8 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
             title: 'Conteúdo',
             columns: 1,
             visible: true,
-            content: {
-              text: 'Conteúdo extraído do seu HTML...'
-            }
+            heading: 'Título do Texto',
+            content: 'Conteúdo extraído do seu HTML...'
           }
         ]
       };
@@ -172,13 +168,11 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
             title: 'Banner Principal',
             columns: 1,
             visible: true,
-            content: {
-              heading: 'Título Inspirado na Imagem',
-              subheading: 'Design baseado na estética da sua imagem',
-              image: imageUrl,
-              buttonText: 'Saiba Mais',
-              buttonUrl: '#'
-            }
+            heading: 'Título Inspirado na Imagem',
+            subheading: 'Design baseado na estética da sua imagem',
+            buttonText: 'Saiba Mais',
+            buttonUrl: '#',
+            backgroundImage: imageUrl
           },
           {
             id: 'image-features',
@@ -186,14 +180,12 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
             title: 'Características',
             columns: 3,
             visible: true,
-            content: {
-              heading: 'Características',
-              features: [
-                { title: 'Característica 1', description: 'Descrição da característica 1', icon: 'Star' },
-                { title: 'Característica 2', description: 'Descrição da característica 2', icon: 'Heart' },
-                { title: 'Característica 3', description: 'Descrição da característica 3', icon: 'Shield' },
-              ]
-            }
+            heading: 'Características',
+            features: [
+              { id: 'feat1', title: 'Característica 1', description: 'Descrição da característica 1', icon: 'Star' },
+              { id: 'feat2', title: 'Característica 2', description: 'Descrição da característica 2', icon: 'Heart' },
+              { id: 'feat3', title: 'Característica 3', description: 'Descrição da característica 3', icon: 'Shield' }
+            ]
           }
         ]
       };
