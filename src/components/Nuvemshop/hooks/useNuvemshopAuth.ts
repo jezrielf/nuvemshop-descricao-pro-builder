@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,8 +30,13 @@ export function useNuvemshopAuth() {
       setUserId(storedUserId);
       setStoreName(storedStoreName);
       setSuccess(true);
+      
+      // Redirect to homepage if we're on the nuvemshop-connect page
+      if (location.pathname === '/nuvemshop-connect') {
+        navigate('/', { replace: true });
+      }
     }
-  }, []);
+  }, [location.pathname, navigate]);
 
   // Handle the redirect from Nuvemshop with the authorization code
   useEffect(() => {
@@ -87,8 +93,8 @@ export function useNuvemshopAuth() {
         description: 'Sua loja Nuvemshop foi conectada com sucesso.',
       });
       
-      // Remove the code from the URL to prevent re-authentication on page refresh
-      navigate('/nuvemshop-connect', { replace: true });
+      // Redirect to the homepage after successful connection
+      navigate('/', { replace: true });
     } catch (err: any) {
       console.error('Authentication error:', err);
       setError(err.message);
