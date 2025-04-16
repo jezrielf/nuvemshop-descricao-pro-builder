@@ -7,6 +7,7 @@ import { useUrlCodeExtractor } from '@/components/Nuvemshop/hooks/useUrlCodeExtr
 import { AuthStatus } from '@/components/Nuvemshop/components/AuthStatus';
 import { AuthenticationPanel } from '@/components/Nuvemshop/components/AuthenticationPanel';
 import { ProductsTable } from '@/components/Nuvemshop/components/ProductsTable';
+import { Button } from '@/components/ui/button';
 
 const NuvemshopConnect: React.FC = () => {
   // Custom hooks for functionality
@@ -21,7 +22,8 @@ const NuvemshopConnect: React.FC = () => {
     setTestCode,
     handleConnect,
     handleTestCode,
-    handleDisconnect
+    handleDisconnect,
+    clearAuthCache
   } = useNuvemshopAuth();
 
   const {
@@ -78,6 +80,10 @@ const NuvemshopConnect: React.FC = () => {
     return await updateProductDescription(productId, description);
   };
 
+  const handleDirectConnect = () => {
+    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Integração com Nuvemshop</h1>
@@ -91,32 +97,44 @@ const NuvemshopConnect: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AuthStatus
-              success={success}
-              error={error}
-              loading={loading}
-              authenticating={authenticating}
-              userId={userId}
-              handleConnect={handleConnect}
-              handleDisconnect={handleDisconnectClick}
-              onFetchProducts={() => fetchProducts(1)}
-              loadingProducts={loadingProducts}
-            />
-            
-            {!success && (
-              <div className="mt-6">
-                <AuthenticationPanel
-                  redirectUrl={redirectUrl}
-                  setRedirectUrl={setRedirectUrl}
-                  extractCodeFromUrl={handleExtractCode}
-                  testCode={testCode}
-                  setTestCode={setTestCode}
-                  handleTestCode={handleTestCodeClick}
-                  authenticating={authenticating}
-                  copyToClipboard={copyToClipboard}
-                />
-              </div>
-            )}
+            <div className="flex flex-col gap-4">
+              <AuthStatus
+                success={success}
+                error={error}
+                loading={loading}
+                authenticating={authenticating}
+                userId={userId}
+                handleConnect={handleDirectConnect}
+                handleDisconnect={handleDisconnectClick}
+                onFetchProducts={() => fetchProducts(1)}
+                loadingProducts={loadingProducts}
+              />
+              
+              {!success && (
+                <div className="mt-2">
+                  <Button 
+                    variant="outline"
+                    onClick={clearAuthCache}
+                    className="text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100"
+                  >
+                    Limpar Cache de Conexão
+                  </Button>
+                  
+                  <div className="mt-6">
+                    <AuthenticationPanel
+                      redirectUrl={redirectUrl}
+                      setRedirectUrl={setRedirectUrl}
+                      extractCodeFromUrl={handleExtractCode}
+                      testCode={testCode}
+                      setTestCode={setTestCode}
+                      handleTestCode={handleTestCodeClick}
+                      authenticating={authenticating}
+                      copyToClipboard={copyToClipboard}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
         

@@ -126,6 +126,37 @@ export function useNuvemshopAuth() {
     });
   };
 
+  const clearAuthCache = () => {
+    // Clear all Nuvemshop related items from localStorage
+    localStorage.removeItem('nuvemshop_access_token');
+    localStorage.removeItem('nuvemshop_user_id');
+    
+    // Clear any other potential cache items
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.includes('nuvemshop')) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Reset state
+    setAccessToken(null);
+    setUserId(null);
+    setSuccess(false);
+    setError(null);
+    
+    toast({
+      title: 'Cache limpo',
+      description: 'O cache de conexão com a Nuvemshop foi limpo com sucesso.',
+    });
+    
+    // Reload the page to ensure a clean state
+    window.location.reload();
+  };
+
   return {
     loading,
     authenticating,
@@ -138,6 +169,7 @@ export function useNuvemshopAuth() {
     processAuthCode,
     handleConnect,
     handleTestCode,
-    handleDisconnect
+    handleDisconnect,
+    clearAuthCache
   };
 }

@@ -75,6 +75,11 @@ const Header: React.FC = () => {
     
     return <div className="h-6 w-0 ml-2" aria-hidden="true"></div>;
   }, [subscriptionTier, descriptionCount]);
+
+  const handleConnectNuvemshop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
+  };
   
   return (
     <header className="border-b bg-white shadow-sm px-3 sm:px-6 py-4 w-full">
@@ -97,9 +102,9 @@ const Header: React.FC = () => {
             </Link>
           )}
           
-          <Link to="/nuvemshop-connect" className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2">
+          <a href="#" onClick={handleConnectNuvemshop} className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2">
             Conectar Nuvemshop
-          </Link>
+          </a>
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
