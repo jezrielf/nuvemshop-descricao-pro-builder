@@ -5,7 +5,7 @@ import { generateBlockHtml } from '@/utils/htmlGenerators';
 
 /**
  * Generates the complete HTML output for the product description
- * without wrapper divs that can cause conflicts in Nuvemshop
+ * with exact same styling that will be exported to Nuvemshop
  */
 export const generateCompleteHtml = (state: EditorState): string => {
   // Check if description exists and has blocks
@@ -22,13 +22,13 @@ export const generateCompleteHtml = (state: EditorState): string => {
     return '<div>Nenhum bloco visível</div>';
   }
   
-  // Generate HTML for each block
+  // Generate HTML for each block with standard styling
   let blocksHtml = '';
   
   for (let i = 0; i < visibleBlocks.length; i++) {
     const block = visibleBlocks[i];
     try {
-      // Generate block HTML
+      // Generate block HTML with all inline styles
       const blockHtml = generateBlockHtml(block);
       
       // Determine spacing based on block style
@@ -50,6 +50,6 @@ export const generateCompleteHtml = (state: EditorState): string => {
 
   console.log("HTML output gerado com " + visibleBlocks.length + " blocos visíveis");
   
-  // Return blocks HTML directly without the problematic wrapper
-  return blocksHtml;
+  // Add a wrapper for the preview that uses standard styling
+  return `<div class="nuvemshop-product-description">${blocksHtml}</div>`;
 }

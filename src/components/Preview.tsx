@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useEditorStore } from '@/store/editor';
-import BlockRenderer from './blocks/BlockRenderer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Eye, Smartphone, Monitor } from 'lucide-react';
@@ -69,16 +68,10 @@ const Preview: React.FC = () => {
       <ScrollArea className="flex-1 h-[calc(100%-50px)]">
         <div className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}>
           {visibleBlocks.length > 0 ? (
-            <div className="preview-container">
-              {visibleBlocks.map((block) => (
-                <div 
-                  key={block.id} 
-                  className={block.style?.blockSpacing === 'none' ? 'mb-0' : 'mb-6'}
-                >
-                  <BlockRenderer block={block} isPreview />
-                </div>
-              ))}
-            </div>
+            <div 
+              className="preview-container"
+              dangerouslySetInnerHTML={{ __html: htmlOutput }}
+            />
           ) : (
             <div className="text-center p-8 text-gray-500">
               <p>Nenhum bloco visível para exibir.</p>
@@ -87,11 +80,6 @@ const Preview: React.FC = () => {
           )}
         </div>
       </ScrollArea>
-      
-      {/* Debug section for checking raw HTML output */}
-      <div className="hidden">
-        <pre>{htmlOutput}</pre>
-      </div>
     </div>
   );
 };

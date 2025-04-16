@@ -14,7 +14,15 @@ export const HtmlOutputTab: React.FC<HtmlOutputTabProps> = ({ htmlOutput }) => {
   const { toast } = useToast();
 
   const copyHtmlToClipboard = () => {
-    navigator.clipboard.writeText(htmlOutput);
+    // Get only the HTML inside the nuvemshop-product-description div
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlOutput, 'text/html');
+    const descriptionDiv = doc.querySelector('.nuvemshop-product-description');
+    
+    // If the wrapper is found, only copy its content, otherwise copy all
+    const htmlToCopy = descriptionDiv ? descriptionDiv.innerHTML : htmlOutput;
+    
+    navigator.clipboard.writeText(htmlToCopy);
     toast({
       title: "HTML copiado!",
       description: "O código HTML foi copiado para a área de transferência.",

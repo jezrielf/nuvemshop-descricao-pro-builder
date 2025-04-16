@@ -24,13 +24,13 @@ export const generateGalleryHtml = (block: GalleryBlock): string => {
     : '';
   
   return `
-    <div${blockStyleAttr} id="block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">
+    <div${blockStyleAttr} id="gallery-${block.id}" style="width:100%;">
       <div style="display:flex;flex-wrap:wrap;margin:-8px;" class="gallery-container">
         ${galleryHtml}
       </div>
       <style>
         @media (min-width: 768px) {
-          #block-${block.id} .gallery-container > .gallery-item {
+          #gallery-${block.id} .gallery-container > .gallery-item {
             flex: 0 0 ${100 / Math.min(block.columns || 1, 4)}%;
           }
         }
