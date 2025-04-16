@@ -81,6 +81,8 @@ const NuvemshopConnect: React.FC = () => {
   };
 
   const handleDirectConnect = () => {
+    // Limpar cache antes de conectar
+    clearAuthCache(false);
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
   };
 

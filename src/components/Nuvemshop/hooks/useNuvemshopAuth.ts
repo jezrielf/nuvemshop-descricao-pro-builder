@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -100,6 +99,8 @@ export function useNuvemshopAuth() {
 
   const handleConnect = () => {
     setLoading(true);
+    // Limpar o cache antes de conectar
+    clearAuthCache(false);
     // Redirect to Nuvemshop authorization URL with the specific link
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
   };
@@ -126,7 +127,7 @@ export function useNuvemshopAuth() {
     });
   };
 
-  const clearAuthCache = () => {
+  const clearAuthCache = (showNotification = true) => {
     // Clear all Nuvemshop related items from localStorage
     localStorage.removeItem('nuvemshop_access_token');
     localStorage.removeItem('nuvemshop_user_id');
@@ -142,19 +143,29 @@ export function useNuvemshopAuth() {
     
     keysToRemove.forEach(key => localStorage.removeItem(key));
     
+    // Limpar cookies relacionados à Nuvemshop (se houver)
+    document.cookie.split(';').forEach(cookie => {
+      const name = cookie.split('=')[0].trim();
+      if (name.includes('nuvemshop')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      }
+    });
+    
     // Reset state
     setAccessToken(null);
     setUserId(null);
     setSuccess(false);
     setError(null);
     
-    toast({
-      title: 'Cache limpo',
-      description: 'O cache de conexão com a Nuvemshop foi limpo com sucesso.',
-    });
-    
-    // Reload the page to ensure a clean state
-    window.location.reload();
+    if (showNotification) {
+      toast({
+        title: 'Cache limpo',
+        description: 'O cache de conexão com a Nuvemshop foi limpo com sucesso.',
+      });
+      
+      // Reload the page to ensure a clean state
+      window.location.reload();
+    }
   };
 
   return {
