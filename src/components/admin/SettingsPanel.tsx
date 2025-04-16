@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GeneralSettings } from './settings/GeneralSettings';
 import { EmailSettings } from './settings/EmailSettings';
 import { IntegrationSettings } from './settings/IntegrationSettings';
-import { NuvemshopSettings } from './settings/NuvemshopSettings';
 
 const SettingsPanel: React.FC = () => {
   const [generalSettings, setGeneralSettings] = useState({
@@ -27,11 +26,6 @@ const SettingsPanel: React.FC = () => {
     enableApiAccess: false,
     apiRateLimit: 100,
     corsOrigins: ''
-  });
-  
-  const [nuvemshopSettings, setNuvemshopSettings] = useState({
-    clientId: "17194",
-    clientSecret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b"
   });
   
   const handleGeneralSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,14 +68,6 @@ const SettingsPanel: React.FC = () => {
     });
   };
   
-  const handleNuvemshopSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNuvemshopSettings({
-      ...nuvemshopSettings,
-      [name]: value
-    });
-  };
-  
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Configurações do Sistema</h2>
@@ -91,7 +77,6 @@ const SettingsPanel: React.FC = () => {
           <TabsTrigger value="general">Geral</TabsTrigger>
           <TabsTrigger value="email">Email</TabsTrigger>
           <TabsTrigger value="integration">Integrações</TabsTrigger>
-          <TabsTrigger value="nuvemshop">Nuvemshop</TabsTrigger>
         </TabsList>
         
         <TabsContent value="general">
@@ -114,13 +99,6 @@ const SettingsPanel: React.FC = () => {
             settings={integrationSettings}
             onSettingChange={handleIntegrationSettingChange}
             onSwitchChange={handleSwitchChange}
-          />
-        </TabsContent>
-        
-        <TabsContent value="nuvemshop">
-          <NuvemshopSettings
-            settings={nuvemshopSettings}
-            onSettingChange={handleNuvemshopSettingChange}
           />
         </TabsContent>
       </Tabs>
