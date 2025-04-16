@@ -77,27 +77,6 @@ const Header: React.FC = () => {
     
     return <div className="h-6 w-0 ml-2" aria-hidden="true"></div>;
   }, [subscriptionTier, descriptionCount]);
-
-  const handleConnectNuvemshop = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Limpar cache antes de conectar
-    localStorage.removeItem('nuvemshop_access_token');
-    localStorage.removeItem('nuvemshop_user_id');
-    
-    // Limpar qualquer outro item potencial de cache relacionado à Nuvemshop
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.includes('nuvemshop')) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    // Redirecionar para a página de autorização da Nuvemshop
-    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
-  };
   
   return (
     <header className="border-b bg-white shadow-sm px-3 sm:px-6 py-4 w-full">
@@ -118,12 +97,6 @@ const Header: React.FC = () => {
             <Link to="/plans" className="text-xs sm:text-sm text-blue-500 hover:text-blue-700 underline">
               Ver planos
             </Link>
-          )}
-          
-          {!isNuvemshopConnected && (
-            <a href="#" onClick={handleConnectNuvemshop} className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2">
-              Nova Conexão Nuvemshop
-            </a>
           )}
         </div>
         
