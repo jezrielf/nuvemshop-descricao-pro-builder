@@ -4,9 +4,10 @@ import { BlockBase } from '../base';
 export interface VideoBlock extends BlockBase {
   type: 'video';
   videoUrl: string;
-  autoplay: boolean; // Required
-  title: string;
+  autoplay?: boolean;
+  title?: string;
   description?: string;
-  heading?: string; // Added heading property
-  caption?: string; // Added caption property
+  heading?: string;
+  caption?: string;
+  aspectRatio?: '16:9' | '4:3' | '1:1';
 }

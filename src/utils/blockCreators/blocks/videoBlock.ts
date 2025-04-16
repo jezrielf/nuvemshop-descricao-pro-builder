@@ -10,10 +10,16 @@ export const createVideoBlock = (columns: ColumnLayout): VideoBlock => {
     columns,
     visible: true,
     videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Default video URL (example)
-    autoplay: true, // Always set this property
+    autoplay: true,
+    heading: 'Título do Vídeo',
+    caption: 'Legenda do vídeo',
     description: 'Descrição do vídeo (opcional)',
-    heading: 'Título do Vídeo', // Added default heading
-    caption: 'Legenda do vídeo', // Added default caption
-    style: {}
+    style: {
+      backgroundColor: '#ffffff',
+      textColor: '#333333',
+      headingColor: '#000000',
+      padding: 'md',
+      blockSpacing: 'md'
+    }
   };
 };

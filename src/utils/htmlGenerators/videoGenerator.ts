@@ -1,7 +1,7 @@
 
 import { VideoBlock } from "@/types/editor/blocks/VideoBlock";
 import { BlockStyle } from "@/types/editor";
-import { getStyleString } from "../styleConverter";
+import { getStylesFromBlock } from "../styleConverter";
 
 // Function to extract YouTube video ID from various URL formats
 function getYoutubeVideoId(url: string): string | null {
@@ -48,7 +48,7 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
   }
   
   // Generate container styles
-  const containerStyle = getStyleString(style as BlockStyle);
+  const containerStyle = getStylesFromBlock(block);
   
   // Default embed code (fallback for non-YouTube/Vimeo URLs)
   let embedCode = `<video controls src="${videoUrl}" class="absolute top-0 left-0 w-full h-full"></video>`;

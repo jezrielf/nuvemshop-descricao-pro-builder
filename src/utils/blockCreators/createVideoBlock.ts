@@ -18,6 +18,7 @@ export function createVideoBlock(
     aspectRatio,
     heading,
     caption,
+    autoplay: true,
     style: {
       backgroundColor: '#ffffff',
       textColor: '#333333',

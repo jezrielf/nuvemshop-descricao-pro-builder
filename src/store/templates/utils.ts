@@ -7,6 +7,7 @@ interface SupabaseTemplate {
   name: string;
   category: string;
   blocks: any;
+  thumbnail?: string;
   created_at?: string;
   updated_at?: string;
   user_id?: string;
@@ -26,7 +27,8 @@ export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Templ
       id: supaTemplate.id,
       name: supaTemplate.name,
       category: supaTemplate.category,
-      blocks: blocks
+      blocks: blocks,
+      thumbnail: supaTemplate.thumbnail || '/placeholder.svg' // Default placeholder if no thumbnail
     };
   } catch (error) {
     console.error('Error converting template:', error, supaTemplate);

@@ -11,7 +11,7 @@ import { generateImageTextHtml } from './imageTextGenerator';
 import { generateTextImageHtml } from './textImageGenerator';
 import { generateFAQHtml } from './faqGenerator';
 import { generateCTAHtml } from './ctaGenerator';
-import { generateVideoHtml } from './videoGenerator';
+import { generateVideoBlockHtml } from './videoGenerator';
 
 // Map block types to their respective HTML generator functions
 const blockGenerators: Record<BlockType, (block: any) => string> = {
@@ -26,7 +26,7 @@ const blockGenerators: Record<BlockType, (block: any) => string> = {
   textImage: generateTextImageHtml,
   faq: generateFAQHtml,
   cta: generateCTAHtml,
-  video: generateVideoHtml
+  video: generateVideoBlockHtml
 };
 
 // Generate HTML for a specific block based on its type
@@ -65,5 +65,5 @@ export {
   generateTextImageHtml,
   generateFAQHtml,
   generateCTAHtml,
-  generateVideoHtml
+  generateVideoBlockHtml
 };

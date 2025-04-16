@@ -34,7 +34,8 @@ export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCateg
     id: uuidv4(),
     name: 'Template from HTML',
     category,
-    blocks: parsedBlocks
+    blocks: parsedBlocks,
+    thumbnail: '/placeholder.svg' // Add default thumbnail
   };
 };
 
@@ -80,6 +81,7 @@ export const customizeBlockTypes = (
   
   return {
     ...template,
-    blocks: updatedBlocks as Block[]
+    blocks: updatedBlocks as Block[],
+    thumbnail: template.thumbnail
   };
 };
