@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, CopyIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
 
 const NuvemshopConnect: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ const NuvemshopConnect: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
+  const [redirectUrl, setRedirectUrl] = useState('');
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,6 +38,35 @@ const NuvemshopConnect: React.FC = () => {
     };
     
     handleAuthorizationCode();
+    
+    // Attempt to extract code from referred URL 
+    const extractCodeFromReferrer = () => {
+      const urlInput = document.getElementById('url-input') as HTMLInputElement;
+      if (!urlInput) return;
+      
+      try {
+        // Get the referrer URL if available
+        const referrer = document.referrer;
+        if (referrer && referrer.includes('descricaopro.com.br') && referrer.includes('code=')) {
+          const url = new URL(referrer);
+          const code = url.searchParams.get('code');
+          if (code) {
+            setTestCode(code);
+            urlInput.value = referrer;
+            setRedirectUrl(referrer);
+            toast({
+              title: 'Código de autorização encontrado',
+              description: 'Um código de autorização foi extraído da URL de referência.',
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error extracting code from referrer:', error);
+      }
+    };
+    
+    // Attempt to extract on initial load
+    setTimeout(extractCodeFromReferrer, 1000);
   }, [location.search, authenticating, success, navigate, toast]);
   
   // Process the authorization code
@@ -182,6 +213,54 @@ const NuvemshopConnect: React.FC = () => {
     }
   };
   
+  const extractCodeFromUrl = () => {
+    try {
+      if (!redirectUrl) return;
+      
+      const url = new URL(redirectUrl);
+      const code = url.searchParams.get('code');
+      
+      if (code) {
+        setTestCode(code);
+        toast({
+          title: 'Código extraído',
+          description: 'Código de autorização extraído com sucesso da URL.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Código não encontrado',
+          description: 'Não foi possível encontrar um código de autorização na URL fornecida.',
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing URL:', error);
+      toast({
+        variant: 'destructive',
+        title: 'URL inválida',
+        description: 'O formato da URL fornecida é inválido.',
+      });
+    }
+  };
+  
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast({
+          title: 'Copiado!',
+          description: 'Texto copiado para a área de transferência.',
+        });
+      })
+      .catch((err) => {
+        console.error('Erro ao copiar:', err);
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao copiar',
+          description: 'Não foi possível copiar o texto.',
+        });
+      });
+  };
+  
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Integração com Nuvemshop</h1>
@@ -226,22 +305,59 @@ const NuvemshopConnect: React.FC = () => {
               <div className="pt-4">
                 {!success ? (
                   <div className="space-y-4">
-                    <Button onClick={handleConnect} disabled={loading || authenticating}>
-                      {(loading || authenticating) && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      Conectar Loja
-                    </Button>
+                    <div className="border-b border-gray-200 pb-4">
+                      <Button onClick={handleConnect} disabled={loading || authenticating}>
+                        {(loading || authenticating) && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Conectar Loja
+                      </Button>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Clique para iniciar o processo de autorização da Nuvemshop
+                      </p>
+                    </div>
                     
-                    <div className="pt-4 border-t border-gray-200">
-                      <p className="text-sm text-gray-500 mb-2">Ou teste com um código específico:</p>
+                    <div className="border-b border-gray-200 pb-4">
+                      <h3 className="text-sm font-medium mb-2">Colar URL de redirecionamento</h3>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Input
+                            id="url-input"
+                            type="text"
+                            placeholder="https://descricaopro.com.br/?code=..."
+                            value={redirectUrl}
+                            onChange={(e) => setRedirectUrl(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button variant="outline" onClick={extractCodeFromUrl} disabled={!redirectUrl}>
+                            Extrair Código
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Cole a URL de redirecionamento que contém o código de autorização (ex: https://descricaopro.com.br/?code=...)
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-sm font-medium mb-2">Testar com código específico</h3>
                       <div className="flex items-center space-x-2">
-                        <input
-                          type="text"
-                          value={testCode}
-                          onChange={(e) => setTestCode(e.target.value)}
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        />
+                        <div className="relative flex-1">
+                          <Input
+                            type="text"
+                            value={testCode}
+                            onChange={(e) => setTestCode(e.target.value)}
+                            className="pr-10"
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-0 top-0" 
+                            onClick={() => copyToClipboard(testCode)}
+                          >
+                            <CopyIcon className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <Button onClick={handleTestCode} disabled={authenticating || !testCode}>
                           {authenticating ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
