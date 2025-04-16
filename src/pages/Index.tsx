@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -12,6 +13,7 @@ import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -28,45 +30,13 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
-  const [storeConnected, setStoreConnected] = useState(false);
-  const [storeName, setStoreName] = useState<string | null>(null);
-  const [storeId, setStoreId] = useState<string | null>(null);
+  const { 
+    success: storeConnected, 
+    storeName, 
+    userId: storeId, 
+    handleConnect: handleConnectNuvemshop 
+  } = useNuvemshopAuth();
   
-  // Verificar se há uma loja conectada
-  useEffect(() => {
-    const storedToken = localStorage.getItem('nuvemshop_access_token');
-    const storedUserId = localStorage.getItem('nuvemshop_user_id');
-    const storedStoreName = localStorage.getItem('nuvemshop_store_name');
-    
-    if (storedToken && storedUserId) {
-      setStoreConnected(true);
-      setStoreId(storedUserId);
-      setStoreName(storedStoreName);
-    }
-  }, []);
-  
-  // Função para lidar com a conexão da Nuvemshop
-  const handleConnectNuvemshop = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Limpar cache antes de conectar
-    localStorage.removeItem('nuvemshop_access_token');
-    localStorage.removeItem('nuvemshop_user_id');
-    
-    // Limpar qualquer outro item potencial de cache relacionado à Nuvemshop
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.includes('nuvemshop')) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    // Redirecionar para a página de autorização da Nuvemshop
-    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
-  };
-
   useEffect(() => {
     // Carrega os templates iniciais
     const initializeTemplates = async () => {
@@ -126,7 +96,10 @@ const Index = () => {
         ) : (
           <a 
             href="#" 
-            onClick={handleConnectNuvemshop} 
+            onClick={(e) => {
+              e.preventDefault();
+              handleConnectNuvemshop();
+            }} 
             className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2"
           >
             Nova Conexão Nuvemshop

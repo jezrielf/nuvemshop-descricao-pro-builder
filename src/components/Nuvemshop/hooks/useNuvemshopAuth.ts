@@ -110,7 +110,8 @@ export function useNuvemshopAuth() {
 
   const handleConnect = () => {
     setLoading(true);
-    // Limpar o cache antes de conectar
+    // Limpar o cache antes de conectar - SEMPRE fazer isso para garantir
+    // que não estamos usando dados de uma conexão anterior
     clearAuthCache(false);
     // Redirect to Nuvemshop authorization URL with the specific link
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
@@ -118,21 +119,15 @@ export function useNuvemshopAuth() {
   
   const handleTestCode = async (code: string) => {
     if (code) {
+      // Limpar cache antes de testar um novo código
+      clearAuthCache(false);
       await processAuthCode(code);
     }
   };
   
   const handleDisconnect = () => {
     // Clear stored tokens and store name
-    localStorage.removeItem('nuvemshop_access_token');
-    localStorage.removeItem('nuvemshop_user_id');
-    localStorage.removeItem('nuvemshop_store_name');
-    
-    // Reset state
-    setAccessToken(null);
-    setUserId(null);
-    setStoreName(null);
-    setSuccess(false);
+    clearAuthCache(false);
     
     toast({
       title: 'Loja desconectada',
