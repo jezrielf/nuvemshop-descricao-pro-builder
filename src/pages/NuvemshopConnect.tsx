@@ -1,13 +1,14 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle2, XCircle, CopyIcon } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, CopyIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const NuvemshopConnect: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -20,6 +21,10 @@ const NuvemshopConnect: React.FC = () => {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
   const [redirectUrl, setRedirectUrl] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [perPage, setPerPage] = useState(200);
+  const [totalPages, setTotalPages] = useState(1);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -157,6 +162,8 @@ const NuvemshopConnect: React.FC = () => {
     setUserId(null);
     setSuccess(false);
     setProducts([]);
+    setCurrentPage(1);
+    setTotalProducts(0);
     
     toast({
       title: 'Loja desconectada',
@@ -164,7 +171,7 @@ const NuvemshopConnect: React.FC = () => {
     });
   };
   
-  const handleFetchProducts = async () => {
+  const handleFetchProducts = async (page = 1) => {
     if (!accessToken || !userId) {
       toast({
         variant: 'destructive',
@@ -176,11 +183,14 @@ const NuvemshopConnect: React.FC = () => {
     
     try {
       setLoadingProducts(true);
+      setCurrentPage(page);
       
       const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-products', {
         body: { 
           accessToken, 
-          userId 
+          userId,
+          page,
+          perPage
         },
       });
       
@@ -195,11 +205,25 @@ const NuvemshopConnect: React.FC = () => {
       }
       
       console.log('Products fetched:', data);
-      setProducts(Array.isArray(data) ? data : []);
+      
+      // If we have a pagination header, update total count
+      const productsArray = Array.isArray(data) ? data : [];
+      setProducts(productsArray);
+      
+      // Estimate total pages based on products returned
+      // If we received less than perPage, we're likely on the last page
+      if (productsArray.length < perPage) {
+        setTotalProducts((page - 1) * perPage + productsArray.length);
+        setTotalPages(page);
+      } else {
+        // Otherwise, estimate there's at least one more page
+        setTotalProducts(page * perPage + 1);
+        setTotalPages(page + 1);
+      }
       
       toast({
         title: 'Produtos carregados',
-        description: `${Array.isArray(data) ? data.length : 0} produtos foram carregados da sua loja.`,
+        description: `${productsArray.length} produtos foram carregados da sua loja (página ${page}).`,
       });
     } catch (err: any) {
       console.error('Error fetching products:', err);
@@ -210,6 +234,18 @@ const NuvemshopConnect: React.FC = () => {
       });
     } finally {
       setLoadingProducts(false);
+    }
+  };
+  
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      handleFetchProducts(currentPage + 1);
+    }
+  };
+  
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      handleFetchProducts(currentPage - 1);
     }
   };
   
@@ -373,7 +409,7 @@ const NuvemshopConnect: React.FC = () => {
                     <Button variant="outline" onClick={handleDisconnect}>
                       Desconectar Loja
                     </Button>
-                    <Button onClick={handleFetchProducts} disabled={loadingProducts}>
+                    <Button onClick={() => handleFetchProducts(1)} disabled={loadingProducts}>
                       {loadingProducts ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
@@ -392,22 +428,72 @@ const NuvemshopConnect: React.FC = () => {
             <CardHeader>
               <CardTitle>Produtos da Loja</CardTitle>
               <CardDescription>
-                {products.length} produtos encontrados
+                Página {currentPage} - Exibindo {products.length} produtos 
+                {totalProducts > 0 ? ` de aproximadamente ${totalProducts}` : ''}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="max-h-96 overflow-y-auto">
-                <ul className="divide-y">
-                  {products.map((product) => (
-                    <li key={product.id} className="py-3">
-                      <div className="font-medium">{product.name}</div>
-                      <div className="text-sm text-gray-500">
-                        ID: {product.id} | SKU: {product.sku || 'N/A'}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>SKU</TableHead>
+                      <TableHead>Preço</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loadingProducts ? (
+                      Array.from({ length: 5 }).map((_, index) => (
+                        <TableRow key={`skeleton-${index}`}>
+                          <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                          <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                          <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      products.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell>{product.id}</TableCell>
+                          <TableCell>{product.name}</TableCell>
+                          <TableCell>{product.sku || 'N/A'}</TableCell>
+                          <TableCell>
+                            {product.price ? `$${parseFloat(product.price).toFixed(2)}` : 'N/A'}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
               </div>
+              
+              {products.length > 0 && (
+                <div className="flex items-center justify-between mt-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handlePrevPage} 
+                    disabled={currentPage <= 1 || loadingProducts}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Anterior
+                  </Button>
+                  <span className="text-sm text-gray-500">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleNextPage} 
+                    disabled={currentPage >= totalPages || loadingProducts}
+                  >
+                    Próxima
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

@@ -23,7 +23,7 @@ serve(async (req) => {
 
     // Parse the request body
     const requestData = await req.json();
-    const { accessToken, userId } = requestData;
+    const { accessToken, userId, page = 1, perPage = 200 } = requestData;
 
     if (!accessToken || !userId) {
       return new Response(JSON.stringify({ error: 'Access token and user ID are required' }), { 
@@ -34,9 +34,10 @@ serve(async (req) => {
 
     console.log(`Fetching products for user ID: ${userId}`);
     console.log(`Using access token: ${accessToken.substring(0, 5)}...`);
+    console.log(`Page: ${page}, Per Page: ${perPage}`);
 
-    // Make the request to Nuvemshop API with proper headers
-    const apiUrl = `https://api.tiendanube.com/v1/${userId}/products`;
+    // Make the request to Nuvemshop API with proper headers and pagination
+    const apiUrl = `https://api.tiendanube.com/v1/${userId}/products?per_page=${perPage}&page=${page}`;
     console.log(`Making request to: ${apiUrl}`);
 
     const response = await fetch(apiUrl, {
