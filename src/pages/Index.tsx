@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -12,8 +11,8 @@ import ProductEditorController from '@/components/Nuvemshop/components/ProductEd
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-// Adicionamos o diretório public/tutorial para as imagens do tutorial
 const placeholderImages = [
   '/tutorial/welcome.png',
   '/tutorial/add-blocks.png',
@@ -46,6 +45,28 @@ const Index = () => {
     }
   }, []);
   
+  // Função para lidar com a conexão da Nuvemshop
+  const handleConnectNuvemshop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Limpar cache antes de conectar
+    localStorage.removeItem('nuvemshop_access_token');
+    localStorage.removeItem('nuvemshop_user_id');
+    
+    // Limpar qualquer outro item potencial de cache relacionado à Nuvemshop
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.includes('nuvemshop')) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Redirecionar para a página de autorização da Nuvemshop
+    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
+  };
+
   useEffect(() => {
     // Carrega os templates iniciais
     const initializeTemplates = async () => {
@@ -93,7 +114,7 @@ const Index = () => {
           <ProductSearch onProductSelect={setSelectedProduct} />
         </div>
         
-        {storeConnected && (
+        {storeConnected ? (
           <div className="mr-4">
             <Badge variant="outline" className="bg-green-100 text-green-800">
               <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -102,6 +123,14 @@ const Index = () => {
                 : `Conectado com a loja ID: ${storeId}`}
             </Badge>
           </div>
+        ) : (
+          <a 
+            href="#" 
+            onClick={handleConnectNuvemshop} 
+            className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2"
+          >
+            Nova Conexão Nuvemshop
+          </a>
         )}
       </div>
       
