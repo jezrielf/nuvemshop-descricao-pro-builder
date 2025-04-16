@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -11,9 +10,10 @@ import ProductSearch from '@/components/Nuvemshop/components/ProductSearch';
 import ProductEditorController from '@/components/Nuvemshop/components/ProductEditorController';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
+import { Button } from '@/components/ui/button';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -34,7 +34,8 @@ const Index = () => {
     success: storeConnected, 
     storeName, 
     userId: storeId, 
-    handleConnect: handleConnectNuvemshop 
+    handleConnect: handleConnectNuvemshop,
+    handleDisconnect: handleDisconnectNuvemshop
   } = useNuvemshopAuth();
   
   useEffect(() => {
@@ -74,6 +75,14 @@ const Index = () => {
       clearInterval(templateRefreshInterval);
     };
   }, [loadTemplates]);
+
+  const handleNuvemshopDisconnect = () => {
+    handleDisconnectNuvemshop();
+    toast({
+      title: 'Nuvemshop Desconectada',
+      description: 'Sua loja Nuvemshop foi desconectada com sucesso.',
+    });
+  };
   
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
@@ -85,13 +94,22 @@ const Index = () => {
         </div>
         
         {storeConnected ? (
-          <div className="mr-4">
+          <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-green-100 text-green-800">
               <CheckCircle2 className="h-4 w-4 mr-1" />
               {storeName 
                 ? `Conectado com a ${storeName}` 
                 : `Conectado com a loja ID: ${storeId}`}
             </Badge>
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={handleNuvemshopDisconnect}
+              className="flex items-center"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Desconectar
+            </Button>
           </div>
         ) : (
           <a 
