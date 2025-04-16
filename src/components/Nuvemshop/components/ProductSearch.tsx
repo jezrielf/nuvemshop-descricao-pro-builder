@@ -34,7 +34,6 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { accessToken, userId, success: isConnected } = useNuvemshopAuth();
   const { toast } = useToast();
-  const { createNewDescription, loadDescription } = useEditorStore();
   
   const {
     products,
@@ -72,22 +71,6 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const handleSelectProduct = (product: NuvemshopProduct) => {
     if (onProductSelect) {
       onProductSelect(product);
-    } else {
-      // Default behavior: Create new description with product name
-      const productName = typeof product.name === 'string' 
-        ? product.name
-        : (product.name?.pt || 'Novo Produto');
-      
-      createNewDescription(`Descrição: ${productName}`);
-      
-      // If product has description, we could potentially load it
-      // This would require adding HTML parsing functionality to convert
-      // the existing HTML description to our block format
-      
-      toast({
-        title: 'Produto selecionado',
-        description: `Editando descrição para: ${productName}`,
-      });
     }
     setOpen(false);
   };

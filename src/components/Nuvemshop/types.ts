@@ -23,4 +23,5 @@ export interface ProductEditorContext {
   setSelectedProduct: (product: NuvemshopProduct | null) => void;
   isSaving: boolean;
   saveDescription: () => Promise<boolean>;
+  loadProductDescription: (product: NuvemshopProduct) => void;
 }

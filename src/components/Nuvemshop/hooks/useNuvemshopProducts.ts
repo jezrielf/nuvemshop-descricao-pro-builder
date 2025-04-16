@@ -1,176 +1,138 @@
 
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback } from 'react';
 import { NuvemshopProduct, NuvemshopProductUpdatePayload } from '../types';
+import { useToast } from '@/hooks/use-toast';
+import { createClient } from '@supabase/supabase-js';
 
-export function useNuvemshopProducts(accessToken: string | null, userId: string | null) {
+export const useNuvemshopProducts = (accessToken?: string, userId?: string | number) => {
   const [products, setProducts] = useState<NuvemshopProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [updatingProduct, setUpdatingProduct] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [perPage, setPerPage] = useState(200);
-  const [totalPages, setTotalPages] = useState(1);
-  
+  const [productError, setProductError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const fetchProducts = async (page = 1) => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  // Reset products
+  const resetProducts = useCallback(() => {
+    setProducts([]);
+  }, []);
+
+  // Fetch products from Nuvemshop
+  const fetchProducts = useCallback(async (page: number = 1, perPage: number = 50) => {
     if (!accessToken || !userId) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: 'Você precisa conectar sua loja primeiro.',
-      });
-      return;
+      setProductError('Access token or user ID not available');
+      return [];
     }
-    
+
     try {
       setLoadingProducts(true);
-      setCurrentPage(page);
-      
-      const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-products', {
-        body: { 
-          accessToken, 
-          userId,
-          page,
-          perPage
-        },
+      setProductError(null);
+
+      const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
+        body: { accessToken, userId, page, perPage }
       });
-      
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw new Error(`Function error: ${functionError.message}`);
+
+      if (error) {
+        console.error('Error fetching Nuvemshop products:', error);
+        setProductError(error.message);
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao buscar produtos',
+          description: error.message,
+        });
+        return [];
       }
-      
-      if (data.error) {
-        console.error('API error:', data.error);
-        throw new Error(data.error);
-      }
-      
-      console.log('Products fetched:', data);
-      
-      // Process the fetched products
-      const productsArray = Array.isArray(data) ? data : [];
-      setProducts(productsArray);
-      
-      // Estimate total pages based on products returned
-      // If we received less than perPage, we're likely on the last page
-      if (productsArray.length < perPage) {
-        setTotalProducts((page - 1) * perPage + productsArray.length);
-        setTotalPages(page);
+
+      if (Array.isArray(data)) {
+        console.log(`Loaded ${data.length} products from Nuvemshop`);
+        setProducts(data);
+        return data;
       } else {
-        // Otherwise, estimate there's at least one more page
-        setTotalProducts(page * perPage + 1);
-        setTotalPages(page + 1);
+        console.error('Unexpected response format:', data);
+        setProductError('Formato de resposta inesperado');
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao buscar produtos',
+          description: 'Formato de resposta inesperado da API',
+        });
+        return [];
       }
-      
-      toast({
-        title: 'Produtos carregados',
-        description: `${productsArray.length} produtos foram carregados da sua loja (página ${page}).`,
-      });
-    } catch (err: any) {
-      console.error('Error fetching products:', err);
+    } catch (err) {
+      console.error('Error in fetchProducts:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      setProductError(errorMessage);
       toast({
         variant: 'destructive',
-        title: 'Erro ao carregar produtos',
-        description: err.message,
+        title: 'Erro ao buscar produtos',
+        description: errorMessage,
       });
+      return [];
     } finally {
       setLoadingProducts(false);
     }
-  };
+  }, [accessToken, userId, supabase.functions, toast]);
 
-  const updateProductDescription = async (productId: number, description: string) => {
+  // Update product description in Nuvemshop
+  const updateProductDescription = useCallback(async (productId: number, description: string) => {
     if (!accessToken || !userId) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: 'Você precisa conectar sua loja primeiro.',
-      });
+      setProductError('Access token or user ID not available');
       return false;
     }
-    
+
     try {
-      setUpdatingProduct(true);
+      console.log(`Updating description for product ID: ${productId}`);
       
-      const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-update-product', {
+      const { data, error } = await supabase.functions.invoke('nuvemshop-update-product', {
         body: { 
           accessToken, 
-          userId,
-          productId,
-          description
-        },
+          userId, 
+          productId, 
+          description 
+        }
       });
-      
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw new Error(`Function error: ${functionError.message}`);
+
+      if (error) {
+        console.error('Error updating product description:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao atualizar descrição',
+          description: error.message,
+        });
+        return false;
       }
+
+      console.log('Product description updated successfully:', data);
       
-      if (data.error) {
-        console.error('API error:', data.error);
-        throw new Error(data.error);
-      }
-      
-      console.log('Product updated:', data);
-      
-      // Update the local products state
+      // Update the local product data if available
       setProducts(prevProducts => 
         prevProducts.map(product => 
           product.id === productId 
-            ? { ...product, description: typeof description === 'string' ? { pt: description } : description } 
+            ? { ...product, description: { pt: description } } 
             : product
         )
       );
       
-      toast({
-        title: 'Produto atualizado',
-        description: `A descrição do produto foi atualizada com sucesso.`,
-      });
-      
       return true;
-    } catch (err: any) {
-      console.error('Error updating product:', err);
+    } catch (err) {
+      console.error('Error in updateProductDescription:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       toast({
         variant: 'destructive',
-        title: 'Erro ao atualizar produto',
-        description: err.message,
+        title: 'Erro ao atualizar descrição',
+        description: errorMessage,
       });
       return false;
-    } finally {
-      setUpdatingProduct(false);
     }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      fetchProducts(currentPage + 1);
-    }
-  };
-  
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      fetchProducts(currentPage - 1);
-    }
-  };
+  }, [accessToken, userId, supabase.functions, toast]);
 
   return {
     products,
     loadingProducts,
-    updatingProduct,
-    currentPage,
-    totalProducts,
-    perPage,
-    totalPages,
+    productError,
     fetchProducts,
-    updateProductDescription,
-    handleNextPage,
-    handlePrevPage,
-    resetProducts: () => {
-      setProducts([]);
-      setCurrentPage(1);
-      setTotalProducts(0);
-    }
+    resetProducts,
+    updateProductDescription
   };
-}
+};

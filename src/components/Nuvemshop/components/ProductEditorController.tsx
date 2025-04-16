@@ -8,6 +8,7 @@ import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Save, RefreshCw, ExternalLink } from 'lucide-react';
+import { parseHtmlToBlocks } from '@/utils/htmlParsers';
 
 interface ProductEditorControllerProps {
   className?: string;
@@ -22,23 +23,93 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const { accessToken, userId } = useNuvemshopAuth();
   const { updateProductDescription } = useNuvemshopProducts(accessToken, userId);
   const { toast } = useToast();
-  const { description, getHtmlOutput, createNewDescription } = useEditorStore();
+  const { description, getHtmlOutput, createNewDescription, loadDescription } = useEditorStore();
 
-  // When product changes, create a new description with the product name
-  useEffect(() => {
-    if (product) {
+  // Parse product HTML description and convert to our block format
+  const loadProductDescription = (product: NuvemshopProduct) => {
+    try {
       const productName = typeof product.name === 'string' 
         ? product.name
         : (product.name?.pt || 'Novo Produto');
-        
+      
+      // First create a basic description with the product name
       createNewDescription(`Descrição: ${productName}`);
       
+      // Check if the product has an existing description to load
+      if (product.description) {
+        // Get product description as HTML string
+        const htmlDescription = typeof product.description === 'string'
+          ? product.description
+          : (product.description.pt || '');
+          
+        if (htmlDescription.trim()) {
+          // Use the HTML parser utility to convert HTML to our block format
+          try {
+            // This is a simplified approach - in a real implementation, 
+            // we would need a more robust HTML to blocks parser
+            console.log('Parsing HTML description:', htmlDescription);
+            
+            // If we can't parse the HTML into blocks format yet, we'll just show it in a text block
+            // In the future, this would be replaced with proper HTML to blocks conversion
+            const blocks = [];
+            
+            // Add a text block with the HTML description
+            blocks.push({
+              id: 'imported-description',
+              type: 'text',
+              title: 'Descrição Importada',
+              content: htmlDescription,
+              columns: 1,
+              visible: true
+            });
+            
+            // Create a description object with the parsed blocks
+            const parsedDescription = {
+              id: description?.id || 'imported-' + Date.now(),
+              name: `Descrição: ${productName}`,
+              blocks: blocks,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            
+            // Load the parsed description into the editor
+            loadDescription(parsedDescription);
+            
+            toast({
+              title: 'Descrição carregada',
+              description: 'A descrição existente do produto foi carregada para edição.',
+            });
+          } catch (parseError) {
+            console.error('Error parsing HTML description:', parseError);
+            toast({
+              variant: 'destructive',
+              title: 'Erro ao carregar descrição',
+              description: 'Não foi possível converter a descrição HTML existente.',
+            });
+          }
+        }
+      } else {
+        toast({
+          title: 'Nova descrição criada',
+          description: 'Este produto não tinha uma descrição. Criamos uma nova para você editar.',
+        });
+      }
+    } catch (error) {
+      console.error('Error loading product description:', error);
       toast({
-        title: 'Produto selecionado',
-        description: `Editando descrição para: ${productName}`,
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível carregar a descrição do produto.',
       });
     }
-  }, [product, createNewDescription]);
+  };
+
+  // When product changes, load its description
+  useEffect(() => {
+    if (product) {
+      loadProductDescription(product);
+    }
+  }, [product]);
 
   const handleSaveToNuvemshop = async () => {
     if (!product || !description) {
