@@ -7,11 +7,11 @@ import { ImageIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Import custom hooks
+// Importar hooks personalizados
 import { useImageLibraryUpload } from './hooks/useImageLibraryUpload';
 import { useUserImages } from './hooks/useUserImages';
 
-// Import components
+// Importar componentes
 import LibraryTab from './components/LibraryTab';
 import UploadsTab from './components/UploadsTab';
 import UploadTab from './components/UploadTab';
@@ -27,11 +27,10 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
   const { toast } = useToast();
   const auth = useAuth();
   
-  // Initialize custom hooks
+  // Inicializar hooks personalizados
   const { 
     uploading, 
     uploadProgress, 
-    imageFile,
     previewUrl,
     imageAlt,
     fileInputRef,
@@ -47,7 +46,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
     addImageToList
   } = useUserImages(open, activeTab);
   
-  // Check for premium features
+  // Verificar recursos premium
   const isPremium = auth.isPremium();
   
   const handleSelectImage = (src: string, alt: string) => {
@@ -63,7 +62,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
   const handleUpload = async () => {
     const result = await uploadImage();
     if (result) {
-      // Add to user images and select it
+      // Adicionar às imagens do usuário e selecioná-la
       const newImage = { 
         id: Date.now().toString(), 
         src: result.url, 
@@ -72,7 +71,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
       
       addImageToList(newImage);
       
-      // Auto-select the uploaded image
+      // Selecionar automaticamente a imagem carregada
       handleSelectImage(result.url, result.alt);
     }
   };

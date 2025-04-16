@@ -16,61 +16,29 @@ export const useUserImages = (isOpen: boolean, activeTab: string) => {
   const { toast } = useToast();
   const auth = useAuth();
 
-  // Helper function to ensure bucket exists
-  const ensureBucketExists = async () => {
-    try {
-      // Check if bucket exists first
-      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-      
-      if (bucketsError) {
-        console.error('Error checking buckets:', bucketsError);
-        return false;
-      }
-      
-      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
-      
-      if (!bucketExists) {
-        // Create the bucket if it doesn't exist
-        const { error: createError } = await supabase.storage.createBucket('user-images', {
-          public: true,
-          fileSizeLimit: 5242880, // 5MB
-        });
-        
-        if (createError) {
-          console.error('Error creating bucket:', createError);
-          return false;
-        }
-        
-        console.log('Created user-images bucket');
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error ensuring bucket exists:', error);
-      return false;
-    }
-  };
-
   const loadUserImages = async () => {
     if (!auth.user) {
-      console.log('No authenticated user for loading images');
+      console.log('Sem usuário autenticado para carregar imagens');
       return;
     }
     
     setLoading(true);
     
     try {
-      const bucketReady = await ensureBucketExists();
-      if (!bucketReady) {
-        throw new Error("Failed to ensure bucket exists");
+      // Verificar se bucket existe
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
+      
+      if (!bucketExists) {
+        // Usuário ainda não tem imagens
+        setUserImages([]);
+        setLoading(false);
+        return;
       }
       
       const userId = auth.user.id;
-      console.log('Loading images for user:', userId);
-      
-      // Only attempt to list files if we have a user ID
       if (!userId) {
-        console.warn("No user ID available, cannot load images");
+        console.warn("Sem ID de usuário disponível, não é possível carregar imagens");
         setLoading(false);
         return;
       }
@@ -83,38 +51,36 @@ export const useUserImages = (isOpen: boolean, activeTab: string) => {
         });
       
       if (error) {
-        console.error("Error loading images:", error);
         if (error.message.includes("The resource was not found")) {
-          // This is normal for new users with no uploads yet
-          console.log("User has no uploads yet");
+          // Normal para novos usuários sem uploads
+          console.log("Usuário não tem uploads ainda");
           setUserImages([]);
-          setLoading(false);
           return;
         }
         throw error;
       }
       
-      console.log('Found user images:', data);
-      
-      if (data) {
-        const imageUrls = await Promise.all(data.map(async (file) => {
-          const { data: fileUrl } = supabase
-            .storage
-            .from('user-images')
-            .getPublicUrl(`${userId}/${file.name}`);
-          
-          return {
-            id: file.id,
-            src: fileUrl.publicUrl,
-            alt: file.name.split('.')[0] || 'Uploaded image'
-          };
-        }));
-        
-        console.log('Processed image URLs:', imageUrls);
-        setUserImages(imageUrls);
+      if (!data || data.length === 0) {
+        setUserImages([]);
+        return;
       }
+      
+      const imageUrls = await Promise.all(data.map(async (file) => {
+        const { data: fileData } = supabase
+          .storage
+          .from('user-images')
+          .getPublicUrl(`${userId}/${file.name}`);
+        
+        return {
+          id: file.id,
+          src: fileData.publicUrl,
+          alt: file.name.split('.')[0] || 'Imagem enviada'
+        };
+      }));
+      
+      setUserImages(imageUrls);
     } catch (error) {
-      console.error('Error loading images:', error);
+      console.error('Erro ao carregar imagens:', error);
       toast({
         title: "Erro ao carregar imagens",
         description: "Não foi possível carregar suas imagens. Tente novamente mais tarde.",
@@ -125,7 +91,7 @@ export const useUserImages = (isOpen: boolean, activeTab: string) => {
     }
   };
 
-  // Load user's uploaded images when the tab changes or dialog opens
+  // Carregar imagens do usuário quando a aba mudar ou o diálogo abrir
   useEffect(() => {
     if (isOpen && activeTab === 'uploads') {
       loadUserImages();

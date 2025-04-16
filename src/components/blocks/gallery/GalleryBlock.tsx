@@ -62,9 +62,8 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
     const newImages = [...block.images];
     const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
     
-    const temp = newImages[currentIndex];
-    newImages[currentIndex] = newImages[targetIndex];
-    newImages[targetIndex] = temp;
+    // Trocar posições
+    [newImages[currentIndex], newImages[targetIndex]] = [newImages[targetIndex], newImages[currentIndex]];
     
     updateBlock(block.id, { images: newImages });
   };
@@ -82,14 +81,14 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, imageId: string) => {
     const result = await handleFileChange(e, imageId);
     if (result) {
-      // Update the gallery image
+      // Atualizar a imagem da galeria
       handleUpdateImage(imageId, 'src', result.url);
       handleUpdateImage(imageId, 'alt', result.alt);
     }
   };
   
   const handleSelectImageFromLibrary = (imageId: string, imageUrl: string, alt: string) => {
-    // Update the specific image in the gallery
+    // Atualizar a imagem específica na galeria
     const updatedImages = block.images.map(image => {
       if (image.id === imageId) {
         return { ...image, src: imageUrl, alt: alt };
@@ -103,12 +102,12 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   const imageFitValue = block.style?.imageFit || 'contain';
   const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
   
-  // Preview mode
+  // Modo de pré-visualização
   if (isPreview) {
     return <GalleryPreview block={block} />;
   }
   
-  // Edit mode
+  // Modo de edição
   return (
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">

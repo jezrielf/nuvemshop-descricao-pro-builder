@@ -35,7 +35,7 @@ const UploadTab: React.FC<UploadTabProps> = ({
           <div className="relative mx-auto max-w-xs">
             <img 
               src={previewUrl} 
-              alt="Preview" 
+              alt="Pré-visualização" 
               className="max-h-64 mx-auto"
             />
             <Button

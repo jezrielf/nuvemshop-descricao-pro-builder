@@ -11,47 +11,11 @@ interface UseImageUploadProps {
 export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const { toast } = useToast();
   const auth = useAuth();
 
-  // Helper function to check if bucket exists and create if it doesn't
-  const ensureBucketExists = async () => {
-    try {
-      // Check if bucket exists first
-      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-      
-      if (bucketsError) {
-        console.error('Error checking buckets:', bucketsError);
-        return false;
-      }
-      
-      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
-      
-      if (!bucketExists) {
-        // Create the bucket if it doesn't exist
-        const { error: createError } = await supabase.storage.createBucket('user-images', {
-          public: true,
-          fileSizeLimit: 5242880, // 5MB
-        });
-        
-        if (createError) {
-          console.error('Error creating bucket:', createError);
-          return false;
-        }
-        
-        console.log('Created user-images bucket');
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error ensuring bucket exists:', error);
-      return false;
-    }
-  };
-
   const validateFile = (file: File): { valid: boolean; error?: string } => {
-    // Check file type
+    // Verificar tipo de arquivo
     if (!file.type.startsWith('image/')) {
       return {
         valid: false,
@@ -59,7 +23,7 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
       };
     }
     
-    // Check file size (limit to 5MB)
+    // Verificar tamanho do arquivo (limite de 5MB)
     if (file.size > 5 * 1024 * 1024) {
       return {
         valid: false,
@@ -77,7 +41,7 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
         description: "Você precisa estar logado para fazer upload de imagens.",
         variant: "destructive",
       });
-      return;
+      return null;
     }
 
     const validation = validateFile(file);
@@ -87,74 +51,75 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
         description: validation.error,
         variant: "destructive",
       });
-      return;
+      return null;
     }
 
-    setImageFile(file);
     setUploading(true);
     setUploadProgress(0);
     
     try {
-      // Ensure bucket exists before uploading
-      const bucketReady = await ensureBucketExists();
-      if (!bucketReady) {
-        throw new Error("Failed to ensure bucket exists");
+      // Criar bucket se não existir
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
+      
+      if (!bucketExists) {
+        const { error: createError } = await supabase.storage.createBucket('user-images', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+        });
+        
+        if (createError) {
+          console.error('Erro ao criar bucket:', createError);
+          throw new Error(`Erro ao criar bucket: ${createError.message}`);
+        }
       }
       
-      // Create a unique file name to avoid conflicts
+      // Nome de arquivo único
       const fileExt = file.name.split('.').pop();
       const fileAlt = file.name.split('.')[0] || 'image';
       const fileName = `${Date.now()}_${fileAlt}.${fileExt}`;
       
-      // Make sure user has a folder - using uid directly to avoid undefined
-      let filePath = fileName;
-      const userId = auth.user.id;
-      if (userId) {
-        filePath = `${userId}/${fileName}`;
-      } else {
-        console.warn("No user ID available, storing in root");
-      }
+      // Caminho do arquivo
+      const filePath = auth.user.id 
+        ? `${auth.user.id}/${fileName}` 
+        : fileName;
       
-      console.log('Uploading file to path:', filePath);
-      
-      // Set up progress tracking with an interval
+      // Simular progresso
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          const newProgress = Math.min(prev + 10, 95); // Increment but cap at 95%
-          return newProgress;
-        });
+        setUploadProgress(prev => Math.min(prev + 10, 95));
       }, 100);
       
-      // Upload the file
-      const { error: uploadError, data } = await supabase.storage
+      // Upload do arquivo
+      const { error: uploadError } = await supabase.storage
         .from('user-images')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
         });
       
-      // Clear the interval after upload completes
       clearInterval(progressInterval);
       
       if (uploadError) {
-        console.error("Upload error details:", uploadError);
+        console.error('Erro no upload:', uploadError);
         throw uploadError;
       }
       
-      console.log('Upload successful:', data);
-      
-      // Upload complete - set to 100%
+      // Progresso completo
       setUploadProgress(100);
       
-      // Get the public URL
-      const { data: fileUrl } = supabase
+      // Obter URL pública
+      const { data: fileData } = supabase
         .storage
         .from('user-images')
         .getPublicUrl(filePath);
       
-      // Call success callback if provided
-      if (onSuccess && fileUrl) {
-        onSuccess(fileUrl.publicUrl, fileAlt);
+      if (!fileData?.publicUrl) {
+        throw new Error('Não foi possível obter URL pública da imagem');
+      }
+      
+      // Chamar callback de sucesso
+      if (onSuccess) {
+        onSuccess(fileData.publicUrl, fileAlt);
       }
       
       toast({
@@ -162,9 +127,12 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
         description: "Sua imagem foi enviada com sucesso.",
       });
 
-      return { url: fileUrl?.publicUrl, alt: fileAlt };
+      return { 
+        url: fileData.publicUrl, 
+        alt: fileAlt 
+      };
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Erro ao fazer upload:', error);
       toast({
         title: "Erro no upload",
         description: "Não foi possível enviar sua imagem. Tente novamente mais tarde.",
@@ -174,13 +142,12 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
     } finally {
       setUploading(false);
       setUploadProgress(0);
-      setImageFile(null);
     }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !auth.user) return;
+    if (!file || !auth.user) return null;
     
     return uploadImage(file);
   };
@@ -188,7 +155,6 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
   return {
     uploading,
     uploadProgress,
-    imageFile,
     handleFileChange,
     uploadImage,
     validateFile
