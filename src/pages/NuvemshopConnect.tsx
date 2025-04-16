@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -7,6 +8,8 @@ import { AuthStatus } from '@/components/Nuvemshop/components/AuthStatus';
 import { AuthenticationPanel } from '@/components/Nuvemshop/components/AuthenticationPanel';
 import { ProductsTable } from '@/components/Nuvemshop/components/ProductsTable';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const NuvemshopConnect: React.FC = () => {
   // Custom hooks for functionality
@@ -23,7 +26,9 @@ const NuvemshopConnect: React.FC = () => {
     handleTestCode,
     handleDisconnect,
     clearAuthCache,
-    storeName, // Add storeName to destructuring
+    storeName,
+    storeUrlName,
+    setStoreUrlName
   } = useNuvemshopAuth();
 
   const {
@@ -88,7 +93,8 @@ const NuvemshopConnect: React.FC = () => {
     
     // Limpar cache antes de conectar
     clearAuthCache(false);
-    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
+    // Use the entered store name
+    handleConnect();
   };
 
   const handleClearCache = (e?: React.MouseEvent) => {
@@ -122,7 +128,7 @@ const NuvemshopConnect: React.FC = () => {
                 handleDisconnect={handleDisconnectClick}
                 onFetchProducts={() => fetchProducts(1)}
                 loadingProducts={loadingProducts}
-                storeName={storeName} // Pass storeName to AuthStatus
+                storeName={storeName}
               />
               
               {!success && (
@@ -135,14 +141,29 @@ const NuvemshopConnect: React.FC = () => {
                     Limpar Cache de Conexão
                   </Button>
                   
-                  <div className="mt-4">
-                    <Button
-                      variant="default"
-                      onClick={handleDirectConnect}
-                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
-                    >
-                      Conectar Loja Nuvemshop
-                    </Button>
+                  <div className="mt-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="storeUrlName">Nome da Loja (URL)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="storeUrlName"
+                          placeholder="minhaloja"
+                          value={storeUrlName}
+                          onChange={(e) => setStoreUrlName(e.target.value)}
+                          className="max-w-md"
+                        />
+                        <Button
+                          variant="default"
+                          onClick={handleDirectConnect}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Conectar Loja Nuvemshop
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Insira o nome da sua loja que aparece na URL (ex: se sua loja é https://minhaloja.lojavirtualnuvem.com.br, digite "minhaloja")
+                      </p>
+                    </div>
                   </div>
                   
                   <div className="mt-6">

@@ -30,6 +30,13 @@ export const exchangeCodeForToken = async (authCode: string): Promise<NuvemshopA
 /**
  * Generate the authorization URL for Nuvemshop
  */
-export const getNuvemshopAuthUrl = () => {
+export const getNuvemshopAuthUrl = (storeName?: string) => {
+  // If store name is provided, use the store-specific URL format
+  if (storeName && storeName.trim() !== '') {
+    return `https://${storeName}.lojavirtualnuvem.com.br/admin/apps/17194/authorize/?state=csrf-code`;
+  }
+  
+  // Default URL for when no store name is provided
   return 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
 };
+

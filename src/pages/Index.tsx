@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -14,6 +15,7 @@ import { CheckCircle2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -35,7 +37,9 @@ const Index = () => {
     storeName, 
     userId: storeId, 
     handleConnect: handleConnectNuvemshop,
-    handleDisconnect: handleDisconnectNuvemshop
+    handleDisconnect: handleDisconnectNuvemshop,
+    storeUrlName,
+    setStoreUrlName
   } = useNuvemshopAuth();
   
   useEffect(() => {
@@ -112,16 +116,26 @@ const Index = () => {
             </Button>
           </div>
         ) : (
-          <a 
-            href="#" 
-            onClick={(e) => {
-              e.preventDefault();
-              handleConnectNuvemshop();
-            }} 
-            className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2"
-          >
-            Nova Conexão Nuvemshop
-          </a>
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="Nome da loja (URL)"
+              value={storeUrlName}
+              onChange={(e) => setStoreUrlName(e.target.value)}
+              className="max-w-[200px] h-8 text-sm"
+            />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={(e) => {
+                e.preventDefault();
+                handleConnectNuvemshop();
+              }}
+              className="text-green-600 border-green-300 hover:bg-green-50 h-8"
+            >
+              Conectar Nuvemshop
+            </Button>
+          </div>
         )}
       </div>
       
