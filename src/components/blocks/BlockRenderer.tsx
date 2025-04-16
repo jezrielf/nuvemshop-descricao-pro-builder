@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Block } from '@/types/editor';
 import HeroBlock from './HeroBlock';
@@ -50,4 +51,3 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
 };
 
 export default BlockRenderer;
-

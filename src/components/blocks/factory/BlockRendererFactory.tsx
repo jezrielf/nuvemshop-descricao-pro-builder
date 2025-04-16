@@ -7,7 +7,7 @@ import FeaturesBlock from '../FeaturesBlock';
 import BenefitsBlock from '../BenefitsBlock';
 import SpecificationsBlock from '../SpecificationsBlock';
 import ImageBlock from '../ImageBlock';
-import GalleryBlock from '../GalleryBlock';
+import GalleryBlock from '../gallery';
 import ImageTextBlock from '../ImageTextBlock';
 import TextImageBlock from '../TextImageBlock';
 import FAQBlock from '../FAQBlock';
