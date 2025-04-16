@@ -44,7 +44,8 @@ serve(async (req) => {
     formData.append('grant_type', 'authorization_code');
     formData.append('code', code);
 
-    console.log('Sending request to Nuvemshop...');
+    console.log('Sending request to Nuvemshop token endpoint');
+    console.log('Request body:', formData.toString());
 
     // Make the request to Nuvemshop
     const response = await fetch('https://www.tiendanube.com/apps/authorize/token', {
@@ -55,21 +56,25 @@ serve(async (req) => {
       body: formData.toString(),
     });
 
+    // Check status and log full response for debugging
+    console.log('Response status:', response.status);
+    const responseText = await response.text();
+    console.log('Response body:', responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error response from Nuvemshop:', errorText);
-      
       return new Response(JSON.stringify({ 
         error: 'Failed to authenticate with Nuvemshop', 
-        details: errorText 
+        details: responseText,
+        status: response.status
       }), { 
         status: response.status, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });
     }
 
-    const data = await response.json();
-    console.log('Successfully authenticated with Nuvemshop:', data);
+    // Parse JSON response (if we got here, we know it's valid text)
+    const data = JSON.parse(responseText);
+    console.log('Successfully authenticated with Nuvemshop');
 
     return new Response(JSON.stringify(data), { 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

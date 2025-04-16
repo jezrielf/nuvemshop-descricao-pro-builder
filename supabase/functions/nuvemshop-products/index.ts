@@ -34,30 +34,36 @@ serve(async (req) => {
 
     console.log(`Fetching products for user ID: ${userId}`);
 
-    // Make the request to Nuvemshop API
+    // Make the request to Nuvemshop API with proper headers
     const response = await fetch(`https://api.tiendanube.com/v1/${userId}/products`, {
       method: 'GET',
       headers: {
         'Authentication': `bearer ${accessToken}`,
         'User-Agent': 'DescricaoPro comercial@weethub.com',
+        'Content-Type': 'application/json',
       },
     });
 
+    // Log response details for debugging
+    console.log('Response status:', response.status);
+    const responseText = await response.text();
+    console.log('Response preview:', responseText.substring(0, 200) + '...');
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error response from Nuvemshop:', errorText);
-      
       return new Response(JSON.stringify({ 
         error: 'Failed to fetch products from Nuvemshop', 
-        details: errorText 
+        details: responseText,
+        status: response.status
       }), { 
         status: response.status, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });
     }
 
-    const data = await response.json();
+    // Parse JSON response
+    const data = JSON.parse(responseText);
     console.log('Successfully fetched products from Nuvemshop');
+    console.log('Number of products:', Array.isArray(data) ? data.length : 'not an array');
 
     return new Response(JSON.stringify(data), { 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

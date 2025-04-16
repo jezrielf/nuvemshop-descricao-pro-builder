@@ -26,16 +26,19 @@ const NuvemshopConnect: React.FC = () => {
   useEffect(() => {
     const handleAuthorizationCode = async () => {
       const query = new URLSearchParams(location.search);
-      const code = query.get('code');
+      const codeParam = query.get('code');
       
-      if (code && !authenticating && !success) {
+      if (codeParam && !authenticating && !success) {
         try {
           setAuthenticating(true);
           setError(null);
           
-          // Extract the code from the URL (between "code=" and "&")
-          const authCode = code.split('&')[0];
-          console.log('Authorization code:', authCode);
+          // Extract the code properly (everything between "code=" and "&" or end of string)
+          const codeRegex = /code=([^&]+)/;
+          const match = location.search.match(codeRegex);
+          const authCode = match ? match[1] : codeParam;
+          
+          console.log('Authorization code extracted:', authCode);
           
           // Call the Edge Function to exchange the code for an access token
           const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-auth', {
@@ -43,10 +46,12 @@ const NuvemshopConnect: React.FC = () => {
           });
           
           if (functionError) {
+            console.error('Function error:', functionError);
             throw new Error(`Function error: ${functionError.message}`);
           }
           
           if (data.error) {
+            console.error('API error:', data.error);
             throw new Error(data.error);
           }
           
@@ -61,9 +66,6 @@ const NuvemshopConnect: React.FC = () => {
           localStorage.setItem('nuvemshop_access_token', data.access_token);
           localStorage.setItem('nuvemshop_user_id', data.user_id.toString());
           
-          // Also store in Supabase if user is logged in
-          // This would be implemented here
-          
           toast({
             title: 'Loja conectada com sucesso!',
             description: 'Sua loja Nuvemshop foi conectada com sucesso.',
@@ -71,7 +73,7 @@ const NuvemshopConnect: React.FC = () => {
           
           // Remove the code from the URL to prevent re-authentication on page refresh
           navigate('/nuvemshop-connect', { replace: true });
-        } catch (err) {
+        } catch (err: any) {
           console.error('Authentication error:', err);
           setError(err.message);
           toast({
@@ -144,10 +146,12 @@ const NuvemshopConnect: React.FC = () => {
       });
       
       if (functionError) {
+        console.error('Function error:', functionError);
         throw new Error(`Function error: ${functionError.message}`);
       }
       
       if (data.error) {
+        console.error('API error:', data.error);
         throw new Error(data.error);
       }
       
@@ -158,7 +162,7 @@ const NuvemshopConnect: React.FC = () => {
         title: 'Produtos carregados',
         description: `${Array.isArray(data) ? data.length : 0} produtos foram carregados da sua loja.`,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching products:', err);
       toast({
         variant: 'destructive',
