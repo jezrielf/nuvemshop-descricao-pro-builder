@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { NuvemshopProduct, NuvemshopProductUpdatePayload } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useNuvemshopProducts = (accessToken?: string, userId?: string | number) => {
   const [products, setProducts] = useState<NuvemshopProduct[]>([]);
@@ -13,10 +13,6 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const { toast } = useToast();
-
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   // Reset products
   const resetProducts = useCallback(() => {
@@ -104,7 +100,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     } finally {
       setLoadingProducts(false);
     }
-  }, [accessToken, userId, supabase.functions, toast]);
+  }, [accessToken, userId, toast]);
 
   // Update product description in Nuvemshop
   const updateProductDescription = useCallback(async (productId: number, description: string) => {
@@ -165,7 +161,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     } finally {
       setUpdatingProduct(false);
     }
-  }, [accessToken, userId, supabase.functions, toast]);
+  }, [accessToken, userId, toast]);
 
   return {
     products,
