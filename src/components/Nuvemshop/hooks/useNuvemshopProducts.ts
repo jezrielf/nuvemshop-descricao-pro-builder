@@ -40,7 +40,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   }, [currentPage]);
 
   // Fetch products from Nuvemshop
-  const fetchProducts = useCallback(async (page: number = 1, perPage: number = 50) => {
+  const fetchProducts = useCallback(async (page: number = 1, perPage: number = 500) => {
     if (!accessToken || !userId) {
       setProductError('Access token or user ID not available');
       return [];
@@ -72,7 +72,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
         
         // Estimate total pages based on product count
         // Nuvemshop API doesn't provide exact count, so we estimate
-        const estimatedTotal = data.length === perPage ? perPage * 10 : data.length;
+        const estimatedTotal = data.length === perPage ? perPage * 2 : data.length;
         setTotalProducts(estimatedTotal);
         setTotalPages(Math.ceil(estimatedTotal / perPage));
         

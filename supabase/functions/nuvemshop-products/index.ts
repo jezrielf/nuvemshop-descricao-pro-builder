@@ -23,7 +23,7 @@ serve(async (req) => {
 
     // Parse the request body
     const requestData = await req.json();
-    const { accessToken, userId, page = 1, perPage = 200 } = requestData;
+    const { accessToken, userId, page = 1, perPage = 500 } = requestData;
 
     if (!accessToken || !userId) {
       return new Response(JSON.stringify({ error: 'Access token and user ID are required' }), { 
@@ -37,6 +37,7 @@ serve(async (req) => {
     console.log(`Page: ${page}, Per Page: ${perPage}`);
 
     // Make the request to Nuvemshop API with proper headers and pagination
+    // Use the direct URL format for better clarity
     const apiUrl = `https://api.tiendanube.com/v1/${userId}/products?per_page=${perPage}&page=${page}`;
     console.log(`Making request to: ${apiUrl}`);
 
