@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
 import Preview from '@/components/Preview';
@@ -6,6 +7,9 @@ import { useTemplateStore } from '@/store/templates';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
+import ProductSearch from '@/components/Nuvemshop/components/ProductSearch';
+import ProductEditorController from '@/components/Nuvemshop/components/ProductEditorController';
+import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 
 // Adicionamos o diretório public/tutorial para as imagens do tutorial
 const placeholderImages = [
@@ -22,6 +26,7 @@ const Index = () => {
   const { loadTemplates } = useTemplateStore();
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
   
   useEffect(() => {
     // Carrega os templates iniciais
@@ -64,6 +69,16 @@ const Index = () => {
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
+      
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
+        <div className="flex-1">
+          <ProductSearch onProductSelect={setSelectedProduct} />
+        </div>
+      </div>
+      
+      {selectedProduct && (
+        <ProductEditorController product={selectedProduct} />
+      )}
       
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup 

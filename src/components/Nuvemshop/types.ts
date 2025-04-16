@@ -17,3 +17,10 @@ export interface NuvemshopProductUpdatePayload {
   id: number;
   description: { pt: string } | string;
 }
+
+export interface ProductEditorContext {
+  selectedProduct: NuvemshopProduct | null;
+  setSelectedProduct: (product: NuvemshopProduct | null) => void;
+  isSaving: boolean;
+  saveDescription: () => Promise<boolean>;
+}
