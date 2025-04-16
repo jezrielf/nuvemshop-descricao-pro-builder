@@ -38,8 +38,19 @@ export const NuvemshopConnect = () => {
         throw new Error('Failed to save auth state');
       }
 
-      // Construct the authorization URL with your app's client ID
-      const authUrl = `https://www.tiendanube.com/apps/authorize/token?client_id=17194&state=${state}`;
+      // Construct the new authorization URL for Nuvemshop v2
+      const storeSubdomain = prompt("Digite o subdomínio da sua loja (ex: universodosparafusos):");
+      
+      if (!storeSubdomain) {
+        toast({
+          title: "Erro",
+          description: "O subdomínio da loja é obrigatório.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const authUrl = `https://${storeSubdomain}.lojavirtualnuvem.com.br/admin/v2/apps/17194/authorize?state=${state}`;
       
       // Redirect to Nuvemshop's authorization page
       window.location.href = authUrl;
