@@ -100,7 +100,7 @@ export function useNuvemshopAuth() {
 
   const handleConnect = () => {
     setLoading(true);
-    // Redirect to Nuvemshop authorization URL
+    // Redirect to Nuvemshop authorization URL with the specific link
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
   };
   
