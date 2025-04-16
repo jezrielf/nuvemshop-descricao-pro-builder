@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -132,6 +133,16 @@ const NuvemshopConnect: React.FC = () => {
                   >
                     Limpar Cache de Conexão
                   </Button>
+                  
+                  <div className="mt-4">
+                    <Button
+                      variant="default"
+                      onClick={handleDirectConnect}
+                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+                    >
+                      Conectar Loja Nuvemshop
+                    </Button>
+                  </div>
                   
                   <div className="mt-6">
                     <AuthenticationPanel
