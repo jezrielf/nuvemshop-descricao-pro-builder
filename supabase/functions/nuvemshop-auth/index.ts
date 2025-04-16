@@ -28,7 +28,7 @@ serve(async (req) => {
 
     console.log('Processing Nuvemshop auth with code:', code);
 
-    // Exchange code for access token using the exact format from the documentation
+    // Exchange code for access token
     const tokenResponse = await fetch('https://www.tiendanube.com/apps/authorize/token', {
       method: 'POST',
       headers: {
@@ -37,7 +37,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         client_id: "17194",
-        client_secret: Deno.env.get('NUVEMSHOP_CLIENT_SECRET'),
+        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b",
         grant_type: "authorization_code",
         code
       })
@@ -85,7 +85,7 @@ serve(async (req) => {
     const { error: insertError } = await supabaseClient
       .from('nuvemshop_stores')
       .insert({
-        user_id: (await req.json()).user_id,
+        user_id: req.headers.get('x-user-id'),
         store_id: authData.user_id,
         name: storeData.name,
         url: storeData.url,

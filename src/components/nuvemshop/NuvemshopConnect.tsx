@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { v4 as uuidv4 } from 'uuid';
 import { Store } from 'lucide-react';
 
 type NuvemshopStore = {
@@ -31,9 +31,9 @@ export const NuvemshopConnect = () => {
           .eq('user_id', user.id)
           .order('connected_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
         
-        if (error && error.code !== 'PGRST116') { // Not found error
+        if (error) {
           console.error('Error fetching connected store:', error);
           return;
         }
@@ -61,7 +61,7 @@ export const NuvemshopConnect = () => {
         return;
       }
 
-      // Construct the new authorization URL for Nuvemshop
+      // Ask for store subdomain
       const storeSubdomain = prompt("Digite o subdomínio da sua loja (ex: universodosparafusos):");
       
       if (!storeSubdomain) {

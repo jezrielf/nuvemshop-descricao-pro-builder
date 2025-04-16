@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +9,6 @@ const NuvemshopCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
-  const [storeName, setStoreName] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -39,27 +38,10 @@ const NuvemshopCallback = () => {
         }
 
         console.log('Authentication successful:', data);
-
-        // Get the store name from the most recent connection
-        const { data: storeData } = await supabase
-          .from('nuvemshop_stores')
-          .select('name')
-          .order('connected_at', { ascending: false })
-          .limit(1)
-          .single();
-        
-        if (storeData) {
-          setStoreName(storeData.name);
-          toast({
-            title: "Conexão realizada",
-            description: `Sua loja ${storeData.name} foi conectada com sucesso!`
-          });
-        } else {
-          toast({
-            title: "Conexão realizada",
-            description: "Sua loja Nuvemshop foi conectada com sucesso!"
-          });
-        }
+        toast({
+          title: "Conexão realizada",
+          description: "Sua loja Nuvemshop foi conectada com sucesso!"
+        });
 
       } catch (error) {
         console.error('Error handling Nuvemshop callback:', error);
@@ -82,11 +64,7 @@ const NuvemshopCallback = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-brand-blue" />
-      <p className="text-lg">
-        {storeName 
-          ? `Conectando à loja ${storeName}...` 
-          : "Conectando à Nuvemshop..."}
-      </p>
+      <p className="text-lg">Conectando à Nuvemshop...</p>
     </div>
   );
 };

@@ -9,27 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      nuvemshop_auth_states: {
-        Row: {
-          created_at: string
-          id: string
-          state: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          state: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          state?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       nuvemshop_stores: {
         Row: {
           access_token: string
@@ -59,30 +38,6 @@ export type Database = {
           scope?: string | null
           store_id?: number
           url?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      nuvemshop_updates: {
-        Row: {
-          id: string
-          product_id: number
-          store_id: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          product_id: number
-          store_id: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          id?: string
-          product_id?: number
-          store_id?: number
-          updated_at?: string
           user_id?: string
         }
         Relationships: []
