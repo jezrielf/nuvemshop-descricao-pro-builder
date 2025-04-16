@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { ConnectionStatus } from './connect/status/ConnectionStatus';
+import { ConnectionActions } from './connect/status/ConnectionActions';
 
 interface AuthStatusProps {
   success: boolean;
@@ -10,79 +9,42 @@ interface AuthStatusProps {
   loading: boolean;
   authenticating: boolean;
   userId: string | null;
-  storeName?: string; // Add optional storeName prop
+  storeName?: string;
   handleConnect: () => void;
   handleDisconnect: () => void;
   onFetchProducts: () => void;
   loadingProducts: boolean;
 }
 
-export const AuthStatus: React.FC<AuthStatusProps> = ({
-  success,
-  error,
-  loading,
-  authenticating,
-  userId,
-  storeName, // Add storeName to destructured props
-  handleConnect,
-  handleDisconnect,
-  onFetchProducts,
-  loadingProducts
-}) => {
+export const AuthStatus: React.FC<AuthStatusProps> = (props) => {
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex items-center">
-        <span className="mr-2">Status:</span>
-        {success ? (
-          <Badge variant="outline" className="bg-green-100 text-green-800">
-            <CheckCircle2 className="h-4 w-4 mr-1" />
-            {storeName 
-              ? `Conectado com a ${storeName}` 
-              : 'Conectado'}
-          </Badge>
-        ) : (
-          <Badge variant="destructive">
-            <XCircle className="h-4 w-4 mr-1" />
-            Desconectado
-          </Badge>
-        )}
-      </div>
+      <ConnectionStatus 
+        success={props.success} 
+        storeName={props.storeName} 
+      />
       
-      {userId && (
+      {props.userId && (
         <div>
-          <span className="font-semibold">ID da Loja:</span> {userId}
+          <span className="font-semibold">ID da Loja:</span> {props.userId}
         </div>
       )}
       
-      {error && (
+      {props.error && (
         <div className="text-red-500 mt-2">
-          Erro: {error}
+          Erro: {props.error}
         </div>
       )}
       
-      <div className="pt-4">
-        {!success ? (
-          <Button onClick={handleConnect} disabled={loading || authenticating}>
-            {(loading || authenticating) && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Conectar Loja
-          </Button>
-        ) : (
-          <div className="flex space-x-4">
-            <Button variant="outline" onClick={handleDisconnect}>
-              Desconectar Loja
-            </Button>
-            <Button onClick={onFetchProducts} disabled={loadingProducts}>
-              {loadingProducts ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                'Carregar Produtos'
-              )}
-            </Button>
-          </div>
-        )}
-      </div>
+      <ConnectionActions 
+        success={props.success}
+        loading={props.loading}
+        authenticating={props.authenticating}
+        loadingProducts={props.loadingProducts}
+        handleConnect={props.handleConnect}
+        handleDisconnect={props.handleDisconnect}
+        onFetchProducts={props.onFetchProducts}
+      />
     </div>
   );
 };
