@@ -40,7 +40,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   }, [currentPage]);
 
   // Fetch products from Nuvemshop
-  const fetchProducts = useCallback(async (page: number = 1, perPage: number = 500) => {
+  const fetchProducts = useCallback(async (page: number = 1, perPage: number = 200) => {
     if (!accessToken || !userId) {
       setProductError('Access token or user ID not available');
       return [];

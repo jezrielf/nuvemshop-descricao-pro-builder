@@ -23,7 +23,8 @@ serve(async (req) => {
 
     // Parse the request body
     const requestData = await req.json();
-    const { accessToken, userId, page = 1, perPage = 500 } = requestData;
+    // Limit perPage to 200 which is the maximum allowed by Nuvemshop API
+    const { accessToken, userId, page = 1, perPage = 200 } = requestData;
 
     if (!accessToken || !userId) {
       return new Response(JSON.stringify({ error: 'Access token and user ID are required' }), { 
