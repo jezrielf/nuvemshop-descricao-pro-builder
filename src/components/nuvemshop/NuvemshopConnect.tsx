@@ -1,15 +1,54 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
+import { Store } from 'lucide-react';
+
+type NuvemshopStore = {
+  id: string;
+  store_id: number;
+  name: string;
+  url: string;
+}
 
 export const NuvemshopConnect = () => {
   const [loading, setLoading] = useState(false);
+  const [connectedStore, setConnectedStore] = useState<NuvemshopStore | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Check if there's already a connected store when component mounts
+  useEffect(() => {
+    const checkConnectedStore = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('nuvemshop_stores')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('connected_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') { // Not found error
+          console.error('Error fetching connected store:', error);
+          return;
+        }
+        
+        if (data) {
+          setConnectedStore(data);
+        }
+      } catch (error) {
+        console.error('Error checking connected store:', error);
+      }
+    };
+    
+    checkConnectedStore();
+  }, [user]);
 
   const handleConnect = async () => {
     try {
@@ -66,6 +105,19 @@ export const NuvemshopConnect = () => {
       setLoading(false);
     }
   };
+
+  if (connectedStore) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+      >
+        <Store className="mr-1 h-4 w-4" />
+        Conectado à {connectedStore.name}
+      </Button>
+    );
+  }
 
   return (
     <Button
