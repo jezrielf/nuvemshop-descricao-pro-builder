@@ -14,9 +14,48 @@ export const useImageLibraryUpload = () => {
   const { toast } = useToast();
   const auth = useAuth();
   
+  // Preparar bucket de imagens
+  const ensureBucketExists = async () => {
+    try {
+      // Verificar se o bucket existe
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error('Erro ao verificar buckets:', bucketsError);
+        throw new Error(`Erro ao verificar buckets: ${bucketsError.message}`);
+      }
+      
+      const userImagesBucket = buckets?.find(bucket => bucket.name === 'user-images');
+      
+      if (!userImagesBucket) {
+        console.log('Bucket de imagens não existe, criando...');
+        const { error: createError } = await supabase.storage.createBucket('user-images', {
+          public: true,
+          fileSizeLimit: 5242880 // 5MB
+        });
+        
+        if (createError) {
+          console.error('Erro ao criar bucket:', createError);
+          throw new Error(`Erro ao criar bucket: ${createError.message}`);
+        }
+        
+        console.log('Bucket user-images criado com sucesso');
+      } else {
+        console.log('Bucket user-images já existe');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Erro ao garantir existência do bucket:', error);
+      return false;
+    }
+  };
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    console.log('Arquivo selecionado:', file.name, file.type, file.size);
     
     // Validações
     if (!file.type.startsWith('image/')) {
@@ -49,45 +88,53 @@ export const useImageLibraryUpload = () => {
   };
   
   const uploadImage = async () => {
-    if (!imageFile || !auth.user) {
-      console.log('Sem arquivo ou usuário autenticado para upload');
+    if (!imageFile) {
+      console.log('Nenhum arquivo para upload');
       return null;
     }
     
+    if (!auth.user) {
+      console.log('Usuário não autenticado');
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para fazer upload de imagens.",
+        variant: "destructive",
+      });
+      return null;
+    }
+    
+    console.log('Iniciando upload:', imageFile.name);
     setUploading(true);
     setUploadProgress(0);
     
     try {
-      // Criar bucket se não existir
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
-      
-      if (!bucketExists) {
-        const { error: createError } = await supabase.storage.createBucket('user-images', {
-          public: true,
-          fileSizeLimit: 5242880, // 5MB
-        });
-        
-        if (createError) {
-          console.error('Erro ao criar bucket:', createError);
-          throw new Error(`Erro ao criar bucket: ${createError.message}`);
-        }
+      // Garantir que o bucket existe
+      const bucketReady = await ensureBucketExists();
+      if (!bucketReady) {
+        throw new Error('Não foi possível preparar o armazenamento');
       }
-      
-      // Nome de arquivo único
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}_${imageAlt || 'image'}.${fileExt}`;
       
       const userId = auth.user.id;
       if (!userId) {
-        throw new Error("Erro de autenticação: ID de usuário não disponível");
+        throw new Error('ID de usuário não disponível');
       }
       
-      const filePath = `${userId}/${fileName}`;
+      console.log('ID do usuário:', userId);
+      
+      // Nome de arquivo único
+      const fileExt = imageFile.name.split('.').pop();
+      const safeFileName = `${Date.now()}_${(imageAlt || 'image').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${fileExt}`;
+      const filePath = `${userId}/${safeFileName}`;
+      
+      console.log('Caminho do arquivo para upload:', filePath);
       
       // Simular progresso
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => Math.min(prev + 10, 95));
+        setUploadProgress(prev => {
+          const newProgress = Math.min(prev + 5, 90);
+          console.log('Progresso de upload:', newProgress);
+          return newProgress;
+        });
       }, 100);
       
       // Upload do arquivo
@@ -101,11 +148,11 @@ export const useImageLibraryUpload = () => {
       clearInterval(progressInterval);
       
       if (uploadError) {
-        console.error('Erro no upload:', uploadError);
+        console.error('Erro de upload:', uploadError);
         throw uploadError;
       }
       
-      // Progresso completo
+      console.log('Upload concluído com sucesso');
       setUploadProgress(100);
       
       // Obter URL pública
@@ -113,6 +160,8 @@ export const useImageLibraryUpload = () => {
         .storage
         .from('user-images')
         .getPublicUrl(filePath);
+      
+      console.log('URL pública:', fileData?.publicUrl);
       
       if (!fileData?.publicUrl) {
         throw new Error('Não foi possível obter URL pública da imagem');
@@ -129,13 +178,26 @@ export const useImageLibraryUpload = () => {
         url: fileData.publicUrl, 
         alt: imageAlt 
       };
-    } catch (error) {
-      console.error('Erro ao fazer upload:', error);
+    } catch (error: any) {
+      console.error('Erro detalhado do upload:', error);
+      
+      let errorMessage = "Não foi possível enviar sua imagem. Tente novamente mais tarde.";
+      
+      // Verificar erros específicos
+      if (error.message?.includes('storage/object_not_found')) {
+        errorMessage = "Diretório não encontrado. Verifique suas permissões.";
+      } else if (error.message?.includes('Permission denied')) {
+        errorMessage = "Permissão negada. Verifique suas permissões.";
+      } else if (error.message?.includes('auth/unauthorized')) {
+        errorMessage = "Você precisa estar logado para fazer upload de imagens.";
+      }
+      
       toast({
         title: "Erro no upload",
-        description: "Não foi possível enviar sua imagem. Tente novamente mais tarde.",
+        description: errorMessage,
         variant: "destructive",
       });
+      
       return null;
     } finally {
       setUploading(false);
