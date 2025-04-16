@@ -10,6 +10,27 @@ export const useGalleryUpload = () => {
   const { toast } = useToast();
   const auth = useAuth();
 
+  // Helper function to check if bucket exists and create if it doesn't
+  const ensureBucketExists = async () => {
+    try {
+      // Check if bucket exists first
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
+      
+      if (!bucketExists) {
+        // Create the bucket if it doesn't exist
+        await supabase.storage.createBucket('user-images', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+        });
+        console.log('Created user-images bucket');
+      }
+    } catch (error) {
+      console.error('Error ensuring bucket exists:', error);
+      // Continue anyway, as the bucket might already exist
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, imageId: string) => {
     const file = e.target.files?.[0];
     if (!file || !auth.user) return;
@@ -38,11 +59,19 @@ export const useGalleryUpload = () => {
     setUploadProgress(prev => ({ ...prev, [imageId]: 0 }));
     
     try {
+      // Ensure bucket exists before uploading
+      await ensureBucketExists();
+      
       // Create a unique file name to avoid conflicts
       const fileExt = file.name.split('.').pop();
       const fileAlt = file.name.split('.')[0] || 'gallery-image';
       const fileName = `${Date.now()}_${fileAlt}.${fileExt}`;
-      const filePath = `${auth.user.id}/${fileName}`;
+      
+      // Make sure user has a folder
+      let filePath = fileName;
+      if (auth.user.id) {
+        filePath = `${auth.user.id}/${fileName}`;
+      }
       
       // Set up progress tracking with an interval
       const progressInterval = setInterval(() => {
@@ -65,6 +94,7 @@ export const useGalleryUpload = () => {
       clearInterval(progressInterval);
       
       if (uploadError) {
+        console.error("Upload error details:", uploadError);
         throw uploadError;
       }
       

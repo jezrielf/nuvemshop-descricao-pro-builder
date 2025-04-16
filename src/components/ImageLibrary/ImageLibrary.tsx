@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -49,6 +48,27 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
   const { toast } = useToast();
   const auth = useAuth();
   
+  // New function to ensure bucket exists
+  const ensureBucketExists = async () => {
+    try {
+      // Check if bucket exists first
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
+      
+      if (!bucketExists) {
+        // Create the bucket if it doesn't exist
+        await supabase.storage.createBucket('user-images', {
+          public: true,
+          fileSizeLimit: 5242880, // 5MB
+        });
+        console.log('Created user-images bucket');
+      }
+    } catch (error) {
+      console.error('Error ensuring bucket exists:', error);
+      // Continue anyway, as the bucket might already exist
+    }
+  };
+  
   // Filtered images based on search term and category
   const filteredImages = images.filter(image => {
     const matchesSearch = image.alt.toLowerCase().includes(searchTerm.toLowerCase());
@@ -69,6 +89,8 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
     setLoading(true);
     
     try {
+      await ensureBucketExists();
+      
       const { data, error } = await supabase
         .storage
         .from('user-images')
@@ -77,6 +99,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
         });
       
       if (error) {
+        console.error("Error loading images:", error);
         throw error;
       }
       
@@ -169,10 +192,18 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
     setUploadProgress(0);
     
     try {
+      // Ensure bucket exists before uploading
+      await ensureBucketExists();
+      
       // Create a unique file name to avoid conflicts
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}_${imageAlt || 'image'}.${fileExt}`;
-      const filePath = `${auth.user.id}/${fileName}`;
+      
+      // Make sure user has a folder
+      let filePath = fileName;
+      if (auth.user.id) {
+        filePath = `${auth.user.id}/${fileName}`;
+      }
       
       // Set up progress tracking with an interval
       const progressInterval = setInterval(() => {
@@ -194,6 +225,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
       clearInterval(progressInterval);
       
       if (uploadError) {
+        console.error("Upload error details:", uploadError);
         throw uploadError;
       }
       
