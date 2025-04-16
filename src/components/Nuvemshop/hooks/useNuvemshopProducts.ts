@@ -1,11 +1,13 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { NuvemshopProduct } from '../types';
+import { NuvemshopProduct, NuvemshopProductUpdatePayload } from '../types';
 
 export function useNuvemshopProducts(accessToken: string | null, userId: string | null) {
   const [products, setProducts] = useState<NuvemshopProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [updatingProduct, setUpdatingProduct] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [perPage, setPerPage] = useState(200);
@@ -79,6 +81,68 @@ export function useNuvemshopProducts(accessToken: string | null, userId: string 
     }
   };
 
+  const updateProductDescription = async (productId: number, description: string) => {
+    if (!accessToken || !userId) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Você precisa conectar sua loja primeiro.',
+      });
+      return false;
+    }
+    
+    try {
+      setUpdatingProduct(true);
+      
+      const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-update-product', {
+        body: { 
+          accessToken, 
+          userId,
+          productId,
+          description
+        },
+      });
+      
+      if (functionError) {
+        console.error('Function error:', functionError);
+        throw new Error(`Function error: ${functionError.message}`);
+      }
+      
+      if (data.error) {
+        console.error('API error:', data.error);
+        throw new Error(data.error);
+      }
+      
+      console.log('Product updated:', data);
+      
+      // Update the local products state
+      setProducts(prevProducts => 
+        prevProducts.map(product => 
+          product.id === productId 
+            ? { ...product, description: typeof description === 'string' ? { pt: description } : description } 
+            : product
+        )
+      );
+      
+      toast({
+        title: 'Produto atualizado',
+        description: `A descrição do produto foi atualizada com sucesso.`,
+      });
+      
+      return true;
+    } catch (err: any) {
+      console.error('Error updating product:', err);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao atualizar produto',
+        description: err.message,
+      });
+      return false;
+    } finally {
+      setUpdatingProduct(false);
+    }
+  };
+
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       fetchProducts(currentPage + 1);
@@ -94,11 +158,13 @@ export function useNuvemshopProducts(accessToken: string | null, userId: string 
   return {
     products,
     loadingProducts,
+    updatingProduct,
     currentPage,
     totalProducts,
     perPage,
     totalPages,
     fetchProducts,
+    updateProductDescription,
     handleNextPage,
     handlePrevPage,
     resetProducts: () => {

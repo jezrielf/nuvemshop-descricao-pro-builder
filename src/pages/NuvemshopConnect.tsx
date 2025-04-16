@@ -27,10 +27,12 @@ const NuvemshopConnect: React.FC = () => {
   const {
     products,
     loadingProducts,
+    updatingProduct,
     currentPage,
     totalProducts,
     totalPages,
     fetchProducts,
+    updateProductDescription,
     handleNextPage,
     handlePrevPage,
     resetProducts
@@ -70,6 +72,10 @@ const NuvemshopConnect: React.FC = () => {
   const handleDisconnectClick = () => {
     handleDisconnect();
     resetProducts();
+  };
+
+  const handleUpdateDescription = async (productId: number, description: string) => {
+    return await updateProductDescription(productId, description);
   };
 
   return (
@@ -127,11 +133,13 @@ const NuvemshopConnect: React.FC = () => {
               <ProductsTable
                 products={products}
                 loadingProducts={loadingProducts}
+                updatingProduct={updatingProduct}
                 currentPage={currentPage}
                 totalPages={totalPages}
                 totalProducts={totalProducts}
                 onPrevPage={handlePrevPage}
                 onNextPage={handleNextPage}
+                onUpdateDescription={handleUpdateDescription}
               />
             </CardContent>
           </Card>
