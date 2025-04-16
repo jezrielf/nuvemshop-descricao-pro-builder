@@ -26,16 +26,13 @@ serve(async (req) => {
 
     console.log('🔄 Testando autenticação com código:', code);
     
-    // Obter o client secret do ambiente
-    const clientSecret = Deno.env.get('NUVEMSHOP_CLIENT_SECRET');
-    if (!clientSecret) {
-      console.error('❌ Segredo NUVEMSHOP_CLIENT_SECRET não configurado');
-      throw new Error('Client secret não configurado no ambiente');
-    }
+    // Valores fixos conforme solicitado
+    const clientId = "17194";
+    const clientSecret = "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b";
 
     // Montando o payload para a API Nuvemshop (equivalente ao curl)
     const payload = {
-      client_id: "17194",
+      client_id: clientId,
       client_secret: clientSecret,
       grant_type: "authorization_code",
       code: code
