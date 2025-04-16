@@ -8,7 +8,7 @@ interface ImageUploadPreviewProps {
   src?: string;
   uploading: boolean;
   uploadProgress: number;
-  onUpload: () => void;
+  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove?: () => void;
   blockId: string;
 }
