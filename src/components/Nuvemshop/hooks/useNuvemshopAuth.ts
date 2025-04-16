@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { NuvemshopAuthResponse } from '../types';
+import { getAuthData, storeAuthData, clearAuthData } from '../utils/authStorage';
+import { exchangeCodeForToken, getNuvemshopAuthUrl } from '../utils/authOperations';
 
 export function useNuvemshopAuth() {
   const [loading, setLoading] = useState(false);
@@ -21,11 +21,9 @@ export function useNuvemshopAuth() {
 
   // Check for existing tokens on component mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('nuvemshop_access_token');
-    const storedUserId = localStorage.getItem('nuvemshop_user_id');
-    const storedStoreName = localStorage.getItem('nuvemshop_store_name');
+    const { accessToken: storedToken, userId: storedUserId, storeName: storedStoreName, isAuthenticated } = getAuthData();
     
-    if (storedToken && storedUserId) {
+    if (isAuthenticated) {
       setAccessToken(storedToken);
       setUserId(storedUserId);
       setStoreName(storedStoreName);
@@ -58,35 +56,16 @@ export function useNuvemshopAuth() {
       setAuthenticating(true);
       setError(null);
       
-      console.log('Processing authorization code:', authCode);
-      
-      // Call the Edge Function to exchange the code for an access token
-      const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-auth', {
-        body: { code: authCode },
-      });
-      
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw new Error(`Function error: ${functionError.message}`);
-      }
-      
-      if (data.error) {
-        console.error('API error:', data.error);
-        throw new Error(data.error);
-      }
-      
-      console.log('Authentication success:', data);
+      const data = await exchangeCodeForToken(authCode);
       
       // Store the access token, user ID, and store name
       setAccessToken(data.access_token);
       setUserId(data.user_id.toString());
-      setStoreName(data.store_name || 'Loja Nuvemshop'); // Add store name
+      setStoreName(data.store_name || 'Loja Nuvemshop');
       setSuccess(true);
       
       // Store in localStorage for persistence
-      localStorage.setItem('nuvemshop_access_token', data.access_token);
-      localStorage.setItem('nuvemshop_user_id', data.user_id.toString());
-      localStorage.setItem('nuvemshop_store_name', data.store_name || 'Loja Nuvemshop');
+      storeAuthData(data.access_token, data.user_id.toString(), data.store_name || 'Loja Nuvemshop');
       
       toast({
         title: 'Loja conectada com sucesso!',
@@ -114,7 +93,7 @@ export function useNuvemshopAuth() {
     // que não estamos usando dados de uma conexão anterior
     clearAuthCache(false);
     // Redirect to Nuvemshop authorization URL with the specific link
-    window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
+    window.location.href = getNuvemshopAuthUrl();
   };
   
   const handleTestCode = async (code: string) => {
@@ -137,28 +116,7 @@ export function useNuvemshopAuth() {
 
   const clearAuthCache = (showNotification = true) => {
     // Clear all Nuvemshop related items from localStorage
-    localStorage.removeItem('nuvemshop_access_token');
-    localStorage.removeItem('nuvemshop_user_id');
-    localStorage.removeItem('nuvemshop_store_name');
-    
-    // Clear any other potential cache items
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.includes('nuvemshop')) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    // Limpar cookies relacionados à Nuvemshop (se houver)
-    document.cookie.split(';').forEach(cookie => {
-      const name = cookie.split('=')[0].trim();
-      if (name.includes('nuvemshop')) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      }
-    });
+    clearAuthData();
     
     // Reset state
     setAccessToken(null);
