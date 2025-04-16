@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// Interface for product data
+interface NuvemshopProduct {
+  id: number;
+  name: string;
+  sku: string | null;
+  price: string | number;
+}
+
 const NuvemshopConnect: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [authenticating, setAuthenticating] = useState(false);
@@ -17,7 +26,7 @@ const NuvemshopConnect: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<NuvemshopProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
   const [redirectUrl, setRedirectUrl] = useState('');
@@ -101,7 +110,7 @@ const NuvemshopConnect: React.FC = () => {
       
       // Store the access token and user ID
       setAccessToken(data.access_token);
-      setUserId(data.user_id);
+      setUserId(data.user_id.toString());
       setSuccess(true);
       
       // Store in localStorage for persistence
@@ -457,10 +466,12 @@ const NuvemshopConnect: React.FC = () => {
                       products.map((product) => (
                         <TableRow key={product.id}>
                           <TableCell>{product.id}</TableCell>
-                          <TableCell>{product.name}</TableCell>
+                          <TableCell>{typeof product.name === 'string' ? product.name : 
+                                     (product.name && typeof product.name === 'object' && 'pt' in product.name) ? 
+                                     (product.name as any).pt : 'N/A'}</TableCell>
                           <TableCell>{product.sku || 'N/A'}</TableCell>
                           <TableCell>
-                            {product.price ? `$${parseFloat(product.price).toFixed(2)}` : 'N/A'}
+                            {product.price ? `$${parseFloat(product.price.toString()).toFixed(2)}` : 'N/A'}
                           </TableCell>
                         </TableRow>
                       ))
