@@ -4,8 +4,8 @@ import { BlockBase } from '../base';
 export interface VideoBlock extends BlockBase {
   type: 'video';
   videoUrl: string;
+  title: string; // Changed from optional to required
   autoplay?: boolean;
-  title?: string;
   description?: string;
   heading?: string;
   caption?: string;

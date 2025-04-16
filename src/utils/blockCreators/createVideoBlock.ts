@@ -11,7 +11,7 @@ export function createVideoBlock(
   return {
     id: uuidv4(),
     type: 'video',
-    title: 'Vídeo',
+    title: 'Vídeo', // This is explicitly required
     columns: 1,
     visible: true,
     videoUrl,

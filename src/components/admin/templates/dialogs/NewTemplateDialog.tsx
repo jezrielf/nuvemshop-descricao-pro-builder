@@ -102,7 +102,8 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
     const newTemplate: Omit<Template, "id"> = {
       name: name,
       category: category,
-      blocks: blocks
+      blocks: blocks,
+      thumbnail: '/placeholder.svg' // Added default thumbnail
     };
 
     try {
