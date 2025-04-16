@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,8 +72,9 @@ export const NuvemshopConnect = () => {
         return;
       }
 
-      // Redirect to Nuvemshop's authorization page
-      const authUrl = `https://${storeSubdomain}.lojavirtualnuvem.com.br/admin/apps/17194/authorize`;
+      // Redirect to the correct Nuvemshop authorization URL format
+      const appId = "17194";  // Your app ID
+      const authUrl = `https://${storeSubdomain}.lojavirtualnuvem.com.br/admin/apps/${appId}/authorize`;
       window.location.href = authUrl;
 
     } catch (error) {
