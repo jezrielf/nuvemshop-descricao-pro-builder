@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -80,7 +79,12 @@ const NuvemshopConnect: React.FC = () => {
     return await updateProductDescription(productId, description);
   };
 
-  const handleDirectConnect = () => {
+  const handleDirectConnect = (e?: React.MouseEvent) => {
+    // Prevent default event behavior if an event is passed
+    if (e) {
+      e.preventDefault();
+    }
+    
     // Limpar cache antes de conectar
     clearAuthCache(false);
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
