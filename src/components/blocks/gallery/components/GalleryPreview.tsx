@@ -11,9 +11,19 @@ const GalleryPreview: React.FC<GalleryPreviewProps> = ({ block }) => {
   const imageFitValue = block.style?.imageFit || 'contain';
   const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
   
+  // Create proper Tailwind column classes based on block.columns
+  const getColumnsClass = () => {
+    switch (block.columns) {
+      case 2: return 'md:grid-cols-2';
+      case 3: return 'md:grid-cols-3';
+      case 4: return 'md:grid-cols-4';
+      default: return '';
+    }
+  };
+  
   return (
     <div className="w-full p-4">
-      <div className={`grid grid-cols-1 gap-4 ${block.columns > 1 ? `md:grid-cols-${block.columns}` : ''}`}>
+      <div className={`grid grid-cols-1 ${getColumnsClass()} gap-4`}>
         {block.images && block.images.map(image => (
           <figure key={image.id} className="text-center">
             {image.src ? (

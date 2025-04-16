@@ -50,6 +50,26 @@ export const generateCompleteHtml = (state: EditorState): string => {
 
   console.log("HTML output gerado com " + visibleBlocks.length + " blocos visíveis");
   
+  // Add CSS reset and responsive styles to ensure consistent rendering
+  const cssReset = `
+    <style>
+      .nuvemshop-product-description * {
+        box-sizing: border-box;
+      }
+      .nuvemshop-product-description img {
+        max-width: 100%;
+        height: auto;
+      }
+      @media (max-width: 768px) {
+        .nuvemshop-product-description [class*="-container"] > [class*="-item"] {
+          width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+      }
+    </style>
+  `;
+  
   // Add a wrapper for the preview that uses standard styling
-  return `<div class="nuvemshop-product-description">${blocksHtml}</div>`;
+  return `<div class="nuvemshop-product-description">${cssReset}${blocksHtml}</div>`;
 }

@@ -11,13 +11,16 @@ export const generateSpecificationsHtml = (block: SpecificationsBlock): string =
   
   // Two-column layout for specifications when columns > 1
   if (block.columns > 1) {
-    const columnClass = block.columns > 2 ? `md:grid-cols-${block.columns}` : 'md:grid-cols-2';
+    // Calculate column width based on the number of columns
+    const columnWidth = 100 / Math.min(block.columns || 1, 4);
     
     const specsHtml = block.specs && block.specs.length > 0 
       ? block.specs.map(spec => `
-        <div class="spec-item border p-3 rounded">
-          <div style="font-weight: 600;">${spec.name}</div>
-          <div>${spec.value}</div>
+        <div style="display: inline-block; vertical-align: top; width: calc(${columnWidth}% - 16px); margin: 8px; box-sizing: border-box;" class="spec-item">
+          <div class="spec-container" style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px;">
+            <div style="font-weight: 600;">${spec.name}</div>
+            <div>${spec.value}</div>
+          </div>
         </div>
       `).join('')
       : '';
@@ -25,9 +28,16 @@ export const generateSpecificationsHtml = (block: SpecificationsBlock): string =
     return `
       <div class="specifications-block" id="block-${block.id}" style="${blockStyles}">
         <h2 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 24px; margin-bottom: 20px;">${block.heading}</h2>
-        <div class="grid grid-cols-1 ${columnClass} gap-4">
+        <div style="font-size: 0; text-align: center; margin: -8px;" class="specs-container">
           ${specsHtml}
         </div>
+        <style>
+          @media (max-width: 768px) {
+            #block-${block.id} .spec-item {
+              width: calc(100% - 16px) !important;
+            }
+          }
+        </style>
       </div>
     `;
   }
