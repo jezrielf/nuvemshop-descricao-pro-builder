@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import ProductSearch from '@/components/Nuvemshop/components/ProductSearch';
 import ProductEditorController from '@/components/Nuvemshop/components/ProductEditorController';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2 } from 'lucide-react';
 
 // Adicionamos o diretório public/tutorial para as imagens do tutorial
 const placeholderImages = [
@@ -27,6 +29,22 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
+  const [storeConnected, setStoreConnected] = useState(false);
+  const [storeName, setStoreName] = useState<string | null>(null);
+  const [storeId, setStoreId] = useState<string | null>(null);
+  
+  // Verificar se há uma loja conectada
+  useEffect(() => {
+    const storedToken = localStorage.getItem('nuvemshop_access_token');
+    const storedUserId = localStorage.getItem('nuvemshop_user_id');
+    const storedStoreName = localStorage.getItem('nuvemshop_store_name');
+    
+    if (storedToken && storedUserId) {
+      setStoreConnected(true);
+      setStoreId(storedUserId);
+      setStoreName(storedStoreName);
+    }
+  }, []);
   
   useEffect(() => {
     // Carrega os templates iniciais
@@ -74,6 +92,17 @@ const Index = () => {
         <div className="flex-1">
           <ProductSearch onProductSelect={setSelectedProduct} />
         </div>
+        
+        {storeConnected && (
+          <div className="mr-4">
+            <Badge variant="outline" className="bg-green-100 text-green-800">
+              <CheckCircle2 className="h-4 w-4 mr-1" />
+              {storeName 
+                ? `Conectado com a ${storeName}` 
+                : `Conectado com a loja ID: ${storeId}`}
+            </Badge>
+          </div>
+        )}
       </div>
       
       {selectedProduct && (
