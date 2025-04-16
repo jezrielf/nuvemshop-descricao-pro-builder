@@ -46,7 +46,7 @@ export interface Template {
   name: string;
   category: string;
   blocks: Block[];
-  thumbnail?: string; // Added thumbnail property
+  thumbnail: string; // Changed from optional to required
 }
 
 export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoes' | 'electronics' | 'energy' | 'other' | string;
