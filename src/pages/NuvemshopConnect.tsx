@@ -187,7 +187,7 @@ const NuvemshopConnect: React.FC = () => {
               <div className="flex items-center">
                 <span className="mr-2">Status:</span>
                 {success ? (
-                  <Badge variant="success" className="bg-green-100 text-green-800">
+                  <Badge variant="outline" className="bg-green-100 text-green-800">
                     <CheckCircle2 className="h-4 w-4 mr-1" />
                     Conectado
                   </Badge>
