@@ -10,6 +10,7 @@ interface AuthStatusProps {
   loading: boolean;
   authenticating: boolean;
   userId: string | null;
+  storeName?: string; // Add optional storeName prop
   handleConnect: () => void;
   handleDisconnect: () => void;
   onFetchProducts: () => void;
@@ -22,6 +23,7 @@ export const AuthStatus: React.FC<AuthStatusProps> = ({
   loading,
   authenticating,
   userId,
+  storeName, // Add storeName to destructured props
   handleConnect,
   handleDisconnect,
   onFetchProducts,
@@ -34,7 +36,9 @@ export const AuthStatus: React.FC<AuthStatusProps> = ({
         {success ? (
           <Badge variant="outline" className="bg-green-100 text-green-800">
             <CheckCircle2 className="h-4 w-4 mr-1" />
-            Conectado
+            {storeName 
+              ? `Conectado com a ${storeName}` 
+              : 'Conectado'}
           </Badge>
         ) : (
           <Badge variant="destructive">

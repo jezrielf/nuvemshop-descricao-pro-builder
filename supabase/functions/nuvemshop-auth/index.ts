@@ -74,11 +74,29 @@ serve(async (req) => {
     }
 
     try {
-      // Parse JSON response (if we got here, we know it's valid text)
+      // Parse JSON response
       const data = JSON.parse(responseText);
       console.log('Successfully authenticated with Nuvemshop');
-      console.log('User ID:', data.user_id);
-      console.log('Access token obtained successfully');
+      
+      // Add store name to the response data
+      // We'll make an additional API call to get the store name
+      const storeInfoResponse = await fetch(`https://api.tiendanube.com/v1/${data.user_id}/store`, {
+        method: 'GET',
+        headers: {
+          'Authentication': `bearer ${data.access_token}`,
+          'User-Agent': 'DescricaoPro comercial@weethub.com',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      let storeName = 'Loja Nuvemshop'; // Default store name
+      if (storeInfoResponse.ok) {
+        const storeInfo = await storeInfoResponse.json();
+        storeName = storeInfo.name || storeName;
+      }
+
+      // Append store name to the data
+      data.store_name = storeName;
 
       return new Response(JSON.stringify(data), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

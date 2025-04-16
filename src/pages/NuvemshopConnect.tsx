@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -23,7 +22,8 @@ const NuvemshopConnect: React.FC = () => {
     handleConnect,
     handleTestCode,
     handleDisconnect,
-    clearAuthCache
+    clearAuthCache,
+    storeName, // Add storeName to destructuring
   } = useNuvemshopAuth();
 
   const {
@@ -122,6 +122,7 @@ const NuvemshopConnect: React.FC = () => {
                 handleDisconnect={handleDisconnectClick}
                 onFetchProducts={() => fetchProducts(1)}
                 loadingProducts={loadingProducts}
+                storeName={storeName} // Pass storeName to AuthStatus
               />
               
               {!success && (

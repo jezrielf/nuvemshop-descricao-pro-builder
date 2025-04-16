@@ -12,6 +12,7 @@ export function useNuvemshopAuth() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
+  const [storeName, setStoreName] = useState<string | null>(null);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -21,10 +22,12 @@ export function useNuvemshopAuth() {
   useEffect(() => {
     const storedToken = localStorage.getItem('nuvemshop_access_token');
     const storedUserId = localStorage.getItem('nuvemshop_user_id');
+    const storedStoreName = localStorage.getItem('nuvemshop_store_name');
     
     if (storedToken && storedUserId) {
       setAccessToken(storedToken);
       setUserId(storedUserId);
+      setStoreName(storedStoreName);
       setSuccess(true);
     }
   }, []);
@@ -68,14 +71,16 @@ export function useNuvemshopAuth() {
       
       console.log('Authentication success:', data);
       
-      // Store the access token and user ID
+      // Store the access token, user ID, and store name
       setAccessToken(data.access_token);
       setUserId(data.user_id.toString());
+      setStoreName(data.store_name || 'Loja Nuvemshop'); // Add store name
       setSuccess(true);
       
       // Store in localStorage for persistence
       localStorage.setItem('nuvemshop_access_token', data.access_token);
       localStorage.setItem('nuvemshop_user_id', data.user_id.toString());
+      localStorage.setItem('nuvemshop_store_name', data.store_name || 'Loja Nuvemshop');
       
       toast({
         title: 'Loja conectada com sucesso!',
@@ -112,13 +117,15 @@ export function useNuvemshopAuth() {
   };
   
   const handleDisconnect = () => {
-    // Clear stored tokens
+    // Clear stored tokens and store name
     localStorage.removeItem('nuvemshop_access_token');
     localStorage.removeItem('nuvemshop_user_id');
+    localStorage.removeItem('nuvemshop_store_name');
     
     // Reset state
     setAccessToken(null);
     setUserId(null);
+    setStoreName(null);
     setSuccess(false);
     
     toast({
@@ -131,6 +138,7 @@ export function useNuvemshopAuth() {
     // Clear all Nuvemshop related items from localStorage
     localStorage.removeItem('nuvemshop_access_token');
     localStorage.removeItem('nuvemshop_user_id');
+    localStorage.removeItem('nuvemshop_store_name');
     
     // Clear any other potential cache items
     const keysToRemove = [];
@@ -154,6 +162,7 @@ export function useNuvemshopAuth() {
     // Reset state
     setAccessToken(null);
     setUserId(null);
+    setStoreName(null);
     setSuccess(false);
     setError(null);
     
@@ -181,6 +190,7 @@ export function useNuvemshopAuth() {
     handleConnect,
     handleTestCode,
     handleDisconnect,
-    clearAuthCache
+    clearAuthCache,
+    storeName,
   };
 }
