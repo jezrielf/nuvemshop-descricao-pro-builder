@@ -32,28 +32,24 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <Routes>
+          <Route path="/" element={
+            <ProtectedRoute requireAuth={false}>
+              <Index />
+            </ProtectedRoute>
+          } />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/success" element={<Success />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin-templates" element={<AdminTemplates />} />
+          <Route path="/admin-auth" element={<AdminAuth />} />
+          <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              <Route path="/" element={
-                <ProtectedRoute requireAuth={false}>
-                  <Index />
-                </ProtectedRoute>
-              } />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/plans" element={<Plans />} />
-              <Route path="/success" element={<Success />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/admin-templates" element={<AdminTemplates />} />
-              <Route path="/admin-auth" element={<AdminAuth />} />
-              <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AuthProvider>
-        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
