@@ -3,44 +3,78 @@ import { VideoBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateVideoHtml = (block: VideoBlock): string => {
-  // Get properly formatted style string
-  const blockStyles = getStylesFromBlock(block);
+  const blockStyleAttr = getStylesFromBlock(block) ? ` style="${getStylesFromBlock(block)}"` : '';
   
-  // Extract video ID from YouTube URL
-  const getYouTubeEmbedUrl = (url: string) => {
-    const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&?/]+)/;
-    const match = url.match(regExp);
+  // Extract YouTube or Vimeo video ID
+  let videoEmbedHtml = '';
+  const videoUrl = block.videoUrl || '';
+  
+  if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+    // Handle YouTube URLs
+    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = videoUrl.match(youtubeRegex);
+    const videoId = match ? match[1] : '';
     
-    if (match && match[1]) {
-      const videoId = match[1];
-      return `https://www.youtube.com/embed/${videoId}?autoplay=${block.autoplay ? '1' : '0'}&mute=${block.autoplay ? '1' : '0'}&rel=0`;
+    if (videoId) {
+      videoEmbedHtml = `
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;border-radius:4px;">
+          <iframe 
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" 
+            src="https://www.youtube.com/embed/${videoId}" 
+            title="${block.title || 'Vídeo'}" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+          ></iframe>
+        </div>
+      `;
     }
+  } else if (videoUrl.includes('vimeo.com')) {
+    // Handle Vimeo URLs
+    const vimeoRegex = /vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|)(\d+)(?:|\/\?)/;
+    const match = videoUrl.match(vimeoRegex);
+    const videoId = match ? match[1] : '';
     
-    return '';
-  };
-  
-  const embedUrl = getYouTubeEmbedUrl(block.videoUrl);
-  
-  if (!embedUrl) {
-    return `<div class="video-error" style="padding: 20px; background-color: #f8f8f8; border-radius: 4px; text-align: center; ${blockStyles}">
-      <p>URL de vídeo inválida</p>
-    </div>`;
+    if (videoId) {
+      videoEmbedHtml = `
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;border-radius:4px;">
+          <iframe 
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" 
+            src="https://player.vimeo.com/video/${videoId}" 
+            title="${block.title || 'Vídeo'}" 
+            allow="autoplay; fullscreen; picture-in-picture" 
+            allowfullscreen
+          ></iframe>
+        </div>
+      `;
+    }
+  } else if (videoUrl) {
+    // Handle direct video URLs
+    videoEmbedHtml = `
+      <div style="max-width:100%;border-radius:4px;">
+        <video 
+          controls 
+          style="width:100%;height:auto;max-width:100%;border-radius:4px;" 
+          title="${block.title || 'Vídeo'}"
+        >
+          <source src="${videoUrl}" type="video/mp4">
+          Seu navegador não suporta a reprodução de vídeos.
+        </video>
+      </div>
+    `;
+  } else {
+    // Placeholder for when no video URL is provided
+    videoEmbedHtml = `
+      <div style="background-color:#f3f4f6;height:315px;display:flex;align-items:center;justify-content:center;border-radius:4px;">
+        <span style="color:#9ca3af;">Vídeo não disponível</span>
+      </div>
+    `;
   }
-  
-  // Generate HTML
-  let html = '';
-  
-  if (block.title) {
-    html += `<h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">${block.title}</h3>\n`;
-  }
-  
-  html += `<div style="position: relative; padding-bottom: 56.25%; /* 16:9 aspect ratio */ height: 0; overflow: hidden; max-width: 100%; margin-bottom: 0.75rem;">\n`;
-  html += `  <iframe src="${embedUrl}" title="${block.title || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 4px;"></iframe>\n`;
-  html += `</div>\n`;
-  
-  if (block.description) {
-    html += `<p style="color: #666;">${block.description}</p>\n`;
-  }
-  
-  return html;
+
+  return `
+    <div${blockStyleAttr} style="width:100%;text-align:center;">
+      ${block.heading ? `<h2 style="font-size:24px;font-weight:bold;margin-bottom:16px;text-align:center;">${block.heading}</h2>` : ''}
+      ${videoEmbedHtml}
+      ${block.caption ? `<p style="margin-top:12px;font-size:14px;color:#6b7280;text-align:center;">${block.caption}</p>` : ''}
+    </div>
+  `;
 };

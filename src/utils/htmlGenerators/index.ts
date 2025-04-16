@@ -2,8 +2,8 @@
 import { Block, BlockType } from '@/types/editor';
 import { generateHeroHtml } from './heroGenerator';
 import { generateTextHtml } from './textGenerator';
-import { generateFeaturesHtml } from './featuresGenerator';
 import { generateBenefitsHtml } from './benefitsGenerator';
+import { generateFeaturesHtml } from './featuresGenerator';
 import { generateSpecificationsHtml } from './specificationsGenerator';
 import { generateImageHtml } from './imageGenerator';
 import { generateGalleryHtml } from './galleryGenerator';
@@ -12,44 +12,58 @@ import { generateTextImageHtml } from './textImageGenerator';
 import { generateFAQHtml } from './faqGenerator';
 import { generateCTAHtml } from './ctaGenerator';
 import { generateVideoHtml } from './videoGenerator';
-import { getStylesFromBlock } from '../styleConverter';
 
+// Map block types to their respective HTML generator functions
+const blockGenerators: Record<BlockType, (block: any) => string> = {
+  hero: generateHeroHtml,
+  text: generateTextHtml,
+  benefits: generateBenefitsHtml,
+  features: generateFeaturesHtml,
+  specifications: generateSpecificationsHtml,
+  image: generateImageHtml,
+  gallery: generateGalleryHtml,
+  imageText: generateImageTextHtml,
+  textImage: generateTextImageHtml,
+  faq: generateFAQHtml,
+  cta: generateCTAHtml,
+  video: generateVideoHtml
+};
+
+// Generate HTML for a specific block based on its type
 export const generateBlockHtml = (block: Block): string => {
-  // Ensure block has a valid type before we try to access it
-  if (!block || typeof block !== 'object' || !('type' in block)) {
-    return '';
+  try {
+    // Check if the block type is supported
+    if (!block || !block.type || !(block.type in blockGenerators)) {
+      console.error(`Unsupported block type: ${block?.type}`);
+      return `<div class="error-block">Tipo de bloco não suportado: ${block?.type || 'indefinido'}</div>`;
+    }
+    
+    // Check if the block is visible
+    if (block.visible === false) {
+      return ''; // Return empty string for invisible blocks
+    }
+    
+    // Generate HTML using the appropriate generator
+    const generator = blockGenerators[block.type as BlockType];
+    return generator(block);
+  } catch (error) {
+    console.error(`Error generating HTML for block ${block?.id}:`, error);
+    return `<div class="error-block">Erro ao gerar HTML para o bloco: ${error instanceof Error ? error.message : 'Erro desconhecido'}</div>`;
   }
-  
-  // Get properly formatted style string
-  const blockStyles = getStylesFromBlock(block);
-  console.log(`Generated styles for block ${block.id}:`, blockStyles);
-  
-  switch(block.type) {
-    case 'hero':
-      return generateHeroHtml(block);
-    case 'text':
-      return generateTextHtml(block);
-    case 'features':
-      return generateFeaturesHtml(block);
-    case 'benefits':
-      return generateBenefitsHtml(block);
-    case 'specifications':
-      return generateSpecificationsHtml(block);
-    case 'image':
-      return generateImageHtml(block);
-    case 'gallery':
-      return generateGalleryHtml(block);
-    case 'imageText':
-      return generateImageTextHtml(block);
-    case 'textImage':
-      return generateTextImageHtml(block);
-    case 'faq':
-      return generateFAQHtml(block);
-    case 'cta':
-      return generateCTAHtml(block);
-    case 'video':
-      return generateVideoHtml(block);
-    default:
-      return `<div class="unknown-block" style="padding: 20px; margin-bottom: 20px; border: 1px dashed #ccc; ${blockStyles}">Bloco do tipo ${(block as any).type}</div>`;
-  }
+};
+
+// Export all generators for use in other modules
+export {
+  generateHeroHtml,
+  generateTextHtml,
+  generateBenefitsHtml,
+  generateFeaturesHtml,
+  generateSpecificationsHtml,
+  generateImageHtml,
+  generateGalleryHtml,
+  generateImageTextHtml,
+  generateTextImageHtml,
+  generateFAQHtml,
+  generateCTAHtml,
+  generateVideoHtml
 };

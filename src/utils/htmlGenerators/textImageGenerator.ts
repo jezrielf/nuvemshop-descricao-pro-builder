@@ -10,7 +10,7 @@ export const generateTextImageHtml = (block: TextImageBlock): string => {
   const objectFitStyle = `object-fit:${imageFit};`;
   
   return `
-    <div${blockStyleAttr} id="block-${block.id}" style="width:100%;padding:20px;margin-bottom:20px;">
+    <div${blockStyleAttr} id="block-${block.id}" style="width:100%;">
       <div style="display:flex;flex-direction:column;gap:20px;width:100%;" class="text-image-container">
         <div style="width:100%;" class="text-container">
           <h2 style="font-size:24px;font-weight:bold;margin-bottom:10px;">${block.heading}</h2>

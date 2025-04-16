@@ -1,25 +1,13 @@
 
 import { Template } from '@/types/editor';
-import { basicTemplate } from './basic';
+import { basicTemplates } from './basic';
 import { supplementsTemplates } from './supplements';
-// Import templates individually
-import { shoesTemplateA, shoesTemplateB } from './shoes';
-import { electronicsTemplate } from './electronics';
-import { healthTemplate } from './health';
-import { fashionTemplate } from './fashion';
-import { accessoriesTemplate } from './accessories';
-import { hauteCoutureTemplate } from './hauteCouture';
-
-// Combining all templates
-export const basicTemplates = [basicTemplate];
-
-// Create arrays for templates that are exported as single objects
-export const shoesTemplates = [shoesTemplateA, shoesTemplateB];
-export const electronicsTemplates = [electronicsTemplate];
-export const healthTemplates = [healthTemplate];
-export const fashionTemplates = [fashionTemplate];
-export const accessoriesTemplates = [accessoriesTemplate];
-export const hauteCoutureTemplates = [hauteCoutureTemplate];
+import { shoesTemplates } from './shoes';
+import { electronicsTemplates } from './electronics';
+import { healthTemplates } from './health';
+import { fashionTemplates } from './fashion';
+import { accessoriesTemplates } from './accessories';
+import { hauteCoutureTemplates } from './hauteCouture';
 
 // Combining all templates
 export const advancedTemplates: Template[] = [
