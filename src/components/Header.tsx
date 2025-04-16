@@ -27,6 +27,9 @@ const Header: React.FC = () => {
   } = auth;
   const isMobile = useIsMobile();
   
+  // Verificar se há uma loja Nuvemshop conectada
+  const isNuvemshopConnected = !!localStorage.getItem('nuvemshop_access_token');
+  
   // Calculate these values once
   const isPremiumUser = isPremium();
   const isBusinessUser = isBusiness();
@@ -117,9 +120,11 @@ const Header: React.FC = () => {
             </Link>
           )}
           
-          <a href="#" onClick={handleConnectNuvemshop} className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2">
-            Nova Conexão Nuvemshop
-          </a>
+          {!isNuvemshopConnected && (
+            <a href="#" onClick={handleConnectNuvemshop} className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2">
+              Nova Conexão Nuvemshop
+            </a>
+          )}
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
