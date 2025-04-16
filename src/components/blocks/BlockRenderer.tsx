@@ -46,7 +46,8 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false 
     case 'video':
       return <VideoBlock block={block} isPreview={isPreview} />;
     default:
-      return <p>Unknown block type: {block.type}</p>;
+      // Fix: Cast the unknown type to string to satisfy TypeScript
+      return <p>Unknown block type: {(block as { type: string }).type}</p>;
   }
 };
 
