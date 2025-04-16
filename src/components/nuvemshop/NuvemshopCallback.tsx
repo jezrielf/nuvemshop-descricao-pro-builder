@@ -13,7 +13,9 @@ const NuvemshopCallback = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
+      // Extract the code from URL parameters
       const code = searchParams.get('code');
+      console.log('Received authorization code:', code);
 
       if (!code) {
         toast({
@@ -26,12 +28,17 @@ const NuvemshopCallback = () => {
       }
 
       try {
-        // Call the edge function to handle the OAuth flow
+        console.log('Initiating Nuvemshop authentication with code:', code);
         const { data, error } = await supabase.functions.invoke('nuvemshop-auth', {
           body: { code }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error in Nuvemshop authentication:', error);
+          throw error;
+        }
+
+        console.log('Authentication successful:', data);
 
         // Get the store name from the most recent connection
         const { data: storeData } = await supabase
