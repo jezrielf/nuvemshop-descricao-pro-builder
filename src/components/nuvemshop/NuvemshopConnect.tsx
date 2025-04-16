@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,22 +61,7 @@ export const NuvemshopConnect = () => {
         return;
       }
 
-      // Generate a state token for CSRF protection
-      const state = uuidv4();
-
-      // Save the state token in the database
-      const { error: stateError } = await supabase
-        .from('nuvemshop_auth_states')
-        .insert({
-          user_id: user.id,
-          state
-        });
-
-      if (stateError) {
-        throw new Error('Failed to save auth state');
-      }
-
-      // Construct the new authorization URL for Nuvemshop v2
+      // Construct the new authorization URL for Nuvemshop
       const storeSubdomain = prompt("Digite o subdomínio da sua loja (ex: universodosparafusos):");
       
       if (!storeSubdomain) {
@@ -89,9 +73,8 @@ export const NuvemshopConnect = () => {
         return;
       }
 
-      const authUrl = `https://${storeSubdomain}.lojavirtualnuvem.com.br/admin/v2/apps/17194/authorize?state=${state}`;
-      
       // Redirect to Nuvemshop's authorization page
+      const authUrl = `https://${storeSubdomain}.lojavirtualnuvem.com.br/admin/apps/17194/authorize`;
       window.location.href = authUrl;
 
     } catch (error) {

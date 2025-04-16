@@ -20,32 +20,13 @@ serve(async (req) => {
   }
 
   try {
-    const { code, state } = await req.json();
+    const { code } = await req.json();
     
-    if (!code || !state) {
+    if (!code) {
       throw new Error('Missing required parameters');
     }
 
-    console.log('Processing Nuvemshop auth with code and state');
-
-    // Validate state from database to prevent CSRF attacks
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    const { data: authState, error: stateError } = await supabaseClient
-      .from('nuvemshop_auth_states')
-      .select('user_id')
-      .eq('state', state)
-      .single();
-
-    if (stateError || !authState) {
-      console.error('Invalid state parameter:', stateError);
-      throw new Error('Invalid state parameter');
-    }
-
-    console.log('State validated, exchanging code for token');
+    console.log('Processing Nuvemshop auth with code:', code);
 
     // Check if client secret is available
     const clientSecret = Deno.env.get('NUVEMSHOP_CLIENT_SECRET');
@@ -101,11 +82,17 @@ serve(async (req) => {
       url: storeData.url
     });
 
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
     // Save store connection
     const { error: insertError } = await supabaseClient
       .from('nuvemshop_stores')
       .insert({
-        user_id: authState.user_id,
+        user_id: (await req.json()).user_id,
         store_id: authData.user_id,
         name: storeData.name,
         url: storeData.url,
@@ -119,12 +106,6 @@ serve(async (req) => {
     }
 
     console.log('Store connection saved successfully');
-
-    // Clean up used state
-    await supabaseClient
-      .from('nuvemshop_auth_states')
-      .delete()
-      .eq('state', state);
 
     return new Response(
       JSON.stringify({ success: true }),

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
@@ -8,18 +8,17 @@ import { Loader2 } from 'lucide-react';
 const NuvemshopCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [storeName, setStoreName] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
-      const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get('code');
-      const state = searchParams.get('state');
 
-      if (!code || !state) {
+      if (!code) {
         toast({
           title: "Erro na autenticação",
-          description: "Parâmetros de autenticação inválidos.",
+          description: "Código de autenticação não encontrado.",
           variant: "destructive"
         });
         navigate('/');
@@ -29,7 +28,7 @@ const NuvemshopCallback = () => {
       try {
         // Call the edge function to handle the OAuth flow
         const { data, error } = await supabase.functions.invoke('nuvemshop-auth', {
-          body: { code, state }
+          body: { code }
         });
 
         if (error) throw error;
@@ -71,7 +70,7 @@ const NuvemshopCallback = () => {
     };
 
     handleCallback();
-  }, [navigate, toast]);
+  }, [navigate, toast, searchParams]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
