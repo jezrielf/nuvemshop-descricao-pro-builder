@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Store } from 'lucide-react';
+import { Store, Loader2 } from 'lucide-react';
 
 type NuvemshopStore = {
   id: string;
@@ -23,6 +24,8 @@ export const NuvemshopConnect = () => {
     const checkConnectedStore = async () => {
       if (!user) return;
       
+      console.log('🔄 Verificando se já existe uma loja conectada para o usuário:', user.id);
+      
       try {
         const { data, error } = await supabase
           .from('nuvemshop_stores')
@@ -33,15 +36,18 @@ export const NuvemshopConnect = () => {
           .maybeSingle();
         
         if (error) {
-          console.error('Error fetching connected store:', error);
+          console.error('❌ Erro ao buscar loja conectada:', error);
           return;
         }
         
         if (data) {
+          console.log('✅ Loja já conectada encontrada:', data);
           setConnectedStore(data);
+        } else {
+          console.log('ℹ️ Nenhuma loja conectada encontrada para este usuário');
         }
       } catch (error) {
-        console.error('Error checking connected store:', error);
+        console.error('❌ Erro ao verificar loja conectada:', error);
       }
     };
     
@@ -50,8 +56,11 @@ export const NuvemshopConnect = () => {
 
   const handleConnect = async () => {
     try {
+      console.log('🔄 Iniciando processo de conexão com a Nuvemshop');
       setLoading(true);
+      
       if (!user) {
+        console.error('❌ Usuário não autenticado');
         toast({
           title: "Erro de autenticação",
           description: "Você precisa estar logado para conectar sua loja.",
@@ -60,10 +69,12 @@ export const NuvemshopConnect = () => {
         return;
       }
 
+      console.log('🔄 Solicitando subdomínio da loja');
       // Ask for store subdomain
       const storeSubdomain = prompt("Digite o subdomínio da sua loja (ex: universodosparafusos):");
       
       if (!storeSubdomain) {
+        console.log('❌ Subdomínio não informado');
         toast({
           title: "Erro",
           description: "O subdomínio da loja é obrigatório.",
@@ -72,13 +83,25 @@ export const NuvemshopConnect = () => {
         return;
       }
 
+      console.log(`✅ Subdomínio informado: ${storeSubdomain}`);
+
       // Redirect to the correct Nuvemshop authorization URL format
       const appId = "17194";  // Your app ID
       const authUrl = `https://${storeSubdomain}.lojavirtualnuvem.com.br/admin/apps/${appId}/authorize`;
-      window.location.href = authUrl;
+      
+      console.log(`🔄 Redirecionando para URL de autorização: ${authUrl}`);
+      toast({
+        title: "Redirecionando",
+        description: "Você será redirecionado para a página de autorização da Nuvemshop."
+      });
+      
+      // Add a small delay to ensure the toast is displayed before redirecting
+      setTimeout(() => {
+        window.location.href = authUrl;
+      }, 1000);
 
     } catch (error) {
-      console.error('Error initiating Nuvemshop connection:', error);
+      console.error('❌ Erro ao iniciar conexão com a Nuvemshop:', error);
       toast({
         title: "Erro ao conectar",
         description: "Não foi possível iniciar a conexão com a Nuvemshop.",
@@ -109,7 +132,14 @@ export const NuvemshopConnect = () => {
       onClick={handleConnect}
       disabled={loading}
     >
-      {loading ? 'Conectando...' : 'Conectar Nuvemshop'}
+      {loading ? (
+        <>
+          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+          Conectando...
+        </>
+      ) : (
+        'Conectar Nuvemshop'
+      )}
     </Button>
   );
 };
