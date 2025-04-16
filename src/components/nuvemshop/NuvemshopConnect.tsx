@@ -54,6 +54,12 @@ export const NuvemshopConnect = () => {
     checkConnectedStore();
   }, [user]);
 
+  const validateSubdomain = (subdomain: string): boolean => {
+    // Verificar se o subdomínio está no formato válido
+    const subdomainRegex = /^[a-zA-Z0-9-]+$/;
+    return subdomainRegex.test(subdomain) && subdomain.trim().length > 0;
+  };
+
   const handleConnect = async () => {
     try {
       console.log('🔄 Iniciando processo de conexão com a Nuvemshop');
@@ -71,7 +77,7 @@ export const NuvemshopConnect = () => {
 
       console.log('🔄 Solicitando subdomínio da loja');
       // Ask for store subdomain
-      const storeSubdomain = prompt("Digite o subdomínio da sua loja (ex: universodosparafusos):");
+      let storeSubdomain = prompt("Digite o subdomínio da sua loja (ex: universodosparafusos):");
       
       if (!storeSubdomain) {
         console.log('❌ Subdomínio não informado');
@@ -80,10 +86,28 @@ export const NuvemshopConnect = () => {
           description: "O subdomínio da loja é obrigatório.",
           variant: "destructive"
         });
+        setLoading(false);
         return;
       }
 
-      console.log(`✅ Subdomínio informado: ${storeSubdomain}`);
+      // Remover espaços em branco e "https://" se o usuário incluiu
+      storeSubdomain = storeSubdomain.trim()
+        .replace(/^https?:\/\//i, '')
+        .replace(/\.lojavirtualnuvem\.com\.br\/?.*$/i, '')
+        .replace(/\.nuvemshop\.com\.br\/?.*$/i, '');
+
+      if (!validateSubdomain(storeSubdomain)) {
+        console.error('❌ Subdomínio inválido:', storeSubdomain);
+        toast({
+          title: "Subdomínio inválido",
+          description: "Por favor, informe apenas o nome da sua loja, sem incluir domínios ou caracteres especiais.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      console.log(`✅ Subdomínio validado: ${storeSubdomain}`);
 
       // Redirect to the correct Nuvemshop authorization URL format
       const appId = "17194";  // Your app ID
@@ -97,6 +121,7 @@ export const NuvemshopConnect = () => {
       
       // Add a small delay to ensure the toast is displayed before redirecting
       setTimeout(() => {
+        console.log('🔄 Executando redirecionamento para:', authUrl);
         window.location.href = authUrl;
       }, 1000);
 
@@ -143,3 +168,4 @@ export const NuvemshopConnect = () => {
     </Button>
   );
 };
+
