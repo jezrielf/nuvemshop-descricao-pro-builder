@@ -14,7 +14,6 @@ export function useNuvemshopAuth() {
   const [userId, setUserId] = useState<string | null>(null);
   const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
   const [storeName, setStoreName] = useState<string | null>(null);
-  const [storeUrlName, setStoreUrlName] = useState<string>(''); // For store URL input
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -93,8 +92,8 @@ export function useNuvemshopAuth() {
     // Limpar o cache antes de conectar - SEMPRE fazer isso para garantir
     // que não estamos usando dados de uma conexão anterior
     clearAuthCache(false);
-    // Redirect to Nuvemshop authorization URL with the specific link
-    window.location.href = getNuvemshopAuthUrl(storeUrlName);
+    // Redirect to Nuvemshop authorization URL
+    window.location.href = getNuvemshopAuthUrl();
   };
   
   const handleTestCode = async (code: string) => {
@@ -137,6 +136,11 @@ export function useNuvemshopAuth() {
     }
   };
 
+  // Utility function to reset the store URL name state (not needed anymore but kept for API compatibility)
+  const resetStoreUrlName = () => {
+    // Function kept for API compatibility
+  };
+
   return {
     loading,
     authenticating,
@@ -152,7 +156,6 @@ export function useNuvemshopAuth() {
     handleDisconnect,
     clearAuthCache,
     storeName,
-    storeUrlName,
-    setStoreUrlName
+    resetStoreUrlName
   };
 }
