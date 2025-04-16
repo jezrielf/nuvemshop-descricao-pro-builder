@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -26,8 +27,6 @@ const NuvemshopConnect: React.FC = () => {
     handleDisconnect,
     clearAuthCache,
     storeName,
-    storeUrlName,
-    setStoreUrlName
   } = useNuvemshopAuth();
 
   const {
@@ -92,7 +91,7 @@ const NuvemshopConnect: React.FC = () => {
     
     // Limpar cache antes de conectar
     clearAuthCache(false);
-    // Use the entered store name
+    // Connect using the hardcoded URL
     handleConnect();
   };
 
@@ -142,25 +141,15 @@ const NuvemshopConnect: React.FC = () => {
                   
                   <div className="mt-4 space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="storeUrlName">Nome da Loja (URL)</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="storeUrlName"
-                          placeholder="minhaloja"
-                          value={storeUrlName}
-                          onChange={(e) => setStoreUrlName(e.target.value)}
-                          className="max-w-md"
-                        />
-                        <Button
-                          variant="default"
-                          onClick={handleDirectConnect}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          Conectar Loja Nuvemshop
-                        </Button>
-                      </div>
+                      <Button
+                        variant="default"
+                        onClick={handleDirectConnect}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Conectar Loja Nuvemshop
+                      </Button>
                       <p className="text-xs text-gray-500">
-                        Insira o nome da sua loja que aparece na URL (ex: se sua loja é https://minhaloja.lojavirtualnuvem.com.br, digite "minhaloja")
+                        Clique para conectar sua loja Nuvemshop usando o link direto de autorização.
                       </p>
                     </div>
                   </div>
