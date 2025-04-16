@@ -14,26 +14,53 @@ export const useGalleryUpload = () => {
   const ensureBucketExists = async () => {
     try {
       // Check if bucket exists first
-      const { data: buckets } = await supabase.storage.listBuckets();
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error('Error checking buckets:', bucketsError);
+        return false;
+      }
+      
       const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
       
       if (!bucketExists) {
         // Create the bucket if it doesn't exist
-        await supabase.storage.createBucket('user-images', {
+        const { error: createError } = await supabase.storage.createBucket('user-images', {
           public: true,
           fileSizeLimit: 5242880, // 5MB
         });
+        
+        if (createError) {
+          console.error('Error creating bucket:', createError);
+          return false;
+        }
+        
         console.log('Created user-images bucket');
       }
+      
+      return true;
     } catch (error) {
       console.error('Error ensuring bucket exists:', error);
-      // Continue anyway, as the bucket might already exist
+      return false;
     }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, imageId: string) => {
     const file = e.target.files?.[0];
-    if (!file || !auth.user) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+    
+    if (!auth.user) {
+      console.log('No authenticated user');
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar logado para fazer upload de imagens.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Check file type
     if (!file.type.startsWith('image/')) {
@@ -60,18 +87,26 @@ export const useGalleryUpload = () => {
     
     try {
       // Ensure bucket exists before uploading
-      await ensureBucketExists();
+      const bucketReady = await ensureBucketExists();
+      if (!bucketReady) {
+        throw new Error("Failed to ensure bucket exists");
+      }
       
       // Create a unique file name to avoid conflicts
       const fileExt = file.name.split('.').pop();
       const fileAlt = file.name.split('.')[0] || 'gallery-image';
       const fileName = `${Date.now()}_${fileAlt}.${fileExt}`;
       
-      // Make sure user has a folder
+      // Make sure user has a folder - using uid directly to avoid undefined
       let filePath = fileName;
-      if (auth.user.id) {
-        filePath = `${auth.user.id}/${fileName}`;
+      const userId = auth.user.id;
+      if (userId) {
+        filePath = `${userId}/${fileName}`;
+      } else {
+        console.warn("No user ID available, storing in root");
       }
+      
+      console.log('Uploading file to path:', filePath);
       
       // Set up progress tracking with an interval
       const progressInterval = setInterval(() => {
@@ -83,7 +118,7 @@ export const useGalleryUpload = () => {
       }, 100);
       
       // Upload the file
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('user-images')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -97,6 +132,8 @@ export const useGalleryUpload = () => {
         console.error("Upload error details:", uploadError);
         throw uploadError;
       }
+      
+      console.log('Upload successful:', data);
       
       // Upload complete - set to 100%
       setUploadProgress(prev => ({ ...prev, [imageId]: 100 }));

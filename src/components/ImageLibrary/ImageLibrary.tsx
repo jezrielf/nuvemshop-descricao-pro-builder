@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -52,20 +53,34 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
   const ensureBucketExists = async () => {
     try {
       // Check if bucket exists first
-      const { data: buckets } = await supabase.storage.listBuckets();
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error('Error checking buckets:', bucketsError);
+        return false;
+      }
+      
       const bucketExists = buckets?.some(bucket => bucket.name === 'user-images');
       
       if (!bucketExists) {
         // Create the bucket if it doesn't exist
-        await supabase.storage.createBucket('user-images', {
+        const { error: createError } = await supabase.storage.createBucket('user-images', {
           public: true,
           fileSizeLimit: 5242880, // 5MB
         });
+        
+        if (createError) {
+          console.error('Error creating bucket:', createError);
+          return false;
+        }
+        
         console.log('Created user-images bucket');
       }
+      
+      return true;
     } catch (error) {
       console.error('Error ensuring bucket exists:', error);
-      // Continue anyway, as the bucket might already exist
+      return false;
     }
   };
   
@@ -84,31 +99,56 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
   }, [open, activeTab]);
 
   const loadUserImages = async () => {
-    if (!auth.user) return;
+    if (!auth.user) {
+      console.log('No authenticated user for loading images');
+      return;
+    }
     
     setLoading(true);
     
     try {
-      await ensureBucketExists();
+      const bucketReady = await ensureBucketExists();
+      if (!bucketReady) {
+        throw new Error("Failed to ensure bucket exists");
+      }
+      
+      const userId = auth.user.id;
+      console.log('Loading images for user:', userId);
+      
+      // Only attempt to list files if we have a user ID
+      if (!userId) {
+        console.warn("No user ID available, cannot load images");
+        setLoading(false);
+        return;
+      }
       
       const { data, error } = await supabase
         .storage
         .from('user-images')
-        .list(auth.user.id, {
+        .list(userId, {
           sortBy: { column: 'created_at', order: 'desc' }
         });
       
       if (error) {
         console.error("Error loading images:", error);
+        if (error.message.includes("The resource was not found")) {
+          // This is normal for new users with no uploads yet
+          console.log("User has no uploads yet");
+          setUserImages([]);
+          setLoading(false);
+          return;
+        }
         throw error;
       }
+      
+      console.log('Found user images:', data);
       
       if (data) {
         const imageUrls = await Promise.all(data.map(async (file) => {
           const { data: fileUrl } = supabase
             .storage
             .from('user-images')
-            .getPublicUrl(`${auth.user!.id}/${file.name}`);
+            .getPublicUrl(`${userId}/${file.name}`);
           
           return {
             id: file.id,
@@ -117,6 +157,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
           };
         }));
         
+        console.log('Processed image URLs:', imageUrls);
         setUserImages(imageUrls);
       }
     } catch (error) {
@@ -186,24 +227,34 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
   };
   
   const uploadImage = async () => {
-    if (!imageFile || !auth.user) return;
+    if (!imageFile || !auth.user) {
+      console.log('No file or authenticated user for upload');
+      return;
+    }
     
     setUploading(true);
     setUploadProgress(0);
     
     try {
       // Ensure bucket exists before uploading
-      await ensureBucketExists();
+      const bucketReady = await ensureBucketExists();
+      if (!bucketReady) {
+        throw new Error("Failed to ensure bucket exists");
+      }
       
       // Create a unique file name to avoid conflicts
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}_${imageAlt || 'image'}.${fileExt}`;
       
-      // Make sure user has a folder
-      let filePath = fileName;
-      if (auth.user.id) {
-        filePath = `${auth.user.id}/${fileName}`;
+      // Make sure user has a folder - using uid directly to avoid undefined
+      const userId = auth.user.id;
+      if (!userId) {
+        console.error("No user ID available for upload");
+        throw new Error("Authentication error: No user ID available");
       }
+      
+      const filePath = `${userId}/${fileName}`;
+      console.log('Uploading file to path:', filePath);
       
       // Set up progress tracking with an interval
       const progressInterval = setInterval(() => {
@@ -214,7 +265,7 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
       }, 100);
       
       // Upload the file
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('user-images')
         .upload(filePath, imageFile, {
           cacheControl: '3600',
@@ -228,6 +279,8 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
         console.error("Upload error details:", uploadError);
         throw uploadError;
       }
+      
+      console.log('Upload successful:', data);
       
       // Upload complete - set to 100%
       setUploadProgress(100);
