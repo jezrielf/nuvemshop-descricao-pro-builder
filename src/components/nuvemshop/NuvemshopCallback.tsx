@@ -38,6 +38,11 @@ const NuvemshopCallback = () => {
         }
 
         console.log('Authentication successful:', data);
+
+        if (data?.authData) {
+          console.log('Auth data received:', data.authData);
+        }
+
         toast({
           title: "Conexão realizada",
           description: "Sua loja Nuvemshop foi conectada com sucesso!"

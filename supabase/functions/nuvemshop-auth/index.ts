@@ -101,7 +101,15 @@ serve(async (req) => {
     console.log('Store connection saved successfully');
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ 
+        success: true, 
+        authData: {
+          access_token: authData.access_token,
+          token_type: authData.token_type,
+          scope: authData.scope,
+          user_id: authData.user_id
+        }
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
