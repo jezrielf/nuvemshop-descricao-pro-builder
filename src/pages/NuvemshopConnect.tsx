@@ -1,15 +1,10 @@
 
-import React, { useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
-import { useUrlCodeExtractor } from '@/components/Nuvemshop/hooks/useUrlCodeExtractor';
-import { AuthStatus } from '@/components/Nuvemshop/components/AuthStatus';
-import { AuthenticationPanel } from '@/components/Nuvemshop/components/AuthenticationPanel';
-import { ProductsTable } from '@/components/Nuvemshop/components/ProductsTable';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useNuvemshopCodeExtractor } from '@/components/Nuvemshop/hooks/useNuvemshopCodeExtractor';
+import { ConnectionCard } from '@/components/Nuvemshop/components/connect/ConnectionCard';
+import { ProductsCard } from '@/components/Nuvemshop/components/connect/ProductsCard';
 
 const NuvemshopConnect: React.FC = () => {
   // Custom hooks for functionality
@@ -46,30 +41,11 @@ const NuvemshopConnect: React.FC = () => {
   const {
     redirectUrl,
     setRedirectUrl,
-    extractCodeFromUrl,
-    extractCodeFromReferrer,
+    handleExtractCode,
     copyToClipboard
-  } = useUrlCodeExtractor();
-
-  // Effect to try extracting code from referrer on load
-  useEffect(() => {
-    // Attempt to extract on initial load
-    setTimeout(() => {
-      const code = extractCodeFromReferrer();
-      if (code) {
-        setTestCode(code);
-      }
-    }, 1000);
-  }, []);
+  } = useNuvemshopCodeExtractor(setTestCode);
 
   // Handlers
-  const handleExtractCode = () => {
-    const code = extractCodeFromUrl(redirectUrl);
-    if (code) {
-      setTestCode(code);
-    }
-  };
-
   const handleTestCodeClick = () => {
     handleTestCode(testCode);
   };
@@ -107,95 +83,38 @@ const NuvemshopConnect: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">Integração com Nuvemshop</h1>
       
       <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Status da Conexão</CardTitle>
-            <CardDescription>
-              Conecte sua loja Nuvemshop para importar produtos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-4">
-              <AuthStatus
-                success={success}
-                error={error}
-                loading={loading}
-                authenticating={authenticating}
-                userId={userId}
-                handleConnect={handleDirectConnect}
-                handleDisconnect={handleDisconnectClick}
-                onFetchProducts={() => fetchProducts(1)}
-                loadingProducts={loadingProducts}
-                storeName={storeName}
-              />
-              
-              {!success && (
-                <div className="mt-2">
-                  <Button 
-                    variant="outline"
-                    onClick={handleClearCache}
-                    className="text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100"
-                  >
-                    Limpar Cache de Conexão
-                  </Button>
-                  
-                  <div className="mt-4 space-y-4">
-                    <div className="space-y-2">
-                      <Button
-                        variant="default"
-                        onClick={handleDirectConnect}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        Conectar Loja Nuvemshop
-                      </Button>
-                      <p className="text-xs text-gray-500">
-                        Clique para conectar sua loja Nuvemshop usando o link direto de autorização.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6">
-                    <AuthenticationPanel
-                      redirectUrl={redirectUrl}
-                      setRedirectUrl={setRedirectUrl}
-                      extractCodeFromUrl={handleExtractCode}
-                      testCode={testCode}
-                      setTestCode={setTestCode}
-                      handleTestCode={handleTestCodeClick}
-                      authenticating={authenticating}
-                      copyToClipboard={copyToClipboard}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ConnectionCard
+          success={success}
+          error={error}
+          loading={loading}
+          authenticating={authenticating}
+          userId={userId}
+          handleConnect={handleDirectConnect}
+          handleDisconnect={handleDisconnectClick}
+          onFetchProducts={() => fetchProducts(1)}
+          loadingProducts={loadingProducts}
+          storeName={storeName}
+          testCode={testCode}
+          setTestCode={setTestCode}
+          redirectUrl={redirectUrl}
+          setRedirectUrl={setRedirectUrl}
+          extractCodeFromUrl={handleExtractCode}
+          handleTestCode={handleTestCodeClick}
+          copyToClipboard={copyToClipboard}
+          handleClearCache={handleClearCache}
+        />
         
-        {products.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Produtos da Loja</CardTitle>
-              <CardDescription>
-                Página {currentPage} - Exibindo {products.length} produtos 
-                {totalProducts > 0 ? ` de aproximadamente ${totalProducts}` : ''}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProductsTable
-                products={products}
-                loadingProducts={loadingProducts}
-                updatingProduct={updatingProduct}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalProducts={totalProducts}
-                onPrevPage={handlePrevPage}
-                onNextPage={handleNextPage}
-                onUpdateDescription={handleUpdateDescription}
-              />
-            </CardContent>
-          </Card>
-        )}
+        <ProductsCard
+          products={products}
+          loadingProducts={loadingProducts}
+          updatingProduct={updatingProduct}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalProducts={totalProducts}
+          handlePrevPage={handlePrevPage}
+          handleNextPage={handleNextPage}
+          handleUpdateDescription={handleUpdateDescription}
+        />
       </div>
     </div>
   );

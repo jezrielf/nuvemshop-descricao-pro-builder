@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -14,7 +15,6 @@ import { CheckCircle2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -36,9 +36,7 @@ const Index = () => {
     storeName, 
     userId: storeId, 
     handleConnect: handleConnectNuvemshop,
-    handleDisconnect: handleDisconnectNuvemshop,
-    storeUrlName,
-    setStoreUrlName
+    handleDisconnect: handleDisconnectNuvemshop
   } = useNuvemshopAuth();
   
   useEffect(() => {
@@ -116,13 +114,6 @@ const Index = () => {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Input
-              type="text"
-              placeholder="Nome da loja (URL)"
-              value={storeUrlName}
-              onChange={(e) => setStoreUrlName(e.target.value)}
-              className="max-w-[200px] h-8 text-sm"
-            />
             <Button 
               variant="outline" 
               size="sm" 
