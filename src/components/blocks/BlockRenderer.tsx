@@ -1,8 +1,17 @@
-
 import React from 'react';
 import { Block } from '@/types/editor';
-import { BlockRendererFactory } from './factory/BlockRendererFactory';
-import { getStylesFromBlock } from '@/utils/styleConverter';
+import HeroBlock from './HeroBlock';
+import TextBlock from './TextBlock';
+import FeaturesBlock from './FeaturesBlock';
+import BenefitsBlock from './BenefitsBlock';
+import SpecificationsBlock from './SpecificationsBlock';
+import ImageBlock from './ImageBlock';
+import GalleryBlock from './gallery';
+import ImageTextBlock from './ImageTextBlock';
+import TextImageBlock from './TextImageBlock';
+import FAQBlock from './FAQBlock';
+import CTABlock from './CTABlock';
+import VideoBlock from './VideoBlock';
 
 interface BlockRendererProps {
   block: Block;
@@ -10,65 +19,33 @@ interface BlockRendererProps {
 }
 
 const BlockRenderer: React.FC<BlockRendererProps> = ({ block, isPreview = false }) => {
-  try {
-    // Validate the block before rendering
-    if (!BlockRendererFactory.isValidBlock(block)) {
-      return BlockRendererFactory.createErrorComponent('Bloco inválido');
-    }
-
-    // Ensure the block has a type property
-    if (!BlockRendererFactory.hasValidType(block)) {
-      return BlockRendererFactory.createErrorComponent('Bloco sem tipo definido');
-    }
-
-    // Ensure the block has required properties for its type
-    if (!BlockRendererFactory.hasRequiredProperties(block)) {
-      return BlockRendererFactory.createErrorComponent(`Bloco do tipo "${block.type}" está faltando propriedades obrigatórias`);
-    }
-
-    // Create a style object based on block.style for the preview
-    const previewStyles: React.CSSProperties = {};
-    if (isPreview && block.style) {
-      // When in preview mode, convert all block styles to inline styles
-      const styleString = getStylesFromBlock(block);
-      
-      // Parse the style string into a CSSProperties object
-      if (styleString) {
-        const styleEntries = styleString.split(';').filter(Boolean).map(style => {
-          const [property, value] = style.split(':').map(s => s.trim());
-          return [property, value];
-        });
-        
-        styleEntries.forEach(([prop, value]) => {
-          if (prop && value) {
-            // Convert kebab-case to camelCase for React inline styles
-            const camelProp = prop.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-            (previewStyles as any)[camelProp] = value;
-          }
-        });
-      }
-    }
-
-    // If it's in preview mode, apply the styles directly to the wrapper
-    if (isPreview) {
-      // Determine the block spacing class
-      const blockSpacingClass = block.style?.blockSpacing === 'none' ? 'mb-0' : '';
-      
-      return (
-        <div 
-          style={previewStyles} 
-          className={`block-preview-container ${blockSpacingClass}`}
-          data-block-type={block.type}
-        >
-          {BlockRendererFactory.createBlockComponent({ block, isPreview })}
-        </div>
-      );
-    }
-
-    return BlockRendererFactory.createBlockComponent({ block, isPreview });
-  } catch (error) {
-    console.error('Error rendering block:', error);
-    return BlockRendererFactory.createErrorComponent(`Erro ao renderizar bloco: ${(error as Error).message}`);
+  switch (block.type) {
+    case 'hero':
+      return <HeroBlock block={block} isPreview={isPreview} />;
+    case 'text':
+      return <TextBlock block={block} isPreview={isPreview} />;
+    case 'features':
+      return <FeaturesBlock block={block} isPreview={isPreview} />;
+    case 'benefits':
+      return <BenefitsBlock block={block} isPreview={isPreview} />;
+    case 'specifications':
+      return <SpecificationsBlock block={block} isPreview={isPreview} />;
+    case 'image':
+      return <ImageBlock block={block} isPreview={isPreview} />;
+    case 'gallery':
+      return <GalleryBlock block={block} isPreview={isPreview} />;
+    case 'imageText':
+      return <ImageTextBlock block={block} isPreview={isPreview} />;
+     case 'textImage':
+      return <TextImageBlock block={block} isPreview={isPreview} />;
+    case 'faq':
+      return <FAQBlock block={block} isPreview={isPreview} />;
+    case 'cta':
+      return <CTABlock block={block} isPreview={isPreview} />;
+    case 'video':
+      return <VideoBlock block={block} isPreview={isPreview} />;
+    default:
+      return <p>Unknown block type: {block.type}</p>;
   }
 };
 
