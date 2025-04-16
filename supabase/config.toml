@@ -2,3 +2,7 @@
 project_id = "zeiodratpawnnbgnflvi"
 
 [functions]
+[functions.nuvemshop-auth]
+verify_jwt = false
+[functions.nuvemshop-products]
+verify_jwt = false

@@ -96,6 +96,10 @@ const Header: React.FC = () => {
               Ver planos
             </Link>
           )}
+          
+          <Link to="/nuvemshop-connect" className="text-xs sm:text-sm text-green-500 hover:text-green-700 underline ml-2">
+            Conectar Nuvemshop
+          </Link>
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
