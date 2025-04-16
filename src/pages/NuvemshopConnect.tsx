@@ -90,6 +90,13 @@ const NuvemshopConnect: React.FC = () => {
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
   };
 
+  const handleClearCache = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    clearAuthCache(true);
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Integração com Nuvemshop</h1>
@@ -120,7 +127,7 @@ const NuvemshopConnect: React.FC = () => {
                 <div className="mt-2">
                   <Button 
                     variant="outline"
-                    onClick={clearAuthCache}
+                    onClick={handleClearCache}
                     className="text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100"
                   >
                     Limpar Cache de Conexão
