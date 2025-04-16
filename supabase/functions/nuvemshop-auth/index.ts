@@ -44,7 +44,7 @@ serve(async (req) => {
     formData.append('grant_type', 'authorization_code');
     formData.append('code', code);
 
-    console.log('Sending request to Nuvemshop token endpoint');
+    console.log('Preparing request to Nuvemshop token endpoint');
     console.log('Request body:', formData.toString());
 
     // Make the request to Nuvemshop
@@ -59,9 +59,10 @@ serve(async (req) => {
     // Check status and log full response for debugging
     console.log('Response status:', response.status);
     const responseText = await response.text();
-    console.log('Response body:', responseText);
+    console.log('Full response body:', responseText);
 
     if (!response.ok) {
+      console.error('Error response from Nuvemshop:', responseText);
       return new Response(JSON.stringify({ 
         error: 'Failed to authenticate with Nuvemshop', 
         details: responseText,
@@ -72,13 +73,26 @@ serve(async (req) => {
       });
     }
 
-    // Parse JSON response (if we got here, we know it's valid text)
-    const data = JSON.parse(responseText);
-    console.log('Successfully authenticated with Nuvemshop');
+    try {
+      // Parse JSON response (if we got here, we know it's valid text)
+      const data = JSON.parse(responseText);
+      console.log('Successfully authenticated with Nuvemshop');
+      console.log('User ID:', data.user_id);
+      console.log('Access token obtained successfully');
 
-    return new Response(JSON.stringify(data), { 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-    });
+      return new Response(JSON.stringify(data), { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    } catch (parseError) {
+      console.error('Error parsing JSON response:', parseError);
+      return new Response(JSON.stringify({ 
+        error: 'Failed to parse Nuvemshop response', 
+        details: responseText 
+      }), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
   } catch (error) {
     console.error('Error processing request:', error);
     

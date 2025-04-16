@@ -17,6 +17,7 @@ const NuvemshopConnect: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,70 +26,71 @@ const NuvemshopConnect: React.FC = () => {
   // Handle the redirect from Nuvemshop with the authorization code
   useEffect(() => {
     const handleAuthorizationCode = async () => {
+      // Check for code in URL parameters
       const query = new URLSearchParams(location.search);
       const codeParam = query.get('code');
       
       if (codeParam && !authenticating && !success) {
-        try {
-          setAuthenticating(true);
-          setError(null);
-          
-          // Extract the code properly (everything between "code=" and "&" or end of string)
-          const codeRegex = /code=([^&]+)/;
-          const match = location.search.match(codeRegex);
-          const authCode = match ? match[1] : codeParam;
-          
-          console.log('Authorization code extracted:', authCode);
-          
-          // Call the Edge Function to exchange the code for an access token
-          const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-auth', {
-            body: { code: authCode },
-          });
-          
-          if (functionError) {
-            console.error('Function error:', functionError);
-            throw new Error(`Function error: ${functionError.message}`);
-          }
-          
-          if (data.error) {
-            console.error('API error:', data.error);
-            throw new Error(data.error);
-          }
-          
-          console.log('Authentication success:', data);
-          
-          // Store the access token and user ID
-          setAccessToken(data.access_token);
-          setUserId(data.user_id);
-          setSuccess(true);
-          
-          // Store in localStorage for persistence
-          localStorage.setItem('nuvemshop_access_token', data.access_token);
-          localStorage.setItem('nuvemshop_user_id', data.user_id.toString());
-          
-          toast({
-            title: 'Loja conectada com sucesso!',
-            description: 'Sua loja Nuvemshop foi conectada com sucesso.',
-          });
-          
-          // Remove the code from the URL to prevent re-authentication on page refresh
-          navigate('/nuvemshop-connect', { replace: true });
-        } catch (err: any) {
-          console.error('Authentication error:', err);
-          setError(err.message);
-          toast({
-            variant: 'destructive',
-            title: 'Erro ao conectar',
-            description: err.message,
-          });
-        } finally {
-          setAuthenticating(false);
-        }
+        await processAuthCode(codeParam);
       }
     };
     
     handleAuthorizationCode();
   }, [location.search, authenticating, success, navigate, toast]);
+  
+  // Process the authorization code
+  const processAuthCode = async (authCode: string) => {
+    try {
+      setAuthenticating(true);
+      setError(null);
+      
+      console.log('Processing authorization code:', authCode);
+      
+      // Call the Edge Function to exchange the code for an access token
+      const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-auth', {
+        body: { code: authCode },
+      });
+      
+      if (functionError) {
+        console.error('Function error:', functionError);
+        throw new Error(`Function error: ${functionError.message}`);
+      }
+      
+      if (data.error) {
+        console.error('API error:', data.error);
+        throw new Error(data.error);
+      }
+      
+      console.log('Authentication success:', data);
+      
+      // Store the access token and user ID
+      setAccessToken(data.access_token);
+      setUserId(data.user_id);
+      setSuccess(true);
+      
+      // Store in localStorage for persistence
+      localStorage.setItem('nuvemshop_access_token', data.access_token);
+      localStorage.setItem('nuvemshop_user_id', data.user_id.toString());
+      
+      toast({
+        title: 'Loja conectada com sucesso!',
+        description: 'Sua loja Nuvemshop foi conectada com sucesso.',
+      });
+      
+      // Remove the code from the URL to prevent re-authentication on page refresh
+      navigate('/nuvemshop-connect', { replace: true });
+    } catch (err: any) {
+      console.error('Authentication error:', err);
+      setError(err.message);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao conectar',
+        description: err.message,
+      });
+    } finally {
+      setAuthenticating(false);
+    }
+  };
   
   // Check for existing tokens on component mount
   useEffect(() => {
@@ -106,6 +108,12 @@ const NuvemshopConnect: React.FC = () => {
     setLoading(true);
     // Redirect to Nuvemshop authorization URL
     window.location.href = 'https://www.tiendanube.com/apps/17194/authorize?state=csrf-code';
+  };
+  
+  const handleTestCode = async () => {
+    if (testCode) {
+      await processAuthCode(testCode);
+    }
   };
   
   const handleDisconnect = () => {
@@ -196,7 +204,7 @@ const NuvemshopConnect: React.FC = () => {
                     Conectado
                   </Badge>
                 ) : (
-                  <Badge variant="destructive" className="bg-red-100 text-red-800">
+                  <Badge variant="destructive">
                     <XCircle className="h-4 w-4 mr-1" />
                     Desconectado
                   </Badge>
@@ -217,12 +225,33 @@ const NuvemshopConnect: React.FC = () => {
               
               <div className="pt-4">
                 {!success ? (
-                  <Button onClick={handleConnect} disabled={loading || authenticating}>
-                    {(loading || authenticating) && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Conectar Loja
-                  </Button>
+                  <div className="space-y-4">
+                    <Button onClick={handleConnect} disabled={loading || authenticating}>
+                      {(loading || authenticating) && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Conectar Loja
+                    </Button>
+                    
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-500 mb-2">Ou teste com um código específico:</p>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={testCode}
+                          onChange={(e) => setTestCode(e.target.value)}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                        <Button onClick={handleTestCode} disabled={authenticating || !testCode}>
+                          {authenticating ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            'Testar'
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="flex space-x-4">
                     <Button variant="outline" onClick={handleDisconnect}>

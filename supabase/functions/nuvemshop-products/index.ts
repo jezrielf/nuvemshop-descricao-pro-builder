@@ -33,9 +33,13 @@ serve(async (req) => {
     }
 
     console.log(`Fetching products for user ID: ${userId}`);
+    console.log(`Using access token: ${accessToken.substring(0, 5)}...`);
 
     // Make the request to Nuvemshop API with proper headers
-    const response = await fetch(`https://api.tiendanube.com/v1/${userId}/products`, {
+    const apiUrl = `https://api.tiendanube.com/v1/${userId}/products`;
+    console.log(`Making request to: ${apiUrl}`);
+
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Authentication': `bearer ${accessToken}`,
@@ -50,6 +54,8 @@ serve(async (req) => {
     console.log('Response preview:', responseText.substring(0, 200) + '...');
 
     if (!response.ok) {
+      console.error('Error response from Nuvemshop API:', responseText);
+      
       return new Response(JSON.stringify({ 
         error: 'Failed to fetch products from Nuvemshop', 
         details: responseText,
@@ -60,14 +66,25 @@ serve(async (req) => {
       });
     }
 
-    // Parse JSON response
-    const data = JSON.parse(responseText);
-    console.log('Successfully fetched products from Nuvemshop');
-    console.log('Number of products:', Array.isArray(data) ? data.length : 'not an array');
+    try {
+      // Parse JSON response
+      const data = JSON.parse(responseText);
+      console.log('Successfully fetched products from Nuvemshop');
+      console.log('Number of products:', Array.isArray(data) ? data.length : 'not an array');
 
-    return new Response(JSON.stringify(data), { 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-    });
+      return new Response(JSON.stringify(data), { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    } catch (parseError) {
+      console.error('Error parsing JSON response:', parseError);
+      return new Response(JSON.stringify({ 
+        error: 'Failed to parse Nuvemshop API response', 
+        details: responseText 
+      }), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
   } catch (error) {
     console.error('Error processing request:', error);
     
