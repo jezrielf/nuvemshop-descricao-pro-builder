@@ -174,21 +174,31 @@ const ImageLibrary: React.FC<ImageLibraryProps> = ({ onSelectImage, trigger }) =
       const fileName = `${Date.now()}_${imageAlt || 'image'}.${fileExt}`;
       const filePath = `${auth.user.id}/${fileName}`;
       
-      // Upload the file with progress tracking
+      // Set up progress tracking with an interval
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          const newProgress = Math.min(prev + 10, 95); // Increment but cap at 95%
+          return newProgress;
+        });
+      }, 100);
+      
+      // Upload the file
       const { error: uploadError } = await supabase.storage
         .from('user-images')
         .upload(filePath, imageFile, {
           cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100;
-            setUploadProgress(Math.round(percent));
-          },
+          upsert: false
         });
+      
+      // Clear the interval after upload completes
+      clearInterval(progressInterval);
       
       if (uploadError) {
         throw uploadError;
       }
+      
+      // Upload complete - set to 100%
+      setUploadProgress(100);
       
       // Get the public URL
       const { data: fileUrl } = supabase
