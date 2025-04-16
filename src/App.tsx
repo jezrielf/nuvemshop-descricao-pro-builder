@@ -14,7 +14,6 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import NuvemshopCallback from "./components/nuvemshop/NuvemshopCallback";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -48,7 +47,6 @@ const App = () => {
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin-templates" element={<AdminTemplates />} />
               <Route path="/admin-auth" element={<AdminAuth />} />
-              <Route path="/nuvemshop/callback" element={<NuvemshopCallback />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

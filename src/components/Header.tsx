@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+
+import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
@@ -13,18 +14,10 @@ import SEOAnalyzer from './SEO/analyzers/SEOAnalyzer';
 import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
-import { NuvemshopConnect } from './nuvemshop/NuvemshopConnect';
-import { StoreSelector } from './nuvemshop/StoreSelector';
-import { ProductSelector } from './nuvemshop/ProductSelector';
-import { useToast } from '@/hooks/use-toast';
 
 const Header: React.FC = () => {
-  const [selectedStoreId, setSelectedStoreId] = useState<number>();
-  const [selectedProductId, setSelectedProductId] = useState<number>();
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
   const auth = useAuth();
-  const { toast } = useToast();
   const { 
     isPremium, 
     isBusiness, 
@@ -50,25 +43,6 @@ const Header: React.FC = () => {
   useEffect(() => {
     loadSavedDescriptions();
   }, [loadSavedDescriptions, subscriptionTier]);
-
-  // Handle store selection
-  const handleStoreSelect = (storeId: number) => {
-    console.log('Store selected:', storeId);
-    setSelectedStoreId(storeId);
-    setSelectedProductId(undefined); // Reset product when store changes
-  };
-
-  // Handle product selection
-  const handleProductSelect = (productId: number) => {
-    console.log('Product selected:', productId);
-    setSelectedProductId(productId);
-    
-    // Here you can add logic to load product data
-    toast({
-      title: "Produto selecionado",
-      description: `Produto ID: ${productId} selecionado com sucesso.`
-    });
-  };
 
   // Memoize the subscription badge to prevent unnecessary re-renders
   const subscriptionBadge = useMemo(() => {
@@ -126,21 +100,6 @@ const Header: React.FC = () => {
         
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
-            <NuvemshopConnect />
-            
-            <StoreSelector 
-              value={selectedStoreId}
-              onSelect={handleStoreSelect}
-            />
-            
-            {selectedStoreId && (
-              <ProductSelector
-                storeId={selectedStoreId}
-                value={selectedProductId}
-                onSelect={handleProductSelect}
-              />
-            )}
-            
             <NewDescriptionDialog 
               isPremium={isPremium} 
               descriptionCount={descriptionCount}
