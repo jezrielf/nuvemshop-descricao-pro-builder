@@ -8,6 +8,10 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   const [products, setProducts] = useState<NuvemshopProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [productError, setProductError] = useState<string | null>(null);
+  const [updatingProduct, setUpdatingProduct] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const { toast } = useToast();
 
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
@@ -17,7 +21,27 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   // Reset products
   const resetProducts = useCallback(() => {
     setProducts([]);
+    setCurrentPage(1);
+    setTotalPages(1);
+    setTotalProducts(0);
   }, []);
+
+  // Handle pagination
+  const handleNextPage = useCallback(() => {
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchProducts(nextPage);
+    }
+  }, [currentPage, totalPages]);
+
+  const handlePrevPage = useCallback(() => {
+    if (currentPage > 1) {
+      const prevPage = currentPage - 1;
+      setCurrentPage(prevPage);
+      fetchProducts(prevPage);
+    }
+  }, [currentPage]);
 
   // Fetch products from Nuvemshop
   const fetchProducts = useCallback(async (page: number = 1, perPage: number = 50) => {
@@ -29,6 +53,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     try {
       setLoadingProducts(true);
       setProductError(null);
+      setCurrentPage(page);
 
       const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
         body: { accessToken, userId, page, perPage }
@@ -48,6 +73,13 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       if (Array.isArray(data)) {
         console.log(`Loaded ${data.length} products from Nuvemshop`);
         setProducts(data);
+        
+        // Estimate total pages based on product count
+        // Nuvemshop API doesn't provide exact count, so we estimate
+        const estimatedTotal = data.length === perPage ? perPage * 10 : data.length;
+        setTotalProducts(estimatedTotal);
+        setTotalPages(Math.ceil(estimatedTotal / perPage));
+        
         return data;
       } else {
         console.error('Unexpected response format:', data);
@@ -83,6 +115,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
 
     try {
       console.log(`Updating description for product ID: ${productId}`);
+      setUpdatingProduct(true);
       
       const { data, error } = await supabase.functions.invoke('nuvemshop-update-product', {
         body: { 
@@ -114,6 +147,11 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
         )
       );
       
+      toast({
+        title: 'Descrição atualizada',
+        description: 'A descrição do produto foi atualizada com sucesso!',
+      });
+      
       return true;
     } catch (err) {
       console.error('Error in updateProductDescription:', err);
@@ -124,6 +162,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
         description: errorMessage,
       });
       return false;
+    } finally {
+      setUpdatingProduct(false);
     }
   }, [accessToken, userId, supabase.functions, toast]);
 
@@ -131,8 +171,14 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     products,
     loadingProducts,
     productError,
+    updatingProduct,
+    currentPage,
+    totalPages,
+    totalProducts,
     fetchProducts,
     resetProducts,
-    updateProductDescription
+    updateProductDescription,
+    handleNextPage,
+    handlePrevPage
   };
 };

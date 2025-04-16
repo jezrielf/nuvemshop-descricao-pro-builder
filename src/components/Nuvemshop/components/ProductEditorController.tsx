@@ -43,25 +43,11 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
           : (product.description.pt || '');
           
         if (htmlDescription.trim()) {
-          // Use the HTML parser utility to convert HTML to our block format
           try {
-            // This is a simplified approach - in a real implementation, 
-            // we would need a more robust HTML to blocks parser
             console.log('Parsing HTML description:', htmlDescription);
             
-            // If we can't parse the HTML into blocks format yet, we'll just show it in a text block
-            // In the future, this would be replaced with proper HTML to blocks conversion
-            const blocks = [];
-            
-            // Add a text block with the HTML description
-            blocks.push({
-              id: 'imported-description',
-              type: 'text',
-              title: 'Descrição Importada',
-              content: htmlDescription,
-              columns: 1,
-              visible: true
-            });
+            // Use our new parseHtmlToBlocks function to convert HTML to block format
+            const blocks = parseHtmlToBlocks(htmlDescription);
             
             // Create a description object with the parsed blocks
             const parsedDescription = {
