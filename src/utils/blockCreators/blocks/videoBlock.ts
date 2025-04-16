@@ -12,6 +12,8 @@ export const createVideoBlock = (columns: ColumnLayout): VideoBlock => {
     videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Default video URL (example)
     autoplay: true, // Always set this property
     description: 'Descrição do vídeo (opcional)',
+    heading: 'Título do Vídeo', // Added default heading
+    caption: 'Legenda do vídeo', // Added default caption
     style: {}
   };
 };

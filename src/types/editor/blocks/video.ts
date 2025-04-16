@@ -7,4 +7,6 @@ export interface VideoBlock extends BlockBase {
   autoplay: boolean; // Required
   title: string;
   description?: string;
+  heading?: string; // Added heading property
+  caption?: string; // Added caption property
 }

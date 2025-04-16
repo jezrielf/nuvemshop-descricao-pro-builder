@@ -1,3 +1,4 @@
+
 export interface BaseBlock {
   id: string;
   type: string;
@@ -45,6 +46,7 @@ export interface Template {
   name: string;
   category: string;
   blocks: Block[];
+  thumbnail?: string; // Added thumbnail property
 }
 
 export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoes' | 'electronics' | 'energy' | 'other' | string;
