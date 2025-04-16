@@ -37,7 +37,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         client_id: "17194",
-        client_secret: "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b",
+        client_secret: Deno.env.get('NUVEMSHOP_CLIENT_SECRET'),
         grant_type: "authorization_code",
         code
       })
