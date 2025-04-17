@@ -7,6 +7,10 @@ import { ensureBlockType } from './typeConversion';
  * for their specific block type.
  */
 export function parseTemplateBlocks(blocks: any[]): Block[] {
+  if (!Array.isArray(blocks)) {
+    console.warn('Invalid blocks data provided:', blocks);
+    return [];
+  }
   return blocks.map(block => ensureBlockType(block));
 }
 
@@ -15,5 +19,9 @@ export function parseTemplateBlocks(blocks: any[]): Block[] {
  * Used when adding blocks to templates or when loading templates
  */
 export function convertBlocks(blocks: any[]): Block[] {
+  if (!Array.isArray(blocks)) {
+    console.warn('Invalid blocks data provided to convertBlocks:', blocks);
+    return [];
+  }
   return parseTemplateBlocks(blocks);
 }

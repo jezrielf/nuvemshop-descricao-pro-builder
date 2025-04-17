@@ -4,6 +4,7 @@ import { Profile } from '@/types/auth';
 import { Plan } from '@/components/admin/plans/types';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
+import { convertBlocks } from '@/utils/blockConverter';
 
 export const adminService = {
   // Users related operations
@@ -368,7 +369,7 @@ export const adminService = {
       
       if (error) throw error;
       
-      // Convert string categories to ProductCategory type
+      // Convert the database response to Template format with proper type handling
       const templates: Template[] = (data || []).map((template) => {
         // Convert string category to ProductCategory
         let category: ProductCategory = 'other';
@@ -386,12 +387,15 @@ export const adminService = {
           }
         }
         
+        // Ensure blocks is always an array
+        const blockData = Array.isArray(template.blocks) ? template.blocks : [];
+        
         return {
           id: template.id,
           name: template.name,
           category: category,
-          blocks: template.blocks || [],
-          thumbnail: template.thumbnail || '/placeholder.svg'
+          blocks: blockData,
+          thumbnail: '/placeholder.svg' // Default thumbnail as it's not in the database
         };
       });
       
@@ -420,13 +424,16 @@ export const adminService = {
       
       if (error) throw error;
       
+      // Ensure blocks is always an array
+      const blockData = Array.isArray(data.blocks) ? data.blocks : [];
+      
       // Convert returned data to Template format
       const template: Template = {
         id: data.id,
         name: data.name,
         category: data.category as ProductCategory,
-        blocks: data.blocks || [],
-        thumbnail: data.thumbnail || '/placeholder.svg'
+        blocks: blockData,
+        thumbnail: '/placeholder.svg' // Default thumbnail
       };
       
       return template;
@@ -456,13 +463,16 @@ export const adminService = {
       
       if (error) throw error;
       
+      // Ensure blocks is always an array
+      const blockData = Array.isArray(data.blocks) ? data.blocks : [];
+      
       // Convert returned data to Template format
       const template: Template = {
         id: data.id,
         name: data.name,
         category: data.category as ProductCategory,
-        blocks: data.blocks || [],
-        thumbnail: data.thumbnail || '/placeholder.svg'
+        blocks: blockData,
+        thumbnail: '/placeholder.svg' // Default thumbnail
       };
       
       return template;

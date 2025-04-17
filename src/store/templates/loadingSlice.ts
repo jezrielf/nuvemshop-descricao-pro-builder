@@ -4,7 +4,6 @@ import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
 import { getAllTemplates } from '@/utils/templates';
 import { adminService } from '@/services/adminService';
-import { convertSupabaseToTemplate } from './utils';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,

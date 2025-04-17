@@ -2,7 +2,6 @@ import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
 import { v4 as uuidv4 } from 'uuid';
-import { serializeBlocks } from './utils';
 import { adminService } from '@/services/adminService';
 
 export const createCRUDSlice: StateCreator<
@@ -13,9 +12,9 @@ export const createCRUDSlice: StateCreator<
 > = (set, get) => ({
   createTemplate: async (templateData) => {
     try {
-      const newTemplate: Template = {
+      const newTemplate: Omit<Template, 'id'> = {
         ...templateData,
-        id: uuidv4()
+        blocks: templateData.blocks || []
       };
       
       const createdTemplate = await adminService.createTemplate(newTemplate);
