@@ -46,7 +46,7 @@ export const useImageUpload = ({ onSuccess, onError }: UseImageUploadProps = {})
       
       return { url: result.url, alt: fileAlt };
     } catch (error: any) {
-      console.error('Erro no upload de imagem:', error);
+      console.error('Erro no upload:', error);
       
       toast({
         title: "Erro no upload",
@@ -61,7 +61,6 @@ export const useImageUpload = ({ onSuccess, onError }: UseImageUploadProps = {})
       return null;
     } finally {
       setUploading(false);
-      // Deixamos o progresso em 100% se foi bem-sucedido, ou volta para 0 se falhou
       setUploadProgress(prev => prev >= 90 ? 100 : 0);
       
       // Resetar input
@@ -99,7 +98,7 @@ export const useImageUpload = ({ onSuccess, onError }: UseImageUploadProps = {})
       
       return { url: result.url, alt: fileAlt };
     } catch (error: any) {
-      console.error('Erro no upload de imagem:', error);
+      console.error('Erro no upload:', error);
       
       toast({
         title: "Erro no upload",

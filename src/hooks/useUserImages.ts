@@ -18,7 +18,6 @@ export const useUserImages = (isOpen: boolean, activeTab: string) => {
 
   const loadUserImages = async () => {
     if (!auth.user) {
-      console.log('Usuário não autenticado, não é possível carregar imagens');
       return;
     }
     

@@ -19,16 +19,16 @@ export const useGalleryUpload = () => {
     setUploadProgress(prev => ({ ...prev, [imageId]: 0 }));
     
     try {
-      // Função para atualizar o progresso específico para esta imagem
+      // Função para atualizar o progresso
       const updateImageProgress = (progress: number) => {
         setUploadProgress(prev => ({ ...prev, [imageId]: progress }));
       };
       
-      // Fazer o upload usando o serviço centralizado
+      // Fazer o upload
       const result = await storageService.uploadFile({
         user: auth.user,
         file,
-        path: 'gallery', // Colocar em uma subpasta "gallery" para organização
+        path: 'gallery',
         onProgress: updateImageProgress
       });
       

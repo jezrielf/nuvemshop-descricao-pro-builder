@@ -18,7 +18,7 @@ export const useImageLibraryUpload = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // Validações básicas no lado do cliente (serão validadas novamente no servidor)
+    // Validações básicas
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Tipo de arquivo inválido",
@@ -50,7 +50,6 @@ export const useImageLibraryUpload = () => {
 
   const uploadImage = async () => {
     if (!imageFile) {
-      console.log('Nenhum arquivo para upload');
       return null;
     }
     
@@ -61,7 +60,7 @@ export const useImageLibraryUpload = () => {
       const result = await storageService.uploadFile({
         user: auth.user,
         file: imageFile,
-        path: 'library', // Organizar em uma subpasta "library"
+        path: 'library',
         onProgress: setUploadProgress
       });
       
