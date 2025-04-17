@@ -112,14 +112,31 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
       
       // If initialData exists, we're editing an existing plan
       if (initialData) {
-        await onSubmit({
-          ...values,
+        // Make sure all required properties are present, using spread to ensure type safety
+        const planData: Plan = {
           id: initialData.id,
-          priceId: initialData.priceId
-        });
+          name: values.name,
+          description: values.description,
+          price: values.price,
+          isActive: values.isActive,
+          isDefault: values.isDefault,
+          features: values.features,
+          priceId: initialData.priceId || ''
+        };
+        
+        await onSubmit(planData);
       } else {
-        // We're creating a new plan
-        await onSubmit(values);
+        // We're creating a new plan, ensure all required fields are present
+        const newPlan: Omit<Plan, 'id'> = {
+          name: values.name,
+          description: values.description,
+          price: values.price,
+          isActive: values.isActive,
+          isDefault: values.isDefault,
+          features: values.features
+        };
+        
+        await onSubmit(newPlan);
       }
       
       form.reset();

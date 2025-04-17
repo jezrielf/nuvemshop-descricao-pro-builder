@@ -56,8 +56,9 @@ const PlanManagementDialogs: React.FC<PlanManagementDialogsProps> = ({
         open={isEditDialogOpen}
         onOpenChange={onEditOpenChange}
         onSubmit={(data) => {
-          if (selectedPlan) {
-            onUpdateSubmit({ ...data, id: selectedPlan.id, priceId: selectedPlan.priceId });
+          if (selectedPlan && 'id' in data) {
+            // Type checking to ensure data has the right structure
+            onUpdateSubmit(data as Plan);
           }
         }}
         title="Editar Plano"
