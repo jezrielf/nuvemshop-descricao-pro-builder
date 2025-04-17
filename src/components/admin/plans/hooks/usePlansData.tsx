@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { adminService } from '@/services/adminService';
+import { adminService } from '@/services/admin';
 
 // Import mockData for fallback
 import { mockPlans } from '../mockData';

@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { UserTableProps, UserFormValues } from './types';
 import UserTableRow from './table/UserTableRow';
 import UserEditSheet from './edit/UserEditSheet';
-import { adminService } from '@/services/adminService';
+import { adminService } from '@/services/admin';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
