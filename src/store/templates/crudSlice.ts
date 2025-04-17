@@ -1,4 +1,3 @@
-
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
@@ -19,13 +18,13 @@ export const createCRUDSlice: StateCreator<
         id: uuidv4()
       };
       
-      await adminService.createTemplate(newTemplate);
+      const createdTemplate = await adminService.createTemplate(newTemplate);
       
       set(state => ({
-        templates: [...state.templates, newTemplate]
+        templates: [...state.templates, createdTemplate]
       }));
       
-      return newTemplate;
+      return createdTemplate;
     } catch (error) {
       console.error('Error in createTemplate:', error);
       throw error;
@@ -39,15 +38,13 @@ export const createCRUDSlice: StateCreator<
       
       if (templateIndex === -1) return null;
       
-      const updatedTemplate: Template = {
-        ...templates[templateIndex],
-        ...templateData
-      };
-      
-      await adminService.updateTemplate(id, {
-        name: updatedTemplate.name,
-        category: updatedTemplate.category,
-        blocks: updatedTemplate.blocks
+      const existingTemplate = templates[templateIndex];
+      const updatedTemplate = await adminService.updateTemplate(id, {
+        ...templateData,
+        // Keep existing properties that aren't being updated
+        name: templateData.name || existingTemplate.name,
+        category: templateData.category || existingTemplate.category,
+        blocks: templateData.blocks || existingTemplate.blocks
       });
       
       const newTemplates = [...templates];

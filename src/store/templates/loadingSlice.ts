@@ -26,9 +26,8 @@ export const createLoadingSlice: StateCreator<
         const templatesData = await adminService.getTemplates();
         console.log('User templates from database:', templatesData?.length || 0);
         
-        // Convert templates
-        userTemplates = templatesData.map(template => convertSupabaseToTemplate(template))
-          .filter((template): template is Template => template !== null);
+        // Templates are already converted in the adminService
+        userTemplates = templatesData;
       } catch (error) {
         console.error('Error loading templates from database:', error);
         userTemplates = [];
