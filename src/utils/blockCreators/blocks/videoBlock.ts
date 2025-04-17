@@ -1,26 +1,18 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { VideoBlock, ColumnLayout } from '@/types/editor';
+import { VideoBlock } from '@/types/editor';
 
-export const createVideoBlock = (columns: ColumnLayout): VideoBlock => {
+export const createVideoBlock = (columns = 1): VideoBlock => {
   return {
     id: uuidv4(),
     type: 'video',
-    title: 'Vídeo',
-    columns,
-    visible: true,
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Default video URL (example)
+    title: 'Video',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    heading: 'Video Title',
+    description: 'This is a video description',
     autoplay: false,
-    heading: 'Título do Vídeo',
-    caption: 'Legenda do vídeo',
-    description: 'Descrição do vídeo (opcional)',
     aspectRatio: '16:9',
-    style: {
-      backgroundColor: '#ffffff',
-      textColor: '#333333',
-      headingColor: '#000000',
-      padding: 'md',
-      blockSpacing: 'md'
-    }
+    columns,
+    visible: true
   };
 };
