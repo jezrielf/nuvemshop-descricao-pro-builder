@@ -1,8 +1,9 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { VideoBlock } from '@/types/editor';
+import { ColumnLayout } from '@/types/editor/base';
 
-export const createVideoBlock = (columns = 1): VideoBlock => {
+export const createVideoBlock = (columns: ColumnLayout = 1): VideoBlock => {
   return {
     id: uuidv4(),
     type: 'video',

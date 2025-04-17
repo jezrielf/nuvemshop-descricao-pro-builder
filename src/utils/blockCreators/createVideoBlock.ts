@@ -1,10 +1,11 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { VideoBlock } from '@/types/editor/blocks/video';
+import { ColumnLayout } from '@/types/editor/base';
 
 export function createVideoBlock(
-  videoUrl: string = '',
-  heading?: string,
+  videoUrl: string = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  heading: string = 'Video Title',
   caption?: string,
   aspectRatio: '16:9' | '4:3' | '1:1' = '16:9'
 ): VideoBlock {
