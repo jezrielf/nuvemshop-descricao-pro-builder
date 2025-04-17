@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Template, ProductCategory } from '@/types/editor';
-import { analyzeHtmlTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
+import { analyzeHtmlForTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
 import { v4 as uuidv4 } from 'uuid';
 
 interface ImportHtmlSectionProps {
@@ -30,19 +30,10 @@ const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({
       setError(null);
       
       // Analyze HTML and convert to blocks
-      const blocks = analyzeHtmlTemplate(htmlContent);
-      
-      // Create a new template
-      const newTemplate: Template = {
-        id: uuidv4(),
-        name: `Template importado ${new Date().toLocaleDateString()}`,
-        category: selectedCategory,
-        blocks: blocks,
-        thumbnail: '/placeholder.svg'
-      };
+      const template = analyzeHtmlForTemplate(htmlContent, selectedCategory);
       
       // Send the template back to the parent component
-      onTemplateGenerated(newTemplate);
+      onTemplateGenerated(template);
       
     } catch (err) {
       console.error('Error analyzing HTML:', err);

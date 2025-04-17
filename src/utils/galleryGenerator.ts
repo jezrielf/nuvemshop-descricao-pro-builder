@@ -7,10 +7,16 @@ export const generateGalleryHtml = (block: GalleryBlock): string => {
   const imageFitValue = block.style?.imageFit || 'contain';
   const objectFit = imageFitValue === 'cover' ? 'cover' : 'contain';
   
-  // Calcular largura das colunas com base no número de colunas
-  const columnWidth = 100 / Math.min(block.columns || 1, 4);
+  // Calculate column width based on number of columns
+  // Ensure columns is converted to a number
+  const columnsValue = typeof block.columns === 'number' ? 
+    block.columns : 
+    (typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))) ? 
+      parseInt(block.columns, 10) : 1;
   
-  // Gerar HTML para cada imagem da galeria
+  const columnWidth = 100 / Math.min(columnsValue, 4);
+  
+  // Generate HTML for each gallery image
   const imagesHtml = block.images && block.images.length > 0 
     ? block.images.map(image => `
       <div style="display: inline-block; vertical-align: top; width: calc(${columnWidth}% - 16px); margin: 8px; box-sizing: border-box;" class="gallery-item">
