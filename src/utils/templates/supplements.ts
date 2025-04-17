@@ -42,7 +42,8 @@ export const supplementsTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 2: Vitaminas e Minerais
@@ -69,7 +70,8 @@ export const supplementsTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 3: Suplementos Naturais
@@ -96,6 +98,7 @@ export const supplementsTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];

@@ -40,7 +40,8 @@ export const clothingTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 2: Moda Sustentável
@@ -66,7 +67,8 @@ export const clothingTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 3: Coleção Sazonal
@@ -92,6 +94,7 @@ export const clothingTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];

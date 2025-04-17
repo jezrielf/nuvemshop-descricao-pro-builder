@@ -40,7 +40,8 @@ export const hauteCoutureTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 2: Atelier de Alta Costura
@@ -66,7 +67,8 @@ export const hauteCoutureTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 3: Coleção de Gala
@@ -92,6 +94,7 @@ export const hauteCoutureTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];

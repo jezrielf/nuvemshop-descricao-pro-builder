@@ -42,7 +42,8 @@ export const electronicsTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 2: Smart TV 4K
@@ -69,7 +70,8 @@ export const electronicsTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 3: Fones de Ouvido Bluetooth
@@ -96,7 +98,8 @@ export const electronicsTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];
 

@@ -40,7 +40,8 @@ export const fashionTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 2: Moda Praia
@@ -66,7 +67,8 @@ export const fashionTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 3: Moda Esportiva
@@ -92,6 +94,7 @@ export const fashionTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];

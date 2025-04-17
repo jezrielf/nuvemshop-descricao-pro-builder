@@ -21,7 +21,7 @@ export const basicTemplates: Template[] = [
   {
     id: uuidv4(),
     name: 'Landing Page Básica',
-    category: 'basic',
+    category: 'other', // Changed from 'basic' to 'other' which is a valid ProductCategory
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
@@ -39,13 +39,14 @@ export const basicTemplates: Template[] = [
       createBenefitsBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   // Template para promoção
   {
     id: uuidv4(),
     name: 'Página Promocional',
-    category: 'basic',
+    category: 'other', // Changed from 'basic' to 'other'
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
@@ -63,13 +64,14 @@ export const basicTemplates: Template[] = [
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   // Template de lançamento
   {
     id: uuidv4(),
     name: 'Lançamento de Produto',
-    category: 'basic',
+    category: 'other', // Changed from 'basic' to 'other'
     blocks: [
       createHeroBlock(1),
       createVideoBlock(1, {
@@ -87,7 +89,8 @@ export const basicTemplates: Template[] = [
       createImageBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];
 

@@ -40,7 +40,8 @@ export const homeDecorTemplates: Template[] = [
       createTextBlock(1),
       createCTABlock(1),
       createFAQBlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 2: Decoração Contemporânea
@@ -58,7 +59,7 @@ export const homeDecorTemplates: Template[] = [
       }),
       createGalleryBlock(1),
       createTextBlock(1),
-      createFeaturesBlock(3),
+      createFeaturesBlock(1),
       createTextImageBlock(1),
       createImageTextBlock(1),
       createBenefitsBlock(1),
@@ -66,7 +67,8 @@ export const homeDecorTemplates: Template[] = [
       createImageBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   },
   
   // Template 3: Decoração Escandinava
@@ -86,12 +88,13 @@ export const homeDecorTemplates: Template[] = [
       }),
       createTextImageBlock(1),
       createGalleryBlock(1),
-      createFeaturesBlock(2),
+      createFeaturesBlock(1),
       createImageTextBlock(1),
       createBenefitsBlock(1),
       createTextBlock(1),
       createFAQBlock(1),
       createCTABlock(1)
-    ]
+    ],
+    thumbnail: '/placeholder.svg' // Added missing thumbnail
   }
 ];
