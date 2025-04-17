@@ -37,6 +37,12 @@ export const hasRole = (role: string | string[] | null, roleToCheck: string): bo
   // Fast path: if role is the exact string we're checking
   if (typeof role === 'string' && role === roleToCheck) return true;
   
+  // If it's a comma-separated string
+  if (typeof role === 'string' && role.includes(',')) {
+    const roles = role.split(',').map(r => r.trim());
+    return roles.includes(roleToCheck);
+  }
+  
   // Otherwise, get the full roles array and check
   const roles = getRoles(role);
   return roles.includes(roleToCheck);
@@ -50,6 +56,11 @@ export const hasRole = (role: string | string[] | null, roleToCheck: string): bo
 export const isAdmin = (role: string | string[] | null): boolean => {
   // Fast path check for exact match
   if (typeof role === 'string' && role === 'admin') return true;
+  
+  // Check for comma-separated roles containing admin
+  if (typeof role === 'string' && role.includes(',')) {
+    return role.split(',').map(r => r.trim()).includes('admin');
+  }
   
   return hasRole(role, 'admin');
 };
@@ -66,6 +77,12 @@ export const isPremium = (role: string | string[] | null): boolean => {
   // Fast path: admin is always premium
   if (typeof role === 'string' && role === 'admin') return true;
   
+  // Check for comma-separated roles
+  if (typeof role === 'string' && role.includes(',')) {
+    const roles = role.split(',').map(r => r.trim());
+    return roles.includes('premium') || roles.includes('admin');
+  }
+  
   // Otherwise, check more thoroughly
   return hasRole(role, 'premium') || isAdmin(role);
 };
@@ -81,6 +98,12 @@ export const isBusiness = (role: string | string[] | null): boolean => {
   
   // Fast path: premium users should also have business privileges
   if (typeof role === 'string' && (role === 'premium' || role === 'admin')) return true;
+  
+  // Check for comma-separated roles
+  if (typeof role === 'string' && role.includes(',')) {
+    const roles = role.split(',').map(r => r.trim());
+    return roles.includes('business') || roles.includes('premium') || roles.includes('admin');
+  }
   
   // Otherwise, check more thoroughly
   return hasRole(role, 'business') || isPremium(role);

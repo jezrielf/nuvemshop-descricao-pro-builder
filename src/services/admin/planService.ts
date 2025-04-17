@@ -132,7 +132,7 @@ export const planService = {
     }
   },
   
-  deletePlan: async (planId: string): Promise<void> => {
+  deletePlan: async (planId: string): Promise<{success: boolean, error?: string}> => {
     try {
       // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
@@ -151,14 +151,21 @@ export const planService = {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        return { success: false, error: error.message };
+      }
       
       if (data && !data.success) {
-        throw new Error(data.error || "Failed to delete plan");
+        return { success: false, error: data.error || "Failed to delete plan" };
       }
-    } catch (error) {
+      
+      return { success: true };
+    } catch (error: any) {
       console.error('Error in deletePlan:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error.message || "An unexpected error occurred" 
+      };
     }
   },
 };

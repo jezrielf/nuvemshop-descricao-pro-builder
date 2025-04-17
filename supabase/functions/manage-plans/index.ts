@@ -14,6 +14,20 @@ const logStep = (step: string, details?: any) => {
   console.log(`[MANAGE-PLANS] ${step}${detailsStr}`);
 };
 
+// Helper function to check if user has a specific role
+const hasRole = (roleString: string | null, roleToCheck: string): boolean => {
+  if (!roleString) return false;
+  
+  // Handle comma-separated roles
+  if (roleString.includes(',')) {
+    const roles = roleString.split(',').map(r => r.trim());
+    return roles.includes(roleToCheck);
+  }
+  
+  // Handle single role
+  return roleString === roleToCheck;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -171,7 +185,8 @@ serve(async (req) => {
         });
       }
       
-      if (profile.role !== 'admin') {
+      // Check if the user has the admin role (accounting for comma-separated roles)
+      if (!hasRole(profile.role, 'admin')) {
         logStep("ERROR: User is not an admin", { role: profile.role });
         return new Response(JSON.stringify({ 
           error: "Unauthorized: Admin access required", 
