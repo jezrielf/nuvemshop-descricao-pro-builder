@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -119,7 +120,11 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
           price: values.price,
           isActive: values.isActive,
           isDefault: values.isDefault,
-          features: values.features,
+          features: values.features.map(feature => ({
+            id: feature.id,
+            name: feature.name,
+            included: feature.included
+          })),
           priceId: initialData.priceId || ''
         };
         
@@ -132,7 +137,11 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
           price: values.price,
           isActive: values.isActive,
           isDefault: values.isDefault,
-          features: values.features
+          features: values.features.map(feature => ({
+            id: feature.id,
+            name: feature.name,
+            included: feature.included
+          }))
         };
         
         await onSubmit(newPlan);
