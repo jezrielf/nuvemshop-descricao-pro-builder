@@ -65,3 +65,8 @@ export const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactN
     description: 'Vídeo do YouTube com autoplay'
   }
 };
+
+// Add the missing function that's being imported in BlockHeader.tsx
+export const getBlockTypeDisplayName = (type: BlockType): string => {
+  return blockTypeInfo[type]?.name || type;
+};
