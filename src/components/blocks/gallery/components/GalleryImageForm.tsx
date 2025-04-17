@@ -56,7 +56,7 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
         <div className="flex space-x-2">
           <Button
             variant="ghost"
-            size="xs"
+            size="sm"
             onClick={() => onMoveImage(image.id, 'left')}
             disabled={index === 0}
             className="h-6 w-6 p-0"
@@ -65,7 +65,7 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
           </Button>
           <Button
             variant="ghost"
-            size="xs"
+            size="sm"
             onClick={() => onMoveImage(image.id, 'right')}
             disabled={index === totalImages - 1}
             className="h-6 w-6 p-0"
@@ -74,7 +74,7 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
           </Button>
           <Button
             variant="ghost"
-            size="xs"
+            size="sm"
             onClick={() => onRemoveImage(image.id)}
             className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
           >
@@ -96,11 +96,28 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
         <div className="flex space-x-2">
           <ImageLibrary 
             onSelectImage={(url, alt) => handleSelectFromLibrary(url, alt)} 
-            buttonLabel="Biblioteca"
-            buttonIcon={<ImageIcon className="h-4 w-4 mr-1" />}
-            buttonVariant="outline"
-            buttonSize="sm"
+            trigger={
+              <Button variant="outline" size="sm" className="flex items-center">
+                <ImageIcon className="h-4 w-4 mr-1" />
+                Biblioteca
+              </Button>
+            }
           />
+          
+          {/* Add direct upload button for clarity */}
+          <div className="relative">
+            <input
+              type="file"
+              id={`gallery-upload-${image.id}`}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <Button variant="outline" size="sm" className="flex items-center">
+              <Upload className="h-4 w-4 mr-1" />
+              Upload
+            </Button>
+          </div>
         </div>
         
         <div>
@@ -109,7 +126,6 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
             value={image.src}
             onChange={(e) => onUpdateImage(image.id, 'src', e.target.value)}
             placeholder="URL da imagem"
-            size="sm"
           />
         </div>
         
@@ -119,7 +135,6 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
             value={image.alt}
             onChange={(e) => onUpdateImage(image.id, 'alt', e.target.value)}
             placeholder="Descrição da imagem"
-            size="sm"
           />
         </div>
         

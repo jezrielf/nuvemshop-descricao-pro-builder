@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GalleryPreview from './components/GalleryPreview';
 import GalleryImageForm from './components/GalleryImageForm';
 import GallerySettings from './components/GallerySettings';
-import { useGalleryUpload } from './hooks/useGalleryUpload';
+import { useGalleryUpload } from '@/hooks/useGalleryUpload';
 
 interface GalleryBlockProps {
   block: GalleryBlockType;
@@ -124,8 +124,8 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
               index={index}
               totalImages={block.images.length}
               imageObjectFit={imageObjectFit}
-              uploading={uploading}
-              uploadProgress={uploadProgress}
+              uploading={!!uploading[image.id]}
+              uploadProgress={uploadProgress[image.id] || 0}
               onUpdateImage={handleUpdateImage}
               onRemoveImage={handleRemoveImage}
               onMoveImage={handleMoveImage}
