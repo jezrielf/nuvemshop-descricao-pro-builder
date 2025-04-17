@@ -24,16 +24,17 @@ const UsersPanel: React.FC = () => {
       setFilteredProfiles(profiles);
     } else {
       const lowercasedSearch = searchTerm.toLowerCase();
-      const filtered = profiles.filter(profile => 
-        (profile.nome && profile.nome.toLowerCase().includes(lowercasedSearch)) || 
-        profile.id.toLowerCase().includes(lowercasedSearch) ||
-        (profile.email && profile.email.toLowerCase().includes(lowercasedSearch)) ||
-        (profile.role && (
-          typeof profile.role === 'string' 
-            ? profile.role.toLowerCase().includes(lowercasedSearch)
-            : profile.role.some(r => r.toLowerCase().includes(lowercasedSearch))
-        ))
-      );
+      const filtered = profiles.filter(profile => {
+        // Handle array or string roles for search
+        const profileRoles = typeof profile.role === 'string' 
+          ? profile.role.split(',') 
+          : (Array.isArray(profile.role) ? profile.role : [profile.role || '']);
+        
+        return (profile.nome && profile.nome.toLowerCase().includes(lowercasedSearch)) || 
+          profile.id.toLowerCase().includes(lowercasedSearch) ||
+          (profile.email && profile.email.toLowerCase().includes(lowercasedSearch)) ||
+          profileRoles.some(r => r.toLowerCase().includes(lowercasedSearch));
+      });
       setFilteredProfiles(filtered);
     }
   }, [searchTerm, profiles]);

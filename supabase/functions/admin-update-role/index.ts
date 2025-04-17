@@ -30,27 +30,38 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Update the user's role
+    // Update the user's role - IMPORTANT: Don't use .single() here
     const { data, error: updateError } = await supabaseAdmin
       .from('profiles')
       .update({ 
         role,
         atualizado_em: new Date().toISOString() 
       })
-      .eq('id', userId)
-      .select();
+      .eq('id', userId);
     
     if (updateError) {
       console.error('Error updating role:', updateError);
       throw updateError;
     }
 
+    // After update, fetch the updated profile to return
+    const { data: profile, error: fetchError } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+      
+    if (fetchError) {
+      console.error('Error fetching updated profile:', fetchError);
+      throw fetchError;
+    }
+
     console.log('User role updated successfully for user:', userId);
-    console.log('Updated data:', data);
+    console.log('Updated profile:', profile);
 
     return new Response(
       JSON.stringify({ 
-        data, 
+        data: profile, 
         error: null 
       }),
       { 

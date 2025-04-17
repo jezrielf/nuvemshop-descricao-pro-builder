@@ -3,6 +3,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Crown, Star, User, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { getRoles } from '@/utils/roleUtils';
 
 interface UserQuickActionsProps {
   profileId: string;
@@ -15,27 +17,46 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
   currentRole, 
   onUpdateRole 
 }) => {
+  const { toast } = useToast();
+
   // Convert current role to array for easier handling
-  const roles = Array.isArray(currentRole) ? currentRole : currentRole ? [currentRole] : ['user'];
+  // Handle comma-separated string roles
+  const roles = getRoles(currentRole);
   
   const handleRoleChange = async (role: string) => {
     try {
+      let newRoles: string[];
+      
       // If the role already exists, remove it (except 'user')
       if (roles.includes(role) && role !== 'user') {
         // Create a new array without the role
-        const newRoles = roles.filter(r => r !== role);
+        newRoles = roles.filter(r => r !== role);
         // If there are no roles left, add 'user'
         if (newRoles.length === 0) {
           newRoles.push('user');
         }
-        await onUpdateRole(profileId, newRoles);
       } else if (!roles.includes(role)) {
         // Add the role to the current roles
-        const newRoles = [...roles, role];
-        await onUpdateRole(profileId, newRoles);
+        newRoles = [...roles, role];
+      } else {
+        // No change needed
+        return;
       }
+      
+      console.log(`Changing role: current=${roles.join(',')}, new=${newRoles.join(',')}`);
+      await onUpdateRole(profileId, newRoles);
+      
+      toast({
+        title: 'Papel atualizado',
+        description: `O papel do usuário foi atualizado para ${newRoles.join(', ')}`,
+      });
     } catch (error) {
       console.error(`Erro ao alterar papel para ${role}:`, error);
+      toast({
+        title: 'Erro ao atualizar papel',
+        description: error instanceof Error ? error.message : 'Erro desconhecido',
+        variant: 'destructive',
+      });
     }
   };
   

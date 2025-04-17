@@ -8,6 +8,7 @@ import { Profile } from '@/types/auth';
 import { UserFormValues } from './types';
 import UserRoleSelector from './UserRoleSelector';
 import UserQuickActions from './UserQuickActions';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserEditFormProps {
   profile: Profile;
@@ -20,24 +21,39 @@ const UserEditForm: React.FC<UserEditFormProps> = ({
   onUpdateProfile, 
   onUpdateRole 
 }) => {
+  const { toast } = useToast();
   // Get the primary role from the profile
-  const primaryRole = Array.isArray(profile.role) 
-    ? profile.role[0] || 'user' 
-    : profile.role || 'user';
+  // Convert string roles (comma-separated) to array if needed
+  const profileRoles = typeof profile.role === 'string' && profile.role.includes(',') 
+    ? profile.role.split(',') 
+    : (Array.isArray(profile.role) ? profile.role : [profile.role || 'user']);
     
   console.log('UserEditForm - profile:', profile);
-  console.log('UserEditForm - primaryRole:', primaryRole);
+  console.log('UserEditForm - profileRoles:', profileRoles);
 
   const form = useForm<UserFormValues>({
     defaultValues: {
       nome: profile.nome || '',
-      role: profile.role || 'user'
+      role: profileRoles
     }
   });
 
   const handleSubmit = async (values: UserFormValues) => {
-    console.log('Submitting form with values:', values);
-    await onUpdateProfile(values);
+    try {
+      console.log('Submitting form with values:', values);
+      await onUpdateProfile(values);
+      toast({
+        title: 'Perfil atualizado',
+        description: 'As informações do usuário foram atualizadas com sucesso',
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: 'Erro ao atualizar perfil',
+        description: error instanceof Error ? error.message : 'Erro desconhecido',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
