@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +8,7 @@ import CurrentPlanCard from '@/components/plans/CurrentPlanCard';
 import PlanCard from '@/components/plans/PlanCard';
 import { usePlanSubscription } from '@/components/plans/hooks/usePlanSubscription';
 import { supabase } from '@/integrations/supabase/client';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 // Updated interface to match the format expected by PlanCard
 interface StripePlan {
@@ -116,11 +116,8 @@ const Plans: React.FC = () => {
 
   if (plansLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 flex justify-center items-center min-h-[50vh]">
-        <div className="text-center">
-          <Loader2 className="h-10 w-10 mx-auto animate-spin text-primary" />
-          <p className="mt-4 text-lg">Carregando planos...</p>
-        </div>
+      <div className="container mx-auto py-8 px-4">
+        <LoadingSpinner size="lg" text="Carregando planos..." />
       </div>
     );
   }
