@@ -27,7 +27,7 @@ const placeholderImages = [
 
 const Index = () => {
   console.log("Index page renderizada");
-  const { loadTemplates } = useTemplateStore();
+  const { loadTemplates, templates } = useTemplateStore();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
@@ -39,13 +39,14 @@ const Index = () => {
     handleDisconnect: handleDisconnectNuvemshop
   } = useNuvemshopAuth();
   
+  // Força o carregamento dos templates na inicialização
   useEffect(() => {
     // Carrega os templates iniciais
     const initializeTemplates = async () => {
       try {
         console.log("Iniciando carregamento de templates na página inicial");
         await loadTemplates();
-        console.log("Templates carregados na inicialização");
+        console.log("Templates carregados na inicialização:", templates.length);
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
         toast({
@@ -56,20 +57,21 @@ const Index = () => {
       }
     };
     
+    // Garante que os templates são carregados
     initializeTemplates();
-    
-    // Configura um intervalo para verificar atualizações de templates a cada 5 minutos
-    const templateRefreshInterval = setInterval(() => {
-      loadTemplates()
-        .then(() => console.log("Templates atualizados no background"))
-        .catch(err => console.error("Erro ao atualizar templates no background:", err));
-    }, 5 * 60 * 1000); // 5 minutos
     
     // Pré-carrega as imagens do tutorial
     placeholderImages.forEach(src => {
       const img = new Image();
       img.src = src;
     });
+    
+    // Verifica atualizações a cada 2 minutos
+    const templateRefreshInterval = setInterval(() => {
+      loadTemplates()
+        .then(() => console.log("Templates atualizados no background"))
+        .catch(err => console.error("Erro ao atualizar templates no background:", err));
+    }, 2 * 60 * 1000); // 2 minutos
     
     // Limpar o intervalo quando o componente for desmontado
     return () => {

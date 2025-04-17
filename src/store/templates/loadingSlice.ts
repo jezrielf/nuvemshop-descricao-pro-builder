@@ -28,6 +28,8 @@ export const createLoadingSlice: StateCreator<
         console.log('Falling back to static templates...');
         const staticTemplates = getAllTemplates();
         
+        console.log(`Loaded ${staticTemplates.length} static templates`);
+        
         // Ensure each template has a valid thumbnail
         const validatedTemplates = staticTemplates.map(template => {
           if (!template.thumbnail || template.thumbnail === '/placeholder.svg') {
@@ -39,9 +41,16 @@ export const createLoadingSlice: StateCreator<
           return template;
         });
         
+        // Log validated templates
+        console.log(`Validated ${validatedTemplates.length} templates with thumbnails`);
+        
+        // Extract unique categories
+        const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
+        console.log(`Found ${categories.length} unique categories:`, categories);
+        
         set({ 
           templates: validatedTemplates,
-          categories: Array.from(new Set(validatedTemplates.map(t => t.category)))
+          categories: categories
         });
         return;
       }
@@ -64,12 +73,18 @@ export const createLoadingSlice: StateCreator<
             return template;
           });
         
+        console.log(`Processed ${templates.length} database templates with thumbnails`);
+        
         const categories = Array.from(new Set(templates.map(t => t.category)));
+        console.log(`Found ${categories.length} unique categories from DB:`, categories);
+        
         set({ templates, categories });
       } else {
         // No templates in database, load from static
         console.log('No templates in database, loading static templates');
         const staticTemplates = getAllTemplates();
+        
+        console.log(`Loaded ${staticTemplates.length} static templates (fallback)`);
         
         // Ensure each template has a valid thumbnail
         const validatedTemplates = staticTemplates.map(template => {
@@ -82,15 +97,22 @@ export const createLoadingSlice: StateCreator<
           return template;
         });
         
+        console.log(`Validated ${validatedTemplates.length} templates with thumbnails (fallback)`);
+        
+        const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
+        console.log(`Found ${categories.length} categories (fallback):`, categories);
+        
         set({ 
           templates: validatedTemplates,
-          categories: Array.from(new Set(validatedTemplates.map(t => t.category)))
+          categories: categories
         });
       }
     } catch (error) {
       console.error('Error in loadTemplates:', error);
       // Fall back to static templates
       const staticTemplates = getAllTemplates();
+      
+      console.log(`Error recovery: Loaded ${staticTemplates.length} static templates`);
       
       // Ensure each template has a valid thumbnail
       const validatedTemplates = staticTemplates.map(template => {
@@ -103,9 +125,13 @@ export const createLoadingSlice: StateCreator<
         return template;
       });
       
+      console.log(`Error recovery: Validated ${validatedTemplates.length} templates with thumbnails`);
+      
+      const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
+      
       set({ 
         templates: validatedTemplates,
-        categories: Array.from(new Set(validatedTemplates.map(t => t.category)))
+        categories: categories
       });
     }
   },
@@ -155,6 +181,8 @@ const getDefaultThumbnail = (category: ProductCategory): string => {
       return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500';
     case 'fashion':
       return 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=500';
+    case 'other':
+      return 'https://images.unsplash.com/photo-1553531384-411a247cce73?q=80&w=500';
     default:
       return 'https://images.unsplash.com/photo-1553531384-411a247cce73?q=80&w=500';
   }

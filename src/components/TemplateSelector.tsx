@@ -40,11 +40,19 @@ const TemplateSelector: React.FC = () => {
     fetchTemplates();
   }, [dialogOpen, loadTemplates]);
   
+  // Load templates immediately on component mount
+  useEffect(() => {
+    loadTemplates()
+      .then(() => console.log('Initial templates loaded in TemplateSelector, count:', templates.length))
+      .catch(error => console.error('Error loading initial templates:', error));
+  }, []);
+  
   // Refresh templates manually
   const handleRefreshTemplates = async () => {
     setIsLoading(true);
     try {
       await loadTemplates();
+      console.log('Templates refreshed, new count:', templates.length);
       toast({
         title: "Templates atualizados",
         description: "Os templates foram atualizados com sucesso.",
@@ -128,6 +136,8 @@ const TemplateSelector: React.FC = () => {
         return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500';
       case 'fashion':
         return 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=500';
+      case 'other':
+        return 'https://images.unsplash.com/photo-1553531384-411a247cce73?q=80&w=500';
       default:
         return 'https://images.unsplash.com/photo-1553531384-411a247cce73?q=80&w=500';
     }
