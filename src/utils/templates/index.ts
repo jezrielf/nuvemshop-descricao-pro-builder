@@ -15,43 +15,65 @@ import { fitnessTemplates } from './fitness';
 import { beveragesTemplates } from './beverages';
 import { waterPurifiersTemplates } from './water-purifiers';
 
-// Advanced templates array (pode ser expandido no futuro)
+// Advanced templates array
 export const advancedTemplates: Template[] = [];
 
 // Função principal para obter todos os templates
 export const getAllTemplates = (): Template[] => {
   console.log("Obtendo todos os templates estáticos");
   
-  // Combine all templates
-  const allTemplates = [
-    ...basicTemplates,
-    ...supplementsTemplates,
-    ...shoesTemplates,
-    ...electronicsTemplates,
-    ...healthTemplates,
-    ...fashionTemplates,
-    ...accessoriesTemplates,
-    ...hauteCoutureTemplates,
-    ...homeDecorTemplates,
-    ...clothingTemplates,
-    ...beautyTemplates,
-    ...fitnessTemplates,
-    ...beveragesTemplates,
-    ...waterPurifiersTemplates,
-    ...advancedTemplates
+  // Arrays de templates a serem combinados
+  const templateArrays = [
+    basicTemplates,
+    supplementsTemplates,
+    shoesTemplates,
+    electronicsTemplates,
+    healthTemplates,
+    fashionTemplates,
+    accessoriesTemplates,
+    hauteCoutureTemplates,
+    homeDecorTemplates,
+    clothingTemplates,
+    beautyTemplates,
+    fitnessTemplates,
+    beveragesTemplates,
+    waterPurifiersTemplates,
+    advancedTemplates
   ];
   
-  // Ensure each template has a valid thumbnail and category
-  const validatedTemplates = allTemplates.map(template => {
-    // Se não tem thumbnail, adicione um padrão
-    if (!template.thumbnail || template.thumbnail === '/placeholder.svg') {
-      return {
-        ...template,
-        thumbnail: getDefaultThumbnailForCategory(template.category)
-      };
-    }
-    return template;
-  });
+  // Combine all templates, filtrando arrays vazios ou indefinidos
+  const allTemplates = templateArrays
+    .filter(arr => Array.isArray(arr) && arr.length > 0)
+    .reduce((acc, curr) => [...acc, ...curr], []);
+  
+  // Certifique-se de que cada template tenha categoria e blocos válidos
+  const validatedTemplates = allTemplates
+    .filter(template => {
+      // Verifica se o template é válido (tem id, nome e blocos)
+      return template && 
+             template.id && 
+             template.name && 
+             Array.isArray(template.blocks) && 
+             template.blocks.length > 0;
+    })
+    .map(template => {
+      // Adiciona categoria padrão se não existir
+      if (!template.category) {
+        return { ...template, category: 'other' };
+      }
+      
+      // Certifica-se de que thumbnails inválidos são tratados
+      if (!template.thumbnail || 
+          template.thumbnail === '/placeholder.svg' || 
+          !template.thumbnail.startsWith('http')) {
+        return {
+          ...template,
+          thumbnail: getDefaultThumbnailForCategory(template.category)
+        };
+      }
+      
+      return template;
+    });
   
   console.log(`getAllTemplates: Retornando ${validatedTemplates.length} templates válidos`);
   

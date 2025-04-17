@@ -1,77 +1,90 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTemplateStore } from '@/store/templates';
 import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText, Star, RefreshCw } from 'lucide-react';
+import { FileText, Star, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType, ProductCategory } from '@/types/editor';
 
 const TemplateSelector: React.FC = () => {
   const { templates, categories, selectCategory, selectedCategory, loadTemplates } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
-  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   
-  // Load templates when the component mounts or dialog opens
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      if (dialogOpen) {
-        setIsLoading(true);
-        try {
-          await loadTemplates();
-          console.log('Templates loaded in TemplateSelector, count:', templates.length);
-        } catch (error) {
-          console.error('Error loading templates in TemplateSelector:', error);
-          toast({
-            title: "Erro ao carregar templates",
-            description: "Não foi possível carregar os templates. Tente novamente.",
-            variant: "destructive",
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-    
-    fetchTemplates();
-  }, [dialogOpen, loadTemplates]);
-  
-  // Load templates immediately on component mount
-  useEffect(() => {
-    loadTemplates()
-      .then(() => console.log('Initial templates loaded in TemplateSelector, count:', templates.length))
-      .catch(error => console.error('Error loading initial templates:', error));
-  }, []);
-  
-  // Refresh templates manually
-  const handleRefreshTemplates = async () => {
+  // Função reutilizável para carregar templates
+  const fetchTemplates = useCallback(async (showToast = false) => {
     setIsLoading(true);
+    setError(null);
+    
     try {
-      await loadTemplates();
-      console.log('Templates refreshed, new count:', templates.length);
-      toast({
-        title: "Templates atualizados",
-        description: "Os templates foram atualizados com sucesso.",
-      });
-    } catch (error) {
-      console.error('Error refreshing templates:', error);
-      toast({
-        title: "Erro ao atualizar templates",
-        description: "Não foi possível atualizar os templates. Tente novamente.",
-        variant: "destructive",
-      });
+      console.log('Iniciando carregamento de templates no TemplateSelector');
+      const loadedTemplates = await loadTemplates();
+      console.log(`TemplateSelector: ${loadedTemplates.length} templates carregados`);
+      
+      if (loadedTemplates.length === 0) {
+        setError("Nenhum template disponível. Tente atualizar ou contate o suporte.");
+        
+        if (showToast) {
+          toast({
+            title: "Aviso",
+            description: "Nenhum template disponível. Tente atualizar novamente.",
+            variant: "warning",
+          });
+        }
+      } else if (showToast) {
+        toast({
+          title: "Templates atualizados",
+          description: `${loadedTemplates.length} templates disponíveis`,
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao carregar templates:', err);
+      setError("Erro ao carregar templates. Tente novamente ou verifique sua conexão.");
+      
+      if (showToast) {
+        toast({
+          title: "Erro ao carregar templates",
+          description: "Não foi possível atualizar os templates. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
+  }, [loadTemplates, toast]);
+  
+  // Carrega templates quando o componente monta e quando o diálogo abre
+  useEffect(() => {
+    // Quando o diálogo é aberto, recarregamos os templates
+    if (dialogOpen) {
+      fetchTemplates();
+    }
+  }, [dialogOpen, fetchTemplates]);
+  
+  // Carrega templates imediatamente na montagem do componente
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+  
+  // Função para forçar recarregamento manual de templates
+  const handleRefreshTemplates = () => {
+    fetchTemplates(true); // true para mostrar toast
+  };
+  
+  // Função para verificar se thumbnail é válido
+  const isValidThumbnail = (url: string | undefined): boolean => {
+    return !!url && url !== '/placeholder.svg' && url.startsWith('http');
   };
   
   // Obter todos os templates quando selectedCategory for null
   const displayedTemplates = React.useMemo(() => {
-    console.log('Displaying templates. Total available:', templates.length);
+    console.log('Exibindo templates. Total disponível:', templates.length);
     return selectedCategory === null 
       ? templates  // Exibir todos os templates quando nenhuma categoria estiver selecionada
       : templates.filter(template => template.category === selectedCategory);
@@ -106,8 +119,8 @@ const TemplateSelector: React.FC = () => {
   
   // Gera uma miniatura para o template
   const getTemplateThumbnail = (template: TemplateType) => {
-    // Se o template já tem uma miniatura, use-a
-    if (template.thumbnail && template.thumbnail !== '/placeholder.svg') {
+    // Se o template já tem uma miniatura válida, use-a
+    if (isValidThumbnail(template.thumbnail)) {
       return template.thumbnail;
     }
     
@@ -146,7 +159,16 @@ const TemplateSelector: React.FC = () => {
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full flex items-center justify-center">
+        <Button 
+          variant="outline" 
+          className="w-full flex items-center justify-center"
+          onClick={() => {
+            // Carrega templates ao abrir o diálogo
+            if (!dialogOpen) {
+              fetchTemplates();
+            }
+          }}
+        >
           <FileText className="mr-2 h-5 w-5" />
           Usar Template
         </Button>
@@ -157,8 +179,9 @@ const TemplateSelector: React.FC = () => {
           <DialogDescription>
             Selecione um template para iniciar rapidamente sua descrição de produto.
             {templates.length === 0 && !isLoading && (
-              <div className="mt-2 text-yellow-600 text-sm">
-                Nenhum template encontrado. Tente atualizar a lista de templates.
+              <div className="mt-2 text-yellow-600 text-sm flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-1" />
+                {error || "Nenhum template encontrado. Tente atualizar a lista de templates."}
               </div>
             )}
           </DialogDescription>
@@ -218,6 +241,10 @@ const TemplateSelector: React.FC = () => {
                             src={getTemplateThumbnail(template)} 
                             alt={template.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Se a imagem falhar, substitui por uma padrão
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1553531384-411a247cce73?q=80&w=500';
+                            }}
                           />
                         </div>
                         <div className="p-4 flex flex-col flex-grow">
@@ -247,7 +274,16 @@ const TemplateSelector: React.FC = () => {
                     ))
                   ) : (
                     <div className="col-span-2 text-center py-8">
-                      <p className="text-muted-foreground">Nenhum template encontrado nesta categoria.</p>
+                      <p className="text-muted-foreground">{error || "Nenhum template encontrado nesta categoria."}</p>
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="mt-4"
+                        onClick={handleRefreshTemplates}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Tentar novamente
+                      </Button>
                     </div>
                   )}
                 </div>

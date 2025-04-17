@@ -25,34 +25,23 @@ export const createLoadingSlice: StateCreator<
       if (error) {
         console.error('Error loading templates from database:', error);
         // Fall back to loading from static templates
-        console.log('Falling back to static templates...');
+        console.log('Erro ao carregar do banco, usando templates estáticos...');
         const staticTemplates = getAllTemplates();
         
-        console.log(`Loaded ${staticTemplates.length} static templates`);
+        console.log(`Loaded ${staticTemplates.length} static templates after database error`);
         
-        // Ensure each template has a valid thumbnail
-        const validatedTemplates = staticTemplates.map(template => {
-          if (!template.thumbnail || template.thumbnail === '/placeholder.svg') {
-            return {
-              ...template,
-              thumbnail: getDefaultThumbnail(template.category)
-            };
-          }
-          return template;
-        });
-        
-        // Log validated templates
-        console.log(`Validated ${validatedTemplates.length} templates with thumbnails`);
+        // Validate thumbnails and format
+        const validatedTemplates = validateTemplates(staticTemplates);
         
         // Extract unique categories
         const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
-        console.log(`Found ${categories.length} unique categories:`, categories);
+        console.log(`Found ${categories.length} unique categories from static templates`);
         
         set({ 
           templates: validatedTemplates,
           categories: categories
         });
-        return;
+        return validatedTemplates;
       }
       
       // Process database templates
@@ -61,24 +50,18 @@ export const createLoadingSlice: StateCreator<
         
         const templates: Template[] = data
           .map(item => convertSupabaseToTemplate(item))
-          .filter((template): template is Template => template !== null)
-          .map(template => {
-            // Ensure each template has a valid thumbnail
-            if (!template.thumbnail || template.thumbnail === '/placeholder.svg') {
-              return {
-                ...template,
-                thumbnail: getDefaultThumbnail(template.category)
-              };
-            }
-            return template;
-          });
+          .filter((template): template is Template => template !== null);
         
-        console.log(`Processed ${templates.length} database templates with thumbnails`);
+        // Validate thumbnails and format
+        const validatedTemplates = validateTemplates(templates);
         
-        const categories = Array.from(new Set(templates.map(t => t.category)));
-        console.log(`Found ${categories.length} unique categories from DB:`, categories);
+        console.log(`Processed ${validatedTemplates.length} validated templates from database`);
         
-        set({ templates, categories });
+        const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
+        console.log(`Found ${categories.length} unique categories from database`);
+        
+        set({ templates: validatedTemplates, categories });
+        return validatedTemplates;
       } else {
         // No templates in database, load from static
         console.log('No templates in database, loading static templates');
@@ -86,26 +69,17 @@ export const createLoadingSlice: StateCreator<
         
         console.log(`Loaded ${staticTemplates.length} static templates (fallback)`);
         
-        // Ensure each template has a valid thumbnail
-        const validatedTemplates = staticTemplates.map(template => {
-          if (!template.thumbnail || template.thumbnail === '/placeholder.svg') {
-            return {
-              ...template,
-              thumbnail: getDefaultThumbnail(template.category)
-            };
-          }
-          return template;
-        });
-        
-        console.log(`Validated ${validatedTemplates.length} templates with thumbnails (fallback)`);
+        // Validate thumbnails and format
+        const validatedTemplates = validateTemplates(staticTemplates);
         
         const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
-        console.log(`Found ${categories.length} categories (fallback):`, categories);
+        console.log(`Found ${categories.length} unique categories from static templates`);
         
         set({ 
           templates: validatedTemplates,
           categories: categories
         });
+        return validatedTemplates;
       }
     } catch (error) {
       console.error('Error in loadTemplates:', error);
@@ -114,18 +88,8 @@ export const createLoadingSlice: StateCreator<
       
       console.log(`Error recovery: Loaded ${staticTemplates.length} static templates`);
       
-      // Ensure each template has a valid thumbnail
-      const validatedTemplates = staticTemplates.map(template => {
-        if (!template.thumbnail || template.thumbnail === '/placeholder.svg') {
-          return {
-            ...template,
-            thumbnail: getDefaultThumbnail(template.category)
-          };
-        }
-        return template;
-      });
-      
-      console.log(`Error recovery: Validated ${validatedTemplates.length} templates with thumbnails`);
+      // Validate thumbnails and format
+      const validatedTemplates = validateTemplates(staticTemplates);
       
       const categories = Array.from(new Set(validatedTemplates.map(t => t.category)));
       
@@ -133,6 +97,7 @@ export const createLoadingSlice: StateCreator<
         templates: validatedTemplates,
         categories: categories
       });
+      return validatedTemplates;
     }
   },
   
@@ -157,6 +122,22 @@ export const createLoadingSlice: StateCreator<
     });
   }
 });
+
+// Helper function to validate templates and ensure they have thumbnails
+const validateTemplates = (templates: Template[]): Template[] => {
+  return templates.map(template => {
+    // Ensure thumbnail exists
+    if (!template.thumbnail || 
+        template.thumbnail === '/placeholder.svg' || 
+        !template.thumbnail.startsWith('http')) {
+      return {
+        ...template,
+        thumbnail: getDefaultThumbnail(template.category)
+      };
+    }
+    return template;
+  });
+};
 
 // Helper function to get default thumbnail based on category
 const getDefaultThumbnail = (category: ProductCategory): string => {

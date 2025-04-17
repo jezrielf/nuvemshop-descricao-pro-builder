@@ -12,7 +12,6 @@ import ProductEditorController from '@/components/Nuvemshop/components/ProductEd
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
 
@@ -31,6 +30,7 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
+  const [templatesLoaded, setTemplatesLoaded] = useState(false);
   const { 
     success: storeConnected, 
     storeName, 
@@ -39,26 +39,42 @@ const Index = () => {
     handleDisconnect: handleDisconnectNuvemshop
   } = useNuvemshopAuth();
   
-  // Força o carregamento dos templates na inicialização
+  // Carrega os templates na inicialização e força recarregamento
   useEffect(() => {
-    // Carrega os templates iniciais
-    const initializeTemplates = async () => {
+    // Função para carregar templates com retry
+    const loadTemplatesWithRetry = async (retryCount = 0) => {
       try {
-        console.log("Iniciando carregamento de templates na página inicial");
+        console.log(`Tentando carregar templates (tentativa ${retryCount + 1})`);
         await loadTemplates();
-        console.log("Templates carregados na inicialização:", templates.length);
+        console.log(`Templates carregados com sucesso: ${templates.length} templates disponíveis`);
+        
+        if (templates.length === 0 && retryCount < 3) {
+          // Se não há templates e ainda temos tentativas, tente novamente após um delay
+          console.log(`Nenhum template encontrado, tentando novamente em 1 segundo...`);
+          setTimeout(() => loadTemplatesWithRetry(retryCount + 1), 1000);
+        } else {
+          setTemplatesLoaded(true);
+        }
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
-        toast({
-          title: "Erro ao carregar templates",
-          description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
-          variant: "destructive",
-        });
+        
+        if (retryCount < 3) {
+          // Tentar novamente após um delay exponencial
+          const delay = Math.pow(2, retryCount) * 1000;
+          console.log(`Erro ao carregar templates, tentando novamente em ${delay/1000} segundos...`);
+          setTimeout(() => loadTemplatesWithRetry(retryCount + 1), delay);
+        } else {
+          toast({
+            title: "Erro ao carregar templates",
+            description: "Tente atualizar a página ou entre em contato com o suporte.",
+            variant: "destructive",
+          });
+        }
       }
     };
     
-    // Garante que os templates são carregados
-    initializeTemplates();
+    // Iniciar processo de carregamento
+    loadTemplatesWithRetry();
     
     // Pré-carrega as imagens do tutorial
     placeholderImages.forEach(src => {
@@ -66,12 +82,12 @@ const Index = () => {
       img.src = src;
     });
     
-    // Verifica atualizações a cada 2 minutos
+    // Verifica atualizações a cada 5 minutos
     const templateRefreshInterval = setInterval(() => {
       loadTemplates()
         .then(() => console.log("Templates atualizados no background"))
         .catch(err => console.error("Erro ao atualizar templates no background:", err));
-    }, 2 * 60 * 1000); // 2 minutos
+    }, 5 * 60 * 1000);
     
     // Limpar o intervalo quando o componente for desmontado
     return () => {
