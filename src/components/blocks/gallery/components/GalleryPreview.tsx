@@ -11,23 +11,22 @@ const GalleryPreview: React.FC<GalleryPreviewProps> = ({ block }) => {
   const imageFitValue = block.style?.imageFit || 'contain';
   const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
   
-  // Convert columns to a normalized number
-  const columnsValue = typeof block.columns === 'number' 
-    ? block.columns 
-    : typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))
-      ? parseInt(block.columns, 10)
-      : 1;
-  
-  // Create proper Tailwind column classes based on normalized columns
+  // Create proper Tailwind column classes based on block.columns
   const getColumnsClass = () => {
-    const columns = Math.min(Math.max(Number(columnsValue), 1), 4);
+    // Convert columns from ColumnLayout to a number for grid display
+    if (typeof block.columns === 'number') {
+      const cols = Math.min(Math.max(block.columns, 1), 4);
+      return `md:grid-cols-${cols}`;
+    }
     
-    switch(columns) {
-      case 1: return '';
-      case 2: return 'md:grid-cols-2';
-      case 3: return 'md:grid-cols-3';
-      case 4: return 'md:grid-cols-4';
-      default: return '';
+    // Handle string-based column layouts
+    switch(block.columns) {
+      case '1/2': return 'md:grid-cols-2';
+      case '1/3': return 'md:grid-cols-3';
+      case '2/3': return 'md:grid-cols-2';
+      case '1/4': return 'md:grid-cols-4';
+      case '3/4': return 'md:grid-cols-1';
+      default: return ''; // Default to single column
     }
   };
   

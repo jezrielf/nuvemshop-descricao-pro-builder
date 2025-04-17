@@ -17,12 +17,17 @@ export function generateGalleryBlockHtml(block: GalleryBlock): string {
   const objectFit = imageFitValue === 'cover' ? 'cover' : 'contain';
   
   // Calculate responsive column structure (1-4 columns)
-  // Normalize columns value to a number for consistency
-  const columnsValue = typeof block.columns === 'number' 
-    ? block.columns 
-    : typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))
-      ? parseInt(block.columns, 10)
-      : 1;
+  // Convert columns from ColumnLayout to a number
+  const columnsValue = (() => {
+    if (typeof block.columns === 'number') return block.columns;
+    if (block.columns === 'full' || block.columns === '1/1') return 1;
+    if (block.columns === '1/2') return 2;
+    if (block.columns === '1/3') return 3;
+    if (block.columns === '2/3') return 2;
+    if (block.columns === '1/4') return 4;
+    if (block.columns === '3/4') return 1;
+    return 1; // Default to 1 column
+  })();
   
   // Limit to maximum of 4 columns
   const columnCount = Math.min(Math.max(Number(columnsValue), 1), 4);
