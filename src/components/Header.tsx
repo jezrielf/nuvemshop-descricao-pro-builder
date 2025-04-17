@@ -10,7 +10,6 @@ import SaveDescriptionButton from './header/SaveDescriptionButton';
 import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
-import SEOTools from './SEO/SEOTools';
 import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -127,9 +126,7 @@ const Header: React.FC = () => {
             {description && <HtmlOutputDialog />}
             
             <div className="flex items-center gap-2">
-              {description && (isPremiumUser || isBusinessUser) && (
-                <SEOTools description={description} />
-              )}
+              {/* SEO Tools button has been removed */}
               
               <AIGeneratorButton />
               
