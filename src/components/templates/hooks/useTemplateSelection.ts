@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTemplateStore } from '@/store/templates';
 import { Template } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
@@ -52,6 +52,13 @@ export const useTemplateSelection = () => {
       setIsLoading(false);
     }
   }, [loadTemplates, toast]);
+
+  // Carrega os templates quando o diálogo é aberto
+  useEffect(() => {
+    if (dialogOpen) {
+      fetchTemplates();
+    }
+  }, [dialogOpen, fetchTemplates]);
 
   // Function to manually refresh templates
   const handleRefreshTemplates = () => {

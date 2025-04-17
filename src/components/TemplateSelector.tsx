@@ -72,8 +72,9 @@ const TemplateSelector: React.FC = () => {
     }
   }, [dialogOpen, fetchTemplates]);
   
-  // Load templates immediately on component mount
+  // Garantir que os templates sejam carregados na montagem inicial
   useEffect(() => {
+    // Carregar templates imediatamente quando o componente monta
     fetchTemplates();
   }, [fetchTemplates]);
   
