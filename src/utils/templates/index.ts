@@ -59,7 +59,7 @@ export const getAllTemplates = (): Template[] => {
     .map(template => {
       // Cast category to ProductCategory to ensure type safety
       const validCategory = isValidProductCategory(template.category) 
-        ? template.category 
+        ? template.category as ProductCategory
         : 'other' as ProductCategory;
       
       // Adiciona categoria padrão se não existir ou categoria for inválida
@@ -73,7 +73,7 @@ export const getAllTemplates = (): Template[] => {
       // Ensure category is of type ProductCategory
       const templateWithValidCategory: Template = {
         ...template,
-        category: validCategory as ProductCategory
+        category: validCategory
       };
       
       // Certifica-se de que thumbnails inválidos são tratados
