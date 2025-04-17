@@ -56,11 +56,13 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
     return (
       <div className="w-full p-4">
         <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
-        <Accordion type="single" collapsible className="w-full">
-          {block.questions && block.questions.map((item, index) => (
-            <AccordionItem key={item.id} value={item.id}>
-              <AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
-              <AccordionContent>
+        <Accordion type="multiple" className="w-full space-y-2">
+          {block.questions && block.questions.map((item) => (
+            <AccordionItem key={item.id} value={item.id} className="border rounded-md overflow-hidden">
+              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left">
+                {item.question}
+              </AccordionTrigger>
+              <AccordionContent className="p-4 bg-white">
                 <div dangerouslySetInnerHTML={{ __html: item.answer }} />
               </AccordionContent>
             </AccordionItem>
