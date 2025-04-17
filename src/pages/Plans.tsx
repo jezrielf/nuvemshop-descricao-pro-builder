@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -185,7 +184,7 @@ const Plans: React.FC = () => {
       )}
       
       {authStatus && (
-        <Alert variant="warning" className="mb-6">
+        <Alert variant="default" className="mb-6">
           <ShieldAlert className="h-4 w-4" />
           <AlertTitle>Aviso de Autenticação</AlertTitle>
           <AlertDescription>
