@@ -2,6 +2,7 @@
 import { ProductDescription, Template } from '@/types/editor';
 import { EditorState } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { parseTemplateBlocks } from '@/utils/blockConverter';
 
 export const createDescriptionActions = (get: () => EditorState, set: any) => ({
   createNewDescription: (name: string) => {
@@ -27,29 +28,39 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
   loadTemplate: (template: Template) => {
     if (!get().description) return;
     
-    // Create a proper typed copy of each block
-    const updatedBlocks = template.blocks.map(templateBlock => {
-      // Create a deep copy with a new ID
-      const blockCopy = JSON.parse(JSON.stringify(templateBlock));
-      blockCopy.id = uuidv4();
+    try {
+      console.log('Loading template:', template.name);
       
-      // Ensure the block is properly typed based on its type property
-      return blockCopy;
-    });
-    
-    // Update the state with properly typed blocks
-    set((state: EditorState) => {
-      if (!state.description) return state;
+      // Create a deep copy of the template blocks
+      const templateBlocksCopy = JSON.parse(JSON.stringify(template.blocks));
       
-      return {
-        ...state,
-        selectedBlockId: null,
-        description: {
-          ...state.description,
-          blocks: updatedBlocks,
-          updatedAt: new Date().toISOString(),
-        }
-      };
-    });
+      // Parse and validate each block, ensuring it has all required properties
+      const validatedBlocks = parseTemplateBlocks(templateBlocksCopy).map(block => {
+        // Generate new IDs for each block to avoid conflicts
+        return {
+          ...block,
+          id: uuidv4()
+        };
+      });
+      
+      console.log('Validated blocks:', validatedBlocks);
+      
+      // Update the state with properly validated blocks
+      set((state: EditorState) => {
+        if (!state.description) return state;
+        
+        return {
+          ...state,
+          selectedBlockId: null,
+          description: {
+            ...state.description,
+            blocks: validatedBlocks,
+            updatedAt: new Date().toISOString(),
+          }
+        };
+      });
+    } catch (error) {
+      console.error('Error loading template:', error);
+    }
   },
 });

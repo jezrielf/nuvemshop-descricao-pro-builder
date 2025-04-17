@@ -9,7 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import BlockTypeSelector from './BlockTypeSelector';
 import BlockConfigForm from './BlockConfigForm';
 import { blockTypeInfo } from '@/utils/blockTypeInfo';
-import { createBlock } from '@/utils/blockCreators';
+import { createBlock } from '@/utils/blockCreators/createBlock';
+import { ensureBlockType } from '@/utils/typeConversion';
 
 const AddBlock: React.FC = () => {
   const { addBlock } = useEditorStore();
@@ -22,19 +23,19 @@ const AddBlock: React.FC = () => {
     if (!selectedType) return;
     
     try {
-      const blockData = createBlock(selectedType, columns);
+      console.log(`Creating new block of type: ${selectedType}`);
+      // Create the block with the selected type and columns
+      const newBlock = createBlock(selectedType, columns);
       
-      if (blockData) {
-        // Convert this block to the expected type for addBlock
-        const blockToAdd = {
-          ...blockData,
-          type: selectedType,
-          title: blockData.title,
-          columns: columns,
-          visible: true
-        };
+      if (newBlock) {
+        console.log('Block created:', newBlock);
         
-        addBlock(blockToAdd);
+        // Ensure the block has all required properties
+        const validatedBlock = ensureBlockType(newBlock);
+        console.log('Block validated:', validatedBlock);
+        
+        // Add the block to the editor
+        addBlock(validatedBlock);
         
         toast({
           title: "Bloco adicionado",

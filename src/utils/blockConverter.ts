@@ -11,7 +11,12 @@ export function parseTemplateBlocks(blocks: any[]): Block[] {
     console.warn('Invalid blocks data provided:', blocks);
     return [];
   }
-  return blocks.map(block => ensureBlockType(block));
+  
+  return blocks.map(block => {
+    // Make a deep clone to avoid reference issues
+    const blockCopy = JSON.parse(JSON.stringify(block));
+    return ensureBlockType(blockCopy);
+  });
 }
 
 /**
@@ -23,5 +28,6 @@ export function convertBlocks(blocks: any[]): Block[] {
     console.warn('Invalid blocks data provided to convertBlocks:', blocks);
     return [];
   }
+  
   return parseTemplateBlocks(blocks);
 }
