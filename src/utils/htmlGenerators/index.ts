@@ -2,11 +2,11 @@
 import { Block, BlockType } from '@/types/editor';
 import { generateHeroHtml } from './heroGenerator';
 import { generateTextHtml } from './textGenerator';
-import { generateBenefitsHtml } from './benefitsGenerator';
-import { generateFeaturesHtml } from './featuresGenerator';
-import { generateSpecificationsHtml } from './specificationsGenerator';
+import { generateBenefitsBlockHtml } from './benefitsGenerator';
+import { generateFeaturesBlockHtml } from './featuresGenerator';
+import { generateSpecificationsBlockHtml } from './specificationsGenerator';
 import { generateImageHtml } from './imageGenerator';
-import { generateGalleryHtml } from './galleryGenerator';
+import { generateGalleryBlockHtml } from './galleryGenerator';
 import { generateImageTextHtml } from './imageTextGenerator';
 import { generateTextImageHtml } from './textImageGenerator';
 import { generateFAQHtml } from './faqGenerator';
@@ -17,11 +17,11 @@ import { generateVideoBlockHtml } from './videoGenerator';
 const blockGenerators: Record<BlockType, (block: any) => string> = {
   hero: generateHeroHtml,
   text: generateTextHtml,
-  benefits: generateBenefitsHtml,
-  features: generateFeaturesHtml,
-  specifications: generateSpecificationsHtml,
+  benefits: generateBenefitsBlockHtml,
+  features: generateFeaturesBlockHtml,
+  specifications: generateSpecificationsBlockHtml,
   image: generateImageHtml,
-  gallery: generateGalleryHtml,
+  gallery: generateGalleryBlockHtml,
   imageText: generateImageTextHtml,
   textImage: generateTextImageHtml,
   faq: generateFAQHtml,
@@ -56,11 +56,11 @@ export const generateBlockHtml = (block: Block): string => {
 export {
   generateHeroHtml,
   generateTextHtml,
-  generateBenefitsHtml,
-  generateFeaturesHtml,
-  generateSpecificationsHtml,
+  generateBenefitsBlockHtml,
+  generateFeaturesBlockHtml,
+  generateSpecificationsBlockHtml,
   generateImageHtml,
-  generateGalleryHtml,
+  generateGalleryBlockHtml,
   generateImageTextHtml,
   generateTextImageHtml,
   generateFAQHtml,

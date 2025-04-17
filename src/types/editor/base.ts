@@ -37,6 +37,7 @@ export interface BlockStyle {
   lineHeight?: string;
   imageFit?: 'cover' | 'contain' | 'fill' | 'none';
   imagePosition?: string;
+  headingColor?: string; // Added for video block
   [key: string]: any;
 }
 

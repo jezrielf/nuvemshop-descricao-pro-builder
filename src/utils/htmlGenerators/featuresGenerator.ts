@@ -15,7 +15,8 @@ export function generateFeaturesBlockHtml(block: FeaturesBlock): string {
       ? parseInt(block.columns, 10)
       : 1;
   
-  const gridColumns = Math.min(Math.max(columnsValue, 1), 4); // Between 1 and 4 columns
+  // Convert to number for comparison
+  const gridColumns = Math.min(Math.max(Number(columnsValue), 1), 4); // Between 1 and 4 columns
   
   return `
     <div class="features-block my-6">

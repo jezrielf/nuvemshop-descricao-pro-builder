@@ -14,6 +14,7 @@ import { createBlock } from '@/utils/blockCreators/createBlock';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
 import { ProductCategory } from '@/types/editor';
+import ImportHtmlSection from './components/ImportHtmlSection';
 
 interface NewTemplateDialogProps {
   open: boolean;

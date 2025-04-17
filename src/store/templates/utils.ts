@@ -25,10 +25,14 @@ export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Templ
     
     // Convert category to a valid ProductCategory
     let category: ProductCategory = 'other';
-    if (supaTemplate.category && [
+    
+    // Check if it's a valid ProductCategory
+    const validCategories: ProductCategory[] = [
       'supplements', 'clothing', 'accessories', 'shoes', 
       'electronics', 'energy', 'Casa e decoração', 'other'
-    ].includes(supaTemplate.category)) {
+    ];
+    
+    if (supaTemplate.category && validCategories.includes(supaTemplate.category as ProductCategory)) {
       category = supaTemplate.category as ProductCategory;
     }
     

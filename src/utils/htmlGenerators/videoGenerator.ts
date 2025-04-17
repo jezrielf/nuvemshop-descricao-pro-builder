@@ -1,6 +1,5 @@
 
-import { VideoBlock } from "@/types/editor/blocks/VideoBlock";
-import { BlockStyle } from "@/types/editor";
+import { VideoBlock } from "@/types/editor/blocks/video";
 import { getStylesFromBlock } from "../styleConverter";
 
 // Function to extract YouTube video ID from various URL formats

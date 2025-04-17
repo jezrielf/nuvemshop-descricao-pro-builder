@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Template, Block, BlockType, ProductCategory } from '@/types/editor';
+import { Template, Block, ProductCategory } from '@/types/editor';
+import { BlockType } from '@/types/editor/base';
 import { useToast } from '@/hooks/use-toast';
 import { convertBlocks, parseTemplateBlocks } from '@/utils/blockConverter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -117,6 +118,11 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
     setPreviewBlockId(prevId => prevId === blockId ? null : blockId);
   };
 
+  const handleCategoryChange = (value: string) => {
+    // Cast the string value to ProductCategory
+    setCategory(value as ProductCategory);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden">
@@ -146,7 +152,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
               <Label htmlFor="category">Categoria</Label>
               <Select
                 value={category}
-                onValueChange={(value: ProductCategory) => setCategory(value)}
+                onValueChange={handleCategoryChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma categoria" />
@@ -258,7 +264,6 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
               </div>
             </div>
           </TabsContent>
-        </Tabs>
         
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>

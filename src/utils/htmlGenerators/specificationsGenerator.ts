@@ -15,9 +15,12 @@ export function generateSpecificationsBlockHtml(block: SpecificationsBlock): str
       ? parseInt(block.columns, 10)
       : 1;
   
-  if (columnsValue > 1) {
+  // Convert to number for comparison
+  const columnsNumber = Number(columnsValue);
+  
+  if (columnsNumber > 1) {
     // Grid layout for multiple columns
-    const gridColumns = Math.min(columnsValue, 4); // Cap at 4 columns
+    const gridColumns = Math.min(columnsNumber, 4); // Cap at 4 columns
     return `
       <div class="specifications-block my-6">
         <h2 class="text-2xl font-bold mb-4">${heading || 'Especificações'}</h2>
