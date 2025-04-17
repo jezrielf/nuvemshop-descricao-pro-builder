@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Block } from '@/types/editor';
 import HeroBlock from './HeroBlock';
@@ -12,7 +11,7 @@ import ImageTextBlock from './ImageTextBlock';
 import TextImageBlock from './TextImageBlock';
 import FAQBlock from './FAQBlock';
 import CTABlock from './CTABlock';
-import VideoBlock from './VideoBlock';
+import VideoBlock from './video';
 
 interface BlockRendererProps {
   block: Block;

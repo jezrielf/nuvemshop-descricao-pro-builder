@@ -12,7 +12,7 @@ import ImageTextBlock from '../ImageTextBlock';
 import TextImageBlock from '../TextImageBlock';
 import FAQBlock from '../FAQBlock';
 import CTABlock from '../CTABlock';
-import VideoBlock from '../VideoBlock';
+import VideoBlock from '../video';
 import { validateBaseBlock, validateBlockByType } from '@/utils/blockCreators/validation';
 
 interface BlockRendererOptions {
