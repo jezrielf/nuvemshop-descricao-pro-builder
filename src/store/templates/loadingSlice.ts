@@ -2,9 +2,9 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import { getAllTemplates } from '@/utils/templates';
 import { supabase } from '@/integrations/supabase/client';
-import { convertSupabaseToTemplate } from './utils';
+import { getAllTemplates } from '@/utils/templates';
+import { deserializeBlocks } from './utils';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -14,64 +14,72 @@ export const createLoadingSlice: StateCreator<
 > = (set, get) => ({
   loadTemplates: async () => {
     try {
-      console.log('Starting template loading process...');
+      console.log('Loading templates from database...');
       
-      // Load default templates
-      const defaultTemplates = getAllTemplates();
-      console.log('Default templates loaded, count:', defaultTemplates.length);
-      
-      // Load user templates from Supabase
-      const { data: userTemplatesData, error } = await supabase
+      // First try to load from database
+      const { data, error } = await supabase
         .from('templates')
         .select('*')
-        .order('updated_at', { ascending: false });
+        .order('created_at', { ascending: false });
       
       if (error) {
         console.error('Error loading templates from database:', error);
-        throw error;
+        // Fall back to loading from static templates
+        console.log('Falling back to static templates...');
+        const staticTemplates = getAllTemplates();
+        set({ 
+          templates: staticTemplates,
+          categories: Array.from(new Set(staticTemplates.map(t => t.category)))
+        });
+        return;
       }
       
-      console.log('User templates from database:', userTemplatesData?.length || 0);
-      
-      // Convert Supabase templates
-      const userTemplates = (userTemplatesData || [])
-        .map(template => convertSupabaseToTemplate(template))
-        .filter((template): template is Template => template !== null);
-      
-      // Combine templates and extract categories
-      const allTemplates = [...defaultTemplates, ...userTemplates];
-      const templateCategories = Array.from(
-        new Set(allTemplates.map(template => template.category))
-      );
-      
-      set({ templates: allTemplates, categories: templateCategories });
-      console.log('Template store updated successfully');
+      // Process database templates
+      if (data && data.length > 0) {
+        console.log(`Loaded ${data.length} templates from database`);
+        
+        const templates: Template[] = data.map(item => ({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          blocks: deserializeBlocks(item.blocks),
+          thumbnail: item.thumbnail || '/placeholder.svg'
+        }));
+        
+        const categories = Array.from(new Set(templates.map(t => t.category)));
+        set({ templates, categories });
+      } else {
+        // No templates in database, load from static
+        console.log('No templates in database, loading static templates');
+        const staticTemplates = getAllTemplates();
+        set({ 
+          templates: staticTemplates,
+          categories: Array.from(new Set(staticTemplates.map(t => t.category)))
+        });
+      }
     } catch (error) {
-      console.error('Critical error in loadTemplates:', error);
-      const defaultTemplates = getAllTemplates();
-      set({
-        templates: defaultTemplates,
-        categories: Array.from(new Set(defaultTemplates.map(t => t.category)))
+      console.error('Error in loadTemplates:', error);
+      // Fall back to static templates
+      const staticTemplates = getAllTemplates();
+      set({ 
+        templates: staticTemplates,
+        categories: Array.from(new Set(staticTemplates.map(t => t.category)))
       });
     }
   },
   
-  getTemplatesByCategory: (category) => {
+  searchTemplates: (query, category) => {
     const { templates } = get();
-    if (!category) return templates;
-    return templates.filter(template => template.category === category);
-  },
-  
-  searchTemplates: (searchTerm, category) => {
-    const { templates } = get();
+    
+    if (!query && !category) return templates;
+    
     return templates.filter(template => {
-      const matchesSearch = searchTerm 
-        ? template.name.toLowerCase().includes(searchTerm.toLowerCase())
-        : true;
-      const matchesCategory = category 
-        ? template.category === category
-        : true;
-      return matchesSearch && matchesCategory;
+      const matchesQuery = !query || 
+        template.name.toLowerCase().includes(query.toLowerCase());
+      
+      const matchesCategory = !category || template.category === category;
+      
+      return matchesQuery && matchesCategory;
     });
   }
 });

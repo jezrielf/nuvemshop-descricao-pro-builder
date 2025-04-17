@@ -189,6 +189,11 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                     <SelectItem value="accessories">Acessórios</SelectItem>
                     <SelectItem value="shoes">Calçados</SelectItem>
                     <SelectItem value="electronics">Eletrônicos</SelectItem>
+                    <SelectItem value="health">Saúde</SelectItem>
+                    <SelectItem value="beauty">Beleza</SelectItem>
+                    <SelectItem value="fashion">Moda</SelectItem>
+                    <SelectItem value="haute-couture">Alta Costura</SelectItem>
+                    <SelectItem value="home-decor">Casa e Decoração</SelectItem>
                     <SelectItem value="energy">Energia</SelectItem>
                     <SelectItem value="other">Outro</SelectItem>
                   </SelectContent>

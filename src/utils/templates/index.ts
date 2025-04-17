@@ -8,6 +8,7 @@ import { healthTemplates } from './health';
 import { fashionTemplates } from './fashion';
 import { accessoriesTemplates } from './accessories';
 import { hauteCoutureTemplates } from './hauteCouture';
+import { homeDecorTemplates } from './home-decor';
 
 // Combining all templates
 export const advancedTemplates: Template[] = [
@@ -17,7 +18,8 @@ export const advancedTemplates: Template[] = [
   ...healthTemplates,
   ...fashionTemplates,
   ...accessoriesTemplates,
-  ...hauteCoutureTemplates
+  ...hauteCoutureTemplates,
+  ...homeDecorTemplates
 ];
 
 export const getAllTemplates = (): Template[] => {
@@ -32,3 +34,4 @@ export * from './health';
 export * from './fashion';
 export * from './accessories';
 export * from './hauteCouture';
+export * from './home-decor';

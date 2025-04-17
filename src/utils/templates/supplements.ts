@@ -1,15 +1,15 @@
 
-import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 
 // Supplements Template Collection
 export const supplementsTemplates: Template[] = [
-  // TEMPLATE 1: Sports Supplements
+  // TEMPLATE 1: Modern Supplements Landing Page
   {
     id: uuidv4(),
-    name: 'Suplementos Esportivos',
+    name: 'Suplementos Premium',
     category: 'supplements',
-    thumbnail: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd',
+    thumbnail: 'https://images.unsplash.com/photo-1581009137042-c552e485697a',
     blocks: [
       // Hero Block
       {
@@ -18,15 +18,15 @@ export const supplementsTemplates: Template[] = [
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Suplementos de Alta Performance',
-        subheading: 'Aumente sua energia e alcance seus objetivos',
-        buttonText: 'Compre Agora',
-        buttonUrl: '/suplementos',
-        backgroundImage: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd',
+        heading: 'Potencialize seus Resultados',
+        subheading: 'Suplementos de alta qualidade para o máximo desempenho',
+        buttonText: 'Conhecer Produtos',
+        buttonUrl: '#products',
+        backgroundImage: 'https://images.unsplash.com/photo-1581009137042-c552e485697a',
         style: {
-          backgroundColor: '#f7f7f7',
-          headingColor: '#000000',
-          textColor: '#333333',
+          backgroundColor: '#0d0d0d',
+          headingColor: '#ffffff',
+          textColor: '#f0f0f0',
           padding: 'lg',
           blockSpacing: 'md'
         }
@@ -38,65 +38,48 @@ export const supplementsTemplates: Template[] = [
         title: 'Benefícios',
         columns: 3,
         visible: true,
-        heading: 'Nossos Suplementos Oferecem',
+        heading: 'Por que escolher nossos suplementos',
         benefits: [
           {
             id: uuidv4(),
-            title: 'Aumento de Energia',
-            description: 'Sinta-se mais disposto para seus treinos',
-            icon: "⚡"
+            title: 'Ingredientes Premium',
+            description: 'Matérias-primas selecionadas e testadas para máxima pureza',
+            icon: '⭐'
           },
           {
             id: uuidv4(),
-            title: 'Recuperação Muscular',
-            description: 'Recupere-se mais rápido entre os treinos',
-            icon: "💪"
+            title: 'Fórmulas Cientificamente Testadas',
+            description: 'Desenvolvidas com base em estudos científicos avançados',
+            icon: '🔬'
           },
           {
             id: uuidv4(),
-            title: 'Ganho de Massa',
-            description: 'Construa músculos mais facilmente',
-            icon: "🏋️"
+            title: 'Produção Certificada',
+            description: 'Fabricados em laboratórios com certificação GMP',
+            icon: '✅'
           },
           {
             id: uuidv4(),
-            title: 'Foco Mental',
-            description: 'Melhore sua concentração durante os exercícios',
-            icon: "🧠"
+            title: 'Resultados Comprovados',
+            description: 'Eficácia demonstrada em testes clínicos',
+            icon: '📈'
           },
           {
             id: uuidv4(),
-            title: 'Nutrição Completa',
-            description: 'Vitaminas e minerais essenciais para seu corpo',
-            icon: "🥗"
+            title: 'Sem Aditivos Artificiais',
+            description: 'Formulações livres de corantes e conservantes nocivos',
+            icon: '🌿'
           },
           {
             id: uuidv4(),
-            title: 'Resultado Garantido',
-            description: 'Fórmulas testadas e aprovadas por atletas',
-            icon: "✅"
+            title: 'Absorção Superior',
+            description: 'Tecnologia que garante melhor biodisponibilidade',
+            icon: '💪'
           }
         ],
         style: {
           backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Text Block
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Descrição',
-        columns: 1,
-        visible: true,
-        heading: 'Sobre Nossos Suplementos',
-        content: '<p>Nossos suplementos são formulados com ingredientes de alta qualidade para garantir o máximo desempenho e resultados. Cada produto é desenvolvido por especialistas em nutrição esportiva e testado rigorosamente para assegurar sua eficácia e segurança.</p><p>Utilizamos processos de fabricação avançados que preservam a integridade dos nutrientes, garantindo que você receba todos os benefícios em cada dose. Nossos produtos são livres de substâncias proibidas e seguem os mais altos padrões de qualidade da indústria.</p>',
-        style: {
-          backgroundColor: '#f7f7f7',
-          headingColor: '#000000',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
@@ -112,76 +95,127 @@ export const supplementsTemplates: Template[] = [
         images: [
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1579722820903-01d3d6a3e6fc',
-            alt: 'Whey Protein',
-            caption: 'Whey Protein Premium'
+            src: 'https://images.unsplash.com/photo-1579310962131-aa21f240d986',
+            alt: 'Proteína Whey Premium',
+            caption: 'Whey Protein Isolado'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1616606103915-dea7be788566',
+            src: 'https://images.unsplash.com/photo-1579722820258-c3c889d39160',
             alt: 'BCAA',
-            caption: 'BCAA 2:1:1'
+            caption: 'BCAA 4:1:1 Premium'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1611079830811-dad04e2a1bdb',
+            src: 'https://images.unsplash.com/photo-1606889464198-fcb18894cf50',
             alt: 'Creatina',
             caption: 'Creatina Monohidratada'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1532635248-cdd3d399f56c',
+            alt: 'Pré-Treino',
+            caption: 'Ultimate Pre-Workout'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1578668577946-2f7065013d5e',
+            alt: 'Multivitamínico',
+            caption: 'Multivitamínico Performance'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1554384557-23889e050ffd',
+            alt: 'Termogênico',
+            caption: 'Termogênico Advanced'
           }
         ],
         style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
+          backgroundColor: '#f5f5f5',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
+          blockSpacing: 'md'
         }
       },
-      // CTA Block
+      // Video Block
       {
         id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
+        type: 'video',
+        title: 'Vídeo Demonstrativo',
         columns: 1,
         visible: true,
-        heading: 'Potencialize seus Resultados',
-        content: 'Descubra como nossos suplementos podem ajudar você a atingir o próximo nível em seus treinos.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#comprar',
+        videoUrl: 'https://www.youtube.com/watch?v=_Gp1RbR2EEA',
+        autoplay: false,
+        heading: 'Conheça Nosso Processo de Produção',
+        caption: 'Qualidade em cada etapa',
+        description: 'Veja como nossos suplementos são produzidos, desde a seleção de ingredientes até o controle de qualidade final.',
         style: {
-          backgroundColor: '#00a8e8',
+          backgroundColor: '#000000',
           headingColor: '#ffffff',
-          textColor: '#ffffff',
+          textColor: '#f0f0f0',
           padding: 'lg',
-          blockSpacing: 'none'
+          blockSpacing: 'md'
         }
-      }
-    ]
-  },
-  
-  // TEMPLATE 2: Natural Supplements
-  {
-    id: uuidv4(),
-    name: 'Suplementos Naturais',
-    category: 'supplements',
-    thumbnail: 'https://images.unsplash.com/photo-1597773150796-e5c14ebecbf5',
-    blocks: [
-      // Hero Block
+      },
+      // ImageText Block
       {
         id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
+        type: 'imageText',
+        title: 'Tecnologia Avançada',
         columns: 1,
         visible: true,
-        heading: 'A Nutrição que a Natureza Oferece',
-        subheading: 'Suplementos 100% naturais para uma vida mais saudável',
-        buttonText: 'Descobrir',
-        buttonUrl: '#natural',
-        backgroundImage: 'https://images.unsplash.com/photo-1597773150796-e5c14ebecbf5',
+        image: {
+          src: 'https://images.unsplash.com/photo-1581089778245-3ce67677f718',
+          alt: 'Laboratório de pesquisa'
+        },
+        heading: 'Tecnologia de Microencapsulação',
+        content: 'Nossos suplementos utilizam a mais avançada tecnologia de microencapsulação, que protege os nutrientes durante o processo digestivo, garantindo sua liberação no momento e local adequados para máxima absorção. Isso significa que você obtém mais benefícios de cada dose, otimizando seus resultados.',
         style: {
-          backgroundColor: '#f0f7ee',
-          headingColor: '#2d6a4f',
+          backgroundColor: '#ffffff',
+          headingColor: '#111111',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Features Block
+      {
+        id: uuidv4(),
+        type: 'features',
+        title: 'Diferenciais',
+        columns: 2,
+        visible: true,
+        heading: 'O que nos diferencia',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Matéria-Prima Importada',
+            description: 'Ingredientes dos mais respeitados fornecedores internacionais',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Testes de Pureza',
+            description: 'Cada lote é testado para garantir ausência de contaminantes',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Equipe de Pesquisa',
+            description: 'Fórmulas desenvolvidas por cientistas e nutricionistas esportivos',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Sabores Naturais',
+            description: 'Aromatizantes naturais para um sabor excepcional',
+            icon: '✓'
+          }
+        ],
+        style: {
+          backgroundColor: '#f5f5f5',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
@@ -191,90 +225,35 @@ export const supplementsTemplates: Template[] = [
       {
         id: uuidv4(),
         type: 'text',
-        title: 'Nossa Filosofia',
+        title: 'Nossa Missão',
         columns: 1,
         visible: true,
-        heading: 'O Poder dos Ingredientes Naturais',
-        content: '<p>Acreditamos que a natureza oferece tudo o que precisamos para uma saúde plena. Nossos suplementos naturais são cuidadosamente formulados utilizando apenas ingredientes orgânicos de alta qualidade, sem aditivos químicos, conservantes artificiais ou organismos geneticamente modificados.</p><p>Cada produto é desenvolvido para trabalhar em harmonia com seu corpo, proporcionando nutrição de forma suave e eficaz, como a natureza pretendia.</p>',
+        heading: 'Compromisso com sua Performance',
+        content: '<p>Nossa missão é fornecer suplementos nutricionais da mais alta qualidade, desenvolvidos com base na ciência mais avançada, para ajudar atletas e entusiastas do fitness a alcançarem seu potencial máximo.</p><p>Acreditamos que a suplementação adequada, combinada com treinamento e alimentação balanceada, é fundamental para quem busca resultados superiores, seja na performance esportiva, na composição corporal ou na saúde geral.</p><p>Por isso, investimos continuamente em pesquisa e desenvolvimento, buscando sempre as melhores matérias-primas e tecnologias de produção para oferecer produtos que realmente fazem a diferença.</p>',
         style: {
           backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // ImageText Block
+      // TextImage Block
       {
         id: uuidv4(),
-        type: 'imageText',
-        title: 'Nosso Processo',
+        type: 'textImage',
+        title: 'Consultoria Nutricional',
         columns: 1,
         visible: true,
         image: {
-          src: 'https://images.unsplash.com/photo-1518465444133-2b3d0dceb29a',
-          alt: 'Processamento de suplementos naturais'
+          src: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438',
+          alt: 'Nutricionista esportivo'
         },
-        heading: 'Da Natureza ao Frasco',
-        content: 'Mantemos a integridade dos nutrientes através de um processo de fabricação suave e de baixa temperatura. Colhemos os ingredientes no momento ideal e utilizamos métodos de extração que preservam seus componentes ativos. Isso garante que você receba o máximo de benefícios que a natureza tem a oferecer em cada dose dos nossos suplementos.',
+        heading: 'Suporte Especializado',
+        content: 'Todos os nossos clientes têm acesso a consultoria nutricional especializada para maximizar os resultados com nossos produtos. Nossa equipe de nutricionistas esportivos está pronta para criar um plano personalizado que integre suplementação, alimentação e treinamento de acordo com seus objetivos específicos.',
         style: {
-          backgroundColor: '#f0f7ee',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Benefits Block
-      {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Benefícios',
-        columns: 3,
-        visible: true,
-        heading: 'Por que escolher suplementos naturais?',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Sem Químicos',
-            description: 'Livres de corantes, aromatizantes e conservantes artificiais',
-            icon: '🌱'
-          },
-          {
-            id: uuidv4(),
-            title: 'Biodisponibilidade',
-            description: 'Seu corpo absorve melhor os nutrientes de fontes naturais',
-            icon: '🔄'
-          },
-          {
-            id: uuidv4(),
-            title: 'Sustentabilidade',
-            description: 'Práticas de cultivo e produção que respeitam o meio ambiente',
-            icon: '🌍'
-          },
-          {
-            id: uuidv4(),
-            title: 'Sinergia Natural',
-            description: 'Combinações de ingredientes que potencializam os efeitos um do outro',
-            icon: '⚡'
-          },
-          {
-            id: uuidv4(),
-            title: 'Menos Efeitos Colaterais',
-            description: 'Gentil com seu organismo, minimizando reações adversas',
-            icon: '😌'
-          },
-          {
-            id: uuidv4(),
-            title: 'Nutrição Completa',
-            description: 'Complexos naturais com todos os cofatores necessários',
-            icon: '🍃'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
+          backgroundColor: '#f5f5f5',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
@@ -287,17 +266,17 @@ export const supplementsTemplates: Template[] = [
         title: 'Especificações',
         columns: 1,
         visible: true,
-        heading: 'Especificações dos Nossos Produtos',
+        heading: 'Detalhes Técnicos',
         specs: [
-          { id: uuidv4(), name: 'Certificações', value: 'Orgânico, Non-GMO, Vegano' },
-          { id: uuidv4(), name: 'Processo', value: 'Extração a frio para preservar nutrientes' },
-          { id: uuidv4(), name: 'Embalagem', value: 'Sustentável e reciclável' },
-          { id: uuidv4(), name: 'Testes', value: 'Testado para pureza e potência' },
-          { id: uuidv4(), name: 'Armazenamento', value: 'Local fresco e seco, protegido da luz' }
+          { id: uuidv4(), name: 'Certificações', value: 'GMP, ISO 9001, ANVISA' },
+          { id: uuidv4(), name: 'Testes', value: 'Pureza, contaminantes, valor biológico' },
+          { id: uuidv4(), name: 'Produção', value: 'Laboratório próprio com tecnologia de ponta' },
+          { id: uuidv4(), name: 'Validade', value: '24 meses após a data de fabricação' },
+          { id: uuidv4(), name: 'Armazenamento', value: 'Local seco e arejado, temperatura ambiente' }
         ],
         style: {
-          backgroundColor: '#f0f7ee',
-          headingColor: '#2d6a4f',
+          backgroundColor: '#ffffff',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
@@ -314,210 +293,31 @@ export const supplementsTemplates: Template[] = [
         questions: [
           {
             id: uuidv4(),
-            question: 'Os suplementos naturais são tão eficazes quanto os sintéticos?',
-            answer: 'Sim, muitos estudos mostram que nutrientes de fontes naturais têm melhor biodisponibilidade e oferecem benefícios adicionais devido aos cofatores naturalmente presentes.'
+            question: 'Qual o melhor momento para consumir proteína?',
+            answer: 'O momento ideal varia de acordo com seus objetivos. Para recuperação muscular, o período pós-treino (30-60 minutos) é eficaz. Para ganho de massa, distribuir o consumo ao longo do dia é recomendado. Antes de dormir, a caseína pode ser benéfica para liberação lenta de aminoácidos durante a noite.'
           },
           {
             id: uuidv4(),
-            question: 'Quanto tempo leva para ver resultados?',
-            answer: 'Os suplementos naturais funcionam gradualmente com seu corpo. A maioria das pessoas começa a notar benefícios após 2-4 semanas de uso consistente.'
+            question: 'A creatina causa retenção de líquido?',
+            answer: 'Sim, a creatina pode causar retenção hídrica intracelular (dentro da célula muscular), o que é benéfico para performance e síntese proteica. Esta retenção não é subcutânea (sob a pele) e contribui para o volume e performance muscular.'
           },
           {
             id: uuidv4(),
-            question: 'São adequados para veganos?',
-            answer: 'Sim, todos os nossos produtos são 100% veganos e livres de qualquer ingrediente de origem animal.'
+            question: 'Os suplementos são testados para substâncias proibidas?',
+            answer: 'Sim, todos os nossos produtos passam por rigorosos testes para garantir que estão livres de substâncias proibidas no esporte. Trabalhamos com laboratórios certificados e seguimos padrões internacionais de controle de qualidade.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Como sei qual suplemento é adequado para meus objetivos?',
+            answer: 'Recomendamos consultar nossa equipe de nutricionistas para uma recomendação personalizada. Em geral, para ganho de massa muscular, proteínas e creatina são fundamentais. Para performance, pré-treinos e BCAAs podem ser benéficos. Para emagrecimento, termogênicos e proteínas podem auxiliar.'
           }
         ],
         style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
+          backgroundColor: '#f5f5f5',
+          headingColor: '#111111',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 3: Weight Management Supplements
-  {
-    id: uuidv4(),
-    name: 'Suplementos para Gerenciamento de Peso',
-    category: 'supplements',
-    thumbnail: 'https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Alcance Seus Objetivos de Forma Saudável',
-        subheading: 'Suplementos avançados para ajudar em sua jornada de gerenciamento de peso',
-        buttonText: 'Transforme seu Corpo',
-        buttonUrl: '#weight-management',
-        backgroundImage: 'https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14',
-        style: {
-          backgroundColor: '#f0f0f0',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Benefits Block
-      {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Principais Benefícios',
-        columns: 2,
-        visible: true,
-        heading: 'Como Nossos Suplementos Podem Ajudar',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Aumento do Metabolismo',
-            description: 'Ingredientes termogênicos que ajudam a queimar calorias de forma mais eficiente',
-            icon: '🔥'
-          },
-          {
-            id: uuidv4(),
-            title: 'Controle do Apetite',
-            description: 'Ajuda a reduzir a fome e os desejos por alimentos calóricos',
-            icon: '🍽️'
-          },
-          {
-            id: uuidv4(),
-            title: 'Níveis de Energia',
-            description: 'Melhora a disposição durante o dia, especialmente em períodos de déficit calórico',
-            icon: '⚡'
-          },
-          {
-            id: uuidv4(),
-            title: 'Preservação Muscular',
-            description: 'Ajuda a manter a massa muscular durante a perda de peso',
-            icon: '💪'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Features Block
-      {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Ingredientes Principais',
-        columns: 2,
-        visible: true,
-        heading: 'Componentes Ativos',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Chá Verde',
-            description: 'Rico em catequinas que auxiliam na queima de gordura e no metabolismo',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Garcinia Cambogia',
-            description: 'Contém HCA que ajuda a bloquear enzimas que produzem gordura',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'L-Carnitina',
-            description: 'Transporta ácidos graxos para serem usados como energia',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Cromo',
-            description: 'Mineral que ajuda a regular os níveis de açúcar no sangue',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Glucomanano',
-            description: 'Fibra natural que aumenta a saciedade',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Cafeína',
-            description: 'Estimulante natural que aumenta a energia e o foco',
-            icon: '✓'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // ImageText Block
-      {
-        id: uuidv4(),
-        type: 'imageText',
-        title: 'Abordagem Científica',
-        columns: 1,
-        visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1551727974-8af20a3b41b2',
-          alt: 'Pesquisa científica de suplementos'
-        },
-        heading: 'Baseado em Ciência',
-        content: 'Nossos suplementos para gerenciamento de peso são desenvolvidos por uma equipe de nutricionistas e cientistas com base nas mais recentes pesquisas. Cada ingrediente é cuidadosamente selecionado e dosado para trabalhar em sinergia, maximizando os resultados de forma segura e saudável.',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Linha de Produtos',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1505751171710-1f6d0ace5a85',
-            alt: 'Termogênico',
-            caption: 'Termogênico Avançado'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1607004772621-ec30a8a512e6',
-            alt: 'Controlador de apetite',
-            caption: 'Controlador de Apetite Natural'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1611079830811-dad04e2a1bdb',
-            alt: 'Bloqueador de carboidratos',
-            caption: 'Bloqueador de Carboidratos'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
         }
       },
       // CTA Block
@@ -527,12 +327,368 @@ export const supplementsTemplates: Template[] = [
         title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Comece Sua Transformação Hoje',
-        content: 'Nossos suplementos são parte de uma abordagem completa para gerenciamento de peso saudável, incluindo dieta equilibrada e exercícios regulares.',
-        buttonText: 'Começar Agora',
-        buttonUrl: '#start',
+        heading: 'Leve seus resultados para o próximo nível',
+        content: 'Experimente a diferença que suplementos de alta qualidade podem fazer em sua performance e resultados.',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#buy',
         style: {
-          backgroundColor: '#1e3a8a',
+          backgroundColor: '#111111',
+          headingColor: '#ffffff',
+          textColor: '#f0f0f0',
+          padding: 'lg',
+          blockSpacing: 'none'
+        }
+      }
+    ]
+  },
+  
+  // TEMPLATE 2: Natural Supplements Landing Page
+  {
+    id: uuidv4(),
+    name: 'Suplementos Naturais',
+    category: 'supplements',
+    thumbnail: 'https://images.unsplash.com/photo-1610725663727-08695a1ac3ff',
+    blocks: [
+      // Hero Block
+      {
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        columns: 1,
+        visible: true,
+        heading: 'Nutrição Natural para Bem-Estar',
+        subheading: 'Suplementos orgânicos para uma vida mais saudável',
+        buttonText: 'Descobrir',
+        buttonUrl: '#discover',
+        backgroundImage: 'https://images.unsplash.com/photo-1610725663727-08695a1ac3ff',
+        style: {
+          backgroundColor: '#e8f3e8',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Text Block
+      {
+        id: uuidv4(),
+        type: 'text',
+        title: 'Nossa Filosofia',
+        columns: 1,
+        visible: true,
+        heading: 'O Poder da Natureza',
+        content: '<p>Acreditamos que a natureza oferece todos os nutrientes que nosso corpo precisa para funcionar em seu potencial máximo. Por isso, desenvolvemos suplementos 100% naturais, feitos apenas com ingredientes orgânicos, sustentáveis e da mais alta qualidade.</p><p>Nossa filosofia se baseia em três pilares: pureza, potência e sustentabilidade. Cada produto é cuidadosamente formulado para fornecer nutrientes biodisponíveis que trabalham em sinergia com seu organismo, sem aditivos artificiais ou substâncias questionáveis.</p><p>Junte-se a nós nessa jornada de saúde verdadeiramente natural.</p>',
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Benefits Block
+      {
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Benefícios',
+        columns: 3,
+        visible: true,
+        heading: 'Vantagens dos Suplementos Naturais',
+        benefits: [
+          {
+            id: uuidv4(),
+            title: '100% Orgânico',
+            description: 'Ingredientes cultivados sem pesticidas ou fertilizantes químicos',
+            icon: '🌱'
+          },
+          {
+            id: uuidv4(),
+            title: 'Sem Aditivos',
+            description: 'Livre de corantes, conservantes e aromas artificiais',
+            icon: '✨'
+          },
+          {
+            id: uuidv4(),
+            title: 'Certificação Orgânica',
+            description: 'Produtos certificados por órgãos internacionais',
+            icon: '📜'
+          },
+          {
+            id: uuidv4(),
+            title: 'Biodisponibilidade Superior',
+            description: 'Formulações que maximizam a absorção dos nutrientes',
+            icon: '⚡'
+          },
+          {
+            id: uuidv4(),
+            title: 'Sustentável',
+            description: 'Embalagens eco-friendly e processos sustentáveis',
+            icon: '♻️'
+          },
+          {
+            id: uuidv4(),
+            title: 'Testado Clinicamente',
+            description: 'Eficácia comprovada em estudos científicos',
+            icon: '🔬'
+          }
+        ],
+        style: {
+          backgroundColor: '#f8f9f8',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Gallery Block
+      {
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Nossos Produtos',
+        columns: 3,
+        visible: true,
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1616117469323-1ec784a3a556',
+            alt: 'Proteína Vegana',
+            caption: 'Proteína Vegetal Orgânica'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1579543767390-cf66a435f1ad',
+            alt: 'Multivitamínico Natural',
+            caption: 'Multivitamínico de Frutas e Vegetais'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1524592485187-145046de8ed4',
+            alt: 'Superalimentos',
+            caption: 'Blend de Superalimentos'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1515364429925-94d2b5ab3bd2',
+            alt: 'Ômega 3 de Algas',
+            caption: 'Ômega 3 Vegano'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1598258334998-a2c138a6a653',
+            alt: 'Probióticos',
+            caption: 'Probióticos Orgânicos'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1542444592-f2bf83d33930',
+            alt: 'Vitamina D Natural',
+            caption: 'Vitamina D de Origem Natural'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Video Block
+      {
+        id: uuidv4(),
+        type: 'video',
+        title: 'Vídeo Institucional',
+        columns: 1,
+        visible: true,
+        videoUrl: 'https://www.youtube.com/watch?v=zFzR3oj4cAc',
+        autoplay: false,
+        heading: 'Da Natureza para Você',
+        caption: 'Conheça nossa história e valores',
+        description: 'Descubra como cultivamos, selecionamos e processamos cuidadosamente cada ingrediente para garantir suplementos verdadeiramente naturais e eficazes.',
+        style: {
+          backgroundColor: '#f8f9f8',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // TextImage Block
+      {
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Ingredientes Orgânicos',
+        columns: 1,
+        visible: true,
+        image: {
+          src: 'https://images.unsplash.com/photo-1573246123716-6b1782bfc499',
+          alt: 'Fazenda orgânica'
+        },
+        heading: 'Cultivados com Respeito',
+        content: 'Nossos ingredientes são cultivados em fazendas orgânicas certificadas, onde o solo é tratado com respeito e sem uso de pesticidas ou fertilizantes químicos. Trabalhamos diretamente com pequenos produtores que compartilham nossa visão de sustentabilidade e qualidade, garantindo matérias-primas superiores e apoiando comunidades agrícolas.',
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Image Block
+      {
+        id: uuidv4(),
+        type: 'image',
+        title: 'Certificações',
+        columns: 1,
+        visible: true,
+        src: 'https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38',
+        alt: 'Certificações orgânicas',
+        caption: 'Nossos produtos são certificados pelos principais órgãos reguladores internacionais',
+        style: {
+          backgroundColor: '#f8f9f8',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Features Block
+      {
+        id: uuidv4(),
+        type: 'features',
+        title: 'Diferenciais',
+        columns: 2,
+        visible: true,
+        heading: 'O que nos torna únicos',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Processamento a Frio',
+            description: 'Preserva nutrientes e enzimas naturais',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Transparência Total',
+            description: 'Rastreabilidade de todos os ingredientes',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Fórmulas Sinérgicas',
+            description: 'Nutrientes que trabalham em conjunto para potencializar resultados',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Especialistas em Fitoterapia',
+            description: 'Equipe com mais de 20 anos de experiência em plantas medicinais',
+            icon: '✓'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // ImageText Block
+      {
+        id: uuidv4(),
+        type: 'imageText',
+        title: 'Processamento Cuidadoso',
+        columns: 1,
+        visible: true,
+        image: {
+          src: 'https://images.unsplash.com/photo-1563178993-61895b25e504',
+          alt: 'Laboratório de produção natural'
+        },
+        heading: 'Tecnologia que Preserva a Natureza',
+        content: 'Utilizamos métodos de processamento de baixa temperatura que preservam as propriedades naturais das plantas e nutrientes. Nossa tecnologia exclusiva mantém intactos compostos sensíveis como enzimas e antioxidantes, garantindo suplementos verdadeiramente vivos e bioativos.',
+        style: {
+          backgroundColor: '#f8f9f8',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Specifications Block
+      {
+        id: uuidv4(),
+        type: 'specifications',
+        title: 'Especificações',
+        columns: 1,
+        visible: true,
+        heading: 'Características dos Produtos',
+        specs: [
+          { id: uuidv4(), name: 'Origem', value: 'Ingredientes 100% orgânicos e vegetais' },
+          { id: uuidv4(), name: 'Certificações', value: 'USDA Organic, Ecocert, IBD, Non-GMO' },
+          { id: uuidv4(), name: 'Embalagem', value: 'Vidro âmbar ou materiais biodegradáveis' },
+          { id: uuidv4(), name: 'Forma', value: 'Disponível em pó, cápsulas vegetais e líquido' },
+          { id: uuidv4(), name: 'Armazenamento', value: 'Preferencialmente em local fresco e protegido da luz' }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // FAQ Block
+      {
+        id: uuidv4(),
+        type: 'faq',
+        title: 'Perguntas Frequentes',
+        columns: 1,
+        visible: true,
+        heading: 'Dúvidas Comuns',
+        questions: [
+          {
+            id: uuidv4(),
+            question: 'Quais as vantagens dos suplementos naturais frente aos sintéticos?',
+            answer: 'Suplementos naturais contêm nutrientes em suas formas complexas originais, com todos os cofatores e enzimas que auxiliam na absorção e utilização pelo organismo. Isso frequentemente resulta em melhor biodisponibilidade e menos efeitos colaterais comparado a vitaminas isoladas sintéticas.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Os produtos são veganos?',
+            answer: 'Sim, todos os nossos suplementos são 100% à base de plantas e livres de ingredientes de origem animal. Utilizamos apenas cápsulas vegetais e não realizamos testes em animais.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Por que os suplementos orgânicos são mais caros?',
+            answer: 'O cultivo orgânico é mais trabalhoso e tem menor rendimento que o convencional. Além disso, as certificações orgânicas têm custos significativos. Preferimos manter o compromisso com a qualidade e sustentabilidade mesmo que isso reflita no preço final do produto.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Como sei qual suplemento é ideal para mim?',
+            answer: 'Recomendamos uma consulta com nossos especialistas em nutrição para uma avaliação personalizada. Também oferecemos um questionário detalhado em nosso site que pode sugerir produtos adequados às suas necessidades específicas.'
+          }
+        ],
+        style: {
+          backgroundColor: '#f8f9f8',
+          headingColor: '#2c5e2e',
+          textColor: '#3a3a3a',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // CTA Block
+      {
+        id: uuidv4(),
+        type: 'cta',
+        title: 'Chamada para Ação',
+        columns: 1,
+        visible: true,
+        heading: 'Nutra seu corpo naturalmente',
+        content: 'Experimente a diferença dos suplementos verdadeiramente naturais e sinta os benefícios para sua saúde e bem-estar.',
+        buttonText: 'Comprar Produtos Orgânicos',
+        buttonUrl: '#shop',
+        style: {
+          backgroundColor: '#2c5e2e',
           headingColor: '#ffffff',
           textColor: '#ffffff',
           padding: 'lg',
