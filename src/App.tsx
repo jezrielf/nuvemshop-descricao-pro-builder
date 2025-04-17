@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,26 +32,38 @@ const App = () => {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Routes>
-            <Route path="/" element={
-              <ProtectedRoute requireAuth={false}>
-                <Index />
-              </ProtectedRoute>
-            } />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/plans" element={<Plans />} />
-            <Route path="/success" element={<Success />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin-templates" element={<AdminTemplates />} />
-            <Route path="/admin-auth" element={<AdminAuth />} />
-            <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={
+                  <ProtectedRoute requireAuth={false}>
+                    <Index />
+                  </ProtectedRoute>
+                } />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/plans" element={<Plans />} />
+                <Route path="/success" element={<Success />} />
+                <Route path="/admin" element={
+                  <ProtectedRoute requireAuth={true} requiredRole="admin">
+                    <Admin />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin-templates" element={
+                  <ProtectedRoute requireAuth={true} requiredRole="admin">
+                    <AdminTemplates />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin-auth" element={<AdminAuth />} />
+                <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

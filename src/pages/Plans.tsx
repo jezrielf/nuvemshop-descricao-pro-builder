@@ -1,14 +1,16 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { RefreshCw, Loader2, AlertCircle, ShieldAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CurrentPlanCard from '@/components/plans/CurrentPlanCard';
 import PlanCard from '@/components/plans/PlanCard';
 import { usePlanSubscription } from '@/components/plans/hooks/usePlanSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { toast } from '@/hooks/use-toast';
 
 // Updated interface to match the format expected by PlanCard
 interface StripePlan {
@@ -23,12 +25,29 @@ interface StripePlan {
 }
 
 const Plans: React.FC = () => {
-  const { isSubscribed, subscriptionTier, user, refreshSubscription } = useAuth();
+  const { isSubscribed, subscriptionTier, user, profile, refreshSubscription } = useAuth();
   const [plans, setPlans] = useState<StripePlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [authStatus, setAuthStatus] = useState<string | null>(null);
   const navigate = useNavigate();
   const { loading, handleSubscribe, handleManageSubscription } = usePlanSubscription();
+
+  // Function to check user authentication status
+  const checkAuthStatus = useCallback(() => {
+    if (!user) {
+      setAuthStatus("Você precisa estar logado para gerenciar planos");
+      return false;
+    }
+    
+    if (!profile?.role || profile.role !== 'admin') {
+      setAuthStatus("Você precisa ser administrador para gerenciar planos");
+      return false;
+    }
+    
+    setAuthStatus(null);
+    return true;
+  }, [user, profile]);
 
   const fetchPlans = useCallback(async () => {
     try {
@@ -36,9 +55,15 @@ const Plans: React.FC = () => {
       setLoadError(null);
       console.log("Fetching plans for public display...");
       
+      // Get the current session to check authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
       // For public plans display, we don't need admin access
       const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { method: 'GET', action: 'list-products' }
+        body: { method: 'GET', action: 'list-products' },
+        headers: session ? {
+          Authorization: `Bearer ${session.access_token}`
+        } : undefined
       });
       
       if (error || (data && !data.success)) {
@@ -96,7 +121,17 @@ const Plans: React.FC = () => {
       setPlans(activePlans);
     } catch (error: any) {
       console.error("Error fetching plans:", error);
-      setLoadError(error.message || "Erro ao carregar planos");
+      // Provide more descriptive error messages for authentication issues
+      if (error.message?.includes("Authentication required")) {
+        setLoadError("É necessário estar autenticado como administrador para gerenciar planos");
+        toast({
+          variant: "destructive",
+          title: "Erro de autenticação",
+          description: "É necessário estar autenticado como administrador para gerenciar planos",
+        });
+      } else {
+        setLoadError(error.message || "Erro ao carregar planos");
+      }
       setPlans([]);
     } finally {
       setPlansLoading(false);
@@ -105,13 +140,15 @@ const Plans: React.FC = () => {
   
   useEffect(() => {
     fetchPlans();
-  }, [fetchPlans]);
+    checkAuthStatus();
+  }, [fetchPlans, checkAuthStatus]);
 
   const handleRefreshPlans = () => {
     fetchPlans();
     if (user) {
       refreshSubscription();
     }
+    checkAuthStatus();
   };
 
   if (plansLoading) {
@@ -140,8 +177,26 @@ const Plans: React.FC = () => {
       {loadError && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro</AlertTitle>
           <AlertDescription>
             {loadError}. Tente atualizar a página ou tente novamente mais tarde.
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {authStatus && (
+        <Alert variant="warning" className="mb-6">
+          <ShieldAlert className="h-4 w-4" />
+          <AlertTitle>Aviso de Autenticação</AlertTitle>
+          <AlertDescription>
+            {authStatus}
+            {!user && (
+              <div className="mt-2">
+                <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
+                  Fazer Login
+                </Button>
+              </div>
+            )}
           </AlertDescription>
         </Alert>
       )}
