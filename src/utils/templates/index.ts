@@ -15,11 +15,27 @@ import { fitnessTemplates } from './fitness';
 import { beveragesTemplates } from './beverages';
 import { waterPurifiersTemplates } from './water-purifiers';
 
-// Empty advanced templates array
+// Advanced templates array
 export const advancedTemplates: Template[] = [];
 
 export const getAllTemplates = (): Template[] => {
-  return [];
+  return [
+    ...basicTemplates,
+    ...supplementsTemplates,
+    ...shoesTemplates,
+    ...electronicsTemplates,
+    ...healthTemplates,
+    ...fashionTemplates,
+    ...accessoriesTemplates,
+    ...hauteCoutureTemplates,
+    ...homeDecorTemplates,
+    ...clothingTemplates,
+    ...beautyTemplates,
+    ...fitnessTemplates,
+    ...beveragesTemplates,
+    ...waterPurifiersTemplates,
+    ...advancedTemplates
+  ];
 };
 
 export * from './basic';
