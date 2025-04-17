@@ -14,12 +14,23 @@ export const createLoadingSlice: StateCreator<
   loadTemplates: async () => {
     try {
       console.log('Tentando carregar templates do serviço...');
+      
+      // Sempre tenha um fallback de templates locais
+      const localTemplates = getAllTemplates();
+      
+      // Garantir que temos templates disponíveis imediatamente
+      if (get().templates.length === 0) {
+        console.log('Definindo templates locais para uso imediato enquanto carregamos do servidor');
+        set({ templates: localTemplates });
+      }
+      
+      // Tenta carregar do servidor
       let templates = await templateService.getTemplates();
       
       // Garantir que sempre temos templates disponíveis
       if (!templates || templates.length === 0) {
         console.log('Nenhum template retornado pelo serviço, usando templates locais');
-        templates = getAllTemplates();
+        templates = localTemplates;
       }
       
       console.log(`Carregados ${templates.length} templates com sucesso`);
@@ -41,6 +52,8 @@ export const createLoadingSlice: StateCreator<
     // Se não há templates, verificamos se precisamos carregar
     if (!templates || templates.length === 0) {
       console.warn('Tentando buscar templates, mas nenhum está carregado');
+      // Retornamos um array vazio, mas o componente deve tratar este caso
+      return [];
     }
     
     return templates.filter(template => {

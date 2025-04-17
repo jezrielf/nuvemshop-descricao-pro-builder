@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
@@ -68,6 +69,19 @@ export const templateService = {
       
       // Se ainda não retornamos, significa que temos templates do banco de dados
       console.log(`Carregados ${templates.length} templates do banco de dados com sucesso`);
+      
+      // Se tivermos templates do banco, mas são poucos, combinamos com os locais
+      if (templates.length < 10) {
+        const localTemplates = getAllTemplates();
+        // Filtramos para não ter IDs duplicados
+        const localWithoutDuplicates = localTemplates.filter(
+          local => !templates.some(db => db.id === local.id)
+        );
+        const combined = [...templates, ...localWithoutDuplicates];
+        console.log(`Combinando ${templates.length} templates do banco com ${localWithoutDuplicates.length} templates locais`);
+        return combined;
+      }
+      
       return templates;
     } catch (error) {
       console.error('Error in getTemplates:', error);

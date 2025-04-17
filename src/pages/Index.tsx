@@ -26,10 +26,11 @@ const placeholderImages = [
 
 const Index = () => {
   console.log("Index page renderizada");
-  const { loadTemplates } = useTemplateStore();
+  const { loadTemplates, templates } = useTemplateStore();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
   const { 
     success: storeConnected, 
     storeName, 
@@ -39,12 +40,26 @@ const Index = () => {
   } = useNuvemshopAuth();
   
   useEffect(() => {
-    // Carrega os templates iniciais
+    // Garantir que temos templates disponíveis tanto no desenvolvimento quanto em produção
     const initializeTemplates = async () => {
       try {
+        setIsLoadingTemplates(true);
         console.log("Iniciando carregamento de templates na página inicial");
-        await loadTemplates();
-        console.log("Templates carregados na inicialização");
+        const loadedTemplates = await loadTemplates();
+        console.log("Templates carregados na inicialização:", loadedTemplates.length);
+        
+        if (loadedTemplates.length > 0) {
+          toast({
+            title: "Templates carregados",
+            description: `${loadedTemplates.length} templates disponíveis`,
+          });
+        } else {
+          toast({
+            title: "Atenção",
+            description: "Problemas ao carregar templates. Tente atualizar a página.",
+            variant: "destructive",
+          });
+        }
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
         toast({
@@ -52,6 +67,8 @@ const Index = () => {
           description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
           variant: "destructive",
         });
+      } finally {
+        setIsLoadingTemplates(false);
       }
     };
     
@@ -60,7 +77,7 @@ const Index = () => {
     // Configura um intervalo para verificar atualizações de templates a cada 5 minutos
     const templateRefreshInterval = setInterval(() => {
       loadTemplates()
-        .then(() => console.log("Templates atualizados no background"))
+        .then(templates => console.log("Templates atualizados no background:", templates.length))
         .catch(err => console.error("Erro ao atualizar templates no background:", err));
     }, 5 * 60 * 1000); // 5 minutos
     
@@ -75,6 +92,11 @@ const Index = () => {
       clearInterval(templateRefreshInterval);
     };
   }, [loadTemplates]);
+
+  // Log sempre que os templates mudam
+  useEffect(() => {
+    console.log(`Index - Templates disponíveis: ${templates.length}`);
+  }, [templates]);
 
   const handleNuvemshopDisconnect = () => {
     handleDisconnectNuvemshop();
