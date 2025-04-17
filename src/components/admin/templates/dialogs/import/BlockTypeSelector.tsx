@@ -2,8 +2,15 @@
 import React from 'react';
 import { BlockType } from '@/types/editor';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from '@/components/ui/select';
 import { Check, X } from 'lucide-react';
+import { blockTypeInfo } from '@/utils/blockTypeInfo';
 
 interface BlockTypeSelectorProps {
   blockType: BlockType;
@@ -12,56 +19,36 @@ interface BlockTypeSelectorProps {
   onCancel: () => void;
 }
 
-const availableBlockTypes: {type: BlockType, label: string}[] = [
-  { type: 'hero', label: 'Banner Principal' },
-  { type: 'text', label: 'Texto' },
-  { type: 'features', label: 'Recursos' },
-  { type: 'benefits', label: 'Benefícios' },
-  { type: 'specifications', label: 'Especificações' },
-  { type: 'image', label: 'Imagem' },
-  { type: 'gallery', label: 'Galeria' },
-  { type: 'imageText', label: 'Imagem + Texto' },
-  { type: 'textImage', label: 'Texto + Imagem' },
-  { type: 'faq', label: 'Perguntas Frequentes' },
-  { type: 'cta', label: 'Chamada para Ação' },
-  { type: 'video', label: 'Vídeo' },
-];
-
 export const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({
   blockType,
   onTypeChange,
   onSave,
-  onCancel
+  onCancel,
 }) => {
   return (
     <div className="flex items-center space-x-2">
-      <Select 
+      <Select
         value={blockType}
         onValueChange={(value) => onTypeChange(value as BlockType)}
       >
-        <SelectTrigger className="h-8 w-[180px]">
+        <SelectTrigger className="w-[180px] h-8">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {availableBlockTypes.map(blockType => (
-            <SelectItem key={blockType.type} value={blockType.type}>
-              {blockType.label}
+          {Object.entries(blockTypeInfo).map(([type, info]) => (
+            <SelectItem key={type} value={type}>
+              <div className="flex items-center">
+                <span className="mr-2">{info.icon}</span>
+                <span>{info.name}</span>
+              </div>
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={onSave}
-      >
+      <Button variant="outline" size="icon" className="h-8 w-8" onClick={onSave}>
         <Check className="h-4 w-4" />
       </Button>
-      <Button 
-        variant="ghost"
-        size="icon"
-        onClick={onCancel}
-      >
+      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onCancel}>
         <X className="h-4 w-4" />
       </Button>
     </div>

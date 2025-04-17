@@ -1,26 +1,29 @@
 
-import { Template } from '@/types/editor';
+import { Template, ProductCategory } from '@/types/editor';
 
+// Base template state
 export interface TemplateState {
   templates: Template[];
+}
+
+// Template loading actions
+export interface TemplateLoadingSlice {
+  loadTemplates: () => Promise<Template[]>;
+  searchTemplates: (query: string, category: string | null) => Template[];
+}
+
+// Template CRUD actions
+export interface TemplateCRUDSlice {
+  createTemplate: (templateData: Omit<Template, "id">) => Promise<Template>;
+  updateTemplate: (id: string, templateData: Partial<Template>) => Promise<Template | null>;
+  deleteTemplate: (id: string) => Promise<boolean>;
+}
+
+// Template category management
+export interface TemplateCategorySlice {
   categories: string[];
   selectedCategory: string | null;
   customCategories: string[];
-}
-
-export interface TemplateLoadingSlice {
-  loadTemplates: () => Promise<void>;
   getTemplatesByCategory: (category: string | null) => Template[];
-  searchTemplates: (searchTerm: string, category: string | null) => Template[];
-}
-
-export interface TemplateCategorySlice {
-  selectCategory: (category: string | null) => void;
-  addCustomCategory: (category: string) => Promise<boolean>;
-}
-
-export interface TemplateCRUDSlice {
-  createTemplate: (template: Omit<Template, "id">) => Promise<Template>;
-  updateTemplate: (id: string, template: Partial<Template>) => Promise<Template | null>;
-  deleteTemplate: (id: string) => Promise<boolean>;
+  setSelectedCategory: (category: string | null) => void;
 }

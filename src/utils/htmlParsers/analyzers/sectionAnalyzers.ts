@@ -1,185 +1,261 @@
-import { Block, BlockType, ColumnLayout, Template, ProductCategory, TextBlock, HeroBlock, GalleryBlock, FeaturesBlock, FAQBlock, CTABlock, ImageTextBlock, TextImageBlock } from '@/types/editor';
-import { v4 as uuidv4 } from 'uuid';
+
+import { Block, TextBlock, HeroBlock, GalleryBlock, FeaturesBlock, FAQBlock, CTABlock, ImageTextBlock } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators/createBlock';
-import { extractHeading, sanitizeHtmlContent } from './utils';
+import { sanitizeHtmlContent } from './utils';
+import { v4 as uuidv4 } from 'uuid';
 
-export const processHeroSection = (section: Element, blocks: Block[]): void => {
-  const heroBlock = createBlock('hero', 1) as HeroBlock;
-  
-  const h1 = section.querySelector('h1');
-  const headings = section.querySelectorAll('h1, h2');
-  const buttons = section.querySelectorAll('a.button, .btn, button, a[class*="button"], a[class*="btn"]');
-  
-  heroBlock.title = h1 ? h1.textContent || 'Heading' : extractHeading(section) || 'Heading';
-  
-  if (headings.length > 1) {
-    heroBlock.subheading = headings[1].textContent || '';
-  } else {
-    const paragraphs = section.querySelectorAll('p');
-    if (paragraphs.length > 0) {
-      heroBlock.subheading = paragraphs[0].textContent || '';
-    }
-  }
-  
-  if (buttons.length > 0) {
-    const button = buttons[0];
-    heroBlock.buttonText = button.textContent || 'Learn More';
-    heroBlock.buttonUrl = button.getAttribute('href') || '#';
-  }
-  
-  blocks.push(heroBlock);
-};
-
-export const processGallerySection = (section: Element, images: NodeListOf<HTMLImageElement>, blocks: Block[]): void => {
-  const columns = Math.min(4, Math.max(1, images.length)) as ColumnLayout;
-  const galleryBlock = createBlock('gallery', columns) as GalleryBlock;
-  
-  const headingText = extractHeading(section) || 'Gallery';
-  galleryBlock.title = headingText;
-  
-  galleryBlock.images = Array.from(images).map((img, index) => {
-    let caption = '';
-    const figcaption = img.closest('figure')?.querySelector('figcaption');
-    if (figcaption) {
-      caption = figcaption.textContent || '';
+export function processHeroSection(section: Element, blocks: Block[]): void {
+  try {
+    const heroBlock = createBlock('hero') as HeroBlock;
+    
+    // Extract heading
+    const heading = section.querySelector('h1, h2, .heading, .title');
+    heroBlock.heading = heading?.textContent?.trim() || 'Título Principal';
+    
+    // Extract subheading
+    const subheading = section.querySelector('h3, h4, .subheading, .subtitle, p:not(:first-child)');
+    heroBlock.subheading = subheading?.textContent?.trim() || 'Subtítulo';
+    
+    // Extract button if available
+    const button = section.querySelector('a.button, .btn, button, a.cta');
+    if (button) {
+      heroBlock.buttonText = button.textContent?.trim() || 'Saiba mais';
+      if (button instanceof HTMLAnchorElement) {
+        heroBlock.buttonUrl = button.href || '#';
+      }
     }
     
-    return {
+    // Extract background image if available
+    const style = section.getAttribute('style') || '';
+    const bgImageMatch = style.match(/background-image:\s*url\(['"]?([^'"]+)['"]?\)/i);
+    if (bgImageMatch && bgImageMatch[1]) {
+      heroBlock.backgroundImage = bgImageMatch[1];
+    }
+    
+    // Extract image if available
+    const image = section.querySelector('img');
+    if (image) {
+      heroBlock.image = {
+        src: image.getAttribute('src') || '',
+        alt: image.getAttribute('alt') || 'Hero image'
+      };
+    }
+    
+    blocks.push(heroBlock);
+  } catch (error) {
+    console.error('Error processing hero section:', error);
+    // Fallback to a simple text block
+    const textBlock = createBlock('text') as TextBlock;
+    textBlock.content = sanitizeHtmlContent(section.innerHTML);
+    blocks.push(textBlock);
+  }
+}
+
+export function processGallerySection(section: Element, images: NodeListOf<HTMLImageElement>, blocks: Block[]): void {
+  try {
+    const galleryBlock = createBlock('gallery') as GalleryBlock;
+    
+    // Extract heading if available
+    const heading = section.querySelector('h2, h3, .heading, .title');
+    galleryBlock.heading = heading?.textContent?.trim();
+    
+    // Process images
+    galleryBlock.images = Array.from(images).map(img => ({
       id: uuidv4(),
-      src: img.src,
-      alt: img.alt || `Image ${index + 1}`,
-      caption: caption
-    };
-  });
-  
-  blocks.push(galleryBlock);
-};
+      src: img.getAttribute('src') || '',
+      alt: img.getAttribute('alt') || 'Imagem da galeria',
+      caption: img.getAttribute('title') || img.getAttribute('data-caption') || ''
+    }));
+    
+    blocks.push(galleryBlock);
+  } catch (error) {
+    console.error('Error processing gallery section:', error);
+    // Fallback to a simple text block
+    const textBlock = createBlock('text') as TextBlock;
+    textBlock.content = sanitizeHtmlContent(section.innerHTML);
+    blocks.push(textBlock);
+  }
+}
 
-export const processFeatureSection = (section: Element, blocks: Block[]): void => {
-  const isBenefits = 
-    section.classList.contains('benefits') || 
-    section.classList.contains('advantage') || 
-    section.innerHTML.toLowerCase().includes('benefit') ||
-    section.innerHTML.toLowerCase().includes('advantage');
-  
-  const blockType: BlockType = isBenefits ? 'benefits' : 'features';
-  const featureBlock = createBlock(blockType, 3) as FeaturesBlock;
-  
-  featureBlock.title = extractHeading(section) || (isBenefits ? 'Benefits' : 'Features');
-  
-  const featureItems = section.querySelectorAll('.feature, .benefit, .item, .card, li');
-  
-  if (featureItems.length > 0) {
-    const items = Array.from(featureItems).map((item, index) => {
-      const title = item.querySelector('h3, h4, strong, b, .title') || null;
-      const description = item.querySelector('p, .description') || null;
-      
-      return {
+export function processFeatureSection(section: Element, blocks: Block[]): void {
+  try {
+    const featuresBlock = createBlock('features') as FeaturesBlock;
+    
+    // Extract heading if available
+    const heading = section.querySelector('h2, h3, .heading, .title');
+    featuresBlock.heading = heading?.textContent?.trim() || 'Recursos';
+    
+    // Try to identify feature items
+    const featureItems = section.querySelectorAll('.feature, li, .item');
+    
+    if (featureItems.length > 0) {
+      featuresBlock.features = Array.from(featureItems).map((item, index) => {
+        const title = item.querySelector('h3, h4, strong, .title, .name') || item;
+        const description = item.querySelector('p, .description, .content') || item;
+        
+        return {
+          id: uuidv4(),
+          title: title.textContent?.trim() || `Recurso ${index + 1}`,
+          description: description.textContent?.trim() || '',
+          icon: 'check' // Default icon
+        };
+      });
+    } else {
+      // If specific feature items not found, try to create from paragraphs
+      const paragraphs = section.querySelectorAll('p');
+      featuresBlock.features = Array.from(paragraphs).map((p, index) => ({
         id: uuidv4(),
-        title: title ? title.textContent || `Item ${index + 1}` : `Item ${index + 1}`,
-        description: description ? description.textContent || '' : item.textContent || '',
-        icon: 'Star'
-      };
+        title: `Recurso ${index + 1}`,
+        description: p.textContent?.trim() || '',
+        icon: 'check'
+      }));
+    }
+    
+    // Ensure we have at least one feature
+    if (featuresBlock.features.length === 0) {
+      featuresBlock.features = [{
+        id: uuidv4(),
+        title: 'Recurso 1',
+        description: 'Descrição do recurso',
+        icon: 'check'
+      }];
+    }
+    
+    blocks.push(featuresBlock);
+  } catch (error) {
+    console.error('Error processing features section:', error);
+    // Fallback to a simple text block
+    const textBlock = createBlock('text') as TextBlock;
+    textBlock.content = sanitizeHtmlContent(section.innerHTML);
+    blocks.push(textBlock);
+  }
+}
+
+export function processFAQSection(section: Element, blocks: Block[]): void {
+  try {
+    const faqBlock = createBlock('faq') as FAQBlock;
+    
+    // Extract heading if available
+    const heading = section.querySelector('h2, h3, .heading, .title');
+    faqBlock.heading = heading?.textContent?.trim() || 'Perguntas Frequentes';
+    
+    // Try to identify FAQ items
+    const faqItems = section.querySelectorAll('details, .faq-item, .accordion-item');
+    
+    if (faqItems.length > 0) {
+      faqBlock.questions = Array.from(faqItems).map((item, index) => {
+        const question = item.querySelector('summary, .question, h3, h4') || item;
+        const answer = item.querySelector('.answer, p') || item;
+        
+        return {
+          id: uuidv4(),
+          question: question.textContent?.trim() || `Pergunta ${index + 1}`,
+          answer: answer.textContent?.trim() || 'Resposta à pergunta.'
+        };
+      });
+    } else {
+      // If specific FAQ items not found, try to identify question paragraphs
+      const paragraphs = section.querySelectorAll('p');
+      const questions = [];
+      
+      for (let i = 0; i < paragraphs.length; i += 2) {
+        const question = paragraphs[i];
+        const answer = paragraphs[i + 1] || paragraphs[i];
+        
+        questions.push({
+          id: uuidv4(),
+          question: question.textContent?.trim() || `Pergunta ${i/2 + 1}`,
+          answer: (i + 1 < paragraphs.length ? answer.textContent?.trim() : 'Resposta à pergunta') || 'Resposta à pergunta'
+        });
+      }
+      
+      faqBlock.questions = questions;
+    }
+    
+    // Ensure we have at least one question
+    if (faqBlock.questions.length === 0) {
+      faqBlock.questions = [{
+        id: uuidv4(),
+        question: 'Pergunta de exemplo',
+        answer: 'Resposta à pergunta de exemplo.'
+      }];
+    }
+    
+    blocks.push(faqBlock);
+  } catch (error) {
+    console.error('Error processing FAQ section:', error);
+    // Fallback to a simple text block
+    const textBlock = createBlock('text') as TextBlock;
+    textBlock.content = sanitizeHtmlContent(section.innerHTML);
+    blocks.push(textBlock);
+  }
+}
+
+export function processCTASection(section: Element, blocks: Block[]): void {
+  try {
+    const ctaBlock = createBlock('cta') as CTABlock;
+    
+    // Extract heading if available
+    const heading = section.querySelector('h2, h3, .heading, .title');
+    ctaBlock.heading = heading?.textContent?.trim() || 'Chamada para Ação';
+    
+    // Extract content/description
+    const content = section.querySelector('p, .content, .description');
+    ctaBlock.content = content?.textContent?.trim() || 'Descrição da chamada para ação.';
+    
+    // Extract button if available
+    const button = section.querySelector('a.button, .btn, button, a.cta');
+    if (button) {
+      ctaBlock.buttonText = button.textContent?.trim() || 'Clique Aqui';
+      if (button instanceof HTMLAnchorElement) {
+        ctaBlock.buttonUrl = button.href || '#';
+      }
+    } else {
+      ctaBlock.buttonText = 'Clique Aqui';
+    }
+    
+    blocks.push(ctaBlock);
+  } catch (error) {
+    console.error('Error processing CTA section:', error);
+    // Fallback to a simple text block
+    const textBlock = createBlock('text') as TextBlock;
+    textBlock.content = sanitizeHtmlContent(section.innerHTML);
+    blocks.push(textBlock);
+  }
+}
+
+export function processImageTextSection(section: Element, image: HTMLImageElement, blocks: Block[], isReversed: boolean = false): void {
+  try {
+    const blockType = isReversed ? 'textImage' : 'imageText';
+    const imageTextBlock = createBlock(blockType) as ImageTextBlock;
+    
+    // Extract heading if available
+    const heading = section.querySelector('h2, h3, .heading, .title');
+    imageTextBlock.heading = heading?.textContent?.trim() || 'Título da Seção';
+    
+    // Process image
+    imageTextBlock.image = {
+      src: image.getAttribute('src') || '',
+      alt: image.getAttribute('alt') || 'Imagem da seção'
+    };
+    
+    // Extract content
+    let content = '';
+    const paragraphs = section.querySelectorAll('p');
+    paragraphs.forEach(p => {
+      if (!p.contains(image)) { // Don't include paragraph that contains the image
+        content += `<p>${p.textContent?.trim()}</p>`;
+      }
     });
     
-    if (blockType === 'benefits') {
-      (featureBlock as any).benefits = items;
-    } else {
-      (featureBlock as FeaturesBlock).features = items;
-    }
+    imageTextBlock.content = content || '<p>Conteúdo da seção.</p>';
+    
+    blocks.push(imageTextBlock);
+  } catch (error) {
+    console.error('Error processing image-text section:', error);
+    // Fallback to a simple text block
+    const textBlock = createBlock('text') as TextBlock;
+    textBlock.content = sanitizeHtmlContent(section.innerHTML);
+    blocks.push(textBlock);
   }
-  
-  blocks.push(featureBlock);
-};
-
-export const processFAQSection = (section: Element, blocks: Block[]): void => {
-  const faqBlock = createBlock('faq', 1) as FAQBlock;
-  
-  faqBlock.title = extractHeading(section) || 'Frequently Asked Questions';
-  
-  const questionItems = section.querySelectorAll('details, .faq-item, .accordion-item, dt, .question');
-  
-  if (questionItems.length > 0) {
-    faqBlock.questions = Array.from(questionItems).map((item, index) => {
-      let question = '';
-      let answer = '';
-      
-      if (item.tagName === 'DETAILS') {
-        const summary = item.querySelector('summary');
-        question = summary ? summary.textContent || '' : `Question ${index + 1}`;
-        const content = item.innerHTML.replace(/<summary.*?<\/summary>/s, '');
-        answer = sanitizeHtmlContent(content);
-      } else if (item.tagName === 'DT') {
-        question = item.textContent || `Question ${index + 1}`;
-        const dd = item.nextElementSibling;
-        answer = dd && dd.tagName === 'DD' ? dd.innerHTML : '';
-      } else {
-        const questionEl = item.querySelector('.question, h3, h4, strong');
-        const answerEl = item.querySelector('.answer, p, div:not(.question)');
-        
-        question = questionEl ? questionEl.textContent || `Question ${index + 1}` : `Question ${index + 1}`;
-        answer = answerEl ? answerEl.innerHTML : item.innerHTML;
-      }
-      
-      return {
-        id: uuidv4(),
-        question: question.trim(),
-        answer: sanitizeHtmlContent(answer).trim()
-      };
-    });
-  }
-  
-  blocks.push(faqBlock);
-};
-
-export const processCTASection = (section: Element, blocks: Block[]): void => {
-  const ctaBlock = createBlock('cta', 1) as CTABlock;
-  
-  ctaBlock.title = extractHeading(section) || 'Take Action';
-  
-  const paragraphs = section.querySelectorAll('p');
-  if (paragraphs.length > 0) {
-    ctaBlock.content = paragraphs[0].textContent || '';
-  }
-  
-  const button = section.querySelector('a.button, .btn, button, a[class*="button"], a[class*="btn"]');
-  if (button) {
-    ctaBlock.buttonText = button.textContent || 'Click Here';
-    ctaBlock.buttonUrl = button.getAttribute('href') || '#';
-  }
-  
-  blocks.push(ctaBlock);
-};
-
-export const processImageTextSection = (
-  section: Element, 
-  image: HTMLImageElement, 
-  blocks: Block[],
-  textFirst: boolean = false
-): void => {
-  const blockType: BlockType = textFirst ? 'textImage' : 'imageText';
-  
-  const mediaBlock = createBlock(blockType, 1) as ImageTextBlock | TextImageBlock;
-  
-  mediaBlock.title = extractHeading(section) || 'Image and Text';
-  
-  const paragraphs = section.querySelectorAll('p');
-  if (paragraphs.length > 0) {
-    let content = '';
-    paragraphs.forEach(p => {
-      if (!p.contains(image)) {
-        content += p.outerHTML;
-      }
-    });
-    mediaBlock.content = sanitizeHtmlContent(content);
-  } else {
-    mediaBlock.content = section.textContent || '';
-  }
-  
-  mediaBlock.image = {
-    src: image.src,
-    alt: image.alt || 'Product image'
-  };
-  
-  blocks.push(mediaBlock);
-};
+}

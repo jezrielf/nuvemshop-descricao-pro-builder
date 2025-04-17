@@ -1,16 +1,17 @@
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search } from 'lucide-react';
-import { ProductCategory } from '@/types/editor';
-import { getCategoryName } from './utils';
-import { useTemplateStore } from '@/store/templates';
+import { Input } from '@/components/ui/input';
+import { Search, Plus } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { getCategoryName } from './utils';
 
 interface TemplateHeaderProps {
   searchQuery: string;
@@ -25,108 +26,52 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
   selectedCategory,
   onCategoryChange,
 }) => {
-  const { categories, addCustomCategory } = useTemplateStore();
   const { openNewDialog } = useTemplateDialogs();
-  const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState('');
-  const { toast } = useToast();
 
-  const handleAddCategory = async () => {
-    if (!newCategory.trim()) {
-      toast({
-        title: "Categoria inválida",
-        description: "Por favor, insira um nome para a categoria.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const success = await addCustomCategory(newCategory);
-    if (success) {
-      toast({
-        title: "Categoria adicionada",
-        description: `A categoria "${newCategory}" foi adicionada com sucesso.`,
-      });
-      setNewCategory('');
-      setIsAddCategoryDialogOpen(false);
-    } else {
-      toast({
-        title: "Erro",
-        description: "Não foi possível adicionar a categoria.",
-        variant: "destructive",
-      });
-    }
-  };
+  const categoryOptions = [
+    'supplements',
+    'clothing',
+    'accessories',
+    'shoes',
+    'electronics',
+    'energy',
+    'Casa e decoração',
+    'other'
+  ];
 
   return (
-    <>
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <div className="flex-1 w-full sm:w-auto relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder="Buscar templates..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Select
-            value={selectedCategory || "all"}
-            onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Todas as categorias" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as categorias</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {getCategoryName(category as ProductCategory)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button variant="outline" size="icon" onClick={() => setIsAddCategoryDialogOpen(true)}>
-            <Plus className="h-4 w-4" />
-          </Button>
-          
-          <Button onClick={() => openNewDialog()}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Template
-          </Button>
-        </div>
+    <div className="flex flex-col md:flex-row gap-2 w-full">
+      <div className="relative flex-1">
+        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar templates..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-8"
+        />
       </div>
 
-      {/* Add Category Dialog */}
-      <Dialog open={isAddCategoryDialogOpen} onOpenChange={setIsAddCategoryDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Adicionar Nova Categoria</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="category-name">Nome da Categoria</Label>
-              <Input
-                id="category-name"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                placeholder="Digite o nome da categoria"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddCategoryDialogOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleAddCategory}>
-              Adicionar Categoria
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+      <Select
+        value={selectedCategory || ""}
+        onValueChange={(value) => onCategoryChange(value === "" ? null : value)}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Todas as categorias" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">Todas as categorias</SelectItem>
+          {categoryOptions.map((category) => (
+            <SelectItem key={category} value={category}>
+              {getCategoryName(category)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Button onClick={openNewDialog}>
+        <Plus className="h-4 w-4 mr-2" />
+        Novo Template
+      </Button>
+    </div>
   );
 };

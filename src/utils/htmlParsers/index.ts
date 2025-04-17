@@ -1,4 +1,3 @@
 
-export * from './htmlTemplateAnalyzer';
-export * from './htmlPreviewGenerator';
-export * from './htmlToBlocks';
+export { analyzeHtmlForTemplate, customizeBlockTypes } from './htmlTemplateAnalyzer';
+export { parseHtmlToBlocks } from './htmlToBlocks';

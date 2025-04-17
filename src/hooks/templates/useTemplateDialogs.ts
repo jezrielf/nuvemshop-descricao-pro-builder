@@ -1,55 +1,66 @@
 
-import { create } from 'zustand';
+import { useState } from 'react';
 import { Template } from '@/types/editor';
+import { useToast } from '@/hooks/use-toast';
 
-interface TemplateDialogState {
-  previewTemplate: Template | null;
-  editTemplate: Template | null;
-  deleteTemplate: Template | null;
-  isNewDialogOpen: boolean;
-  isPreviewDialogOpen: boolean;
-  isEditDialogOpen: boolean;
-  isDeleteDialogOpen: boolean;
-  openNewDialog: () => void;
-  openPreviewDialog: (template: Template) => void;
-  openEditDialog: (template: Template) => void;
-  openDeleteDialog: (template: Template) => void;
-  closeAllDialogs: () => void;
+export function useTemplateDialogs() {
+  const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
+  const [editTemplate, setEditTemplate] = useState<Template | null>(null);
+  const [deleteTemplate, setDeleteTemplate] = useState<Template | null>(null);
+  
+  const { toast } = useToast();
+  
+  const openNewDialog = () => {
+    closeAllDialogs();
+    setIsNewDialogOpen(true);
+  };
+  
+  const openPreviewDialog = (template: Template) => {
+    closeAllDialogs();
+    setPreviewTemplate(template);
+    setIsPreviewDialogOpen(true);
+  };
+  
+  const openEditDialog = (template: Template) => {
+    closeAllDialogs();
+    setEditTemplate(template);
+    setIsEditDialogOpen(true);
+  };
+  
+  const openDeleteDialog = (template: Template) => {
+    closeAllDialogs();
+    setDeleteTemplate(template);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const closeAllDialogs = () => {
+    setIsNewDialogOpen(false);
+    setIsPreviewDialogOpen(false);
+    setIsEditDialogOpen(false);
+    setIsDeleteDialogOpen(false);
+  };
+  
+  return {
+    // Dialog states
+    isNewDialogOpen,
+    isPreviewDialogOpen,
+    isEditDialogOpen,
+    isDeleteDialogOpen,
+    
+    // Template data
+    previewTemplate,
+    editTemplate,
+    deleteTemplate,
+    
+    // Actions
+    openNewDialog,
+    openPreviewDialog,
+    openEditDialog,
+    openDeleteDialog,
+    closeAllDialogs
+  };
 }
-
-export const useTemplateDialogs = create<TemplateDialogState>((set) => ({
-  previewTemplate: null,
-  editTemplate: null,
-  deleteTemplate: null,
-  isNewDialogOpen: false,
-  isPreviewDialogOpen: false,
-  isEditDialogOpen: false,
-  isDeleteDialogOpen: false,
-
-  openNewDialog: () => set({ isNewDialogOpen: true }),
-  
-  openPreviewDialog: (template) => set({ 
-    previewTemplate: template,
-    isPreviewDialogOpen: true 
-  }),
-  
-  openEditDialog: (template) => set({ 
-    editTemplate: template,
-    isEditDialogOpen: true 
-  }),
-  
-  openDeleteDialog: (template) => set({ 
-    deleteTemplate: template,
-    isDeleteDialogOpen: true 
-  }),
-  
-  closeAllDialogs: () => set({
-    previewTemplate: null,
-    editTemplate: null,
-    deleteTemplate: null,
-    isNewDialogOpen: false,
-    isPreviewDialogOpen: false,
-    isEditDialogOpen: false,
-    isDeleteDialogOpen: false
-  })
-}));

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Template, ProductCategory, Block, BlockType } from '@/types/editor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { analyzeHtmlForTemplate, customizeBlockTypes } from '@/utils/htmlParsers';
+import { analyzeHtmlForTemplate, customizeBlockTypes } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
 import { HtmlInputTab } from './import/HtmlInputTab';
 import { ReviewBlocksTab } from './import/ReviewBlocksTab';
 
