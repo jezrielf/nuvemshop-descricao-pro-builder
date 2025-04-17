@@ -99,26 +99,9 @@ export const useSEOChecks = (description: ProductDescription | null) => {
     return checksList;
   }, [description]);
 
-  // Extract categories
-  const categories = useMemo(() => {
-    return Array.from(new Set(checks.map(check => check.category)));
-  }, [checks]);
-
-  // Return first item separately as it's the overall score
-  const scoreItem = useMemo(() => checks.length > 0 ? checks[0] : null, [checks]);
-  
-  // Get the remaining checks (excluding the overall score)
-  const checksByCategory = useMemo(() => {
-    return categories.map(category => ({
-      category,
-      items: checks.filter(check => check.category === category && check.id !== 'overall-score')
-    }));
-  }, [checks, categories]);
-
   return { 
     checks, 
-    categories, 
-    scoreItem, 
-    checksByCategory 
+    scoreItem: checks.length > 0 ? checks[0] : null 
   };
 };
+
