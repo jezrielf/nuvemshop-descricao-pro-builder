@@ -18,19 +18,19 @@ import {
 
 // Templates para purificadores de água
 export const waterPurifiersTemplates: Template[] = [
-  // Template 1: Purificadores Residenciais
+  // Template 1: Purificador Residencial
   {
     id: uuidv4(),
-    name: 'Purificadores Residenciais',
-    category: 'water-purifiers',
+    name: 'Purificador Residencial',
+    category: 'energy',
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
       createGalleryBlock(1),
       createVideoBlock(1, {
-        videoUrl: 'https://www.youtube.com/watch?v=WtfKuGo1Bnc',
-        heading: 'Água Pura em Casa',
-        description: 'Como nossa tecnologia exclusiva garante água limpa e saudável para toda a família.',
+        videoUrl: 'https://www.youtube.com/watch?v=EO1-uP-fxbs',
+        heading: 'Água Pura em Sua Casa',
+        description: 'Descubra como nosso sistema de purificação traz água limpa e saudável para toda a família.',
         aspectRatio: '16:9'
       }),
       createSpecificationsBlock(1),
@@ -43,24 +43,24 @@ export const waterPurifiersTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1612478969473-6545894474c2?q=80&w=500'
   },
   
-  // Template 2: Filtros de Água Portáteis
+  // Template 2: Purificador Industrial
   {
     id: uuidv4(),
-    name: 'Filtros de Água Portáteis',
-    category: 'water-purifiers',
+    name: 'Purificador Industrial',
+    category: 'energy',
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
+      createGalleryBlock(1),
       createVideoBlock(1, {
-        videoUrl: 'https://www.youtube.com/watch?v=xvTyRj8OfFI',
-        heading: 'Água Limpa em Qualquer Lugar',
-        description: 'Filtros compactos e eficientes para levar água de qualidade para suas aventuras.',
+        videoUrl: 'https://www.youtube.com/watch?v=9duPxoJzNRA',
+        heading: 'Soluções Industriais de Purificação',
+        description: 'Sistemas de alta capacidade para empresas que precisam de água purificada em larga escala.',
         aspectRatio: '16:9'
       }),
-      createGalleryBlock(1),
       createSpecificationsBlock(1),
       createImageTextBlock(1),
       createTextImageBlock(1),
@@ -71,22 +71,22 @@ export const waterPurifiersTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1613025636703-1803d2f390cc?q=80&w=500'
   },
   
-  // Template 3: Sistemas de Filtração Avançada
+  // Template 3: Filtros Avançados
   {
     id: uuidv4(),
-    name: 'Sistemas de Filtração Avançada',
-    category: 'water-purifiers',
+    name: 'Filtros Avançados',
+    category: 'energy',
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
       createGalleryBlock(1),
       createVideoBlock(1, {
-        videoUrl: 'https://www.youtube.com/watch?v=oWl2vXfgJbg',
-        heading: 'Tecnologia de Ponta',
-        description: 'Sistemas completos de filtração que removem até os contaminantes mais difíceis.',
+        videoUrl: 'https://www.youtube.com/watch?v=BdzLQBMtszk',
+        heading: 'Tecnologia de Filtragem Avançada',
+        description: 'Conheça nossos filtros com tecnologia de ponta para remoção de contaminantes e purificação premium.',
         aspectRatio: '16:9'
       }),
       createSpecificationsBlock(1),
@@ -99,6 +99,6 @@ export const waterPurifiersTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1626168078796-ed36c3e9ad82?q=80&w=500'
   }
 ];

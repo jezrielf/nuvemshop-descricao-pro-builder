@@ -21,7 +21,7 @@ export const basicTemplates: Template[] = [
   {
     id: uuidv4(),
     name: 'Landing Page Básica',
-    category: 'other', // Changed from 'basic' to 'other' which is a valid ProductCategory
+    category: 'other', // Using 'other' which is a valid ProductCategory
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
@@ -40,13 +40,13 @@ export const basicTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500'
   },
   // Template para promoção
   {
     id: uuidv4(),
     name: 'Página Promocional',
-    category: 'other', // Changed from 'basic' to 'other'
+    category: 'other', // Using 'other' which is a valid ProductCategory
     blocks: [
       createHeroBlock(1),
       createTextBlock(1),
@@ -65,13 +65,13 @@ export const basicTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=500'
   },
   // Template de lançamento
   {
     id: uuidv4(),
     name: 'Lançamento de Produto',
-    category: 'other', // Changed from 'basic' to 'other'
+    category: 'other', // Using 'other' which is a valid ProductCategory
     blocks: [
       createHeroBlock(1),
       createVideoBlock(1, {
@@ -90,7 +90,7 @@ export const basicTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=500'
   }
 ];
 

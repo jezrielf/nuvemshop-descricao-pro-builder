@@ -41,7 +41,7 @@ export const fashionTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=500'
   },
   
   // Template 2: Moda Praia
@@ -68,7 +68,7 @@ export const fashionTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?q=80&w=500'
   },
   
   // Template 3: Moda Esportiva
@@ -95,6 +95,6 @@ export const fashionTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1518214598173-1666bc921d66?q=80&w=500'
   }
 ];
