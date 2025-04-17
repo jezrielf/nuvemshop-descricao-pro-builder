@@ -1,5 +1,5 @@
 
 // Export the block creators
 export * from './createBlock';
-// Export createVideoBlock from blocks instead of the duplicate export
+// Export all block creators from the blocks directory
 export * from './blocks';
