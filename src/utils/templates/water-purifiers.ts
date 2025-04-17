@@ -184,7 +184,7 @@ export const waterPurifiersTemplates: Template[] = [
         content: 'Adquira agora seu purificador e comece a desfrutar dos benefícios da água verdadeiramente pura. Parcelamento em até 12x e frete grátis.',
         buttonText: 'Comprar agora',
         buttonUrl: '#shop'
-      }
+      })
     ]
   },
   {
@@ -342,7 +342,7 @@ export const waterPurifiersTemplates: Template[] = [
         content: 'Adquira seu filtro ecológico hoje e faça parte da revolução por um consumo mais consciente e sustentável.',
         buttonText: 'Comprar com impacto positivo',
         buttonUrl: '#shop'
-      }
+      })
     ]
   },
   {
@@ -500,7 +500,7 @@ export const waterPurifiersTemplates: Template[] = [
         content: 'Agende uma consulta gratuita com um de nossos especialistas para análise da água e projeto personalizado para sua residência.',
         buttonText: 'Agendar consulta gratuita',
         buttonUrl: '#schedule'
-      }
+      })
     ]
   }
 ];
