@@ -1,69 +1,68 @@
 
-export interface BaseBlock {
-  id: string;
-  type: string;
-  title: string;
-  columns: ColumnLayout;
-  visible: boolean;
-  style?: BlockStyle;
-}
+import { ProductCategory } from './products';
 
-// Adding BlockBase and BlockStyle interfaces
-export interface BlockBase extends BaseBlock {
-  id: string;
-  type: string;
-  title: string;
-  columns: ColumnLayout;
-  visible: boolean;
-  style?: BlockStyle;
-}
+export type BlockType = 
+  | 'hero'
+  | 'text'
+  | 'features'
+  | 'benefits'
+  | 'specifications'
+  | 'image'
+  | 'gallery'
+  | 'imageText'
+  | 'textImage'
+  | 'faq'
+  | 'cta'
+  | 'video';
+
+export type ColumnLayout = '1/2' | '1/3' | '2/3' | '1/4' | '3/4' | 'full';
+
+export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
 
 export interface BlockStyle {
   backgroundColor?: string;
+  backgroundImage?: string;
   textColor?: string;
   padding?: string;
   margin?: string;
   borderRadius?: string;
   borderWidth?: string;
   borderColor?: string;
+  borderStyle?: string;
+  boxShadow?: string;
+  fontFamily?: string;
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
   fontSize?: string;
   fontWeight?: string;
-  textAlign?: string;
-  boxShadow?: string;
-  [key: string]: any; // For other custom styles
+  lineHeight?: string;
+  imageFit?: 'cover' | 'contain' | 'fill' | 'none';
+  imagePosition?: string;
+  [key: string]: any;
 }
 
-export interface ProductDescription {
+export interface BlockBase {
   id: string;
-  name: string;
-  blocks: Block[];
-  createdAt: string;
-  updatedAt: string;
+  type: BlockType;
+  title: string;
+  visible: boolean;
+  columns: ColumnLayout;
+  style: BlockStyle;
 }
 
 export interface Template {
   id: string;
   name: string;
-  category: string;
-  blocks: Block[];
-  thumbnail: string; // Changed from optional to required
+  category: ProductCategory;
+  thumbnail?: string;
+  blocks: any[];
 }
 
-export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoes' | 'electronics' | 'energy' | 'other' | string;
-
-// Import block types from the blocks directory
-import { Block } from './blocks';
-import { BlockType } from './blocks';
-
-// Note: BlockType is now exported from blocks/index.ts
-export type { Block };
-
-export type ColumnLayout = 1 | 2 | 3 | 4;
-
-// Define BlockSpacing for styleConverter.ts
-export interface BlockSpacing {
-  margin?: string;
-  padding?: string;
+export interface ProductDescription {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  productName?: string;
+  category?: ProductCategory;
+  blocks: any[];
 }
-
-export type { BlockType };
