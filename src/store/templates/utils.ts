@@ -1,6 +1,5 @@
 
-import { Block } from '@/types/editor';
-import { Template } from '@/types/editor';
+import { Block, Template, ProductCategory } from '@/types/editor';
 
 interface SupabaseTemplate {
   id: string;
@@ -26,7 +25,7 @@ export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Templ
     return {
       id: supaTemplate.id,
       name: supaTemplate.name,
-      category: supaTemplate.category,
+      category: supaTemplate.category as ProductCategory, // Fix: Cast string to ProductCategory
       blocks: blocks,
       thumbnail: supaTemplate.thumbnail || '/placeholder.svg' // Default placeholder if no thumbnail
     };

@@ -1,6 +1,6 @@
 
 import { StateCreator } from 'zustand';
-import { Template } from '@/types/editor';
+import { Template, ProductCategory } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { getAllTemplates } from '@/utils/templates';
@@ -41,7 +41,7 @@ export const createLoadingSlice: StateCreator<
         const templates: Template[] = data.map(item => ({
           id: item.id,
           name: item.name,
-          category: item.category as any, // Type assertion to handle string to ProductCategory
+          category: item.category as ProductCategory, // Type assertion to handle string to ProductCategory
           blocks: deserializeBlocks(item.blocks),
           thumbnail: item.thumbnail || '/placeholder.svg'
         }));
