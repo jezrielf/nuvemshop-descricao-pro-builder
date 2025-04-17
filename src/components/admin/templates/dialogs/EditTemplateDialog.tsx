@@ -264,6 +264,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
               </div>
             </div>
           </TabsContent>
+        </Tabs>
         
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>
