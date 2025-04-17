@@ -30,6 +30,17 @@ export interface BlockStyle {
   boxShadow?: 'none' | 'sm' | 'md' | 'lg';
   fontFamily?: string;
   textAlign?: 'left' | 'center' | 'right';
+  
+  // Additional missing properties
+  imageFit?: 'contain' | 'cover';
+  fontSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+  fontWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  textDecoration?: 'none' | 'underline';
+  margin?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
+  hasBorder?: boolean;
+  hasShadow?: boolean;
+  headingWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
 }
 
 export interface BlockBase {
@@ -39,6 +50,18 @@ export interface BlockBase {
   columns: ColumnLayout;
   visible: boolean;
   style?: BlockStyle;
+}
+
+// Define the ProductDescription interface
+export interface ProductDescription {
+  id: string;
+  name: string;
+  category: ProductCategory;
+  blocks: Block[];
+  thumbnail?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  userId?: string;
 }
 
 export interface Template {
