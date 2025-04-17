@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, Shield, Settings } from 'lucide-react';
+import { LogOut, Shield, Settings, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const UserButton: React.FC = () => {
@@ -54,6 +54,16 @@ export const UserButton: React.FC = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        {/* Nova opção de Descrições para todos os usuários */}
+        <DropdownMenuItem asChild>
+          <Link to="/admin?tab=descriptions" className="flex items-center cursor-pointer">
+            <FileText className="mr-2 h-4 w-4" />
+            <span>Descrições</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        
         {isAdmin() && (
           <>
             <DropdownMenuItem asChild>

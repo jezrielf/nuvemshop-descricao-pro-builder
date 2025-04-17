@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import NuvemshopConnect from "./pages/NuvemshopConnect";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DescriptionsView from "./pages/DescriptionsView";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,8 +56,12 @@ const App = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="/admin-auth" element={<AdminAuth />} />
+                <Route path="/descriptions" element={
+                  <ProtectedRoute requireAuth={true}>
+                    <DescriptionsView />
+                  </ProtectedRoute>
+                } />
                 <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
