@@ -1,15 +1,16 @@
+
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { BadgeAlert, BadgeCheck, Crown, Settings, Plus, Save, Lock, ListTodo } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Plus, Save, Lock, ListTodo } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
 import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
-import SEOAnalyzer from './SEO/analyzers/SEOAnalyzer';
+import SEOTools from './SEO/SEOTools';
 import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -126,7 +127,9 @@ const Header: React.FC = () => {
             {description && <HtmlOutputDialog />}
             
             <div className="flex items-center gap-2">
-              {description && (isPremiumUser || isBusinessUser) && <SEOAnalyzer description={description} />}
+              {description && (isPremiumUser || isBusinessUser) && (
+                <SEOTools description={description} />
+              )}
               
               <AIGeneratorButton />
               

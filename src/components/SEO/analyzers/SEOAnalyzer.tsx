@@ -2,7 +2,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Search, Settings } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { ProductDescription } from '@/types/editor';
 import { AnalyzerDialogHeader } from './components/AnalyzerDialogHeader';
 import { AnalyzerDialogContent } from './components/AnalyzerDialogContent';
@@ -26,10 +26,7 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center">
-          <Settings className="h-4 w-4 mr-1" />
-          Ferramentas SEO
-        </Button>
+        <span className="w-full">Ferramentas SEO</span>
       </DialogTrigger>
       <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
         <AnalyzerDialogHeader />
