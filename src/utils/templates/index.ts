@@ -15,25 +15,11 @@ import { fitnessTemplates } from './fitness';
 import { beveragesTemplates } from './beverages';
 import { waterPurifiersTemplates } from './water-purifiers';
 
-// Combining all templates
-export const advancedTemplates: Template[] = [
-  ...supplementsTemplates,
-  ...shoesTemplates,
-  ...electronicsTemplates,
-  ...healthTemplates,
-  ...fashionTemplates,
-  ...accessoriesTemplates,
-  ...hauteCoutureTemplates,
-  ...homeDecorTemplates,
-  ...clothingTemplates,
-  ...beautyTemplates,
-  ...fitnessTemplates,
-  ...beveragesTemplates,
-  ...waterPurifiersTemplates
-];
+// Empty advanced templates array
+export const advancedTemplates: Template[] = [];
 
 export const getAllTemplates = (): Template[] => {
-  return [...basicTemplates, ...advancedTemplates];
+  return [];
 };
 
 export * from './basic';
