@@ -6,19 +6,19 @@ import { ColumnLayout } from '@/types/editor/base';
 export function createVideoBlock(
   videoUrl: string = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   heading: string = 'Video Title',
-  caption?: string,
+  description?: string,
   aspectRatio: '16:9' | '4:3' | '1:1' = '16:9'
 ): VideoBlock {
   return {
     id: uuidv4(),
     type: 'video',
     title: 'Vídeo',
-    columns: 1,
+    columns: 1 as ColumnLayout,
     visible: true,
     videoUrl,
     aspectRatio,
     heading,
-    caption,
+    description,
     autoplay: true,
     style: {
       backgroundColor: '#ffffff',
