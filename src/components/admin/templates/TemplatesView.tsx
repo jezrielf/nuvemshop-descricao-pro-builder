@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useTemplateStore } from '@/store/templates';
+import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
 import { TemplateList } from './TemplateList';
 import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,15 +24,10 @@ export const TemplatesView = () => {
     setLoadError(null);
     try {
       console.log("TemplatesView - carregando templates");
-      const loadedTemplates = await loadTemplates();
-      console.log("TemplatesView - templates carregados com sucesso:", loadedTemplates.length);
+      await loadTemplates();
+      console.log("TemplatesView - templates carregados com sucesso:", templates.length);
       
-      if (loadedTemplates.length > 0) {
-        toast({
-          title: 'Templates carregados',
-          description: `${loadedTemplates.length} templates disponíveis`,
-        });
-      } else {
+      if (templates.length === 0) {
         toast({
           title: 'Atenção',
           description: 'Nenhum template encontrado. Verifique sua conexão ou crie novos templates.',
