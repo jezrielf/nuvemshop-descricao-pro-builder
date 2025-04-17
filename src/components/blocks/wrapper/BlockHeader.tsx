@@ -1,24 +1,24 @@
 
 import React from 'react';
 import { BlockBase } from '@/types/editor';
-import { Grip } from 'lucide-react';
+import { getBlockTypeDisplayName } from '@/utils/blockTypeInfo';
+import { cn } from '@/lib/utils';
 
 interface BlockHeaderProps {
   block: BlockBase;
+  className?: string;
 }
 
-const BlockHeader: React.FC<BlockHeaderProps> = ({ block }) => {
+const BlockHeader: React.FC<BlockHeaderProps> = ({ block, className }) => {
+  const blockTypeName = getBlockTypeDisplayName(block.type);
+  
   return (
-    <>
-      <div className="absolute left-2 top-2 z-10 drag-handle">
-        <Grip className="h-5 w-5" />
-      </div>
-      
-      <div className="text-sm font-medium text-gray-500 mb-2 flex items-center justify-between">
-        <span>{block.title || block.type}</span>
-        <span className="text-xs bg-gray-100 px-2 py-1 rounded">{block.columns} coluna(s)</span>
-      </div>
-    </>
+    <div className={cn("block-header text-xs font-medium flex items-center gap-2", className)}>
+      <span className="px-2 py-1 rounded-sm bg-primary/10 text-primary">
+        {blockTypeName}
+      </span>
+      <span className="truncate max-w-[200px]">{block.title}</span>
+    </div>
   );
 };
 

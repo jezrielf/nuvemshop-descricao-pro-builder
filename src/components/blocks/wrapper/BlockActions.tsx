@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Copy, Eye, EyeOff, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useEditorStore } from '@/store/editor';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface BlockActionsProps {
   block: BlockBase;
