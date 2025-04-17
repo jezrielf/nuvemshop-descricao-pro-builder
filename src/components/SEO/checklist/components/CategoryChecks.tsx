@@ -21,30 +21,30 @@ export const CategoryChecks: React.FC<CategoryChecksProps> = ({ check }) => {
   const getStatusIcon = (status: 'pass' | 'fail' | 'warning') => {
     switch (status) {
       case 'pass':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'warning':
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       case 'fail':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500" />;
     }
   };
 
   return (
     <div 
       className={cn(
-        "p-3 mb-2 rounded-md border",
+        "p-2 mb-1.5 rounded-md border text-sm",
         getStatusColor(check.status)
       )}
     >
       <div className="flex items-start">
-        <div className="mr-3 mt-0.5">
+        <div className="mr-2 mt-0.5 flex-shrink-0">
           {getStatusIcon(check.status)}
         </div>
         <div>
-          <h4 className="font-medium text-sm">{check.title}</h4>
-          <p className="text-sm text-gray-600">{check.description}</p>
+          <h4 className="font-medium text-xs">{check.title}</h4>
+          <p className="text-xs text-gray-600">{check.description}</p>
           {check.suggestion && (
-            <p className="text-xs italic mt-1 text-gray-500">{check.suggestion}</p>
+            <p className="text-xs italic mt-0.5 text-gray-500">{check.suggestion}</p>
           )}
         </div>
       </div>

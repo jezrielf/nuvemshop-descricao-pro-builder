@@ -21,10 +21,15 @@ export const useSEOChecklist = (description: ProductDescription | null) => {
       }, {} as Record<string, SEOCheckItem[]>);
     
     // Convert to array format expected by the component
-    return Object.entries(categories).map(([category, items]) => ({
-      title: category,
-      items
-    }));
+    // Sort categories to ensure consistent order
+    return Object.entries(categories)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([category, items]) => ({
+        title: category === 'content' ? 'Conteúdo' : 
+               category === 'images' ? 'Imagens' : 
+               category === 'structure' ? 'Estrutura' : category,
+        items
+      }));
   }, [checks]);
 
   const progress = scoreItem ? 

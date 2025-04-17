@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Settings, ChevronDown, List, Lightbulb, Image, FileCode } from 'lucide-react';
+import { Settings, ChevronDown } from 'lucide-react';
 import { ProductDescription } from '@/types/editor';
 import SEOAnalyzer from '../analyzers/SEOAnalyzer';
 import SEOChecklist from '../checklist/SEOChecklist';
@@ -38,10 +38,10 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 p-3" onClick={handleToolClick}>
+      <PopoverContent align="end" className="w-48 p-2.5" onClick={handleToolClick}>
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">Otimização de SEO</h4>
-          <div className="grid gap-1.5">
+          <h4 className="text-xs font-medium">Otimização de SEO</h4>
+          <div className="grid gap-1">
             <SEOToolButton>
               <SEOAnalyzer description={description} />
             </SEOToolButton>
@@ -62,10 +62,10 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
             </SEOToolButton>
           </div>
           
-          <Separator className="my-2" />
+          <Separator className="my-1.5" />
           
-          <h4 className="text-sm font-medium">Recursos de IA</h4>
-          <div className="grid gap-1.5">
+          <h4 className="text-xs font-medium">Recursos de IA</h4>
+          <div className="grid gap-1">
             <SEOToolButton>
               <AIContentRecommender description={description} />
             </SEOToolButton>
@@ -79,7 +79,7 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
 // Componente auxiliar para simplificar a estrutura
 const SEOToolButton: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="w-full" onClick={(e) => e.stopPropagation()}>
+    <div className="w-full text-sm" onClick={(e) => e.stopPropagation()}>
       {children}
     </div>
   );

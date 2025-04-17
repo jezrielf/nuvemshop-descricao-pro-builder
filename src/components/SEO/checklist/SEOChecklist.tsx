@@ -33,21 +33,21 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
         </button>
       </DialogTrigger>
       <DialogContent 
-        className="max-w-md p-0 overflow-visible border rounded-md shadow-md"
+        className="max-w-sm p-0 overflow-auto max-h-[85vh] border rounded-md shadow-md"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Checklist SEO</h2>
+        <div className="flex justify-between items-center p-3 border-b">
+          <h2 className="text-base font-semibold">Checklist SEO</h2>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{Math.round(progress)}%</span>
-            <Progress value={progress} className="w-24 h-2" />
+            <span className="text-xs font-medium">{Math.round(progress)}%</span>
+            <Progress value={progress} className="w-16 h-1.5" />
           </div>
         </div>
         
-        <div className="p-4">
+        <div className="p-3">
           {checklistItems.map((section) => (
-            <div key={section.title} className="mb-4">
-              <h3 className="font-medium text-sm text-gray-700 mb-2">{section.title}</h3>
+            <div key={section.title} className="mb-3">
+              <h3 className="font-medium text-xs text-gray-700 mb-1">{section.title}</h3>
               {section.items.map((item) => (
                 <CategoryChecks key={item.id} check={item} />
               ))}
@@ -55,8 +55,8 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
           ))}
         </div>
         
-        <div className="border-t p-3 flex justify-end">
-          <Button variant="default" className="px-4" onClick={() => setOpen(false)}>
+        <div className="border-t p-2 flex justify-end">
+          <Button variant="default" size="sm" className="px-2 py-1 h-auto text-xs" onClick={() => setOpen(false)}>
             Fechar
           </Button>
         </div>
