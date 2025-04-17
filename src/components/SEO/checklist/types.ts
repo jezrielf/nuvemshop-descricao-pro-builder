@@ -5,4 +5,5 @@ export interface SEOCheckItem {
   description: string;
   status: 'pass' | 'fail' | 'warning';
   category: 'content' | 'images' | 'structure' | 'metatags';
+  suggestion?: string;
 }

@@ -22,7 +22,8 @@ export const useSEOChecks = (description: ProductDescription | null) => {
         ? 'Bom comprimento de conteúdo (superior a 300 palavras)' 
         : 'Conteúdo muito curto (menos de 300 palavras)',
       status: getContentLength(description) > 300 ? 'pass' : 'fail',
-      category: 'content'
+      category: 'content',
+      suggestion: getContentLength(description) <= 300 ? 'Adicione mais conteúdo descritivo para melhorar o SEO. Recomendamos pelo menos 300 palavras.' : undefined
     });
     
     checksList.push({
@@ -32,7 +33,8 @@ export const useSEOChecks = (description: ProductDescription | null) => {
         ? 'Bom uso de cabeçalhos para estruturar o conteúdo' 
         : 'Poucos cabeçalhos. Considere adicionar mais para melhorar a estrutura',
       status: countHeadings(description) > 3 ? 'pass' : 'warning',
-      category: 'content'
+      category: 'content',
+      suggestion: countHeadings(description) <= 3 ? 'Adicione mais cabeçalhos (H1, H2, H3) para estruturar melhor seu conteúdo.' : undefined
     });
     
     // Image checks
@@ -47,7 +49,8 @@ export const useSEOChecks = (description: ProductDescription | null) => {
         ? 'A descrição contém imagens, o que é ótimo para SEO' 
         : 'Nenhuma imagem encontrada. Imagens melhoram o engajamento e SEO',
       status: hasImages ? 'pass' : 'fail',
-      category: 'images'
+      category: 'images',
+      suggestion: !hasImages ? 'Adicione pelo menos uma imagem relevante ao produto para melhorar o engajamento.' : undefined
     });
     
     const allImagesHaveAlt = checkImagesAlt(description);
@@ -58,7 +61,8 @@ export const useSEOChecks = (description: ProductDescription | null) => {
         ? 'Todas as imagens possuem textos alternativos (alt)' 
         : 'Algumas imagens não possuem texto alternativo (alt)',
       status: allImagesHaveAlt ? 'pass' : 'warning',
-      category: 'images'
+      category: 'images',
+      suggestion: !allImagesHaveAlt ? 'Adicione texto alternativo (alt) a todas as imagens para melhorar a acessibilidade e SEO.' : undefined
     });
     
     // Structure checks
@@ -69,7 +73,8 @@ export const useSEOChecks = (description: ProductDescription | null) => {
         ? 'Contém chamada para ação, excelente para conversão' 
         : 'Nenhuma chamada para ação encontrada',
       status: description.blocks.some(block => block.type === 'cta') ? 'pass' : 'warning',
-      category: 'structure'
+      category: 'structure',
+      suggestion: !description.blocks.some(block => block.type === 'cta') ? 'Adicione um bloco de CTA (Chamada para Ação) para melhorar as taxas de conversão.' : undefined
     });
     
     checksList.push({
@@ -79,7 +84,8 @@ export const useSEOChecks = (description: ProductDescription | null) => {
         ? 'Contém seção de FAQ, excelente para SEO e rich snippets' 
         : 'Nenhuma seção de FAQ encontrada',
       status: description.blocks.some(block => block.type === 'faq') ? 'pass' : 'warning',
-      category: 'structure'
+      category: 'structure',
+      suggestion: !description.blocks.some(block => block.type === 'faq') ? 'Adicione uma seção de FAQ para melhorar a experiência do usuário e criar oportunidades para rich snippets.' : undefined
     });
     
     // Calculate score
@@ -104,4 +110,3 @@ export const useSEOChecks = (description: ProductDescription | null) => {
     scoreItem: checks.length > 0 ? checks[0] : null 
   };
 };
-
