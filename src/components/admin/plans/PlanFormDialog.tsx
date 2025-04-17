@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -24,12 +24,15 @@ import { Switch } from '@/components/ui/switch';
 import { Plan, PlanFeature, defaultFeaturesTemplate } from './types';
 import { Plus, Trash } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/hooks/use-toast';
 
 // Create a schema that ensures all required fields are present
 const formSchema = z.object({
   name: z.string().min(3, {
     message: 'O nome do plano deve ter pelo menos 3 caracteres.',
   }),
+  description: z.string().optional(),
   price: z.coerce.number().min(0, {
     message: 'O preço deve ser um número positivo.',
   }),
@@ -48,7 +51,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface PlanFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Omit<Plan, 'id'>) => void;
+  onSubmit: (data: Omit<Plan, 'id'> | Plan) => void;
   title: string;
   initialData?: Plan | null;
 }
@@ -61,10 +64,12 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   initialData,
 }) => {
   const [newFeatureName, setNewFeatureName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Create a properly typed default value object that matches the FormValues type
   const defaultValues: FormValues = {
     name: '',
+    description: '',
     price: 0,
     isActive: true,
     isDefault: false,
@@ -74,13 +79,61 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   // Set default values with the correct types to match Plan requirements
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || defaultValues,
+    defaultValues,
   });
 
-  const handleSubmit = (values: FormValues) => {
-    // We now have a properly typed FormValues object that matches Omit<Plan, 'id'>
-    onSubmit(values as Omit<Plan, 'id'>);
-    form.reset();
+  // When initialData changes or open changes, reset the form
+  useEffect(() => {
+    if (open && initialData) {
+      console.log("Loading plan data for editing:", initialData);
+      // Reset the form with the initialData
+      form.reset({
+        name: initialData.name,
+        description: initialData.description || '',
+        price: initialData.price,
+        isActive: initialData.isActive,
+        isDefault: initialData.isDefault,
+        features: initialData.features || [...defaultFeaturesTemplate],
+      });
+      
+      toast({
+        title: "Plano carregado",
+        description: "Os dados do plano foram carregados para edição",
+      });
+    } else if (open && !initialData) {
+      // Reset to default values when creating a new plan
+      form.reset(defaultValues);
+    }
+  }, [open, initialData, form]);
+
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      setIsLoading(true);
+      
+      // If initialData exists, we're editing an existing plan
+      if (initialData) {
+        await onSubmit({
+          ...values,
+          id: initialData.id,
+          priceId: initialData.priceId
+        });
+      } else {
+        // We're creating a new plan
+        await onSubmit(values);
+      }
+      
+      form.reset();
+      setNewFeatureName('');
+    } catch (error) {
+      console.error("Error submitting plan form:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar o plano. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const addNewFeature = () => {
@@ -125,6 +178,25 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
                 </FormItem>
               )}
             />
+            
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Descrição do plano" 
+                      rows={3}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
             <FormField
               control={form.control}
               name="price"
@@ -227,7 +299,12 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Salvar</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Salvando..." : "Salvar"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

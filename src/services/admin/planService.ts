@@ -69,11 +69,20 @@ export const planService = {
   
   createPlan: async (planData: Omit<Plan, 'id'>): Promise<Plan> => {
     try {
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Authentication required");
+      }
+      
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { 
           method: 'POST', 
           action: 'create-product',
           productData: planData
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       
@@ -92,12 +101,21 @@ export const planService = {
   
   updatePlan: async (planId: string, planData: Partial<Plan>): Promise<Plan> => {
     try {
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Authentication required");
+      }
+      
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { 
           method: 'PUT', 
           action: 'update-product',
           productId: planId,
           productData: planData
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       
@@ -116,11 +134,20 @@ export const planService = {
   
   deletePlan: async (planId: string): Promise<void> => {
     try {
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Authentication required");
+      }
+      
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { 
           method: 'DELETE', 
           action: 'delete-product',
           productId: planId
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       
