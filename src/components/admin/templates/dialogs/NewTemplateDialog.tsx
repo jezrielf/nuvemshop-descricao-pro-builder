@@ -13,7 +13,6 @@ import { Plus, Trash2, ArrowUp, ArrowDown, Eye } from 'lucide-react';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
-import { ImportHtmlSection } from './ImportHtmlSection';
 import { ProductCategory } from '@/types/editor';
 
 interface NewTemplateDialogProps {
@@ -26,7 +25,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
   onClose,
 }) => {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('other');
+  const [category, setCategory] = useState<ProductCategory>('other');
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -131,7 +130,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
 
   const handleTemplateFromHtml = (generatedTemplate: Template) => {
     setName(generatedTemplate.name);
-    setCategory(generatedTemplate.category as string);
+    setCategory(generatedTemplate.category);
     setBlocks(convertBlocks(generatedTemplate.blocks));
     setActiveTab('blocks');
   };
@@ -176,7 +175,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                 <Label htmlFor="category">Categoria</Label>
                 <Select
                   value={category}
-                  onValueChange={setCategory}
+                  onValueChange={(value: ProductCategory) => setCategory(value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -188,6 +187,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                     <SelectItem value="shoes">Calçados</SelectItem>
                     <SelectItem value="electronics">Eletrônicos</SelectItem>
                     <SelectItem value="energy">Energia</SelectItem>
+                    <SelectItem value="Casa e decoração">Casa e decoração</SelectItem>
                     <SelectItem value="other">Outro</SelectItem>
                   </SelectContent>
                 </Select>

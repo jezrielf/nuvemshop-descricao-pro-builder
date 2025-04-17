@@ -51,13 +51,31 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
   
   // Create responsive column classes for two-column layout on desktop
   const getColumnsClass = () => {
-    if (block.columns <= 1) return '';
-    return 'md:grid-cols-2';
+    if (typeof block.columns === 'number' || typeof block.columns === 'string') {
+      // Convert to number if it's a string number or already a number
+      const columnsNumber = typeof block.columns === 'string' 
+        ? parseInt(block.columns, 10) 
+        : block.columns;
+      
+      // Check if columnsNumber is NaN or less than or equal to 1
+      if (isNaN(columnsNumber) || columnsNumber <= 1) {
+        return '';
+      }
+      return 'md:grid-cols-2';
+    }
+    return '';
   };
   
   // Preview mode
   if (isPreview) {
-    if (block.columns > 1) {
+    // Check if columns is a number or can be converted to a number
+    const columnsNumber = typeof block.columns === 'number' 
+      ? block.columns 
+      : typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))
+        ? parseInt(block.columns, 10)
+        : 1;
+    
+    if (columnsNumber > 1) {
       // Two-column layout for specifications
       return (
         <div className="w-full p-4">

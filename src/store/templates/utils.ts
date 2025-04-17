@@ -1,5 +1,5 @@
 
-import { Block } from '@/types/editor';
+import { Block, ProductCategory } from '@/types/editor';
 import { Template } from '@/types/editor';
 
 interface SupabaseTemplate {
@@ -23,10 +23,19 @@ export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Templ
       blocks = Object.values(supaTemplate.blocks);
     }
     
+    // Convert category to a valid ProductCategory
+    let category: ProductCategory = 'other';
+    if (supaTemplate.category && [
+      'supplements', 'clothing', 'accessories', 'shoes', 
+      'electronics', 'energy', 'Casa e decoração', 'other'
+    ].includes(supaTemplate.category)) {
+      category = supaTemplate.category as ProductCategory;
+    }
+    
     return {
       id: supaTemplate.id,
       name: supaTemplate.name,
-      category: supaTemplate.category,
+      category: category,
       blocks: blocks,
       thumbnail: supaTemplate.thumbnail || '/placeholder.svg' // Default placeholder if no thumbnail
     };

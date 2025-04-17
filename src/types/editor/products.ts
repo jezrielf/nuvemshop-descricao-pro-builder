@@ -6,4 +6,5 @@ export type ProductCategory =
   | 'shoes'
   | 'electronics'
   | 'energy'
+  | 'Casa e decoração'
   | 'other';

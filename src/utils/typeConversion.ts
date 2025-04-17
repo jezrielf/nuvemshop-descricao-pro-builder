@@ -11,7 +11,7 @@ export function ensureBlockType(block: BlockBase | Block): Block {
   const typedBlock = { ...block } as Block;
   
   // Handle special cases for specific block types
-  if (typedBlock.type === 'video' && typedBlock.autoplay === undefined) {
+  if (typedBlock.type === 'video' && (typedBlock as any).autoplay === undefined) {
     (typedBlock as any).autoplay = true; // Set default value if missing
   }
   

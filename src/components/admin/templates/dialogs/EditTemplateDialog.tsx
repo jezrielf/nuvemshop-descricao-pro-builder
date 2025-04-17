@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Template, Block, BlockType } from '@/types/editor';
+import { Template, Block, BlockType, ProductCategory } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
 import { convertBlocks, parseTemplateBlocks } from '@/utils/blockConverter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,7 +27,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   onUpdate,
 }) => {
   const [name, setName] = useState(template.name);
-  const [category, setCategory] = useState(template.category);
+  const [category, setCategory] = useState<ProductCategory>(template.category);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -146,7 +146,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
               <Label htmlFor="category">Categoria</Label>
               <Select
                 value={category}
-                onValueChange={setCategory}
+                onValueChange={(value: ProductCategory) => setCategory(value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma categoria" />
@@ -158,6 +158,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
                   <SelectItem value="shoes">Calçados</SelectItem>
                   <SelectItem value="electronics">Eletrônicos</SelectItem>
                   <SelectItem value="energy">Energia</SelectItem>
+                  <SelectItem value="Casa e decoração">Casa e decoração</SelectItem>
                   <SelectItem value="other">Outro</SelectItem>
                 </SelectContent>
               </Select>

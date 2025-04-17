@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useTemplateStore } from '@/store/templates';
 import { useEditorStore } from '@/store/editor';
@@ -6,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FileText, Star, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Template as TemplateType } from '@/types/editor';
+import { Template as TemplateType, ProductCategory } from '@/types/editor';
 
 const TemplateSelector: React.FC = () => {
   const { templates, categories, selectCategory, selectedCategory, loadTemplates } = useTemplateStore();
@@ -97,23 +98,22 @@ const TemplateSelector: React.FC = () => {
     const category = template.category;
     
     // Miniaturas personalizadas por categoria
-    switch(category) {
-      case 'supplements':
-        return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd';
-      case 'clothing':
-        return 'https://images.unsplash.com/photo-1560243563-062bfc001d68';
-      case 'shoes':
-        return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff';
-      case 'electronics':
-        return 'https://images.unsplash.com/photo-1498049794561-7780e7231661';
-      case 'energy':
-        return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
-      case 'accessories':
-        return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
-      case 'Casa e decoração':
-        return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92';
-      default:
-        return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
+    if (category === 'supplements') {
+      return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd';
+    } else if (category === 'clothing') {
+      return 'https://images.unsplash.com/photo-1560243563-062bfc001d68';
+    } else if (category === 'shoes') {
+      return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff';
+    } else if (category === 'electronics') {
+      return 'https://images.unsplash.com/photo-1498049794561-7780e7231661';
+    } else if (category === 'energy') {
+      return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
+    } else if (category === 'accessories') {
+      return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
+    } else if (category === 'Casa e decoração') {
+      return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92';
+    } else {
+      return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
     }
   };
 

@@ -1,67 +1,54 @@
 
-import { SpecificationsBlock } from '@/types/editor';
-import { getStylesFromBlock } from '../styleConverter';
+import { SpecificationsBlock } from "@/types/editor";
 
-export const generateSpecificationsHtml = (block: SpecificationsBlock): string => {
-  const blockStyles = getStylesFromBlock(block);
+export function generateSpecificationsBlockHtml(block: SpecificationsBlock): string {
+  const { heading, specs } = block;
   
-  // Extract heading color from block styles or use default
-  const headingColor = block.style?.headingColor || 'inherit';
-  const headingWeight = block.style?.headingWeight || 'bold';
+  if (!specs || specs.length === 0) {
+    return '';
+  }
   
-  // Two-column layout for specifications when columns > 1
-  if (block.columns > 1) {
-    // Calculate column width based on the number of columns
-    const columnWidth = 100 / Math.min(block.columns || 1, 4);
-    
-    const specsHtml = block.specs && block.specs.length > 0 
-      ? block.specs.map(spec => `
-        <div style="display: inline-block; vertical-align: top; width: calc(${columnWidth}% - 16px); margin: 8px; box-sizing: border-box;" class="spec-item">
-          <div class="spec-container" style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px;">
-            <div style="font-weight: 600;">${spec.name}</div>
-            <div>${spec.value}</div>
-          </div>
-        </div>
-      `).join('')
-      : '';
-    
+  // Determine whether to use grid or table based on columns
+  const columnsValue = typeof block.columns === 'number' 
+    ? block.columns 
+    : typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))
+      ? parseInt(block.columns, 10)
+      : 1;
+  
+  if (columnsValue > 1) {
+    // Grid layout for multiple columns
+    const gridColumns = Math.min(columnsValue, 4); // Cap at 4 columns
     return `
-      <div class="specifications-block" id="block-${block.id}" style="${blockStyles}">
-        <h2 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 24px; margin-bottom: 20px;">${block.heading}</h2>
-        <div style="font-size: 0; text-align: center; margin: -8px;" class="specs-container">
-          ${specsHtml}
+      <div class="specifications-block my-6">
+        <h2 class="text-2xl font-bold mb-4">${heading || 'Especificações'}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-${gridColumns} gap-4">
+          ${specs.map(spec => `
+            <div class="border rounded-md p-3">
+              <div class="font-medium">${spec.name}</div>
+              <div>${spec.value}</div>
+            </div>
+          `).join('')}
         </div>
-        <style>
-          @media (max-width: 768px) {
-            #block-${block.id} .spec-item {
-              width: calc(100% - 16px) !important;
-            }
-          }
-        </style>
+      </div>
+    `;
+  } else {
+    // Table layout for single column
+    return `
+      <div class="specifications-block my-6">
+        <h2 class="text-2xl font-bold mb-4">${heading || 'Especificações'}</h2>
+        <div class="border rounded-md overflow-hidden">
+          <table class="w-full">
+            <tbody>
+              ${specs.map((spec, index) => `
+                <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
+                  <td class="p-3 border-b font-medium">${spec.name}</td>
+                  <td class="p-3 border-b">${spec.value}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   }
-  
-  // Traditional table layout for single column
-  const specsHtml = block.specs && block.specs.length > 0 
-    ? block.specs.map((spec, index) => `
-      <tr style="${index % 2 === 0 ? 'background-color: #f9fafb;' : ''}">
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${spec.name}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${spec.value}</td>
-      </tr>
-    `).join('')
-    : '';
-  
-  return `
-    <div class="specifications-block" id="block-${block.id}" style="${blockStyles}">
-      <h2 style="color: ${headingColor}; font-weight: ${headingWeight}; font-size: 24px; margin-bottom: 20px;">${block.heading}</h2>
-      <div style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tbody>
-            ${specsHtml}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-};
+}

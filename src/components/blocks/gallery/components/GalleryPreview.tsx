@@ -14,10 +14,17 @@ const GalleryPreview: React.FC<GalleryPreviewProps> = ({ block }) => {
   // Create proper Tailwind column classes based on block.columns
   const getColumnsClass = () => {
     const columns = block.columns;
-    // Handle both string and number format of columns
-    if (columns === 2 || columns === '2' || columns === '1/2') return 'md:grid-cols-2';
-    if (columns === 3 || columns === '3' || columns === '1/3') return 'md:grid-cols-3';
-    if (columns === 4 || columns === '4' || columns === '1/4') return 'md:grid-cols-4';
+    
+    // Convert columns to a normalized form for comparison
+    const columnsValue = typeof columns === 'string' && columns.includes('/') 
+      ? columns 
+      : typeof columns === 'number' || !isNaN(parseInt(columns as string, 10))
+        ? Number(columns)
+        : columns;
+    
+    if (columnsValue === 2 || columnsValue === '1/2') return 'md:grid-cols-2';
+    if (columnsValue === 3 || columnsValue === '1/3') return 'md:grid-cols-3';
+    if (columnsValue === 4 || columnsValue === '1/4') return 'md:grid-cols-4';
     return '';
   };
   

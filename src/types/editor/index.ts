@@ -1,7 +1,6 @@
 
 // Re-export from base
 export type { 
-  BaseBlock, 
   BlockBase,
   BlockStyle,
   ProductDescription,
@@ -9,9 +8,8 @@ export type {
   ProductCategory,
   ColumnLayout,
   BlockSpacing,
-  BlockType  // Add this line
+  BlockType
 } from './base';
 
 // Re-export from blocks directory - this will be our canonical source for Block types
 export * from './blocks';
-
