@@ -27,7 +27,7 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
       id: uuidv4(),
       title: 'Novo Recurso',
       description: 'Descrição do recurso',
-      icon: 'star'
+      icon: '✓'
     };
     
     updateBlock(block.id, {
@@ -51,13 +51,23 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
     updateBlock(block.id, { features: updatedFeatures });
   };
   
-  // Create responsive column classes
+  // Create responsive column classes for the preview
   const getColumnsClass = () => {
-    switch (block.columns) {
-      case 2: return 'md:grid-cols-2';
-      case 3: return 'md:grid-cols-3';
-      case 4: return 'md:grid-cols-4';
-      default: return '';
+    // Convert columns from ColumnLayout to a number for grid display
+    if (typeof block.columns === 'number') {
+      const cols = Math.min(Math.max(block.columns, 1), 4);
+      return `md:grid-cols-${cols}`;
+    }
+    
+    // Handle string-based column layouts
+    switch(block.columns) {
+      case 'full': return ''; // Single column
+      case '1/2': return 'md:grid-cols-2';
+      case '1/3': return 'md:grid-cols-3';
+      case '2/3': return 'md:grid-cols-2';
+      case '1/4': return 'md:grid-cols-4';
+      case '3/4': return '';
+      default: return ''; // Default to single column
     }
   };
   
@@ -69,8 +79,17 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
         <div className={`grid grid-cols-1 ${getColumnsClass()} gap-6`}>
           {block.features && block.features.map(feature => (
             <div key={feature.id} className="p-4 border rounded-md">
-              <h3 className="text-lg font-medium mb-2">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <div className={`${block.layout === 'vertical' ? 'text-center mb-2' : 'flex items-start'}`}>
+                {feature.icon && (
+                  <div className={`text-2xl ${block.layout === 'vertical' ? 'mb-2' : 'mr-3'}`}>
+                    {feature.icon}
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-lg font-medium mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -108,6 +127,15 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
               </div>
               
               <div className="space-y-3">
+                <div>
+                  <label className="block text-xs mb-1">Ícone</label>
+                  <Input
+                    value={feature.icon}
+                    onChange={(e) => handleUpdateFeature(feature.id, 'icon', e.target.value)}
+                    placeholder="Exemplo: ✓, ★, ✚, etc."
+                  />
+                </div>
+                
                 <div>
                   <label className="block text-xs mb-1">Título</label>
                   <Input
