@@ -5,18 +5,20 @@ import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText, RefreshCw } from 'lucide-react';
+import { FileText, RefreshCw, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType } from '@/types/editor';
+import { Input } from '@/components/ui/input';
 import CategoryFilter from './CategoryFilter';
 import TemplateGrid from './TemplateGrid';
 import useTemplateUtils from './useTemplateUtils';
 
 const TemplateSelector: React.FC = () => {
-  const { templates, categories, selectCategory, selectedCategory, loadTemplates } = useTemplateStore();
+  const { templates, categories, selectCategory, selectedCategory, loadTemplates, searchTemplates } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const { categoryNames, isAdvancedTemplate, getTemplateThumbnail } = useTemplateUtils();
   
@@ -65,13 +67,10 @@ const TemplateSelector: React.FC = () => {
     }
   };
   
-  // Get all templates when selectedCategory is null
+  // Apply search and category filtering
   const displayedTemplates = React.useMemo(() => {
-    console.log('Displaying templates. Total available:', templates.length);
-    return selectedCategory === null 
-      ? templates  // Show all templates when no category is selected
-      : templates.filter(template => template.category === selectedCategory);
-  }, [templates, selectedCategory]);
+    return searchTemplates(searchQuery, selectedCategory);
+  }, [templates, selectedCategory, searchQuery, searchTemplates]);
 
   const handleSelectTemplate = (template: TemplateType) => {
     loadTemplate(template);
@@ -105,6 +104,17 @@ const TemplateSelector: React.FC = () => {
         </DialogHeader>
         
         <div className="flex flex-col flex-grow h-full mt-4">
+          {/* Search bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Buscar templates..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          
           <div className="flex items-center justify-between mb-4">
             <CategoryFilter
               categories={categories}

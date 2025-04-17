@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Template } from '@/types/editor';
 import { useTemplateStore } from '@/store/templates';
@@ -35,4 +36,3 @@ export function useTemplates() {
     filteredTemplates
   };
 }
-
