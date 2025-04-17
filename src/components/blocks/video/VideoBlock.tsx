@@ -30,7 +30,8 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
       videoUrl: block.videoUrl,
       title: block.title,
       description: block.description || '',
-      autoplay: block.autoplay
+      autoplay: block.autoplay ?? true,
+      caption: block.caption || ''
     }
   });
 
