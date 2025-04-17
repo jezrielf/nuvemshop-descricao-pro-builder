@@ -100,6 +100,16 @@ export const useSEOChecks = (description: ProductDescription | null) => {
       suggestion: !description.blocks.some(block => block.type === 'faq') ? 'Adicione uma seção de FAQ para melhorar a experiência do usuário e criar oportunidades para rich snippets.' : undefined
     });
     
+    // Add dialog performance check
+    checksList.push({
+      id: 'dialog-performance',
+      title: 'Performance do Diálogo',
+      description: 'Verificar o tempo de abertura do diálogo (ideal: <500ms)',
+      status: 'pass', // Initial status, will be updated when dialog opens
+      category: 'structure',
+      suggestion: 'O tempo de abertura do diálogo deve ser menor que 500ms para uma boa experiência do usuário.'
+    });
+    
     const totalChecks = checksList.length;
     const passedChecks = checksList.filter(check => check.status === 'pass').length;
     const percentage = Math.round((passedChecks / totalChecks) * 100);

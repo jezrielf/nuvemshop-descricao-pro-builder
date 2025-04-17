@@ -1,4 +1,3 @@
-
 import { ProductDescription } from '@/types/editor';
 
 /**

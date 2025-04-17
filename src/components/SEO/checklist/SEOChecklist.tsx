@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProductDescription } from '@/types/editor';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,18 @@ interface SEOChecklistProps {
 const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
   const [open, setOpen] = useState(false);
   const { checklistItems, progress } = useSEOChecklist(description);
+  const openTimeRef = useRef<number>(0);
+  
+  useEffect(() => {
+    if (open) {
+      openTimeRef.current = Date.now();
+    } else if (openTimeRef.current > 0) {
+      const timing = Date.now() - openTimeRef.current;
+      const isAcceptable = timing <= 500; // 500ms is ideal timing
+      console.log(`Checklist dialog timing: ${timing}ms (${isAcceptable ? 'acceptable' : 'slow'})`);
+      openTimeRef.current = 0;
+    }
+  }, [open]);
   
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -28,6 +40,7 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
         <button 
           className="w-full text-left py-1.5 px-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           onClick={handleClick}
+          data-testid="seo-checklist"
         >
           Checklist SEO
         </button>
