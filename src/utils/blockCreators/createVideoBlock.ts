@@ -12,7 +12,8 @@ export const createVideoBlock = (columns: ColumnLayout): Block => {
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     description: 'Descrição do vídeo (opcional)',
     aspectRatio: '16:9',
-    autoplay: false,
+    autoplay: true,
+    muteAudio: false,
     style: {}
   } as Block;
 };

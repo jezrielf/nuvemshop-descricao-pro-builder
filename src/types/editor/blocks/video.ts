@@ -6,6 +6,7 @@ export interface VideoBlock extends BlockBase {
   videoUrl: string;
   aspectRatio?: '16:9' | '4:3' | '1:1';
   autoplay?: boolean;
+  muteAudio?: boolean;
   description?: string;
   caption?: string;
   heading?: string;

@@ -22,7 +22,8 @@ const formSchema = z.object({
   videoUrl: z.string().url({ message: "URL inválida" }),
   title: z.string(),
   description: z.string().optional(),
-  autoplay: z.boolean().default(true)
+  autoplay: z.boolean().default(true),
+  muteAudio: z.boolean().default(false)
 });
 
 const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => {
@@ -36,7 +37,8 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
       videoUrl: block.videoUrl,
       title: block.title,
       description: block.description || '',
-      autoplay: block.autoplay
+      autoplay: block.autoplay ?? true,
+      muteAudio: block.muteAudio ?? false
     }
   });
 
@@ -54,16 +56,15 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
       
       if (match && match[1]) {
         // Formar URL de incorporação com parâmetros de autoplay e mudo
-        // Nota: YouTube requer 'mute=1' para que o autoplay funcione
         const videoId = match[1];
-        return `https://www.youtube.com/embed/${videoId}?autoplay=${block.autoplay ? '1' : '0'}&mute=${block.autoplay ? '1' : '0'}&rel=0`;
+        return `https://www.youtube.com/embed/${videoId}?autoplay=${block.autoplay ? '1' : '0'}&mute=${block.muteAudio ? '1' : '0'}&rel=0`;
       }
       
       return '';
     };
     
     setEmbedUrl(getYouTubeEmbedUrl(block.videoUrl));
-  }, [block.videoUrl, block.autoplay]);
+  }, [block.videoUrl, block.autoplay, block.muteAudio]);
 
   if (isPreview) {
     if (!embedUrl) {
@@ -187,6 +188,30 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
                       onCheckedChange={(checked) => {
                         field.onChange(checked);
                         onValueChange('autoplay', checked);
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="muteAudio"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel>Silenciar Áudio</FormLabel>
+                    <FormDescription>
+                      Reproduzir o vídeo sem áudio
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                        onValueChange('muteAudio', checked);
                       }}
                     />
                   </FormControl>

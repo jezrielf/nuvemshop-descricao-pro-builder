@@ -29,6 +29,8 @@ function isVimeoUrl(url: string): boolean {
 // Main function to generate HTML for a video block
 export function generateVideoBlockHtml(block: VideoBlock): string {
   const { videoUrl, aspectRatio = '16:9', heading, caption } = block;
+  const autoplay = block.autoplay ?? true;
+  const muteAudio = block.muteAudio ?? false;
   
   // Set aspect ratio CSS class
   let aspectRatioClass = '';
@@ -50,16 +52,17 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
   const containerStyle = getStylesFromBlock(block);
   
   // Default embed code (fallback for non-YouTube/Vimeo URLs)
-  let embedCode = `<video controls src="${videoUrl}" class="absolute top-0 left-0 w-full h-full"></video>`;
+  let embedCode = `<video controls src="${videoUrl}" class="absolute top-0 left-0 w-full h-full" ${autoplay ? 'autoplay' : ''} ${muteAudio ? 'muted' : ''}></video>`;
   
   // Process YouTube videos
   if (isYoutubeUrl(videoUrl)) {
     const videoId = getYoutubeVideoId(videoUrl);
     if (videoId) {
       embedCode = `<iframe 
-        src="https://www.youtube.com/embed/${videoId}" 
+        src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? '1' : '0'}&mute=${muteAudio ? '1' : '0'}&rel=0" 
         frameborder="0" 
         allowfullscreen 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
         class="absolute top-0 left-0 w-full h-full"
       ></iframe>`;
     }
@@ -69,9 +72,10 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
     const videoId = getVimeoVideoId(videoUrl);
     if (videoId) {
       embedCode = `<iframe 
-        src="https://player.vimeo.com/video/${videoId}" 
+        src="https://player.vimeo.com/video/${videoId}?autoplay=${autoplay ? '1' : '0'}&muted=${muteAudio ? '1' : '0'}" 
         frameborder="0" 
         allowfullscreen 
+        allow="autoplay; fullscreen; picture-in-picture" 
         class="absolute top-0 left-0 w-full h-full"
       ></iframe>`;
     }
