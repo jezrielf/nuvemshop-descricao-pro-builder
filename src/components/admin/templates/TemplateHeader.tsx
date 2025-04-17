@@ -33,21 +33,21 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
         />
       </div>
       <Select
-        value={selectedCategory || ""}
-        onValueChange={(value) => onCategoryChange(value || null)}
+        value={selectedCategory || "all"}
+        onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Todas as categorias" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Todas as categorias</SelectItem>
+          <SelectItem value="all">Todas as categorias</SelectItem>
           <SelectItem value="supplements">Suplementos</SelectItem>
           <SelectItem value="clothing">Vestuário</SelectItem>
           <SelectItem value="accessories">Acessórios</SelectItem>
           <SelectItem value="shoes">Calçados</SelectItem>
           <SelectItem value="electronics">Eletrônicos</SelectItem>
           <SelectItem value="energy">Energia</SelectItem>
-          <SelectItem value="Casa e decoração">Casa e decoração</SelectItem>
+          <SelectItem value="house">Casa e decoração</SelectItem>
           <SelectItem value="other">Outros</SelectItem>
         </SelectContent>
       </Select>
