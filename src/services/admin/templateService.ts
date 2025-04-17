@@ -1,18 +1,29 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
 import { convertBlocks } from '@/utils/blockConverter';
+import { getAllTemplates } from '@/utils/templates';
 
 export const templateService = {
   getTemplates: async (): Promise<Template[]> => {
     try {
+      // Primeiro tentamos obter templates do banco de dados
       const { data, error } = await supabase
         .from('templates')
         .select('*')
         .order('updated_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.warn('Erro ao carregar templates do banco de dados:', error);
+        // Se houve erro, retornamos templates locais
+        return getAllTemplates();
+      }
+      
+      // Se não há dados ou o array está vazio, retornamos templates locais
+      if (!data || data.length === 0) {
+        console.log('Nenhum template encontrado no banco de dados, usando templates locais');
+        return getAllTemplates();
+      }
       
       // Convert the database response to Template format with proper type handling
       const templates: Template[] = (data || []).map((template) => {
@@ -50,10 +61,14 @@ export const templateService = {
         };
       });
       
+      // Se ainda não retornamos, significa que temos templates do banco de dados
+      console.log(`Carregados ${templates.length} templates do banco de dados`);
       return templates;
     } catch (error) {
       console.error('Error in getTemplates:', error);
-      throw error;
+      // Em caso de qualquer erro, retornamos os templates locais como fallback
+      console.log('Usando templates locais como fallback devido a erro');
+      return getAllTemplates();
     }
   },
   

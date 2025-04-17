@@ -28,8 +28,16 @@ const TemplateSelector: React.FC = () => {
       if (dialogOpen) {
         setIsLoading(true);
         try {
-          await loadTemplates();
-          console.log('Templates loaded in TemplateSelector, count:', templates.length);
+          const loadedTemplates = await loadTemplates();
+          console.log('Templates loaded in TemplateSelector, count:', loadedTemplates.length);
+          
+          if (loadedTemplates.length === 0) {
+            toast({
+              title: "Aviso",
+              description: "Não foi possível encontrar templates. Usando templates padrão.",
+              variant: "warning",
+            });
+          }
         } catch (error) {
           console.error('Error loading templates in TemplateSelector:', error);
           toast({
@@ -50,10 +58,11 @@ const TemplateSelector: React.FC = () => {
   const handleRefreshTemplates = async () => {
     setIsLoading(true);
     try {
-      await loadTemplates();
+      const refreshedTemplates = await loadTemplates();
+      console.log('Templates refreshed, count:', refreshedTemplates.length);
       toast({
         title: "Templates atualizados",
-        description: "Os templates foram atualizados com sucesso.",
+        description: `${refreshedTemplates.length} templates disponíveis.`,
       });
     } catch (error) {
       console.error('Error refreshing templates:', error);
@@ -95,11 +104,6 @@ const TemplateSelector: React.FC = () => {
           <DialogTitle>Escolha um Template</DialogTitle>
           <DialogDescription>
             Selecione um template para iniciar rapidamente sua descrição de produto.
-            {templates.length === 0 && !isLoading && (
-              <div className="mt-2 text-yellow-600 text-sm">
-                Nenhum template encontrado. Tente atualizar a lista de templates.
-              </div>
-            )}
           </DialogDescription>
         </DialogHeader>
         

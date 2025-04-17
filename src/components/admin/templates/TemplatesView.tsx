@@ -22,12 +22,21 @@ export const TemplatesView = () => {
     setIsLoading(true);
     try {
       console.log("TemplatesView - carregando templates");
-      await loadTemplates();
-      console.log("TemplatesView - templates carregados com sucesso");
-      toast({
-        title: 'Templates carregados',
-        description: `${templates.length} templates disponíveis`,
-      });
+      const loadedTemplates = await loadTemplates();
+      console.log("TemplatesView - templates carregados com sucesso:", loadedTemplates.length);
+      
+      if (loadedTemplates.length > 0) {
+        toast({
+          title: 'Templates carregados',
+          description: `${loadedTemplates.length} templates disponíveis`,
+        });
+      } else {
+        toast({
+          title: 'Atenção',
+          description: 'Nenhum template encontrado. Verifique sua conexão ou crie novos templates.',
+          variant: 'warning',
+        });
+      }
     } catch (error) {
       console.error('Error loading templates:', error);
       toast({
@@ -84,7 +93,19 @@ export const TemplatesView = () => {
       </div>
       
       <ScrollArea className="h-[calc(100vh-220px)]">
-        <TemplateList templates={filteredTemplates} />
+        {templates.length > 0 ? (
+          <TemplateList templates={filteredTemplates} />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-muted-foreground mb-4">
+              Nenhum template encontrado. Crie um novo template ou atualize a lista.
+            </p>
+            <Button onClick={handleRefresh} variant="outline">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Tentar novamente
+            </Button>
+          </div>
+        )}
       </ScrollArea>
       
       {/* Template Dialogs */}
