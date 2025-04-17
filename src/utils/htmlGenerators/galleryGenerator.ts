@@ -20,7 +20,7 @@ export function generateGalleryBlockHtml(block: GalleryBlock): string {
   // Convert columns from ColumnLayout to a number
   const columnsValue = (() => {
     if (typeof block.columns === 'number') return block.columns;
-    if (block.columns === 'full' || block.columns === '1/1') return 1;
+    if (block.columns === 'full') return 1;
     if (block.columns === '1/2') return 2;
     if (block.columns === '1/3') return 3;
     if (block.columns === '2/3') return 2;
