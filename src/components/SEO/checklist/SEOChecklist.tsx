@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProductDescription } from '@/types/editor';
@@ -7,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { useSEOChecklist } from '../hooks/useSEOChecklist';
+import { useSEOChecklist } from './hooks/useSEOChecklist';
 
 interface SEOChecklistProps {
   description: ProductDescription | null;
@@ -44,24 +45,20 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
                       key={itemIndex} 
                       className={cn(
                         "flex items-start p-3 rounded-md border",
-                        item.status === 'complete' && "bg-green-50 border-green-200",
+                        item.status === 'pass' && "bg-green-50 border-green-200",
                         item.status === 'warning' && "bg-yellow-50 border-yellow-200",
-                        item.status === 'error' && "bg-red-50 border-red-200",
-                        item.status === 'pending' && "bg-gray-50 border-gray-200"
+                        item.status === 'fail' && "bg-red-50 border-red-200"
                       )}
                     >
                       <div className="mt-0.5 mr-3">
-                        {item.status === 'complete' && (
+                        {item.status === 'pass' && (
                           <CheckCircle className="h-5 w-5 text-green-600" />
                         )}
                         {item.status === 'warning' && (
                           <AlertCircle className="h-5 w-5 text-yellow-600" />
                         )}
-                        {item.status === 'error' && (
+                        {item.status === 'fail' && (
                           <AlertCircle className="h-5 w-5 text-red-600" />
-                        )}
-                        {item.status === 'pending' && (
-                          <Circle className="h-5 w-5 text-gray-400" />
                         )}
                       </div>
                       <div className="flex-1">
