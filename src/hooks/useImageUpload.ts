@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { storageService } from '@/services/storageService';
+import { storageService } from '@/services/storage';
 
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);

@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { storageService } from '@/services/storageService';
+import { storageService } from '@/services/storage';
 
 export const useGalleryUpload = () => {
   const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});

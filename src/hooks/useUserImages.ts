@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { storageService } from '@/services/storageService';
+import { storageService } from '@/services/storage';
 
 interface UserImage {
   id: string;
