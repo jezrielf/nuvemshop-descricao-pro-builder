@@ -23,12 +23,19 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
     handleAnalyze
   } = useSEODialog(description);
   
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('SEO Analyzer clicked, opening dialog');
+    setOpen(true);
+  };
+  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <span className="w-full">Ferramentas SEO</span>
+        <span className="w-full" onClick={handleClick}>Ferramentas SEO</span>
       </DialogTrigger>
-      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
+      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4" onClick={(e) => e.stopPropagation()}>
         <AnalyzerDialogHeader />
         <div className="flex-grow overflow-hidden">
           <AnalyzerDialogContent

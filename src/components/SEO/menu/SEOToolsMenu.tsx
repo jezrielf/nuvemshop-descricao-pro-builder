@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Settings, ChevronDown } from 'lucide-react';
+import { Settings, ChevronDown, List, Lightbulb, Image, FileCode } from 'lucide-react';
 import { ProductDescription } from '@/types/editor';
 import SEOAnalyzer from '../analyzers/SEOAnalyzer';
 import SEOChecklist from '../checklist/SEOChecklist';
@@ -74,7 +74,7 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
 // Componente auxiliar para simplificar a estrutura
 const SEOToolButton: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="w-full">
+    <div className="w-full" onClick={(e) => e.stopPropagation()}>
       {children}
     </div>
   );

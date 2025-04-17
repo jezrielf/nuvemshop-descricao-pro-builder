@@ -32,6 +32,13 @@ const SEOTools: React.FC<SEOToolsProps> = ({ description }) => {
     updateBlockImage(blockId, imageType, newImageUrl, updateBlock, description);
   };
   
+  // Prevenindo o fechamento ao clicar nos itens do menu
+  const handleItemClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('Item de ferramenta SEO clicado');
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -44,21 +51,29 @@ const SEOTools: React.FC<SEOToolsProps> = ({ description }) => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Otimização de SEO</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
             <Settings className="h-4 w-4 mr-2" />
-            <SEOAnalyzer description={description} />
+            <span onClick={handleItemClick} className="flex-1">
+              <SEOAnalyzer description={description} />
+            </span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
             <List className="h-4 w-4 mr-2" />
-            <SEOChecklist description={description} />
+            <span onClick={handleItemClick} className="flex-1">
+              <SEOChecklist description={description} />
+            </span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
             <FileCode className="h-4 w-4 mr-2" />
-            <MetaTagValidator description={description} />
+            <span onClick={handleItemClick} className="flex-1">
+              <MetaTagValidator description={description} />
+            </span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
             <Image className="h-4 w-4 mr-2" />
-            <ImageOptimizer description={description} onUpdateImage={handleUpdateImage} />
+            <span onClick={handleItemClick} className="flex-1">
+              <ImageOptimizer description={description} onUpdateImage={handleUpdateImage} />
+            </span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         
@@ -66,9 +81,11 @@ const SEOTools: React.FC<SEOToolsProps> = ({ description }) => {
         
         <DropdownMenuLabel>Recursos de IA</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
             <Lightbulb className="h-4 w-4 mr-2" />
-            <AIContentRecommender description={description} />
+            <span onClick={handleItemClick} className="flex-1">
+              <AIContentRecommender description={description} />
+            </span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
