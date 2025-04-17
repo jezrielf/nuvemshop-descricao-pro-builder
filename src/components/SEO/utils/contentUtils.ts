@@ -1,122 +1,107 @@
-
 import { ProductDescription } from '@/types/editor';
 
-export const getTextContentFromDescription = (desc: ProductDescription): string => {
-  // Extract text content from all blocks
-  const textContent = desc.blocks.map(block => {
-    switch (block.type) {
-      case 'text':
-        return 'content' in block ? block.content : '';
-      case 'hero':
-        return `${'heading' in block ? block.heading : ''} ${'subheading' in block ? block.subheading : ''}`;
-      case 'features':
-        return `${'heading' in block ? block.heading : ''} ${
-          'features' in block && block.features ? 
-            block.features.map(f => `${f.title} ${f.description}`).join(' ') : 
-            ''
-        }`;
-      case 'benefits':
-        return `${'heading' in block ? block.heading : ''} ${
-          'benefits' in block && block.benefits ? 
-            block.benefits.map(b => `${b.title} ${b.description}`).join(' ') : 
-            ''
-        }`;
-      case 'specifications':
-        return `${'heading' in block ? block.heading : ''} ${
-          'specs' in block && block.specs ? 
-            block.specs.map(s => `${s.name} ${s.value}`).join(' ') : 
-            ''
-        }`;
-      case 'faq':
-        return `${'heading' in block ? block.heading : ''} ${
-          'questions' in block && block.questions ? 
-            block.questions.map(q => `${q.question} ${q.answer}`).join(' ') : 
-            ''
-        }`;
-      case 'cta':
-        return `${'heading' in block ? block.heading : ''} ${'content' in block ? block.content : ''} ${'buttonText' in block ? block.buttonText : ''}`;
-      case 'imageText':
-      case 'textImage':
-        return `${'heading' in block ? block.heading : ''} ${'content' in block ? block.content : ''}`;
-      default:
-        return '';
-    }
-  }).join(' ');
-  
-  return textContent;
-};
+/**
+ * Counts the number of headings (h1, h2, h3) in the product description.
+ * @param description The product description object.
+ * @returns The number of headings in the description.
+ */
+export const countHeadings = (description: ProductDescription | null): number => {
+  if (!description || !description.blocks) {
+    return 0;
+  }
 
-export const countHeadings = (desc: ProductDescription): number => {
   let headingCount = 0;
-  desc.blocks.forEach(block => {
-    // Count block headings
-    if ('heading' in block && block.heading) headingCount++;
-    
-    // Count headings in HTML content
-    if (block.type === 'text' && 'content' in block && block.content) {
-      const h1Count = (block.content.match(/<h1[^>]*>/g) || []).length;
-      const h2Count = (block.content.match(/<h2[^>]*>/g) || []).length;
-      const h3Count = (block.content.match(/<h3[^>]*>/g) || []).length;
-      const h4Count = (block.content.match(/<h4[^>]*>/g) || []).length;
-      headingCount += h1Count + h2Count + h3Count + h4Count;
+  description.blocks.forEach(block => {
+    if (block.type === 'heading') {
+      headingCount++;
     }
   });
   return headingCount;
 };
 
-export const checkImagesAlt = (desc: ProductDescription): boolean => {
-  let allHaveAlt = true;
-  
-  desc.blocks.forEach(block => {
-    if (block.type === 'image' && 'alt' in block && block.alt === '') {
-      allHaveAlt = false;
+/**
+ * Checks if all images in the product description have alt text.
+ * @param description The product description object.
+ * @returns True if all images have alt text, false otherwise.
+ */
+export const checkImagesAlt = (description: ProductDescription | null): boolean => {
+  if (!description || !description.blocks) {
+    return true; // Consider no images as having all alt texts
+  }
+
+  for (const block of description.blocks) {
+    if (block.type === 'image' && (!block.image?.alt || block.image.alt.trim() === '')) {
+      return false;
     }
-    else if (block.type === 'hero' && 'image' in block && block.image && (!block.image.alt || block.image.alt === '')) {
-      allHaveAlt = false;
+    if (block.type === 'gallery' && block.images) {
+      for (const image of block.images) {
+        if (!image.alt || image.alt.trim() === '') {
+          return false;
+        }
+      }
     }
-    else if (block.type === 'gallery' && 'images' in block && block.images) {
-      block.images.forEach(img => {
-        if (!img.alt || img.alt === '') allHaveAlt = false;
-      });
+    if (block.type === 'hero' && (!block.image?.alt || block.image.alt.trim() === '')) {
+      return false;
     }
-    else if ((block.type === 'imageText' || block.type === 'textImage') && 
-             'image' in block && block.image && (!block.image.alt || block.image.alt === '')) {
-      allHaveAlt = false;
+    if (block.type === 'imageText' && (!block.image?.alt || block.image.alt.trim() === '')) {
+      return false;
     }
-  });
-  
-  return allHaveAlt;
+    if (block.type === 'textImage' && (!block.image?.alt || block.image.alt.trim() === '')) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
-export const getContentLength = (desc: ProductDescription): number => {
-  let wordCount = 0;
-  desc.blocks.forEach(block => {
-    switch (block.type) {
-      case 'text':
-        if ('content' in block && block.content) {
-          // Strip HTML tags and count words
-          const content = block.content.replace(/<[^>]+>/g, ' ');
-          wordCount += content.split(/\s+/).filter(Boolean).length;
-        }
-        break;
-      case 'hero':
-        if ('heading' in block && block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
-        if ('subheading' in block && block.subheading) wordCount += block.subheading.split(/\s+/).filter(Boolean).length;
-        break;
-      case 'cta':
-        if ('heading' in block && block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
-        if ('content' in block && block.content) wordCount += block.content.split(/\s+/).filter(Boolean).length;
-        break;
-      case 'textImage':
-      case 'imageText':
-        if ('heading' in block && block.heading) wordCount += block.heading.split(/\s+/).filter(Boolean).length;
-        if ('content' in block && block.content) {
-          const content = block.content.replace(/<[^>]+>/g, ' ');
-          wordCount += content.split(/\s+/).filter(Boolean).length;
-        }
-        break;
-      // Add other block types as needed
+/**
+ * Gets the length of the content in the product description.
+ * @param description The product description object.
+ * @returns The length of the content in the description.
+ */
+export const getContentLength = (description: ProductDescription | null): number => {
+  if (!description || !description.blocks) {
+    return 0;
+  }
+
+  let contentLength = 0;
+  description.blocks.forEach(block => {
+    if (block.type === 'text' && block.content) {
+      // Remove HTML tags and count words
+      const textContent = block.content.replace(/<[^>]*>/g, '');
+      const words = textContent.trim().split(/\s+/);
+      contentLength += words.length;
     }
   });
-  return wordCount;
+  return contentLength;
+};
+
+/**
+ * Check if SEO Analyzer is present in the layout
+ * @returns boolean indicating if analyzer is integrated
+ */
+export const checkAnalyzerPresence = (): boolean => {
+  // Check if SEOAnalyzer component is mounted in DOM
+  const analyzerElement = document.querySelector('[data-testid="seo-analyzer"]');
+  return !!analyzerElement;
+};
+
+/**
+ * Track dialog timing analytics
+ * @param startTime Opening timestamp
+ * @returns number Time in milliseconds
+ */
+export const calculateDialogTiming = (startTime: number): number => {
+  return Date.now() - startTime;
+};
+
+/**
+ * Calculate if dialog timing is within acceptable range
+ * Ideal time: < 500ms for opening
+ * @param timing Time in milliseconds
+ * @returns boolean
+ */
+export const isDialogTimingAcceptable = (timing: number): boolean => {
+  const IDEAL_TIMING = 500; // 500ms
+  return timing <= IDEAL_TIMING;
 };

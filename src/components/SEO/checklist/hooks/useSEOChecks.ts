@@ -1,11 +1,11 @@
-
 import { useMemo } from 'react';
 import { ProductDescription } from '@/types/editor';
 import { SEOCheckItem } from '../types';
 import { 
   countHeadings, 
   checkImagesAlt, 
-  getContentLength 
+  getContentLength,
+  checkAnalyzerPresence 
 } from '../../utils/contentUtils';
 
 export const useSEOChecks = (description: ProductDescription | null) => {
@@ -35,6 +35,18 @@ export const useSEOChecks = (description: ProductDescription | null) => {
       status: countHeadings(description) > 3 ? 'pass' : 'warning',
       category: 'content',
       suggestion: countHeadings(description) <= 3 ? 'Adicione mais cabeçalhos (H1, H2, H3) para estruturar melhor seu conteúdo.' : undefined
+    });
+    
+    // Analyzer integration check
+    checksList.push({
+      id: 'analyzer-integration',
+      title: 'Integração com Analisador',
+      description: checkAnalyzerPresence() 
+        ? 'Analisador SEO está corretamente integrado' 
+        : 'Analisador SEO não está integrado ao layout',
+      status: checkAnalyzerPresence() ? 'pass' : 'warning',
+      category: 'structure',
+      suggestion: !checkAnalyzerPresence() ? 'Verifique se o componente SEOAnalyzer está corretamente importado e vinculado ao layout.' : undefined
     });
     
     // Image checks
@@ -88,7 +100,6 @@ export const useSEOChecks = (description: ProductDescription | null) => {
       suggestion: !description.blocks.some(block => block.type === 'faq') ? 'Adicione uma seção de FAQ para melhorar a experiência do usuário e criar oportunidades para rich snippets.' : undefined
     });
     
-    // Calculate score
     const totalChecks = checksList.length;
     const passedChecks = checksList.filter(check => check.status === 'pass').length;
     const percentage = Math.round((passedChecks / totalChecks) * 100);
