@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -26,6 +25,35 @@ const hasRole = (roleString: string | null, roleToCheck: string): boolean => {
   
   // Handle single role
   return roleString === roleToCheck;
+};
+
+// Function to compress feature data to fit in Stripe's metadata limits
+const compressFeatures = (features: any[]): string => {
+  // Create a minimal representation of features
+  const minimalFeatures = features.map(feature => {
+    // Only keep essential data and shorten property names
+    return {
+      n: feature.name.substring(0, 30), // Truncate name if needed
+      i: feature.included ? 1 : 0       // Use 1/0 instead of true/false
+    };
+  });
+  
+  // Stringify and limit total length if needed
+  let featuresStr = JSON.stringify(minimalFeatures);
+  
+  // If still too long, truncate the array
+  if (featuresStr.length > 480) { // Leave some buffer
+    // Keep reducing features until under limit
+    let i = minimalFeatures.length;
+    while (featuresStr.length > 480 && i > 0) {
+      i--;
+      featuresStr = JSON.stringify(minimalFeatures.slice(0, i));
+    }
+    // Add indicator that features were truncated
+    featuresStr = featuresStr.substring(0, featuresStr.length - 1) + ',{"n":"...","i":0}]';
+  }
+  
+  return featuresStr;
 };
 
 serve(async (req) => {
@@ -91,6 +119,30 @@ serve(async (req) => {
         // Format the products into a more usable format
         const formattedProducts = products.data.map(product => {
           const defaultPrice = product.default_price as Stripe.Price;
+          
+          // Try to parse features from metadata
+          let features = [];
+          try {
+            if (product.metadata.features) {
+              const parsedFeatures = JSON.parse(product.metadata.features);
+              
+              // Check if we have compressed features (with n/i properties)
+              if (parsedFeatures.length > 0 && 'n' in parsedFeatures[0]) {
+                features = parsedFeatures.map((f: any) => ({
+                  id: `feature-${features.length}`,
+                  name: f.n,
+                  included: f.i === 1
+                }));
+              } else {
+                // Standard format
+                features = parsedFeatures;
+              }
+            }
+          } catch (e) {
+            logStep(`Warning: Could not parse features for product ${product.id}`, e);
+            features = [];
+          }
+          
           return {
             id: product.id,
             name: product.name,
@@ -99,7 +151,7 @@ serve(async (req) => {
             priceId: defaultPrice ? defaultPrice.id : null,
             isActive: product.active,
             metadata: product.metadata,
-            features: product.metadata.features ? JSON.parse(product.metadata.features) : [],
+            features: features,
             isDefault: product.metadata.default === 'true',
           };
         });
@@ -202,13 +254,16 @@ serve(async (req) => {
       // Handle admin actions based on method and action
       if (method === "POST" && action === "create-product") {
         try {
+          // Compress features data to fit in metadata
+          const compressedFeatures = compressFeatures(productData.features || []);
+          
           // Create a new product
           const product = await stripe.products.create({
             name: productData.name,
             description: productData.description || '',
             active: productData.isActive,
             metadata: {
-              features: JSON.stringify(productData.features || []),
+              features: compressedFeatures,
               default: productData.isDefault ? 'true' : 'false',
             },
           });
@@ -257,13 +312,16 @@ serve(async (req) => {
       
       if (method === "PUT" && action === "update-product") {
         try {
+          // Compress features to fit in metadata limits
+          const compressedFeatures = compressFeatures(productData.features || []);
+          
           // Update the product
           const product = await stripe.products.update(productId, {
             name: productData.name,
             description: productData.description || '',
             active: productData.isActive,
             metadata: {
-              features: JSON.stringify(productData.features || []),
+              features: compressedFeatures,
               default: productData.isDefault ? 'true' : 'false',
             },
           });
