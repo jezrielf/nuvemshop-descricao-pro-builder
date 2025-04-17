@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -12,9 +11,9 @@ import ProductEditorController from '@/components/Nuvemshop/components/ProductEd
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
+import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
+import ImageUpload from '@/components/ImageUpload';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -85,6 +84,7 @@ const Index = () => {
     });
   };
   
+  // First, show the image upload component
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
@@ -132,6 +132,11 @@ const Index = () => {
       {selectedProduct && (
         <ProductEditorController product={selectedProduct} />
       )}
+      
+      {/* Display the image upload component */}
+      <div className="p-4 bg-white">
+        <ImageUpload />
+      </div>
       
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup 
