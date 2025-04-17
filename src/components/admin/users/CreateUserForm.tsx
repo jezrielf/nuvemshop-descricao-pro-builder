@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { CreateUserFormValues } from './types';
 import CreateUserRoleSelector from './CreateUserRoleSelector';
-import { authService } from '@/services/authService';
+import { adminService } from '@/services/adminService';
 
 interface CreateUserFormProps {
   onUserCreated: () => void;
@@ -37,24 +37,10 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
         role: values.role
       };
       
-      // Create the user using the admin edge function
-      const { data, error } = await authService.adminCreateUser(
-        values.email,
-        values.password,
-        userData
-      );
+      // Create the user using the admin service
+      const data = await adminService.createUser(values.email, values.password, userData);
       
-      if (error) {
-        console.error('Error response from adminCreateUser:', error);
-        throw new Error(error.message || 'Failed to create user');
-      }
-      
-      if (!data?.user) {
-        console.error('No user returned from adminCreateUser');
-        throw new Error('User creation failed. No user returned.');
-      }
-      
-      console.log('User created successfully:', data.user);
+      console.log('User created successfully:', data);
       
       toast({
         title: 'Usuário criado com sucesso',

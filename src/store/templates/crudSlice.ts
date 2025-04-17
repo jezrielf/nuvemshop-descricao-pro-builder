@@ -2,9 +2,9 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
-import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { serializeBlocks } from './utils';
+import { adminService } from '@/services/adminService';
 
 export const createCRUDSlice: StateCreator<
   TemplateState & TemplateCRUDSlice,
@@ -19,19 +19,7 @@ export const createCRUDSlice: StateCreator<
         id: uuidv4()
       };
       
-      const { error } = await supabase
-        .from('templates')
-        .insert({
-          id: newTemplate.id,
-          name: newTemplate.name,
-          category: newTemplate.category,
-          blocks: serializeBlocks(newTemplate.blocks)
-        });
-      
-      if (error) {
-        console.error('Error saving template to database:', error);
-        throw error;
-      }
+      await adminService.createTemplate(newTemplate);
       
       set(state => ({
         templates: [...state.templates, newTemplate]
@@ -56,20 +44,11 @@ export const createCRUDSlice: StateCreator<
         ...templateData
       };
       
-      const { error } = await supabase
-        .from('templates')
-        .update({
-          name: updatedTemplate.name,
-          category: updatedTemplate.category,
-          blocks: serializeBlocks(updatedTemplate.blocks),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id);
-      
-      if (error) {
-        console.error('Error updating template in database:', error);
-        throw error;
-      }
+      await adminService.updateTemplate(id, {
+        name: updatedTemplate.name,
+        category: updatedTemplate.category,
+        blocks: updatedTemplate.blocks
+      });
       
       const newTemplates = [...templates];
       newTemplates[templateIndex] = updatedTemplate;
@@ -84,15 +63,7 @@ export const createCRUDSlice: StateCreator<
   
   deleteTemplate: async (id) => {
     try {
-      const { error } = await supabase
-        .from('templates')
-        .delete()
-        .eq('id', id);
-      
-      if (error) {
-        console.error('Error deleting template from database:', error);
-        throw error;
-      }
+      await adminService.deleteTemplate(id);
       
       set(state => ({
         templates: state.templates.filter(template => template.id !== id)

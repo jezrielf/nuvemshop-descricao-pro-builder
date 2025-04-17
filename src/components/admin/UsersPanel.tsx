@@ -1,16 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import UserPanelHeader from './users/panels/UserPanelHeader';
 import UserPanelContent from './users/panels/UserPanelContent';
-
-interface AuthUser {
-  id: string;
-  email: string;
-  created_at: string;
-}
+import { adminService } from '@/services/adminService';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -49,58 +43,9 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // First, get users from auth.users through the admin API
-      const { data: authUsers, error: authError } = await supabase.functions.invoke('admin-list-users', {
-        body: {}
-      });
-      
-      if (authError) {
-        console.error('Error fetching auth users:', authError);
-        throw authError;
-      }
-      
-      console.log('Auth users fetched:', authUsers);
-      
-      // Now get profiles data
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*');
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        throw profilesError;
-      }
-      
-      // Create a map of profiles by ID for faster lookup
-      const profilesMap = new Map<string, Profile>();
-      profilesData?.forEach((profile: Profile) => {
-        profilesMap.set(profile.id, profile);
-      });
-      
-      // Map auth users to profiles and enrich with email
-      const enrichedProfiles: Profile[] = [];
-      
-      authUsers?.users?.forEach((user: AuthUser) => {
-        const profile = profilesMap.get(user.id) || {
-          id: user.id,
-          nome: null,
-          avatar_url: null,
-          criado_em: user.created_at,
-          atualizado_em: user.created_at,
-          role: 'user',
-        };
-        
-        // Add email from auth user to profile
-        enrichedProfiles.push({
-          ...profile,
-          email: user.email
-        });
-      });
-      
-      console.log('Enriched profiles:', enrichedProfiles);
-      
-      setProfiles(enrichedProfiles);
-      setFilteredProfiles(enrichedProfiles);
+      const users = await adminService.getUsers();
+      setProfiles(users);
+      setFilteredProfiles(users);
     } catch (error: any) {
       console.error('Error fetching users:', error);
       setError(error.message || 'Erro ao carregar usuários');

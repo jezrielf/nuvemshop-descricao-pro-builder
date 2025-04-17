@@ -12,10 +12,9 @@ import {
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { UserTableProps, UserFormValues } from './types';
-import { authService } from '@/services/authService';
-import { supabase } from '@/integrations/supabase/client';
 import UserTableRow from './table/UserTableRow';
 import UserEditSheet from './edit/UserEditSheet';
+import { adminService } from '@/services/adminService';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
@@ -34,22 +33,13 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       setUpdatingUser(editingUser.id);
       
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          nome: values.nome,
-          atualizado_em: new Date().toISOString()
-        })
-        .eq('id', editingUser.id);
-        
-      if (error) throw error;
+      // Update profile data
+      await adminService.updateUserProfile(editingUser.id, {
+        nome: values.nome
+      });
       
-      const { error: roleError } = await authService.updateUserRole(
-        editingUser.id,
-        values.role
-      );
-      
-      if (roleError) throw roleError;
+      // Update user role
+      await adminService.updateUserRole(editingUser.id, values.role);
       
       toast({
         title: 'Perfil atualizado',
@@ -76,12 +66,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       
       console.log('Atualizando papel do usuário:', userId, 'para:', newRole);
       
-      const { error } = await authService.updateUserRole(userId, newRole);
-        
-      if (error) {
-        console.error('Erro ao atualizar papel:', error);
-        throw error;
-      }
+      await adminService.updateUserRole(userId, newRole);
       
       toast({
         title: 'Papel atualizado',
@@ -110,9 +95,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       setUpdatingUser(profileId);
       
-      const { error } = await supabase.auth.admin.deleteUser(profileId);
-        
-      if (error) throw error;
+      await adminService.deleteUser(profileId);
       
       toast({
         title: 'Usuário excluído',

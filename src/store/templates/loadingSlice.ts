@@ -3,7 +3,7 @@ import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
 import { getAllTemplates } from '@/utils/templates';
-import { supabase } from '@/integrations/supabase/client';
+import { adminService } from '@/services/adminService';
 import { convertSupabaseToTemplate } from './utils';
 
 export const createLoadingSlice: StateCreator<
@@ -20,23 +20,19 @@ export const createLoadingSlice: StateCreator<
       const defaultTemplates = getAllTemplates();
       console.log('Default templates loaded, count:', defaultTemplates.length);
       
-      // Load user templates from Supabase
-      const { data: userTemplatesData, error } = await supabase
-        .from('templates')
-        .select('*')
-        .order('updated_at', { ascending: false });
-      
-      if (error) {
+      // Load user templates from Supabase using our admin service
+      let userTemplates: Template[] = [];
+      try {
+        const templatesData = await adminService.getTemplates();
+        console.log('User templates from database:', templatesData?.length || 0);
+        
+        // Convert templates
+        userTemplates = templatesData.map(template => convertSupabaseToTemplate(template))
+          .filter((template): template is Template => template !== null);
+      } catch (error) {
         console.error('Error loading templates from database:', error);
-        throw error;
+        userTemplates = [];
       }
-      
-      console.log('User templates from database:', userTemplatesData?.length || 0);
-      
-      // Convert Supabase templates
-      const userTemplates = (userTemplatesData || [])
-        .map(template => convertSupabaseToTemplate(template))
-        .filter((template): template is Template => template !== null);
       
       // Combine templates and extract categories
       const allTemplates = [...defaultTemplates, ...userTemplates];

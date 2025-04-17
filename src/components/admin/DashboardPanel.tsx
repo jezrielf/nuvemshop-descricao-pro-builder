@@ -5,65 +5,98 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Users, ShoppingCart, FileText, RefreshCw } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { mockPlans } from './plans/mockData';
 import { useToast } from '@/hooks/use-toast';
+import { adminService } from '@/services/adminService';
 
-// Demo data
+// Demo data for charts that don't have backend data yet
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const defaultSalesData = [
+  { name: 'Jan', value: 1200 },
+  { name: 'Fev', value: 1900 },
+  { name: 'Mar', value: 2400 },
+  { name: 'Abr', value: 1800 },
+  { name: 'Mai', value: 2800 },
+  { name: 'Jun', value: 3100 }
+];
+
+const defaultTemplateUsage = [
+  { name: 'Suplementos', value: 45 },
+  { name: 'Eletrônicos', value: 30 },
+  { name: 'Roupas', value: 65 },
+  { name: 'Calçados', value: 38 },
+  { name: 'Outros', value: 22 }
+];
 
 const DashboardPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [userStats, setUserStats] = useState({
-    total: 125,
-    premium: 45,
-    admin: 3,
-    newToday: 5
+    total: 0,
+    premium: 0,
+    admin: 0,
+    newToday: 0
   });
-  const [salesData, setSalesData] = useState([
-    { name: 'Jan', value: 1200 },
-    { name: 'Fev', value: 1900 },
-    { name: 'Mar', value: 2400 },
-    { name: 'Abr', value: 1800 },
-    { name: 'Mai', value: 2800 },
-    { name: 'Jun', value: 3100 }
-  ]);
-  const [planDistribution, setPlanDistribution] = useState([
-    { name: 'Básico', value: 80 },
-    { name: 'Premium', value: 35 },
-    { name: 'Empresarial', value: 10 }
-  ]);
-  const [templateUsage, setTemplateUsage] = useState([
-    { name: 'Suplementos', value: 45 },
-    { name: 'Eletrônicos', value: 30 },
-    { name: 'Roupas', value: 65 },
-    { name: 'Calçados', value: 38 },
-    { name: 'Outros', value: 22 }
-  ]);
+  const [salesData, setSalesData] = useState(defaultSalesData);
+  const [planDistribution, setPlanDistribution] = useState<Array<{ name: string; value: number }>>([]);
+  const [templateUsage, setTemplateUsage] = useState(defaultTemplateUsage);
+  const [descriptionsStats, setDescriptionsStats] = useState({
+    total: 0,
+    recent: 0
+  });
+  const [plansStats, setPlansStats] = useState({
+    total: 0,
+    active: 0
+  });
+  
   const { toast } = useToast();
 
-  const refreshData = () => {
-    setLoading(true);
-    
-    // Simulate API call with timeout
-    setTimeout(() => {
-      setLoading(false);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load dashboard stats from our admin service
+      const stats = await adminService.getDashboardStats();
+      
+      setUserStats(stats.userStats);
+      setDescriptionsStats(stats.descriptions);
+      setPlansStats(stats.plans);
+      
+      // Create plan distribution data
+      const planDistData = [];
+      if (stats.userStats.premium > 0) planDistData.push({ name: 'Premium', value: stats.userStats.premium });
+      if (stats.userStats.total - stats.userStats.premium - stats.userStats.admin > 0) {
+        planDistData.push({ name: 'Básico', value: stats.userStats.total - stats.userStats.premium - stats.userStats.admin });
+      }
+      if (stats.userStats.admin > 0) planDistData.push({ name: 'Admin', value: stats.userStats.admin });
+      
+      setPlanDistribution(planDistData);
+      
+      // Success toast
       toast({
         title: "Dashboard atualizado",
         description: "Os dados do dashboard foram atualizados com sucesso.",
       });
-    }, 1500);
+    } catch (error: any) {
+      console.error('Error loading dashboard data:', error);
+      
+      toast({
+        title: 'Erro ao carregar dados',
+        description: error.message || 'Ocorreu um erro ao atualizar o dashboard.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Load data when component mounts
-    refreshData();
+    loadData();
   }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Dashboard</h2>
-        <Button variant="outline" onClick={refreshData} disabled={loading}>
+        <Button variant="outline" onClick={loadData} disabled={loading}>
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Atualizar
         </Button>
@@ -90,7 +123,7 @@ const DashboardPanel: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold">{userStats.premium}</div>
             <p className="text-xs text-muted-foreground">
-              {Math.round((userStats.premium / userStats.total) * 100)}% do total
+              {userStats.total > 0 ? Math.round((userStats.premium / userStats.total) * 100) : 0}% do total
             </p>
           </CardContent>
         </Card>
@@ -100,9 +133,9 @@ const DashboardPanel: React.FC = () => {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockPlans.filter(p => p.isActive).length}</div>
+            <div className="text-2xl font-bold">{plansStats.active}</div>
             <p className="text-xs text-muted-foreground">
-              De {mockPlans.length} planos totais
+              De {plansStats.total} planos totais
             </p>
           </CardContent>
         </Card>
@@ -112,9 +145,9 @@ const DashboardPanel: React.FC = () => {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
+            <div className="text-2xl font-bold">{descriptionsStats.total}</div>
             <p className="text-xs text-muted-foreground">
-              +48 nas últimas 24h
+              +{descriptionsStats.recent} nas últimas 24h
             </p>
           </CardContent>
         </Card>
@@ -169,7 +202,7 @@ const DashboardPanel: React.FC = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={planDistribution}
+                    data={planDistribution.length > 0 ? planDistribution : [{ name: 'Sem dados', value: 1 }]}
                     cx="50%"
                     cy="50%"
                     labelLine={false}

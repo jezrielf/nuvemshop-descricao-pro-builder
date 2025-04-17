@@ -1,63 +1,47 @@
 
-import { useCallback } from 'react';
 import { Plan } from '../types';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { adminService } from '@/services/adminService';
 
 export const useDeletePlan = (
-  plans: Plan[], 
+  plans: Plan[],
   setPlans: React.Dispatch<React.SetStateAction<Plan[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  setIsDeleteDialogOpen: (open: boolean) => void,
+  setIsDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
   fetchPlans: () => Promise<void>
 ) => {
   const { toast } = useToast();
 
-  const handleDeleteConfirm = useCallback(async (selectedPlan: Plan | null) => {
-    if (!selectedPlan) return;
+  const handleDeleteConfirm = async (plan: Plan | null) => {
+    if (!plan) return;
     
     try {
       setLoading(true);
-      console.log("Deleting plan:", selectedPlan.id);
       
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { 
-          method: 'POST', 
-          action: 'delete-product',
-          data: { id: selectedPlan.id }
-        }
-      });
+      await adminService.deletePlan(plan.id);
       
-      if (error) {
-        console.error("Stripe API error:", error);
-        throw new Error(error.message || "Failed to delete plan");
-      }
-      
-      if (data && !data.success) {
-        console.error("Delete plan error:", data.error);
-        throw new Error(data.error || "Failed to delete plan");
-      }
-      
-      setPlans(plans.filter(p => p.id !== selectedPlan.id));
-      setIsDeleteDialogOpen(false);
-
       toast({
-        title: "Plano excluído",
-        description: `O plano ${selectedPlan.name} foi excluído com sucesso.`,
+        title: 'Plano excluído',
+        description: `O plano "${plan.name}" foi excluído com sucesso.`,
       });
       
+      // Refresh plans list
       await fetchPlans();
+      
+      // Close the dialog
+      setIsDeleteDialogOpen(false);
     } catch (error: any) {
-      console.error("Error deleting plan:", error);
+      console.error('Error deleting plan:', error);
+      
       toast({
-        title: "Erro ao excluir plano",
-        description: error.message || "Houve um erro ao excluir o plano.",
-        variant: "destructive",
+        title: 'Erro ao excluir plano',
+        description: error.message || 'Ocorreu um erro ao excluir o plano.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
-  }, [fetchPlans, plans, setIsDeleteDialogOpen, setLoading, setPlans, toast]);
+  };
 
   return { handleDeleteConfirm };
 };

@@ -1,6 +1,6 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,28 +21,22 @@ serve(async (req) => {
       throw new Error('Email and password are required');
     }
     
-    console.log('Create user request received for email:', email);
-    console.log('User data:', JSON.stringify(userData));
+    console.log('User creation request received for:', email);
     
     // Create a Supabase client with the service role key for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Create the new user with admin privileges
-    console.log('Attempting to create user with createUser method');
-    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+    // Create the user
+    const { data: { user }, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: userData
+      user_metadata: {
+        nome: userData?.nome || email.split('@')[0]
+      }
     });
     
     if (createError) {
@@ -50,38 +44,33 @@ serve(async (req) => {
       throw createError;
     }
 
-    if (!newUser?.user) {
-      console.error('No user object returned from createUser');
-      throw new Error('User creation failed. No user returned.');
+    if (!user) {
+      throw new Error('Failed to create user');
     }
 
-    console.log('User created successfully:', newUser.user.id);
-
-    // Update the profiles table with role and other metadata
-    console.log('Updating profile data for ID:', newUser.user.id);
+    console.log('User created successfully with ID:', user.id);
     
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .upsert({
-        id: newUser.user.id,
-        nome: userData.nome,
-        role: userData.role,
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString()
-      });
-    
-    if (profileError) {
-      console.error('Error updating profile:', profileError);
-      throw profileError;
+    // Update profile with additional data if provided
+    if (userData) {
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          nome: userData.nome,
+          role: userData.role || 'user',
+          atualizado_em: new Date().toISOString()
+        })
+        .eq('id', user.id);
+      
+      if (profileError) {
+        console.error('Error updating user profile:', profileError);
+        // Not throwing here as the user was created, just log the error
+      }
     }
-    
-    console.log('Profile updated successfully');
-    
-    // Return the created user data
+
     return new Response(
       JSON.stringify({ 
-        data: newUser, 
-        error: null 
+        user,
+        success: true 
       }),
       { 
         headers: { 
