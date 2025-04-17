@@ -52,14 +52,14 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
       </div>
 
       <Select
-        value={selectedCategory || ""}
-        onValueChange={(value) => onCategoryChange(value === "" ? null : value)}
+        value={selectedCategory || "all"}
+        onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Todas as categorias" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Todas as categorias</SelectItem>
+          <SelectItem value="all">Todas as categorias</SelectItem>
           {categoryOptions.map((category) => (
             <SelectItem key={category} value={category}>
               {getCategoryName(category)}

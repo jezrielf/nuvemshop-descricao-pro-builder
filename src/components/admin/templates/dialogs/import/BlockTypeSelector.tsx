@@ -28,7 +28,7 @@ export const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({
   return (
     <div className="flex items-center space-x-2">
       <Select
-        value={blockType}
+        value={blockType || "text"}
         onValueChange={(value) => onTypeChange(value as BlockType)}
       >
         <SelectTrigger className="w-[180px] h-8">
