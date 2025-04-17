@@ -1,5 +1,5 @@
 
-import { Block, TextBlock } from '@/types/editor';
+import { Block, TextBlock, ColumnLayout } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -24,8 +24,9 @@ export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
       title: 'Descrição Importada',
       content: htmlContent,
       heading: 'Descrição do Produto',
-      columns: 1,
-      visible: true
+      columns: 'full' as ColumnLayout,
+      visible: true,
+      style: {}
     };
 
     return [textBlock];

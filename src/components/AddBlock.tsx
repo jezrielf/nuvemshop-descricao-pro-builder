@@ -15,7 +15,7 @@ const AddBlock: React.FC = () => {
   const { addBlock } = useEditorStore();
   const [open, setOpen] = React.useState(false);
   const [selectedType, setSelectedType] = React.useState<BlockType | null>(null);
-  const [columns, setColumns] = React.useState<ColumnLayout>(1);
+  const [columns, setColumns] = React.useState<ColumnLayout>('full');
   const { toast } = useToast();
   
   const handleAddBlock = () => {
@@ -42,7 +42,7 @@ const AddBlock: React.FC = () => {
         });
         
         setSelectedType(null);
-        setColumns(1);
+        setColumns('full');
         setOpen(false);
       }
     } catch (error) {

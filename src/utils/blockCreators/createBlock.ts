@@ -16,7 +16,7 @@ import {
 } from './blocks';
 import { ensureValidBlock } from './validation';
 
-export const createBlock = (type: BlockType, columns: ColumnLayout = 1): Block => {
+export const createBlock = (type: BlockType, columns: ColumnLayout = 'full'): Block => {
   try {
     let block: Block;
     

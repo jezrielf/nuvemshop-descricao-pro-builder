@@ -31,7 +31,7 @@ const BlockConfigForm: React.FC<BlockConfigFormProps> = ({
         <label className="text-sm font-medium">Número de Colunas</label>
         <Select
           value={columns.toString()}
-          onValueChange={(value) => onColumnsChange(parseInt(value) as ColumnLayout)}
+          onValueChange={(value) => onColumnsChange(value as ColumnLayout)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Selecione o número de colunas" />

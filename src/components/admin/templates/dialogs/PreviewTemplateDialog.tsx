@@ -1,14 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Template, Block } from '@/types/editor';
+import { Template, Block, BlockType } from '@/types/editor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { useEditorStore } from '@/store/editor';
 import { Plus, Edit, Code } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { BlockType } from '@/types/editor/blocks';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { convertBlocks } from '@/utils/blockConverter';

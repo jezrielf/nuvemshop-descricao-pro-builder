@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GalleryBlock } from '@/types/editor';
+import { GalleryBlock, ColumnLayout } from '@/types/editor';
 import { Image } from 'lucide-react';
 
 interface GalleryPreviewProps {
@@ -13,12 +13,12 @@ const GalleryPreview: React.FC<GalleryPreviewProps> = ({ block }) => {
   
   // Create proper Tailwind column classes based on block.columns
   const getColumnsClass = () => {
-    switch (block.columns) {
-      case 2: return 'md:grid-cols-2';
-      case 3: return 'md:grid-cols-3';
-      case 4: return 'md:grid-cols-4';
-      default: return '';
-    }
+    const columns = block.columns;
+    // Handle both string and number format of columns
+    if (columns === 2 || columns === '2' || columns === '1/2') return 'md:grid-cols-2';
+    if (columns === 3 || columns === '3' || columns === '1/3') return 'md:grid-cols-3';
+    if (columns === 4 || columns === '4' || columns === '1/4') return 'md:grid-cols-4';
+    return '';
   };
   
   return (

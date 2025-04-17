@@ -15,7 +15,7 @@ export type BlockType =
   | 'cta'
   | 'video';
 
-export type ColumnLayout = '1/2' | '1/3' | '2/3' | '1/4' | '3/4' | 'full';
+export type ColumnLayout = 'full' | '1/2' | '1/3' | '2/3' | '1/4' | '3/4' | 1 | 2 | 3 | 4;
 
 export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
 
@@ -66,3 +66,6 @@ export interface ProductDescription {
   category?: ProductCategory;
   blocks: any[];
 }
+
+// Export ProductCategory to be used in other files
+export { ProductCategory };

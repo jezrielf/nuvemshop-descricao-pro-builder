@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Lightbulb, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ProductDescription } from '@/types/editor';
+import { ProductDescription, ColumnLayout } from '@/types/editor';
 import { useEditorStore } from '@/store/editor';
-import { BlockType, ColumnLayout } from '@/types/editor';
+import { BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
 interface AIContentRecommenderProps {
@@ -87,7 +88,7 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
         id: blockId,
         type: blockType,
         title: blockTitle,
-        columns: 1 as ColumnLayout,
+        columns: 'full' as ColumnLayout,
         visible: true,
         heading: 'Perguntas Frequentes',
         questions: [
@@ -109,7 +110,7 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({ description
         id: blockId,
         type: blockType,
         title: blockTitle,
-        columns: 1 as ColumnLayout,
+        columns: 'full' as ColumnLayout,
         visible: true,
         heading: getHeadingFromRecommendation(recommendation),
         content: `<p>${recommendation}</p>`
