@@ -61,9 +61,9 @@ export const useImageUpload = ({ onSuccess, onError }: UseImageUploadProps = {})
       return null;
     } finally {
       setUploading(false);
-      setUploadProgress(prev => prev >= 90 ? 100 : 0);
+      setUploadProgress(0);
       
-      // Resetar input
+      // Reset input
       if (e.target) e.target.value = '';
     }
   };
@@ -113,7 +113,7 @@ export const useImageUpload = ({ onSuccess, onError }: UseImageUploadProps = {})
       return null;
     } finally {
       setUploading(false);
-      setUploadProgress(prev => prev >= 90 ? 100 : 0);
+      setUploadProgress(0);
     }
   };
 
