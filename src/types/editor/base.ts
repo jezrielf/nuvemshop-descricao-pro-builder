@@ -1,4 +1,37 @@
 
+export type ColumnLayout = 1 | 2 | 3 | 4;
+
+export type ProductCategory = 
+  | 'supplements'       // Suplementos
+  | 'clothing'          // Roupas
+  | 'accessories'       // Acessórios
+  | 'shoes'             // Calçados
+  | 'electronics'       // Eletrônicos
+  | 'energy'            // Energéticos
+  | 'health'            // Saúde e bem estar
+  | 'beauty'            // Cosméticos
+  | 'fashion'           // Moda
+  | 'haute-couture'     // Alta Costura
+  | 'home-decor'        // Casa e decoração
+  | 'fitness'           // Fitness
+  | 'beverages'         // Bebidas
+  | 'water-purifiers'   // Purificadores de água
+  | 'other';            // Outros
+
+export interface BlockStyle {
+  backgroundColor?: string;
+  textColor?: string;
+  headingColor?: string;
+  padding?: 'sm' | 'md' | 'lg' | 'none';
+  blockSpacing?: 'sm' | 'md' | 'lg' | 'none';
+  borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+  borderWidth?: 'none' | 'sm' | 'md' | 'lg';
+  borderColor?: string;
+  boxShadow?: 'none' | 'sm' | 'md' | 'lg';
+  fontFamily?: string;
+  textAlign?: 'left' | 'center' | 'right';
+}
+
 export interface BlockBase {
   id: string;
   type: string;
@@ -8,56 +41,6 @@ export interface BlockBase {
   style?: BlockStyle;
 }
 
-export interface BlockStyle {
-  backgroundColor?: string;
-  textColor?: string;
-  headingColor?: string;
-  padding?: string;
-  margin?: string;
-  borderRadius?: string;
-  borderWidth?: string;
-  borderColor?: string;
-  fontSize?: string;
-  fontWeight?: string;
-  textAlign?: string;
-  boxShadow?: string;
-  hasBorder?: boolean;
-  hasShadow?: boolean;
-  blockSpacing?: string;
-  [key: string]: any; // For other custom styles
-}
-
-export interface ProductDescription {
-  id: string;
-  name: string;
-  blocks: Block[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type ColumnLayout = 1 | 2 | 3 | 4;
-
-// Import block types from the blocks directory
-import { Block } from './blocks';
-import { BlockType } from './blocks';
-
-// Export these types for use in other files
-export type { Block, BlockType };
-
-export type ProductCategory = 
-  | 'supplements' 
-  | 'clothing' 
-  | 'accessories' 
-  | 'shoes' 
-  | 'electronics' 
-  | 'energy' 
-  | 'health'
-  | 'beauty'
-  | 'fashion'
-  | 'haute-couture'
-  | 'home-decor' // Home decor category
-  | 'other';
-
 export interface Template {
   id: string;
   name: string;
@@ -66,8 +49,5 @@ export interface Template {
   thumbnail: string;
 }
 
-// Define BlockSpacing for styleConverter.ts
-export interface BlockSpacing {
-  margin?: string;
-  padding?: string;
-}
+// Import all block types
+import { Block } from './blocks';

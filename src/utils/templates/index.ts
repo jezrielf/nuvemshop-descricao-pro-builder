@@ -9,6 +9,11 @@ import { fashionTemplates } from './fashion';
 import { accessoriesTemplates } from './accessories';
 import { hauteCoutureTemplates } from './hauteCouture';
 import { homeDecorTemplates } from './home-decor';
+import { clothingTemplates } from './clothing';
+import { beautyTemplates } from './beauty';
+import { fitnessTemplates } from './fitness';
+import { beveragesTemplates } from './beverages';
+import { waterPurifiersTemplates } from './water-purifiers';
 
 // Combining all templates
 export const advancedTemplates: Template[] = [
@@ -19,7 +24,12 @@ export const advancedTemplates: Template[] = [
   ...fashionTemplates,
   ...accessoriesTemplates,
   ...hauteCoutureTemplates,
-  ...homeDecorTemplates
+  ...homeDecorTemplates,
+  ...clothingTemplates,
+  ...beautyTemplates,
+  ...fitnessTemplates,
+  ...beveragesTemplates,
+  ...waterPurifiersTemplates
 ];
 
 export const getAllTemplates = (): Template[] => {
@@ -35,3 +45,8 @@ export * from './fashion';
 export * from './accessories';
 export * from './hauteCouture';
 export * from './home-decor';
+export * from './clothing';
+export * from './beauty';
+export * from './fitness';
+export * from './beverages';
+export * from './water-purifiers';
