@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { BlockType, ProductDescription, Block } from '@/types/editor';
+import { BlockType, ProductDescription, Block, ProductCategory } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
 
 interface AIDescriptionInput {
@@ -50,6 +49,27 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   
   // Format the name
   const descriptionName = `Descrição de ${input.productName}`;
+  
+  // Parse the product category if provided, or default to 'other'
+  let category: ProductCategory = 'other';
+  if (input.productCategory) {
+    // Try to map the input category to one of our ProductCategory types
+    const normalizedCategory = input.productCategory.toLowerCase().trim();
+    
+    if (normalizedCategory.includes('supplement')) category = 'supplements';
+    else if (normalizedCategory.includes('cloth')) category = 'clothing';
+    else if (normalizedCategory.includes('accessory') || normalizedCategory.includes('accessories')) category = 'accessories';
+    else if (normalizedCategory.includes('shoe')) category = 'shoes';
+    else if (normalizedCategory.includes('electronic')) category = 'electronics';
+    else if (normalizedCategory.includes('health')) category = 'health';
+    else if (normalizedCategory.includes('beauty') || normalizedCategory.includes('cosmetic')) category = 'beauty';
+    else if (normalizedCategory.includes('fashion')) category = 'fashion';
+    else if (normalizedCategory.includes('haute') || normalizedCategory.includes('couture')) category = 'haute-couture';
+    else if (normalizedCategory.includes('home') || normalizedCategory.includes('decor')) category = 'home-decor';
+    else if (normalizedCategory.includes('fitness')) category = 'fitness';
+    else if (normalizedCategory.includes('beverage')) category = 'beverages';
+    else if (normalizedCategory.includes('purifier')) category = 'water-purifiers';
+  }
   
   // Create blocks array
   const blocks: Block[] = [];
@@ -287,6 +307,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   const description: ProductDescription = {
     id: descriptionId,
     name: descriptionName,
+    category, // Add the category
     blocks,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()

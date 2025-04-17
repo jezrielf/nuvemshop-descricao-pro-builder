@@ -1,5 +1,6 @@
 
-import { BlockType, ColumnLayout, Block } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
+import { Block, BlockType, ColumnLayout } from '@/types/editor';
 import {
   createHeroBlock,
   createTextBlock,
@@ -14,71 +15,35 @@ import {
   createCTABlock,
   createVideoBlock
 } from './blocks';
-import { ensureValidBlock } from './validation';
 
-export const createBlock = (type: BlockType, columns: ColumnLayout = 1): Block => {
-  try {
-    let block: Block;
-    
-    switch (type) {
-      case 'hero':
-        block = createHeroBlock(columns);
-        break;
-        
-      case 'text':
-        block = createTextBlock(columns);
-        break;
-        
-      case 'features':
-        block = createFeaturesBlock(columns);
-        break;
-        
-      case 'benefits':
-        block = createBenefitsBlock(columns);
-        break;
-        
-      case 'specifications':
-        block = createSpecificationsBlock(columns);
-        break;
-        
-      case 'image':
-        block = createImageBlock(columns);
-        break;
-        
-      case 'gallery':
-        block = createGalleryBlock(columns);
-        break;
-        
-      case 'imageText':
-        block = createImageTextBlock(columns);
-        break;
-        
-      case 'textImage':
-        block = createTextImageBlock(columns);
-        break;
-        
-      case 'faq':
-        block = createFAQBlock(columns);
-        break;
-        
-      case 'cta':
-        block = createCTABlock(columns);
-        break;
-        
-      case 'video':
-        block = createVideoBlock(columns);
-        break;
-        
-      default:
-        // Provide a more detailed error message
-        throw new Error(`Unrecognized block type: ${type}`);
-    }
-    
-    // Validate the created block to ensure it has all required properties
-    return ensureValidBlock(block, type);
-  } catch (error) {
-    console.error(`Error creating block of type ${type}:`, error);
-    // Fallback to a text block with error information
-    return createTextBlock(columns);
+export const createBlock = (type: BlockType, columns: ColumnLayout): Block => {
+  switch (type) {
+    case 'hero':
+      return createHeroBlock(columns);
+    case 'text':
+      return createTextBlock(columns);
+    case 'features':
+      return createFeaturesBlock(columns);
+    case 'benefits':
+      return createBenefitsBlock(columns);
+    case 'specifications':
+      return createSpecificationsBlock(columns);
+    case 'image':
+      return createImageBlock(columns);
+    case 'gallery':
+      return createGalleryBlock(columns);
+    case 'imageText':
+      return createImageTextBlock(columns);
+    case 'textImage':
+      return createTextImageBlock(columns);
+    case 'faq':
+      return createFAQBlock(columns);
+    case 'cta':
+      return createCTABlock(columns);
+    case 'video':
+      return createVideoBlock(columns);
+    default:
+      // For unknown types, return a text block as fallback
+      return createTextBlock(columns);
   }
 };

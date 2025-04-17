@@ -64,7 +64,7 @@ export interface BlockBase {
 export interface ProductDescription {
   id: string;
   name: string;
-  category: ProductCategory;
+  category?: ProductCategory; // Make category optional so it doesn't break existing code
   blocks: Block[];
   thumbnail?: string;
   createdAt?: string;
