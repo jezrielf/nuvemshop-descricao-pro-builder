@@ -12,14 +12,14 @@ export function createVideoBlock(
   return {
     id: uuidv4(),
     type: 'video',
-    title: 'Vídeo',
+    title: heading, // Using heading as title for consistency
     columns: 1 as ColumnLayout,
     visible: true,
     videoUrl,
     aspectRatio,
     heading,
     description,
-    autoplay: true,
+    autoplay: false,
     style: {
       backgroundColor: '#ffffff',
       textColor: '#333333',
