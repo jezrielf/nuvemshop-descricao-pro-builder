@@ -14,12 +14,13 @@ export const generateGalleryHtml = (block: GalleryBlock): string => {
     (typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))) ? 
       parseInt(block.columns, 10) : 1;
   
-  const columnWidth = 100 / Math.min(columnsValue, 4);
+  // Limit to maximum of 4 columns
+  const columnCount = Math.min(Math.max(Number(columnsValue), 1), 4);
   
-  // Generate HTML for each gallery image
+  // Generate HTML for each gallery image with fixed width percentage
   const imagesHtml = block.images && block.images.length > 0 
     ? block.images.map(image => `
-      <div style="display: inline-block; vertical-align: top; width: calc(${columnWidth}% - 16px); margin: 8px; box-sizing: border-box;" class="gallery-item">
+      <div class="gallery-item" style="display: inline-block; vertical-align: top; width: ${100/columnCount}%; padding: 8px; box-sizing: border-box;">
         <figure style="margin: 0; text-align: center;">
           ${image.src 
             ? `<img src="${image.src}" alt="${image.alt || ''}" style="max-width: 100%; height: auto; object-fit: ${objectFit}; border-radius: 4px;">` 
@@ -33,13 +34,13 @@ export const generateGalleryHtml = (block: GalleryBlock): string => {
   
   return `
     <div class="gallery-block" id="block-${block.id}" style="${blockStyles}">
-      <div style="font-size: 0; text-align: center; margin: -8px;" class="gallery-container">
+      <div class="gallery-container" style="font-size: 0; text-align: left; margin: 0 -8px;">
         ${imagesHtml}
       </div>
       <style>
         @media (max-width: 768px) {
           #block-${block.id} .gallery-item {
-            width: calc(100% - 16px) !important;
+            width: 100% !important;
           }
         }
       </style>
