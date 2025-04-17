@@ -1,14 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TextImageBlock as TextImageBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
 import { useEditorStore } from '@/store/editor';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Image } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useImageUpload } from './image/hooks/useImageUpload';
+import { useImageUploadFallback } from './image/hooks/useImageUploadFallback';
+import ImageLibrary from '@/components/ImageLibrary/ImageLibrary';
+import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 
 interface TextImageBlockProps {
   block: TextImageBlockType;
@@ -19,6 +23,8 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
   const { updateBlock, selectedBlockId } = useEditorStore();
   const isEditing = selectedBlockId === block.id && !isPreview;
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+  const [useFallback, setUseFallback] = useState(false);
   
   const handleUpdateImageSrc = (src: string) => {
     updateBlock(block.id, { image: { ...block.image, src } });
@@ -44,6 +50,71 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
         imageFit: value as 'contain' | 'cover'
       }
     });
+  };
+  
+  const handleSelectFromLibrary = (imageUrl: string, alt: string) => {
+    updateBlock(block.id, { 
+      image: {
+        src: imageUrl,
+        alt: alt
+      }
+    });
+  };
+
+  // Upload padrão para o Supabase
+  const { uploading: standardUploading, uploadProgress: standardProgress, handleFileChange: standardFileChange } = useImageUpload({
+    onSuccess: (url, alt) => {
+      updateBlock(block.id, { 
+        image: {
+          src: url,
+          alt: alt
+        }
+      });
+    }
+  });
+  
+  // Fallback upload usando Base64
+  const { uploading: fallbackUploading, uploadProgress: fallbackProgress, handleFileChange: fallbackFileChange } = useImageUploadFallback({
+    onSuccess: (url, alt) => {
+      updateBlock(block.id, { 
+        image: {
+          src: url,
+          alt: alt
+        }
+      });
+    }
+  });
+  
+  // Handle file change with error handling
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      // Tente o upload padrão primeiro
+      if (!useFallback) {
+        const result = await standardFileChange(e);
+        
+        // Se falhar, mudar para o método alternativo
+        if (!result) {
+          setUseFallback(true);
+          toast({
+            title: "Usando método alternativo",
+            description: "Não foi possível fazer upload para o servidor. Usando método alternativo.",
+          });
+          
+          // Tente novamente com o fallback
+          await fallbackFileChange(e);
+        }
+      } else {
+        // Já está usando o fallback
+        await fallbackFileChange(e);
+      }
+    } catch (error) {
+      console.error('Erro no upload de imagem:', error);
+      toast({
+        title: "Erro no upload",
+        description: "Ocorreu um erro ao fazer upload da imagem. Use a URL direta ou escolha da biblioteca.",
+        variant: "destructive",
+      });
+    }
   };
   
   const imageFitValue = block.style?.imageFit || 'contain';
@@ -137,6 +208,31 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
             )}
             
             <div className="space-y-3">
+              <div className="flex space-x-2 mb-2">
+                <ImageLibrary onSelectImage={handleSelectFromLibrary} />
+                
+                <div className="relative">
+                  <input
+                    type="file"
+                    id={`image-upload-${block.id}`}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <button className="h-9 px-4 py-2 bg-white border border-gray-200 text-sm rounded-md hover:bg-gray-100 flex items-center justify-center">
+                    <Image className="h-4 w-4 mr-2" />
+                    Upload
+                  </button>
+                </div>
+              </div>
+              
+              {(useFallback ? fallbackUploading : standardUploading) && (
+                <div className="space-y-2">
+                  <Progress value={useFallback ? fallbackProgress : standardProgress} className="h-2" />
+                  <p className="text-xs text-muted-foreground">Enviando... {useFallback ? fallbackProgress : standardProgress}%</p>
+                </div>
+              )}
+              
               <div>
                 <label className="block text-xs mb-1">URL da Imagem</label>
                 <Input
