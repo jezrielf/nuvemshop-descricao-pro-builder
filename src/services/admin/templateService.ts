@@ -7,6 +7,7 @@ import { getAllTemplates } from '@/utils/templates';
 export const templateService = {
   getTemplates: async (): Promise<Template[]> => {
     try {
+      console.log('Iniciando carregamento de templates do banco de dados');
       // Primeiro tentamos obter templates do banco de dados
       const { data, error } = await supabase
         .from('templates')
@@ -16,13 +17,17 @@ export const templateService = {
       if (error) {
         console.warn('Erro ao carregar templates do banco de dados:', error);
         // Se houve erro, retornamos templates locais
-        return getAllTemplates();
+        const localTemplates = getAllTemplates();
+        console.log(`Fallback para ${localTemplates.length} templates locais devido a erro no banco`);
+        return localTemplates;
       }
       
       // Se não há dados ou o array está vazio, retornamos templates locais
       if (!data || data.length === 0) {
         console.log('Nenhum template encontrado no banco de dados, usando templates locais');
-        return getAllTemplates();
+        const localTemplates = getAllTemplates();
+        console.log(`Carregados ${localTemplates.length} templates locais como fallback`);
+        return localTemplates;
       }
       
       // Convert the database response to Template format with proper type handling
@@ -62,13 +67,14 @@ export const templateService = {
       });
       
       // Se ainda não retornamos, significa que temos templates do banco de dados
-      console.log(`Carregados ${templates.length} templates do banco de dados`);
+      console.log(`Carregados ${templates.length} templates do banco de dados com sucesso`);
       return templates;
     } catch (error) {
       console.error('Error in getTemplates:', error);
       // Em caso de qualquer erro, retornamos os templates locais como fallback
-      console.log('Usando templates locais como fallback devido a erro');
-      return getAllTemplates();
+      const localTemplates = getAllTemplates();
+      console.log(`Usando ${localTemplates.length} templates locais como fallback devido a erro geral`);
+      return localTemplates;
     }
   },
   

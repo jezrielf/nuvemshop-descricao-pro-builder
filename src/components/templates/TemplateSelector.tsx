@@ -5,7 +5,7 @@ import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText, RefreshCw, Search } from 'lucide-react';
+import { FileText, RefreshCw, Search, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Template as TemplateType } from '@/types/editor';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ const TemplateSelector: React.FC = () => {
   const { loadTemplate } = useEditorStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const { categoryNames, isAdvancedTemplate, getTemplateThumbnail } = useTemplateUtils();
@@ -27,19 +28,22 @@ const TemplateSelector: React.FC = () => {
     const fetchTemplates = async () => {
       if (dialogOpen) {
         setIsLoading(true);
+        setLoadError(null);
         try {
           const loadedTemplates = await loadTemplates();
           console.log('Templates loaded in TemplateSelector, count:', loadedTemplates.length);
           
           if (loadedTemplates.length === 0) {
+            setLoadError('Não foram encontrados templates.');
             toast({
               title: "Aviso",
               description: "Não foi possível encontrar templates. Usando templates padrão.",
-              variant: "destructive", // Changed from 'warning' to 'destructive'
+              variant: "destructive",
             });
           }
         } catch (error) {
           console.error('Error loading templates in TemplateSelector:', error);
+          setLoadError('Erro ao carregar templates. Tente novamente.');
           toast({
             title: "Erro ao carregar templates",
             description: "Não foi possível carregar os templates. Tente novamente.",
@@ -57,15 +61,27 @@ const TemplateSelector: React.FC = () => {
   // Refresh templates manually
   const handleRefreshTemplates = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const refreshedTemplates = await loadTemplates();
       console.log('Templates refreshed, count:', refreshedTemplates.length);
-      toast({
-        title: "Templates atualizados",
-        description: `${refreshedTemplates.length} templates disponíveis.`,
-      });
+      
+      if (refreshedTemplates.length > 0) {
+        toast({
+          title: "Templates atualizados",
+          description: `${refreshedTemplates.length} templates disponíveis.`,
+        });
+      } else {
+        setLoadError('Nenhum template encontrado após atualização.');
+        toast({
+          title: "Aviso",
+          description: "Não encontramos templates após a atualização.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error('Error refreshing templates:', error);
+      setLoadError('Erro ao atualizar templates. Tente novamente.');
       toast({
         title: "Erro ao atualizar templates",
         description: "Não foi possível atualizar os templates. Tente novamente.",
@@ -78,7 +94,9 @@ const TemplateSelector: React.FC = () => {
   
   // Apply search and category filtering
   const displayedTemplates = React.useMemo(() => {
-    return searchTemplates(searchQuery, selectedCategory);
+    const filtered = searchTemplates(searchQuery, selectedCategory);
+    console.log(`TemplateSelector - Filtrados ${filtered.length} templates de ${templates.length} total`);
+    return filtered;
   }, [templates, selectedCategory, searchQuery, searchTemplates]);
 
   const handleSelectTemplate = (template: TemplateType) => {
@@ -140,14 +158,31 @@ const TemplateSelector: React.FC = () => {
           
           <div className="overflow-y-auto flex-grow">
             <ScrollArea className="h-[calc(60vh-120px)] pr-4">
-              <TemplateGrid
-                templates={displayedTemplates}
-                isLoading={isLoading}
-                categoryNames={categoryNames}
-                onSelectTemplate={handleSelectTemplate}
-                getThumbnail={getTemplateThumbnail}
-                isAdvancedTemplate={isAdvancedTemplate}
-              />
+              {loadError && templates.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-40 text-center">
+                  <AlertCircle className="h-8 w-8 text-amber-500 mb-2" />
+                  <p className="text-muted-foreground">{loadError}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleRefreshTemplates}
+                    className="mt-4"
+                    disabled={isLoading}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    Tentar novamente
+                  </Button>
+                </div>
+              ) : (
+                <TemplateGrid
+                  templates={displayedTemplates}
+                  isLoading={isLoading}
+                  categoryNames={categoryNames}
+                  onSelectTemplate={handleSelectTemplate}
+                  getThumbnail={getTemplateThumbnail}
+                  isAdvancedTemplate={isAdvancedTemplate}
+                />
+              )}
             </ScrollArea>
           </div>
         </div>
