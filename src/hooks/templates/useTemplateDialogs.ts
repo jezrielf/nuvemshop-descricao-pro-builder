@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Template } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,35 +14,40 @@ export function useTemplateDialogs() {
   
   const { toast } = useToast();
   
-  const openNewDialog = () => {
+  const openNewDialog = useCallback(() => {
+    console.log('Opening new template dialog');
     closeAllDialogs();
     setIsNewDialogOpen(true);
-  };
+  }, []);
   
-  const openPreviewDialog = (template: Template) => {
+  const openPreviewDialog = useCallback((template: Template) => {
+    console.log('Opening preview dialog for template:', template.id);
     closeAllDialogs();
     setPreviewTemplate(template);
     setIsPreviewDialogOpen(true);
-  };
+  }, []);
   
-  const openEditDialog = (template: Template) => {
+  const openEditDialog = useCallback((template: Template) => {
+    console.log('Opening edit dialog for template:', template.id);
     closeAllDialogs();
     setEditTemplate(template);
     setIsEditDialogOpen(true);
-  };
+  }, []);
   
-  const openDeleteDialog = (template: Template) => {
+  const openDeleteDialog = useCallback((template: Template) => {
+    console.log('Opening delete dialog for template:', template.id);
     closeAllDialogs();
     setDeleteTemplate(template);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
   
-  const closeAllDialogs = () => {
+  const closeAllDialogs = useCallback(() => {
+    console.log('Closing all dialogs');
     setIsNewDialogOpen(false);
     setIsPreviewDialogOpen(false);
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
-  };
+  }, []);
   
   return {
     // Dialog states

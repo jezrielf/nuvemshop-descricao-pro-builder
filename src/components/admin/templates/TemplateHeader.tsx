@@ -28,6 +28,12 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
 }) => {
   const { openNewDialog } = useTemplateDialogs();
 
+  const handleNewTemplateClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log('New template button clicked');
+    openNewDialog();
+  };
+
   const categoryOptions = [
     'supplements',
     'clothing',
@@ -68,7 +74,7 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
         </SelectContent>
       </Select>
 
-      <Button onClick={openNewDialog}>
+      <Button onClick={handleNewTemplateClick}>
         <Plus className="h-4 w-4 mr-2" />
         Novo Template
       </Button>
