@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
@@ -126,7 +125,7 @@ const Header: React.FC = () => {
             {description && <HtmlOutputDialog />}
             
             <div className="flex items-center gap-2">
-              {/* SEO Tools button has been removed */}
+              
               
               <AIGeneratorButton />
               
