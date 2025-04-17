@@ -39,12 +39,12 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
   onFileChange,
   onSelectImageFromLibrary
 }) => {
-  // Função para lidar com o arquivo selecionado para essa imagem específica
+  // Function to handle file change specifically for this image
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFileChange(e, image.id);
   };
   
-  // Função para lidar com a seleção da biblioteca para essa imagem específica
+  // Function to handle library selection for this specific image
   const handleSelectFromLibrary = (imageUrl: string, alt: string) => {
     onSelectImageFromLibrary(image.id, imageUrl, alt);
   };
@@ -83,6 +83,7 @@ const GalleryImageForm: React.FC<GalleryImageFormProps> = ({
         </div>
       </div>
       
+      {/* Image upload component */}
       <GalleryImageUpload
         image={image}
         uploading={uploading}

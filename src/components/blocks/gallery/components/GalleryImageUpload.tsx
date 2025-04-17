@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Image, Upload } from 'lucide-react';
 
 interface GalleryImageUploadProps {
   image: {
@@ -27,56 +26,46 @@ const GalleryImageUpload: React.FC<GalleryImageUploadProps> = ({
   onFileChange
 }) => {
   return (
-    <>
-      {image.src ? (
-        <div className="relative">
+    <div className="relative border rounded-md overflow-hidden">
+      {/* Image Preview */}
+      <div className="aspect-video w-full">
+        {image.src ? (
           <img
             src={image.src}
-            alt={image.alt}
-            className={`w-full h-32 ${imageObjectFit} mb-3 rounded-md`}
+            alt={image.alt || 'Imagem da galeria'}
+            className={`w-full h-full ${imageObjectFit} object-center`}
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onUpdateImage(image.id, 'src', '')}
-            className="absolute top-1 right-1 bg-white/80 hover:bg-white/90 h-8 w-8 p-0 rounded-full"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      ) : (
-        <div className="w-full h-32 bg-gray-100 flex items-center justify-center mb-3 rounded-md relative">
-          {uploading ? (
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <div className="w-3/4 max-w-xs">
-                <Progress value={uploadProgress} className="h-2" />
-                <p className="text-xs text-center mt-1 text-muted-foreground">
-                  Enviando... {uploadProgress}%
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                id={`galleryImageUpload-${image.id}`}
-                className="hidden"
-                onChange={onFileChange}
-              />
-              <label 
-                htmlFor={`galleryImageUpload-${image.id}`} 
-                className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
-              >
-                <Upload className="h-6 w-6 text-gray-400 mb-1" />
-                <span className="text-sm text-gray-500 block">Clique para fazer upload</span>
-              </label>
-            </>
-          )}
-        </div>
-      )}
-    </>
+        ) : (
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+            <Image className="h-10 w-10 text-gray-400" />
+          </div>
+        )}
+      </div>
+      
+      {/* Upload overlay */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <input
+          type="file"
+          id={`gallery-direct-upload-${image.id}`}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          onChange={onFileChange}
+          accept="image/*"
+        />
+        
+        {!image.src && !uploading && (
+          <div className="bg-white bg-opacity-75 rounded-full p-3 shadow-md">
+            <Upload className="h-6 w-6 text-primary" />
+          </div>
+        )}
+        
+        {uploading && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-4 text-white">
+            <p className="text-sm mb-2">Enviando... {uploadProgress}%</p>
+            <Progress value={uploadProgress} className="h-2 w-full max-w-[200px]" />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
