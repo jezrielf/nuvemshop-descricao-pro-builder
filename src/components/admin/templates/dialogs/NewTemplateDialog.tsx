@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,6 @@ import { BlockType } from '@/types/editor/blocks';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
 import { ImportHtmlSection } from './ImportHtmlSection';
-import { ProductCategory } from '@/types/editor';
 
 interface NewTemplateDialogProps {
   open: boolean;
