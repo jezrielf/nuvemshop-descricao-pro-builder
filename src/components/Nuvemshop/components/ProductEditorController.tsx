@@ -32,7 +32,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
     let category: ProductCategory = 'other';
     
     // If product has tags, try to determine the category
-    if (product.tags) {
+    if (product.tags !== undefined) {
       const tagString = typeof product.tags === 'string' ? product.tags.toLowerCase() : '';
       
       if (tagString.includes('supplement')) return 'supplements';

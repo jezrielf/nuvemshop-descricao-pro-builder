@@ -16,7 +16,7 @@ import {
   createVideoBlock
 } from './blocks';
 
-export const createBlock = (type: BlockType, columns: ColumnLayout): Block => {
+export const createBlock = (type: BlockType, columns: ColumnLayout = 1): Block => {
   switch (type) {
     case 'hero':
       return createHeroBlock(columns);

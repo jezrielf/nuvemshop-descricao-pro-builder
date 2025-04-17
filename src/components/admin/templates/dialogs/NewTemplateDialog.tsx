@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
   ];
 
   const handleAddBlock = (blockType: BlockType) => {
-    const newBlock = createBlock(blockType);
+    const newBlock = createBlock(blockType, 1);
     setBlocks(convertBlocks([...blocks, newBlock]));
     toast({
       title: "Bloco adicionado",

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -84,7 +83,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   ];
 
   const handleAddBlock = (blockType: BlockType) => {
-    const newBlock = createBlock(blockType);
+    const newBlock = createBlock(blockType, 1);
     setBlocks(prev => [...prev, newBlock]);
     toast({
       title: "Bloco adicionado",

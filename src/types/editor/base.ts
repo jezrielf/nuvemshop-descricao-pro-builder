@@ -60,11 +60,11 @@ export interface BlockBase {
   style?: BlockStyle;
 }
 
-// Define the ProductDescription interface and export it
+// Make the category property optional in ProductDescription interface
 export interface ProductDescription {
   id: string;
   name: string;
-  category?: ProductCategory; // Make category optional so it doesn't break existing code
+  category?: ProductCategory; // Optional category
   blocks: Block[];
   thumbnail?: string;
   createdAt?: string;

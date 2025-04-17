@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { BlockType, ProductDescription, Block, ProductCategory } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators';
@@ -307,7 +308,7 @@ export const generateAIDescription = async (input: AIDescriptionInput): Promise<
   const description: ProductDescription = {
     id: descriptionId,
     name: descriptionName,
-    category, // Add the category
+    category, // Include the category
     blocks,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()

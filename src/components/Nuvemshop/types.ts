@@ -5,6 +5,7 @@ export interface NuvemshopProduct {
   sku: string | null;
   price: string | number;
   description?: string | { pt?: string; [key: string]: string | undefined };
+  tags?: string;
 }
 
 export interface NuvemshopAuthResponse {
