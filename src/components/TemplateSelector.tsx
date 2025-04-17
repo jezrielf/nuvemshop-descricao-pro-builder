@@ -34,7 +34,7 @@ const TemplateSelector: React.FC = () => {
           toast({
             title: "Aviso",
             description: "Nenhum template disponível. Tente atualizar novamente.",
-            variant: "warning",
+            variant: "destructive",
           });
         }
       } else if (showToast) {

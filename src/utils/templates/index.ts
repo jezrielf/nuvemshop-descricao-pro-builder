@@ -1,5 +1,5 @@
 
-import { Template } from '@/types/editor';
+import { Template, ProductCategory } from '@/types/editor';
 import { basicTemplates } from './basic';
 import { supplementsTemplates } from './supplements';
 import { shoesTemplates } from './shoes';
@@ -57,22 +57,36 @@ export const getAllTemplates = (): Template[] => {
              template.blocks.length > 0;
     })
     .map(template => {
-      // Adiciona categoria padrão se não existir
-      if (!template.category) {
-        return { ...template, category: 'other' };
-      }
+      // Cast category to ProductCategory to ensure type safety
+      const validCategory = isValidProductCategory(template.category) 
+        ? template.category 
+        : 'other' as ProductCategory;
       
-      // Certifica-se de que thumbnails inválidos são tratados
-      if (!template.thumbnail || 
-          template.thumbnail === '/placeholder.svg' || 
-          !template.thumbnail.startsWith('http')) {
-        return {
-          ...template,
-          thumbnail: getDefaultThumbnailForCategory(template.category)
+      // Adiciona categoria padrão se não existir ou categoria for inválida
+      if (!template.category) {
+        return { 
+          ...template, 
+          category: 'other' as ProductCategory 
         };
       }
       
-      return template;
+      // Ensure category is of type ProductCategory
+      const templateWithValidCategory: Template = {
+        ...template,
+        category: validCategory as ProductCategory
+      };
+      
+      // Certifica-se de que thumbnails inválidos são tratados
+      if (!templateWithValidCategory.thumbnail || 
+          templateWithValidCategory.thumbnail === '/placeholder.svg' || 
+          !templateWithValidCategory.thumbnail.startsWith('http')) {
+        return {
+          ...templateWithValidCategory,
+          thumbnail: getDefaultThumbnailForCategory(validCategory)
+        };
+      }
+      
+      return templateWithValidCategory;
     });
   
   console.log(`getAllTemplates: Retornando ${validatedTemplates.length} templates válidos`);
@@ -80,8 +94,19 @@ export const getAllTemplates = (): Template[] => {
   return validatedTemplates;
 };
 
+// Helper function to check if a string is a valid ProductCategory
+const isValidProductCategory = (category: string): boolean => {
+  const validCategories: ProductCategory[] = [
+    'supplements', 'clothing', 'accessories', 'shoes', 'electronics',
+    'energy', 'health', 'beauty', 'fashion', 'haute-couture', 
+    'home-decor', 'fitness', 'beverages', 'water-purifiers', 'other'
+  ];
+  
+  return validCategories.includes(category as ProductCategory);
+};
+
 // Função auxiliar para obter thumbnails padrão por categoria
-const getDefaultThumbnailForCategory = (category: string): string => {
+const getDefaultThumbnailForCategory = (category: ProductCategory): string => {
   switch (category) {
     case 'supplements':
       return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=500';
