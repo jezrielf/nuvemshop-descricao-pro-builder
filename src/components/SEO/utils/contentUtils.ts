@@ -1,3 +1,4 @@
+
 import { ProductDescription } from '@/types/editor';
 
 /**
@@ -74,6 +75,57 @@ export const getContentLength = (description: ProductDescription | null): number
     }
   });
   return contentLength;
+};
+
+/**
+ * Extracts text content from all blocks in a product description.
+ * @param description The product description object.
+ * @returns The extracted text content as a string.
+ */
+export const getTextContentFromDescription = (description: ProductDescription | null): string => {
+  if (!description || !description.blocks) {
+    return '';
+  }
+
+  let allContent = '';
+  
+  description.blocks.forEach(block => {
+    // Extract text from different block types
+    if (block.type === 'text' && block.content) {
+      // Remove HTML tags from text blocks
+      const textContent = block.content.replace(/<[^>]*>/g, '');
+      allContent += textContent + ' ';
+    } else if (block.type === 'hero' && block.title) {
+      allContent += block.title + ' ';
+      if (block.subtitle) allContent += block.subtitle + ' ';
+    } else if (block.type === 'imageText' || block.type === 'textImage') {
+      if (block.title) allContent += block.title + ' ';
+      if (block.content) {
+        const textContent = block.content.replace(/<[^>]*>/g, '');
+        allContent += textContent + ' ';
+      }
+    } else if (block.type === 'features' && block.features) {
+      block.features.forEach(feature => {
+        if (feature.title) allContent += feature.title + ' ';
+        if (feature.description) allContent += feature.description + ' ';
+      });
+    } else if (block.type === 'specifications' && block.specifications) {
+      block.specifications.forEach(spec => {
+        if (spec.name) allContent += spec.name + ' ';
+        if (spec.value) allContent += spec.value + ' ';
+      });
+    } else if (block.type === 'faq' && block.questions) {
+      block.questions.forEach(q => {
+        if (q.question) allContent += q.question + ' ';
+        if (q.answer) allContent += q.answer + ' ';
+      });
+    } else if (block.type === 'cta') {
+      if (block.title) allContent += block.title + ' ';
+      if (block.description) allContent += block.description + ' ';
+    }
+  });
+  
+  return allContent.trim();
 };
 
 /**
