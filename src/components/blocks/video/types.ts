@@ -1,10 +1,9 @@
 
-import { z } from 'zod';
-import { videoFormSchema } from './videoSchema';
-
-export type VideoFormValues = z.infer<typeof videoFormSchema>;
-
-export interface VideoUrlParserResult {
-  embedUrl: string;
-  isValid: boolean;
+export interface VideoFormValues {
+  videoUrl: string;
+  title: string;
+  description?: string;
+  autoplay: boolean;
+  caption?: string;
+  aspectRatio: '16:9' | '4:3' | '1:1';
 }
