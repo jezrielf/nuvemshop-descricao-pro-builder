@@ -1,5 +1,4 @@
 
-// Export all block creators
 export * from './heroBlock';
 export * from './textBlock';
 export * from './featuresBlock';

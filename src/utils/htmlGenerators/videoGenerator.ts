@@ -1,71 +1,91 @@
 
-import { VideoBlock } from '@/types/editor';
-import { getStylesFromBlock } from '../styleConverter';
+import { VideoBlock } from "@/types/editor/blocks/VideoBlock";
+import { BlockStyle } from "@/types/editor";
+import { getStylesFromBlock } from "../styleConverter";
 
-/**
- * Extracts YouTube video ID from different YouTube URL formats
- * @param url The YouTube URL
- * @returns The video ID or empty string if not found
- */
-const getYoutubeVideoId = (url: string): string => {
-  if (!url) return '';
-  
-  // Regular expression to extract YouTube video ID from various URL formats
-  const regExp = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#\&\?]*).*/;
+// Function to extract YouTube video ID from various URL formats
+function getYoutubeVideoId(url: string): string | null {
+  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
   const match = url.match(regExp);
-  
-  return (match && match[1]) ? match[1] : '';
-};
+  return (match && match[7].length === 11) ? match[7] : null;
+}
 
-/**
- * Generate HTML for a video block
- * @param block The video block configuration
- * @returns HTML string representation of the video block
- */
-export const generateVideoBlockHtml = (block: VideoBlock): string => {
-  const videoId = getYoutubeVideoId(block.videoUrl);
-  if (!videoId) {
-    return `
-      <div style="padding:20px;background-color:#f8f8f8;border-radius:6px;text-align:center;margin-bottom:20px;">
-        <p style="color:#666;">URL de vídeo inválida ou não suportada</p>
-      </div>
-    `;
+// Function to determine if a URL is a YouTube URL
+function isYoutubeUrl(url: string): boolean {
+  return url.includes('youtube.com') || url.includes('youtu.be');
+}
+
+// Function to extract Vimeo video ID from various URL formats
+function getVimeoVideoId(url: string): string | null {
+  const regExp = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+  const match = url.match(regExp);
+  return match ? match[1] : null;
+}
+
+// Function to determine if a URL is a Vimeo URL
+function isVimeoUrl(url: string): boolean {
+  return url.includes('vimeo.com');
+}
+
+// Main function to generate HTML for a video block
+export function generateVideoBlockHtml(block: VideoBlock): string {
+  const { videoUrl, aspectRatio = '16:9', heading, caption, style } = block;
+  
+  // Set aspect ratio CSS class
+  let aspectRatioClass = '';
+  switch (aspectRatio) {
+    case '16:9':
+      aspectRatioClass = 'pb-[56.25%]'; // 9/16 * 100%
+      break;
+    case '4:3':
+      aspectRatioClass = 'pb-[75%]'; // 3/4 * 100%
+      break;
+    case '1:1':
+      aspectRatioClass = 'pb-[100%]';
+      break;
+    default:
+      aspectRatioClass = 'pb-[56.25%]'; // Default to 16:9
   }
   
-  const blockStyleAttr = getStylesFromBlock(block) ? ` style="${getStylesFromBlock(block)}"` : '';
-  const autoplay = block.autoplay ? '1' : '0';
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=${autoplay}&mute=${autoplay}&rel=0`;
+  // Generate container styles
+  const containerStyle = getStylesFromBlock(block);
   
-  // Calculate aspect ratio class
-  let aspectRatioClass = 'aspect-16-9';
-  if (block.aspectRatio === '4:3') {
-    aspectRatioClass = 'aspect-4-3';
-  } else if (block.aspectRatio === '1:1') {
-    aspectRatioClass = 'aspect-1-1';
+  // Default embed code (fallback for non-YouTube/Vimeo URLs)
+  let embedCode = `<video controls src="${videoUrl}" class="absolute top-0 left-0 w-full h-full"></video>`;
+  
+  // Process YouTube videos
+  if (isYoutubeUrl(videoUrl)) {
+    const videoId = getYoutubeVideoId(videoUrl);
+    if (videoId) {
+      embedCode = `<iframe 
+        src="https://www.youtube.com/embed/${videoId}" 
+        frameborder="0" 
+        allowfullscreen 
+        class="absolute top-0 left-0 w-full h-full"
+      ></iframe>`;
+    }
+  } 
+  // Process Vimeo videos
+  else if (isVimeoUrl(videoUrl)) {
+    const videoId = getVimeoVideoId(videoUrl);
+    if (videoId) {
+      embedCode = `<iframe 
+        src="https://player.vimeo.com/video/${videoId}" 
+        frameborder="0" 
+        allowfullscreen 
+        class="absolute top-0 left-0 w-full h-full"
+      ></iframe>`;
+    }
   }
   
-  // Inline CSS for aspect ratios
-  const aspectRatioStyles = `
-    .aspect-16-9 { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; }
-    .aspect-4-3 { position: relative; padding-bottom: 75%; height: 0; overflow: hidden; width: 100%; }
-    .aspect-1-1 { position: relative; padding-bottom: 100%; height: 0; overflow: hidden; width: 100%; }
-    .video-responsive iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-  `;
-  
+  // Construct the full HTML for the video block
   return `
-    <style>${aspectRatioStyles}</style>
-    <div${blockStyleAttr} class="video-block">
-      ${block.heading ? `<h2 style="font-size:24px;font-weight:600;margin-bottom:16px;">${block.heading}</h2>` : ''}
-      <div class="video-responsive ${aspectRatioClass}">
-        <iframe 
-          src="${embedUrl}" 
-          title="${block.title || 'Video'}" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
+    <div class="video-block my-6" style="${containerStyle}">
+      ${heading ? `<h3 class="text-xl font-semibold mb-3" style="color: ${(style as BlockStyle)?.headingColor || 'inherit'}">${heading}</h3>` : ''}
+      <div class="video-container relative ${aspectRatioClass}">
+        ${embedCode}
       </div>
-      ${block.caption ? `<p style="font-size:14px;color:#666;margin-top:8px;">${block.caption}</p>` : ''}
-      ${block.description ? `<div style="margin-top:16px;">${block.description}</div>` : ''}
+      ${caption ? `<p class="text-sm mt-2 text-gray-600" style="color: ${(style as BlockStyle)?.textColor || 'inherit'}">${caption}</p>` : ''}
     </div>
   `;
-};
+}

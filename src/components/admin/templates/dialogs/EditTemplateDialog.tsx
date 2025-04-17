@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Template, Block, ProductCategory } from '@/types/editor';
+import { Template, Block } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
 import { BlockType } from '@/types/editor/blocks';
 import { convertBlocks, parseTemplateBlocks } from '@/utils/blockConverter';
@@ -28,7 +29,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   onUpdate,
 }) => {
   const [name, setName] = useState(template.name);
-  const [category, setCategory] = useState<ProductCategory>(template.category);
+  const [category, setCategory] = useState(template.category);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   ];
 
   const handleAddBlock = (blockType: BlockType) => {
-    const newBlock = createBlock(blockType, 1);
+    const newBlock = createBlock(blockType);
     setBlocks(prev => [...prev, newBlock]);
     toast({
       title: "Bloco adicionado",
@@ -147,7 +148,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
               <Label htmlFor="category">Categoria</Label>
               <Select
                 value={category}
-                onValueChange={(value: ProductCategory) => setCategory(value)}
+                onValueChange={setCategory}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione uma categoria" />
@@ -159,11 +160,6 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
                   <SelectItem value="shoes">Calçados</SelectItem>
                   <SelectItem value="electronics">Eletrônicos</SelectItem>
                   <SelectItem value="energy">Energia</SelectItem>
-                  <SelectItem value="health">Saúde</SelectItem>
-                  <SelectItem value="beauty">Beleza</SelectItem>
-                  <SelectItem value="fashion">Moda</SelectItem>
-                  <SelectItem value="haute-couture">Alta Costura</SelectItem>
-                  <SelectItem value="home-decor">Casa e Decoração</SelectItem>
                   <SelectItem value="other">Outro</SelectItem>
                 </SelectContent>
               </Select>

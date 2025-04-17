@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Template, Block, ProductCategory } from '@/types/editor';
+import { Template, Block } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
 import { useTemplateStore } from '@/store/templates';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +16,7 @@ import { BlockType } from '@/types/editor/blocks';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
 import { ImportHtmlSection } from './ImportHtmlSection';
+import { ProductCategory } from '@/types/editor';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -26,7 +28,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
   onClose,
 }) => {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<ProductCategory>('other');
+  const [category, setCategory] = useState('other');
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
   ];
 
   const handleAddBlock = (blockType: BlockType) => {
-    const newBlock = createBlock(blockType, 1);
+    const newBlock = createBlock(blockType);
     setBlocks(convertBlocks([...blocks, newBlock]));
     toast({
       title: "Bloco adicionado",
@@ -131,7 +133,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
 
   const handleTemplateFromHtml = (generatedTemplate: Template) => {
     setName(generatedTemplate.name);
-    setCategory(generatedTemplate.category);
+    setCategory(generatedTemplate.category as string);
     setBlocks(convertBlocks(generatedTemplate.blocks));
     setActiveTab('blocks');
   };
@@ -176,7 +178,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                 <Label htmlFor="category">Categoria</Label>
                 <Select
                   value={category}
-                  onValueChange={(value: ProductCategory) => setCategory(value)}
+                  onValueChange={setCategory}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -187,11 +189,6 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                     <SelectItem value="accessories">Acessórios</SelectItem>
                     <SelectItem value="shoes">Calçados</SelectItem>
                     <SelectItem value="electronics">Eletrônicos</SelectItem>
-                    <SelectItem value="health">Saúde</SelectItem>
-                    <SelectItem value="beauty">Beleza</SelectItem>
-                    <SelectItem value="fashion">Moda</SelectItem>
-                    <SelectItem value="haute-couture">Alta Costura</SelectItem>
-                    <SelectItem value="home-decor">Casa e Decoração</SelectItem>
                     <SelectItem value="energy">Energia</SelectItem>
                     <SelectItem value="other">Outro</SelectItem>
                   </SelectContent>

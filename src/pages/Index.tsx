@@ -12,9 +12,9 @@ import ProductEditorController from '@/components/Nuvemshop/components/ProductEd
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -27,12 +27,10 @@ const placeholderImages = [
 
 const Index = () => {
   console.log("Index page renderizada");
-  const { loadTemplates, templates } = useTemplateStore();
+  const { loadTemplates } = useTemplateStore();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
-  const [templatesLoaded, setTemplatesLoaded] = useState(false);
-  const { session, user } = useAuth();
   const { 
     success: storeConnected, 
     storeName, 
@@ -41,42 +39,31 @@ const Index = () => {
     handleDisconnect: handleDisconnectNuvemshop
   } = useNuvemshopAuth();
   
-  // Carrega os templates na inicialização e força recarregamento
   useEffect(() => {
-    // Função para carregar templates com retry
-    const loadTemplatesWithRetry = async (retryCount = 0) => {
+    // Carrega os templates iniciais
+    const initializeTemplates = async () => {
       try {
-        console.log(`Tentando carregar templates (tentativa ${retryCount + 1})`);
+        console.log("Iniciando carregamento de templates na página inicial");
         await loadTemplates();
-        console.log(`Templates carregados com sucesso: ${templates.length} templates disponíveis`);
-        
-        if (templates.length === 0 && retryCount < 3) {
-          // Se não há templates e ainda temos tentativas, tente novamente após um delay
-          console.log(`Nenhum template encontrado, tentando novamente em 1 segundo...`);
-          setTimeout(() => loadTemplatesWithRetry(retryCount + 1), 1000);
-        } else {
-          setTemplatesLoaded(true);
-        }
+        console.log("Templates carregados na inicialização");
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
-        
-        if (retryCount < 3) {
-          // Tentar novamente após um delay exponencial
-          const delay = Math.pow(2, retryCount) * 1000;
-          console.log(`Erro ao carregar templates, tentando novamente em ${delay/1000} segundos...`);
-          setTimeout(() => loadTemplatesWithRetry(retryCount + 1), delay);
-        } else {
-          toast({
-            title: "Erro ao carregar templates",
-            description: "Tente atualizar a página ou entre em contato com o suporte.",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Erro ao carregar templates",
+          description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
+          variant: "destructive",
+        });
       }
     };
     
-    // Iniciar processo de carregamento
-    loadTemplatesWithRetry();
+    initializeTemplates();
+    
+    // Configura um intervalo para verificar atualizações de templates a cada 5 minutos
+    const templateRefreshInterval = setInterval(() => {
+      loadTemplates()
+        .then(() => console.log("Templates atualizados no background"))
+        .catch(err => console.error("Erro ao atualizar templates no background:", err));
+    }, 5 * 60 * 1000); // 5 minutos
     
     // Pré-carrega as imagens do tutorial
     placeholderImages.forEach(src => {
@@ -84,27 +71,11 @@ const Index = () => {
       img.src = src;
     });
     
-    // Verifica atualizações a cada 5 minutos
-    const templateRefreshInterval = setInterval(() => {
-      loadTemplates()
-        .then(() => console.log("Templates atualizados no background"))
-        .catch(err => console.error("Erro ao atualizar templates no background:", err));
-    }, 5 * 60 * 1000);
-    
     // Limpar o intervalo quando o componente for desmontado
     return () => {
       clearInterval(templateRefreshInterval);
     };
-  }, [loadTemplates, toast]);
-
-  // Debug para autenticação
-  useEffect(() => {
-    if (session) {
-      console.log("Usuário está autenticado:", user?.id);
-    } else {
-      console.log("Usuário não está autenticado");
-    }
-  }, [session, user]);
+  }, [loadTemplates]);
 
   const handleNuvemshopDisconnect = () => {
     handleDisconnectNuvemshop();

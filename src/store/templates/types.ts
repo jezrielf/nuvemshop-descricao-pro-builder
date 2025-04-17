@@ -9,7 +9,7 @@ export interface TemplateState {
 }
 
 export interface TemplateLoadingSlice {
-  loadTemplates: () => Promise<Template[]>;
+  loadTemplates: () => Promise<void>;
   getTemplatesByCategory: (category: string | null) => Template[];
   searchTemplates: (searchTerm: string, category: string | null) => Template[];
 }

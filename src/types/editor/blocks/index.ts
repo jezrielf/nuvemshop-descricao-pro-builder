@@ -1,7 +1,17 @@
 
-import { BlockBase } from '../base';
+import { HeroBlock } from './hero';
+import { TextBlock } from './text';
+import { FeaturesBlock } from './features';
+import { BenefitsBlock } from './benefits';
+import { SpecificationsBlock } from './specifications';
+import { ImageBlock } from './image';
+import { GalleryBlock } from './gallery';
+import { ImageTextBlock } from './imageText';
+import { TextImageBlock } from './textImage';
+import { FAQBlock } from './faq';
+import { CTABlock } from './cta';
+import { VideoBlock } from './video';
 
-// Re-export all block type interfaces
 export * from './hero';
 export * from './text';
 export * from './features';
@@ -16,18 +26,18 @@ export * from './cta';
 export * from './video';
 
 export type Block = 
-  | import('./hero').HeroBlock 
-  | import('./text').TextBlock
-  | import('./features').FeaturesBlock 
-  | import('./benefits').BenefitsBlock 
-  | import('./specifications').SpecificationsBlock 
-  | import('./image').ImageBlock 
-  | import('./gallery').GalleryBlock
-  | import('./imageText').ImageTextBlock
-  | import('./textImage').TextImageBlock
-  | import('./faq').FAQBlock
-  | import('./cta').CTABlock
-  | import('./video').VideoBlock;
+  | HeroBlock 
+  | FeaturesBlock 
+  | BenefitsBlock 
+  | SpecificationsBlock 
+  | TextBlock 
+  | ImageBlock 
+  | GalleryBlock
+  | ImageTextBlock
+  | TextImageBlock
+  | FAQBlock
+  | CTABlock
+  | VideoBlock;
 
 // Define BlockType as a union of all possible block type literals
 export type BlockType = 

@@ -1,57 +1,5 @@
 
-export type ColumnLayout = 1 | 2 | 3 | 4;
-
-export type ProductCategory = 
-  | 'supplements'       // Suplementos
-  | 'clothing'          // Roupas
-  | 'accessories'       // Acessórios
-  | 'shoes'             // Calçados
-  | 'electronics'       // Eletrônicos
-  | 'energy'            // Energéticos
-  | 'health'            // Saúde e bem estar
-  | 'beauty'            // Cosméticos
-  | 'fashion'           // Moda
-  | 'haute-couture'     // Alta Costura
-  | 'home-decor'        // Casa e decoração
-  | 'fitness'           // Fitness
-  | 'beverages'         // Bebidas
-  | 'water-purifiers'   // Purificadores de água
-  | 'other';            // Outros
-
-export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'extra-large' | 'small' | 'medium' | 'large';
-
-export interface BlockStyle {
-  backgroundColor?: string;
-  textColor?: string;
-  headingColor?: string;
-  padding?: 'sm' | 'md' | 'lg' | 'none';
-  blockSpacing?: BlockSpacing;
-  borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
-  borderWidth?: 'none' | 'sm' | 'md' | 'lg';
-  borderColor?: string;
-  boxShadow?: 'none' | 'sm' | 'md' | 'lg';
-  fontFamily?: string;
-  textAlign?: 'left' | 'center' | 'right';
-  
-  // Additional properties
-  imageFit?: 'contain' | 'cover';
-  fontSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
-  fontWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
-  fontStyle?: 'normal' | 'italic';
-  textDecoration?: 'none' | 'underline';
-  margin?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
-  hasBorder?: boolean;
-  hasShadow?: boolean;
-  headingWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
-  
-  // Additional background properties
-  backgroundImage?: string;
-  backgroundPosition?: string;
-  backgroundSize?: string;
-  lineHeight?: string;
-}
-
-export interface BlockBase {
+export interface BaseBlock {
   id: string;
   type: string;
   title: string;
@@ -60,25 +8,62 @@ export interface BlockBase {
   style?: BlockStyle;
 }
 
-// Make the category property optional in ProductDescription interface
+// Adding BlockBase and BlockStyle interfaces
+export interface BlockBase extends BaseBlock {
+  id: string;
+  type: string;
+  title: string;
+  columns: ColumnLayout;
+  visible: boolean;
+  style?: BlockStyle;
+}
+
+export interface BlockStyle {
+  backgroundColor?: string;
+  textColor?: string;
+  padding?: string;
+  margin?: string;
+  borderRadius?: string;
+  borderWidth?: string;
+  borderColor?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  textAlign?: string;
+  boxShadow?: string;
+  [key: string]: any; // For other custom styles
+}
+
 export interface ProductDescription {
   id: string;
   name: string;
-  category?: ProductCategory; // Optional category
   blocks: Block[];
-  thumbnail?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  userId?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Template {
   id: string;
   name: string;
-  category: ProductCategory;
+  category: string;
   blocks: Block[];
-  thumbnail: string;
+  thumbnail: string; // Changed from optional to required
 }
 
-// Import all block types
+export type ProductCategory = 'supplements' | 'clothing' | 'accessories' | 'shoes' | 'electronics' | 'energy' | 'other' | string;
+
+// Import block types from the blocks directory
 import { Block } from './blocks';
+import { BlockType } from './blocks';
+
+// Note: BlockType is now exported from blocks/index.ts
+export type { Block };
+
+export type ColumnLayout = 1 | 2 | 3 | 4;
+
+// Define BlockSpacing for styleConverter.ts
+export interface BlockSpacing {
+  margin?: string;
+  padding?: string;
+}
+
+export type { BlockType };
