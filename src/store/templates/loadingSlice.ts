@@ -1,9 +1,8 @@
-
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
 import { getAllTemplates } from '@/utils/templates';
-import { adminService } from '@/services/adminService';
+import { adminService } from '@/services/admin';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { CreateUserFormValues } from './types';
 import CreateUserRoleSelector from './CreateUserRoleSelector';
-import { adminService } from '@/services/adminService';
+import { adminService } from '@/services/admin';
 
 interface CreateUserFormProps {
   onUserCreated: () => void;

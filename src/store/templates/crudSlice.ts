@@ -1,8 +1,8 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
+import { adminService } from '@/services/admin';
 import { v4 as uuidv4 } from 'uuid';
-import { adminService } from '@/services/adminService';
 
 export const createCRUDSlice: StateCreator<
   TemplateState & TemplateCRUDSlice,

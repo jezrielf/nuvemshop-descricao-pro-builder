@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 import UserPanelHeader from './users/panels/UserPanelHeader';
 import UserPanelContent from './users/panels/UserPanelContent';
-import { adminService } from '@/services/adminService';
+import { adminService } from '@/services/admin';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
