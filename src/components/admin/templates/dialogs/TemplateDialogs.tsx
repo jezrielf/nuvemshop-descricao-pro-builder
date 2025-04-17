@@ -19,7 +19,7 @@ export const TemplateDialogs: React.FC = () => {
     closeAllDialogs
   } = useTemplateDialogs();
   
-  const { deleteTemplate: removeTemplate, updateTemplate } = useTemplateStore();
+  const { deleteTemplate: removeTemplate } = useTemplateStore();
 
   return (
     <>
@@ -43,10 +43,6 @@ export const TemplateDialogs: React.FC = () => {
           open={isEditDialogOpen}
           onClose={closeAllDialogs}
           template={editTemplate}
-          onUpdate={(updatedTemplate) => {
-            updateTemplate(editTemplate.id, updatedTemplate);
-            closeAllDialogs();
-          }}
         />
       )}
       
