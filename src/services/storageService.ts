@@ -24,15 +24,39 @@ export const storageService = {
    */
   async ensureBucketExists(): Promise<boolean> {
     try {
+      console.log('Verificando se o bucket existe...');
+      
+      // Primeiro, verificar se o bucket existe
       const { data: buckets, error } = await supabase.storage.listBuckets();
       
       if (error) {
-        console.error('Erro ao verificar buckets:', error);
+        console.error('Erro ao listar buckets:', error);
         return false;
       }
       
       const bucket = buckets?.find(b => b.name === BUCKET_NAME);
-      return !!bucket;
+      
+      if (!bucket) {
+        console.log('Bucket não encontrado, tentando criar...');
+        
+        // Tentar criar o bucket se não existe
+        const { error: createError } = await supabase.storage.createBucket(BUCKET_NAME, {
+          public: true,
+          fileSizeLimit: MAX_FILE_SIZE,
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        });
+        
+        if (createError) {
+          console.error('Erro ao criar bucket:', createError);
+          return false;
+        }
+        
+        console.log('Bucket criado com sucesso');
+        return true;
+      }
+      
+      console.log('Bucket já existe:', bucket.name);
+      return true;
     } catch (error) {
       console.error('Exceção ao verificar bucket:', error);
       return false;
@@ -43,7 +67,10 @@ export const storageService = {
    * Faz upload de um arquivo para o storage
    */
   async uploadFile({ user, file, path, onProgress }: UploadOptions): Promise<UploadResult> {
+    console.log('Iniciando processo de upload');
+    
     if (!user) {
+      console.error('Upload falhou: Usuário não autenticado');
       return { 
         success: false, 
         error: 'É necessário estar autenticado para fazer upload'
@@ -52,6 +79,7 @@ export const storageService = {
 
     // Validar tipo de arquivo
     if (!file.type.startsWith('image/')) {
+      console.error('Upload falhou: Tipo de arquivo inválido', file.type);
       return { 
         success: false, 
         error: 'Tipo de arquivo inválido. Apenas imagens são permitidas'
@@ -60,6 +88,7 @@ export const storageService = {
 
     // Validar tamanho do arquivo
     if (file.size > MAX_FILE_SIZE) {
+      console.error('Upload falhou: Arquivo muito grande', file.size);
       return { 
         success: false, 
         error: `Arquivo muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)}MB` 
@@ -70,6 +99,7 @@ export const storageService = {
       // Verificar se o bucket existe
       const bucketExists = await this.ensureBucketExists();
       if (!bucketExists) {
+        console.error('Upload falhou: Bucket não existe');
         return { 
           success: false, 
           error: 'Bucket de armazenamento não está disponível'
@@ -84,15 +114,16 @@ export const storageService = {
       const userId = user.id;
       const filePath = path ? `${userId}/${path}/${fileName}` : `${userId}/${fileName}`;
       
-      console.log('Iniciando upload para caminho:', filePath);
+      console.log('Caminho do arquivo para upload:', filePath);
       
       // Criar um intervalo para simular o progresso para o usuário
       let progressInterval: number | null = null;
+      let currentProgress = 0;
       
       if (onProgress) {
         progressInterval = window.setInterval(() => {
-          onProgress(Math.min((onProgress as any).lastProgress || 0 + 5, 90));
-          (onProgress as any).lastProgress = Math.min((onProgress as any).lastProgress || 0 + 5, 90);
+          currentProgress = Math.min(currentProgress + 5, 90);
+          onProgress(currentProgress);
         }, 100) as unknown as number;
       }
       
@@ -125,11 +156,14 @@ export const storageService = {
         .getPublicUrl(filePath);
       
       if (!fileData?.publicUrl) {
+        console.error('URL pública não disponível');
         return { 
           success: false, 
           error: 'Não foi possível obter URL pública do arquivo'
         };
       }
+      
+      console.log('Upload concluído com sucesso. URL:', fileData.publicUrl);
       
       return {
         success: true,
@@ -155,12 +189,14 @@ export const storageService = {
     }
 
     try {
+      console.log('Verificando bucket para listagem de imagens');
       const bucketExists = await this.ensureBucketExists();
       if (!bucketExists) {
         console.error('Bucket não existe para listar imagens');
         return [];
       }
       
+      console.log('Listando arquivos para o usuário:', userId);
       const { data: files, error } = await supabase.storage
         .from(BUCKET_NAME)
         .list(userId, {
@@ -170,6 +206,7 @@ export const storageService = {
       if (error) {
         // Diretório vazio é esperado para novos usuários
         if (error.message.includes('The specified key does not exist')) {
+          console.log('Diretório de usuário vazio ou não existe ainda');
           return [];
         }
         
@@ -178,8 +215,11 @@ export const storageService = {
       }
       
       if (!files || files.length === 0) {
+        console.log('Nenhum arquivo encontrado para o usuário');
         return [];
       }
+      
+      console.log(`${files.length} arquivos encontrados`);
       
       // Mapear para o formato esperado
       return files.map(file => {
@@ -212,6 +252,8 @@ export const storageService = {
       const fileName = pathParts[pathParts.length - 1];
       const filePath = `${userId}/${fileName}`;
       
+      console.log('Tentando excluir arquivo:', filePath);
+      
       const { error } = await supabase.storage
         .from(BUCKET_NAME)
         .remove([filePath]);
@@ -221,6 +263,7 @@ export const storageService = {
         return false;
       }
       
+      console.log('Arquivo excluído com sucesso');
       return true;
     } catch (error) {
       console.error('Exceção ao excluir imagem:', error);
@@ -233,6 +276,8 @@ export const storageService = {
    */
   parseStorageError(error: any): string {
     if (!error) return 'Erro desconhecido';
+    
+    console.log('Tipo de erro recebido:', error, typeof error);
     
     if (error.message?.includes('storage/object_not_found')) {
       return 'Diretório não encontrado. Verifique suas permissões.';
@@ -248,6 +293,14 @@ export const storageService = {
     
     if (error.message?.includes('duplicate')) {
       return 'Uma imagem com este nome já existe.';
+    }
+    
+    if (error.message?.includes('Unexpected')) {
+      return 'Erro de conexão. Verifique sua internet e tente novamente.';
+    }
+    
+    if (error.statusCode === 413) {
+      return 'Arquivo muito grande. Tente uma imagem menor.';
     }
     
     return error.message || 'Não foi possível enviar sua imagem. Tente novamente mais tarde.';
