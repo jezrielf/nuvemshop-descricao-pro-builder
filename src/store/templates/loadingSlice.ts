@@ -41,7 +41,7 @@ export const createLoadingSlice: StateCreator<
         const templates: Template[] = data.map(item => ({
           id: item.id,
           name: item.name,
-          category: item.category,
+          category: item.category as any, // Type assertion to handle string to ProductCategory
           blocks: deserializeBlocks(item.blocks),
           thumbnail: item.thumbnail || '/placeholder.svg'
         }));
@@ -66,6 +66,12 @@ export const createLoadingSlice: StateCreator<
         categories: Array.from(new Set(staticTemplates.map(t => t.category)))
       });
     }
+  },
+  
+  getTemplatesByCategory: (category) => {
+    const { templates } = get();
+    if (!category) return templates;
+    return templates.filter(template => template.category === category);
   },
   
   searchTemplates: (query, category) => {

@@ -39,3 +39,30 @@ export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Templ
 export const serializeBlocks = (blocks: Block[]): any => {
   return JSON.parse(JSON.stringify(blocks));
 };
+
+/**
+ * Deserializes blocks from JSON format to Block[] format
+ * This function handles any transformation needed when loading blocks from database
+ */
+export const deserializeBlocks = (blocks: any): Block[] => {
+  if (!blocks) return [];
+  
+  try {
+    if (typeof blocks === 'string') {
+      return JSON.parse(blocks);
+    }
+    
+    if (Array.isArray(blocks)) {
+      return blocks;
+    }
+    
+    if (typeof blocks === 'object') {
+      return Object.values(blocks);
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error deserializing blocks:', error);
+    return [];
+  }
+};
