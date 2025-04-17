@@ -4,7 +4,7 @@ import { createHeroBlock } from '../blockCreators/blocks/heroBlock';
 import { createTextBlock } from '../blockCreators/blocks/textBlock';
 import { createImageBlock } from '../blockCreators/blocks/imageBlock';
 import { createGalleryBlock } from '../blockCreators/blocks/galleryBlock';
-import { createVideoBlock } from '../blockCreators/createVideoBlock';
+import { createVideoBlock } from '../blockCreators/blocks/videoBlock';
 import { createImageTextBlock } from '../blockCreators/blocks/imageTextBlock';
 import { createTextImageBlock } from '../blockCreators/blocks/textImageBlock';
 import { createCTABlock } from '../blockCreators/blocks/ctaBlock';
@@ -29,11 +29,11 @@ export const homeDecorTemplates: Template[] = [
         buttonUrl: '#collection'
       }),
       // Video showcase
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=7maUQRoG3xk',
-        'Nossa Inspiração',
-        'Veja como nossa mobília transforma ambientes comuns em espaços extraordinários.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=7maUQRoG3xk',
+        heading: 'Nossa Inspiração',
+        description: 'Veja como nossa mobília transforma ambientes comuns em espaços extraordinários.'
+      }),
       // Features in columns
       createFeaturesBlock(3, {
         heading: 'Por que escolher nossos produtos',
@@ -190,11 +190,11 @@ export const homeDecorTemplates: Template[] = [
         buttonUrl: '#concept'
       }),
       // Concept Video
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=tGAxla9VSvQ',
-        'A arte de viver com menos',
-        'Conheça a filosofia por trás do design minimalista e como ela pode transformar sua vida.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=tGAxla9VSvQ',
+        heading: 'A arte de viver com menos',
+        description: 'Conheça a filosofia por trás do design minimalista e como ela pode transformar sua vida.'
+      }),
       // Text introduction
       createTextBlock(1, {
         heading: 'Design consciente',
@@ -303,11 +303,11 @@ export const homeDecorTemplates: Template[] = [
         ]
       }),
       // Another video for how-to
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=D4X_qQvXxhY',
-        'Como começar sua jornada minimalista',
-        'Guia passo a passo para simplificar sua casa e começar a viver com menos.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=D4X_qQvXxhY',
+        heading: 'Como começar sua jornada minimalista',
+        description: 'Guia passo a passo para simplificar sua casa e começar a viver com menos.'
+      }),
       // FAQ section
       createFAQBlock(1, {
         heading: 'Dúvidas Comuns',
@@ -393,11 +393,11 @@ export const homeDecorTemplates: Template[] = [
         ]
       }),
       // Video showcase
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=8llfD6Bz7G0',
-        'Da natureza para sua casa',
-        'Veja como transformamos matérias-primas naturais em peças únicas para sua casa.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=8llfD6Bz7G0',
+        heading: 'Da natureza para sua casa',
+        description: 'Veja como transformamos matérias-primas naturais em peças únicas para sua casa.'
+      }),
       // Features showcase
       createFeaturesBlock(3, {
         heading: 'Elementos do estilo rústico moderno',
@@ -471,11 +471,11 @@ export const homeDecorTemplates: Template[] = [
         ]
       }),
       // Another video for styling tips
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=iNJl-ioF6JQ',
-        'Como combinar peças rústicas e modernas',
-        'Nossa designer de interiores compartilha dicas para criar o equilíbrio perfeito entre elementos rústicos e contemporâneos.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=iNJl-ioF6JQ',
+        heading: 'Como combinar peças rústicas e modernas',
+        description: 'Nossa designer de interiores compartilha dicas para criar o equilíbrio perfeito entre elementos rústicos e contemporâneos.'
+      }),
       // FAQ section
       createFAQBlock(1, {
         heading: 'Perguntas Frequentes',

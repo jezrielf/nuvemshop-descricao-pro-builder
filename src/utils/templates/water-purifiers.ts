@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Template, Block } from '@/types/editor';
+import { Template } from '@/types/editor';
 import { createHeroBlock } from '../blockCreators/blocks/heroBlock';
 import { createTextBlock } from '../blockCreators/blocks/textBlock';
 import { createImageBlock } from '../blockCreators/blocks/imageBlock';
 import { createGalleryBlock } from '../blockCreators/blocks/galleryBlock';
-import { createVideoBlock } from '../blockCreators/createVideoBlock';
+import { createVideoBlock } from '../blockCreators/blocks/videoBlock';
 import { createImageTextBlock } from '../blockCreators/blocks/imageTextBlock';
 import { createTextImageBlock } from '../blockCreators/blocks/textImageBlock';
 import { createCTABlock } from '../blockCreators/blocks/ctaBlock';
@@ -34,11 +34,11 @@ export const waterPurifiersTemplates: Template[] = [
         content: '<p>A água é essencial para nossa saúde e bem-estar, mas a qualidade da água que consumimos pode variar consideravelmente. Nossos purificadores utilizam tecnologias avançadas de filtração para remover impurezas, contaminantes e garantir que sua família tenha acesso à água mais pura e saudável possível.</p><p>Desenvolvidos com os mais rigorosos padrões de qualidade, nossos sistemas não apenas purificam a água, mas também preservam minerais essenciais e otimizam o pH para maior benefício à saúde.</p>'
       }),
       // Product demonstration video
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=5SuU_2dAJ8w',
-        'Como funcionam nossos purificadores',
-        'Veja em detalhes os estágios de purificação e como nossos sistemas removem eficientemente contaminantes invisíveis presentes na água.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=5SuU_2dAJ8w',
+        heading: 'Como funcionam nossos purificadores',
+        description: 'Veja em detalhes os estágios de purificação e como nossos sistemas removem eficientemente contaminantes invisíveis presentes na água.'
+      }),
       // Product categories
       createFeaturesBlock(3, {
         heading: 'Linhas de produtos',
@@ -112,11 +112,11 @@ export const waterPurifiersTemplates: Template[] = [
         }
       }),
       // Installation video
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=aJ7kQ1DMOC8',
-        'Como instalar seu purificador',
-        'Guia passo a passo de instalação dos nossos principais modelos, mostrando como é simples ter água pura em sua casa ou escritório.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=aJ7kQ1DMOC8',
+        heading: 'Como instalar seu purificador',
+        description: 'Guia passo a passo de instalação dos nossos principais modelos, mostrando como é simples ter água pura em sua casa ou escritório.'
+      }),
       // Benefits section
       createBenefitsBlock(2, {
         heading: 'Benefícios da água realmente pura',
@@ -205,11 +205,11 @@ export const waterPurifiersTemplates: Template[] = [
         heading: 'Água pura, planeta limpo',
         content: '<p>Nossos filtros ecológicos combinam eficiência de purificação com responsabilidade ambiental. Desenvolvemos produtos que não apenas fornecem água limpa e saudável, mas também minimizam o impacto ambiental em cada etapa, do processo de fabricação ao descarte dos componentes.</p><p>Utilizamos materiais biodegradáveis, recicláveis e de baixo impacto, além de processos produtivos que consomem menos energia e água.</p>'
       }),
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=_GvV_BaFNM4',
-        'Conheça nosso processo ecológico',
-        'Um tour por nossa fábrica sustentável e processos de produção que reduzem significativamente o impacto ambiental.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=_GvV_BaFNM4',
+        heading: 'Conheça nosso processo ecológico',
+        description: 'Um tour por nossa fábrica sustentável e processos de produção que reduzem significativamente o impacto ambiental.'
+      }),
       createFeaturesBlock(3, {
         heading: 'Filtração natural',
         features: [
@@ -278,11 +278,11 @@ export const waterPurifiersTemplates: Template[] = [
           alt: 'Reciclagem de filtros'
         }
       }),
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=S3Cq1GhTmfM',
-        'Como nossos produtos ajudam comunidades',
-        'Para cada produto vendido, doamos um filtro básico para comunidades sem acesso à água potável. Conheça alguns dos projetos que apoiamos.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=S3Cq1GhTmfM',
+        heading: 'Como nossos produtos ajudam comunidades',
+        description: 'Para cada produto vendido, doamos um filtro básico para comunidades sem acesso à água potável. Conheça alguns dos projetos que apoiamos.'
+      }),
       createBenefitsBlock(2, {
         heading: 'Vantagens da filtração ecológica',
         benefits: [
@@ -363,11 +363,11 @@ export const waterPurifiersTemplates: Template[] = [
         heading: 'Purificação completa, conforto total',
         content: '<p>Nossos sistemas residenciais completos oferecem água purificada em todos os pontos de uso da sua casa - cozinha, banheiros, chuveiros e até mesmo para eletrodomésticos. Projetados para eliminar a mais ampla gama de contaminantes, estes sistemas garantem que toda água que toca você e sua família seja pura e saudável.</p><p>Combinamos diferentes tecnologias de filtração para criar uma solução personalizada para as necessidades específicas da água da sua região e do seu estilo de vida.</p>'
       }),
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=c6OsV1LmH60',
-        'Solução integrada',
-        'Uma visão detalhada de como os diferentes componentes do sistema trabalham juntos para purificar a água em toda sua residência.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=c6OsV1LmH60',
+        heading: 'Solução integrada',
+        description: 'Uma visão detalhada de como os diferentes componentes do sistema trabalham juntos para purificar a água em toda sua residência.'
+      }),
       createFeaturesBlock(3, {
         heading: 'Componentes do sistema',
         features: [
@@ -436,11 +436,11 @@ export const waterPurifiersTemplates: Template[] = [
           alt: 'App de monitoramento'
         }
       }),
-      createVideoBlock(
-        'https://www.youtube.com/watch?v=Z9SxWpZt0TE',
-        'Como implementamos seu sistema',
-        'Acompanhe o processo de instalação profissional, desde o planejamento inicial até os testes finais de qualidade da água.'
-      ),
+      createVideoBlock(1, {
+        videoUrl: 'https://www.youtube.com/watch?v=Z9SxWpZt0TE',
+        heading: 'Como implementamos seu sistema',
+        description: 'Acompanhe o processo de instalação profissional, desde o planejamento inicial até os testes finais de qualidade da água.'
+      }),
       createBenefitsBlock(2, {
         heading: 'Benefícios para toda a casa',
         benefits: [

@@ -15,6 +15,7 @@ export const createVideoBlock = (columns: ColumnLayout = 1, options?: any): Vide
   const description = options?.description || defaultDescription;
   const aspectRatio = options?.aspectRatio || defaultAspectRatio;
   const autoplay = options?.autoplay ?? false;
+  const caption = options?.caption || '';
 
   return {
     id: uuidv4(),
@@ -23,6 +24,7 @@ export const createVideoBlock = (columns: ColumnLayout = 1, options?: any): Vide
     videoUrl,
     heading,
     description,
+    caption,
     autoplay,
     aspectRatio,
     columns,
