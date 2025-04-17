@@ -1,5 +1,5 @@
 
-import { VideoBlock } from "@/types/editor/blocks/VideoBlock";
+import { VideoBlock } from "@/types/editor/blocks/video";
 import { BlockStyle } from "@/types/editor";
 import { getStylesFromBlock } from "../styleConverter";
 
@@ -29,7 +29,7 @@ function isVimeoUrl(url: string): boolean {
 
 // Main function to generate HTML for a video block
 export function generateVideoBlockHtml(block: VideoBlock): string {
-  const { videoUrl, aspectRatio = '16:9', heading, caption, style } = block;
+  const { videoUrl, aspectRatio = '16:9', heading, caption, style = {} } = block;
   
   // Set aspect ratio CSS class
   let aspectRatioClass = '';
@@ -48,7 +48,7 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
   }
   
   // Generate container styles
-  const containerStyle = getStylesFromBlock(block);
+  const containerStyle = getStylesFromBlock(block as any);
   
   // Default embed code (fallback for non-YouTube/Vimeo URLs)
   let embedCode = `<video controls src="${videoUrl}" class="absolute top-0 left-0 w-full h-full"></video>`;
@@ -81,11 +81,11 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
   // Construct the full HTML for the video block
   return `
     <div class="video-block my-6" style="${containerStyle}">
-      ${heading ? `<h3 class="text-xl font-semibold mb-3" style="color: ${(style as BlockStyle)?.headingColor || 'inherit'}">${heading}</h3>` : ''}
+      ${heading ? `<h3 class="text-xl font-semibold mb-3" style="color: ${style?.headingColor || 'inherit'}">${heading}</h3>` : ''}
       <div class="video-container relative ${aspectRatioClass}">
         ${embedCode}
       </div>
-      ${caption ? `<p class="text-sm mt-2 text-gray-600" style="color: ${(style as BlockStyle)?.textColor || 'inherit'}">${caption}</p>` : ''}
+      ${caption ? `<p class="text-sm mt-2 text-gray-600" style="color: ${style?.textColor || 'inherit'}">${caption}</p>` : ''}
     </div>
   `;
 }

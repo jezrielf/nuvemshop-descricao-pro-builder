@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { VideoBlock } from '@/types/editor/blocks/VideoBlock';
+import { VideoBlock } from '@/types/editor/blocks/video';
 
 export function createVideoBlock(
   videoUrl: string = '',
@@ -11,7 +11,7 @@ export function createVideoBlock(
   return {
     id: uuidv4(),
     type: 'video',
-    title: 'Vídeo', // This is explicitly required
+    title: 'Vídeo',
     columns: 1,
     visible: true,
     videoUrl,

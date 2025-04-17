@@ -4,7 +4,7 @@ import { Template, ProductCategory } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { getAllTemplates } from '@/utils/templates';
-import { deserializeBlocks } from './utils';
+import { deserializeBlocks, convertSupabaseToTemplate } from './utils';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -38,13 +38,9 @@ export const createLoadingSlice: StateCreator<
       if (data && data.length > 0) {
         console.log(`Loaded ${data.length} templates from database`);
         
-        const templates: Template[] = data.map(item => ({
-          id: item.id,
-          name: item.name,
-          category: item.category as ProductCategory, // Type assertion to handle string to ProductCategory
-          blocks: deserializeBlocks(item.blocks),
-          thumbnail: item.thumbnail || '/placeholder.svg'
-        }));
+        const templates: Template[] = data
+          .map(item => convertSupabaseToTemplate(item))
+          .filter((template): template is Template => template !== null);
         
         const categories = Array.from(new Set(templates.map(t => t.category)));
         set({ templates, categories });

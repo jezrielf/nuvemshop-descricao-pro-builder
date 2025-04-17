@@ -55,7 +55,7 @@ export type ProductCategory =
   | 'beauty'
   | 'fashion'
   | 'haute-couture'
-  | 'home-decor' // Added home-decor category
+  | 'home-decor' // Home decor category
   | 'other';
 
 export interface Template {

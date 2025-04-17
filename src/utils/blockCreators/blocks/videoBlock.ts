@@ -6,7 +6,7 @@ export const createVideoBlock = (columns: ColumnLayout): VideoBlock => {
   return {
     id: uuidv4(),
     type: 'video',
-    title: 'Vídeo', // This is explicitly required
+    title: 'Vídeo',
     columns,
     visible: true,
     videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Default video URL (example)

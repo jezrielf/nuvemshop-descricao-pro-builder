@@ -25,7 +25,7 @@ export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Templ
     return {
       id: supaTemplate.id,
       name: supaTemplate.name,
-      category: supaTemplate.category as ProductCategory, // Fix: Cast string to ProductCategory
+      category: supaTemplate.category as ProductCategory,
       blocks: blocks,
       thumbnail: supaTemplate.thumbnail || '/placeholder.svg' // Default placeholder if no thumbnail
     };

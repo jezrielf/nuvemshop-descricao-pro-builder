@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Template, Block } from '@/types/editor';
+import { Template, Block, ProductCategory } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
 import { useTemplateStore } from '@/store/templates';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +27,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
   onClose,
 }) => {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('other');
+  const [category, setCategory] = useState<ProductCategory>('other');
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -133,7 +132,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
 
   const handleTemplateFromHtml = (generatedTemplate: Template) => {
     setName(generatedTemplate.name);
-    setCategory(generatedTemplate.category as string);
+    setCategory(generatedTemplate.category);
     setBlocks(convertBlocks(generatedTemplate.blocks));
     setActiveTab('blocks');
   };
@@ -178,7 +177,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
                 <Label htmlFor="category">Categoria</Label>
                 <Select
                   value={category}
-                  onValueChange={setCategory}
+                  onValueChange={(value: ProductCategory) => setCategory(value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma categoria" />

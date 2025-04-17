@@ -1,10 +1,10 @@
 
-import { BaseBlock } from '../base';
+import { BlockBase } from '../base';
 
-export interface VideoBlock extends BaseBlock {
+export interface VideoBlock extends BlockBase {
   type: 'video';
   videoUrl: string;
-  title: string; // Changed from optional to required
+  title: string;
   aspectRatio?: '16:9' | '4:3' | '1:1';
   heading?: string;
   caption?: string;

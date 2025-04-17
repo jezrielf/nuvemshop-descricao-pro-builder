@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FileText, Star, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Template as TemplateType } from '@/types/editor';
+import { Template as TemplateType, ProductCategory } from '@/types/editor';
 
 const TemplateSelector: React.FC = () => {
   const { templates, categories, selectCategory, selectedCategory, loadTemplates } = useTemplateStore();
@@ -86,7 +86,7 @@ const TemplateSelector: React.FC = () => {
     electronics: 'Eletrônicos',
     energy: 'Energéticos',
     other: 'Outros',
-    'Casa e decoração': 'Casa e decoração'
+    'home-decor': 'Casa e decoração'
   };
   
   // Verifica se é um template avançado pelo ID
@@ -110,7 +110,7 @@ const TemplateSelector: React.FC = () => {
         return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
       case 'accessories':
         return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
-      case 'Casa e decoração':
+      case 'home-decor':
         return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92';
       default:
         return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
