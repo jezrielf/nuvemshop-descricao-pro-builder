@@ -35,7 +35,7 @@ const TemplateSelector: React.FC = () => {
             toast({
               title: "Aviso",
               description: "Não foi possível encontrar templates. Usando templates padrão.",
-              variant: "warning",
+              variant: "destructive", // Changed from 'warning' to 'destructive'
             });
           }
         } catch (error) {

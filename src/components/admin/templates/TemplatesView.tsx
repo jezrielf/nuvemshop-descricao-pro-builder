@@ -34,7 +34,7 @@ export const TemplatesView = () => {
         toast({
           title: 'Atenção',
           description: 'Nenhum template encontrado. Verifique sua conexão ou crie novos templates.',
-          variant: 'warning',
+          variant: 'destructive', // Changed from 'warning' to 'destructive'
         });
       }
     } catch (error) {
