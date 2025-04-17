@@ -31,17 +31,36 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
     try {
       console.log('Loading template:', template.name);
       
-      // Create a deep copy of the template blocks
-      const templateBlocksCopy = JSON.parse(JSON.stringify(template.blocks));
+      // Create a deep copy of the template blocks with a try-catch for extra safety
+      let templateBlocksCopy;
+      try {
+        templateBlocksCopy = JSON.parse(JSON.stringify(template.blocks));
+      } catch (error) {
+        console.error('Error creating deep copy of template blocks:', error);
+        templateBlocksCopy = [];
+      }
+      
+      // Early return if no valid blocks
+      if (!templateBlocksCopy || !Array.isArray(templateBlocksCopy) || templateBlocksCopy.length === 0) {
+        console.warn('No valid template blocks to load');
+        return;
+      }
       
       // Parse and validate each block, ensuring it has all required properties
-      const validatedBlocks = parseTemplateBlocks(templateBlocksCopy).map(block => {
-        // Generate new IDs for each block to avoid conflicts
-        return {
-          ...block,
-          id: uuidv4()
-        };
-      });
+      // Wrap in try-catch to catch any parsing errors
+      let validatedBlocks = [];
+      try {
+        validatedBlocks = parseTemplateBlocks(templateBlocksCopy).map(block => {
+          // Generate new IDs for each block to avoid conflicts
+          return {
+            ...block,
+            id: uuidv4()
+          };
+        });
+      } catch (error) {
+        console.error('Error parsing template blocks:', error);
+        validatedBlocks = [];
+      }
       
       console.log('Validated blocks:', validatedBlocks);
       

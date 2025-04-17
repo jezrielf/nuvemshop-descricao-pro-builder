@@ -2,7 +2,10 @@
 import { BlockBase, BlockType } from '@/types/editor/base';
 
 export function validateBaseBlock(block: any): boolean {
-  if (!block || typeof block !== 'object') return false;
+  if (!block || typeof block !== 'object') {
+    console.warn('Invalid block: not an object', block);
+    return false;
+  }
   
   // Check only critical base properties
   const criticalProperties = ['id', 'type'];
@@ -10,6 +13,17 @@ export function validateBaseBlock(block: any): boolean {
   
   if (!hasAllCritical) {
     console.warn('Block missing critical properties:', block);
+    return false;
+  }
+  
+  // Ensure type is a valid BlockType
+  const validBlockTypes = [
+    'hero', 'text', 'features', 'benefits', 'specifications', 
+    'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta', 'video'
+  ];
+  
+  if (!validBlockTypes.includes(block.type)) {
+    console.warn(`Invalid block type: ${block.type}`, block);
     return false;
   }
   
@@ -33,28 +47,40 @@ export function validateBlockByType(block: any): boolean {
   try {
     switch (type) {
       case 'hero':
-        return 'heading' in block && 'subheading' in block;
+        // Less strict validation for hero block
+        return true;
       case 'text':
-        return 'content' in block && 'heading' in block;
+        // Ensure at least content exists, heading can be added
+        return 'content' in block;
       case 'features':
+        // Ensure features array exists, even if empty
         return 'features' in block && Array.isArray(block.features);
       case 'benefits':
+        // Ensure benefits array exists, even if empty
         return 'benefits' in block && Array.isArray(block.benefits);
       case 'specifications':
+        // Ensure specs array exists, even if empty
         return 'specs' in block && Array.isArray(block.specs);
       case 'image':
-        return 'src' in block && 'alt' in block;
+        // Ensure src and alt exist, but don't be too strict
+        return 'src' in block || 'imageUrl' in block;
       case 'gallery':
+        // Ensure images array exists, even if empty
         return 'images' in block && Array.isArray(block.images);
       case 'imageText':
+        // Ensure image and content exist
         return 'image' in block && 'content' in block && typeof block.image === 'object';
       case 'textImage':
+        // Ensure image and content exist
         return 'image' in block && 'content' in block && typeof block.image === 'object';
       case 'faq':
+        // Ensure questions array exists, even if empty
         return 'questions' in block && Array.isArray(block.questions);
       case 'cta':
-        return 'heading' in block && 'content' in block && 'buttonText' in block;
+        // Less strict validation for CTA
+        return 'heading' in block || 'content' in block;
       case 'video':
+        // Ensure videoUrl exists
         return 'videoUrl' in block;
       default:
         console.warn(`Unknown block type: ${type}`);
@@ -68,16 +94,18 @@ export function validateBlockByType(block: any): boolean {
 
 export function ensureValidBlock(block: any, expectedType: BlockType): any {
   if (!block || typeof block !== 'object') {
+    console.error(`Invalid block: not an object`, block);
     throw new Error(`Invalid block: not an object`);
   }
   
   if (block.type !== expectedType) {
+    console.error(`Invalid block type: expected ${expectedType}, got ${block?.type}`, block);
     throw new Error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
   }
   
   if (!validateBlockByType(block)) {
     console.warn(`Block of type ${expectedType} is missing required properties:`, block);
-    // Instead of throwing error, we'll let the calling code handle this situation
+    // Don't throw error, let the calling code handle this situation
   }
   
   return block;

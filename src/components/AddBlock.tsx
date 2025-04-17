@@ -30,21 +30,32 @@ const AddBlock: React.FC = () => {
       if (newBlock) {
         console.log('Block created:', newBlock);
         
-        // Ensure the block has all required properties
-        const validatedBlock = ensureBlockType(newBlock);
-        console.log('Block validated:', validatedBlock);
-        
-        // Add the block to the editor
-        addBlock(validatedBlock);
-        
-        toast({
-          title: "Bloco adicionado",
-          description: `${blockTypeInfo[selectedType].name} foi adicionado à sua descrição.`,
-        });
-        
-        setSelectedType(null);
-        setColumns('full');
-        setOpen(false);
+        // Use try-catch to ensure validation doesn't break the app
+        try {
+          // Ensure the block has all required properties
+          const validatedBlock = ensureBlockType(newBlock);
+          console.log('Block validated:', validatedBlock);
+          
+          // Add the block to the editor
+          addBlock(validatedBlock);
+          
+          toast({
+            title: "Bloco adicionado",
+            description: `${blockTypeInfo[selectedType].name} foi adicionado à sua descrição.`,
+          });
+          
+          setSelectedType(null);
+          setColumns('full');
+          setOpen(false);
+        } catch (validationError) {
+          console.error('Block validation error:', validationError);
+          
+          toast({
+            title: "Erro ao validar bloco",
+            description: `O bloco ${selectedType} não pôde ser validado. Detalhes: ${validationError.message}`,
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
       console.error('Error creating block:', error);

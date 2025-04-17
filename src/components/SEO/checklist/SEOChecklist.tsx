@@ -18,12 +18,26 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
   const [open, setOpen] = useState(false);
   const { checklistItems, progress } = useSEOChecklist(description);
   
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(true);
+  };
+  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <span className="w-full">Checklist SEO</span>
+        <button 
+          className="w-full text-left py-1.5 px-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          onClick={handleClick}
+        >
+          Checklist SEO
+        </button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
+      <DialogContent 
+        className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Checklist SEO</h2>
           <div className="flex items-center gap-2">

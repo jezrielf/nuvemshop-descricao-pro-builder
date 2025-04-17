@@ -12,11 +12,16 @@ export function parseTemplateBlocks(blocks: any[]): Block[] {
     return [];
   }
   
-  return blocks.map(block => {
-    // Make a deep clone to avoid reference issues
-    const blockCopy = JSON.parse(JSON.stringify(block));
-    return ensureBlockType(blockCopy);
-  });
+  try {
+    return blocks.map(block => {
+      // Make a deep clone to avoid reference issues
+      const blockCopy = JSON.parse(JSON.stringify(block));
+      return ensureBlockType(blockCopy);
+    });
+  } catch (error) {
+    console.error('Error parsing template blocks:', error);
+    return [];
+  }
 }
 
 /**
@@ -29,5 +34,12 @@ export function convertBlocks(blocks: any[]): Block[] {
     return [];
   }
   
-  return parseTemplateBlocks(blocks);
+  try {
+    // Deep clone the blocks to avoid reference issues
+    const blocksCopy = JSON.parse(JSON.stringify(blocks));
+    return parseTemplateBlocks(blocksCopy);
+  } catch (error) {
+    console.error('Error converting blocks:', error);
+    return [];
+  }
 }
