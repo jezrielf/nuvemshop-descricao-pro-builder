@@ -31,7 +31,8 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
       title: block.title,
       description: block.description || '',
       autoplay: block.autoplay ?? true,
-      caption: block.caption || ''
+      caption: block.caption || '',
+      aspectRatio: block.aspectRatio || '16:9'
     }
   });
 

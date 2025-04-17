@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { UseFormReturn } from 'react-hook-form';
 import { VideoFormValues } from './types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface VideoFormProps {
   block: VideoBlock;
@@ -14,7 +15,7 @@ interface VideoFormProps {
 }
 
 const VideoForm: React.FC<VideoFormProps> = ({ block, form }) => {
-  const { register, control } = form;
+  const { control } = form;
 
   return (
     <Form {...form}>
@@ -71,6 +72,32 @@ const VideoForm: React.FC<VideoFormProps> = ({ block, form }) => {
               <FormControl>
                 <Input placeholder="Legenda do vídeo" {...field} />
               </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={control}
+          name="aspectRatio"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Proporção</FormLabel>
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value} 
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Escolha a proporção do vídeo" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="16:9">16:9 (Widescreen)</SelectItem>
+                  <SelectItem value="4:3">4:3 (Clássico)</SelectItem>
+                  <SelectItem value="1:1">1:1 (Quadrado)</SelectItem>
+                </SelectContent>
+              </Select>
             </FormItem>
           )}
         />
