@@ -41,7 +41,7 @@ export const clothingTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1523381294911-8d3cead13475?q=80&w=500'
   },
   
   // Template 2: Moda Sustentável
@@ -68,7 +68,7 @@ export const clothingTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1581783898377-1c85bf937427?q=80&w=500'
   },
   
   // Template 3: Coleção Sazonal
@@ -95,6 +95,6 @@ export const clothingTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=500'
   }
 ];

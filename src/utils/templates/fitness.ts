@@ -41,7 +41,7 @@ export const fitnessTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500'
   },
   
   // Template 2: Equipamentos para Yoga
@@ -68,7 +68,7 @@ export const fitnessTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?q=80&w=500'
   },
   
   // Template 3: Acessórios para Corrida
@@ -95,6 +95,6 @@ export const fitnessTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=500'
   }
 ];

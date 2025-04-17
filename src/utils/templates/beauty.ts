@@ -41,7 +41,7 @@ export const beautyTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=500'
   },
   
   // Template 2: Maquiagem Profissional
@@ -68,7 +68,7 @@ export const beautyTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=500'
   },
   
   // Template 3: Perfumaria Exclusiva
@@ -95,6 +95,6 @@ export const beautyTemplates: Template[] = [
       createFAQBlock(1),
       createCTABlock(1)
     ],
-    thumbnail: '/placeholder.svg' // Added missing thumbnail
+    thumbnail: 'https://images.unsplash.com/photo-1600612253971-422e7f7faeb6?q=80&w=500'
   }
 ];

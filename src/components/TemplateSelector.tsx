@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useTemplateStore } from '@/store/templates';
 import { useEditorStore } from '@/store/editor';
@@ -85,8 +86,11 @@ const TemplateSelector: React.FC = () => {
     shoes: 'Calçados',
     electronics: 'Eletrônicos',
     energy: 'Energéticos',
-    other: 'Outros',
-    'home-decor': 'Casa e decoração'
+    beauty: 'Beleza',
+    fitness: 'Fitness',
+    fashion: 'Moda',
+    'home-decor': 'Casa e decoração',
+    other: 'Outros'
   };
   
   // Verifica se é um template avançado pelo ID
@@ -94,26 +98,38 @@ const TemplateSelector: React.FC = () => {
   
   // Gera uma miniatura para o template
   const getTemplateThumbnail = (template: TemplateType) => {
+    // Se o template já tem uma miniatura, use-a
+    if (template.thumbnail && template.thumbnail !== '/placeholder.svg') {
+      return template.thumbnail;
+    }
+    
+    // Caso contrário, use uma miniatura com base na categoria
     const category = template.category;
     
     // Miniaturas personalizadas por categoria
     switch(category) {
       case 'supplements':
-        return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd';
+        return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=500';
       case 'clothing':
-        return 'https://images.unsplash.com/photo-1560243563-062bfc001d68';
+        return 'https://images.unsplash.com/photo-1560243563-062bfc001d68?q=80&w=500';
       case 'shoes':
-        return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff';
+        return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=500';
       case 'electronics':
-        return 'https://images.unsplash.com/photo-1498049794561-7780e7231661';
+        return 'https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=500';
       case 'energy':
-        return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
+        return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b?q=80&w=500';
       case 'accessories':
-        return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
+        return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=500';
       case 'home-decor':
-        return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92';
+        return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=500';
+      case 'beauty':
+        return 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=500';
+      case 'fitness':
+        return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500';
+      case 'fashion':
+        return 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=500';
       default:
-        return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
+        return 'https://images.unsplash.com/photo-1553531384-411a247cce73?q=80&w=500';
     }
   };
 
@@ -188,17 +204,11 @@ const TemplateSelector: React.FC = () => {
                         className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow"
                       >
                         <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
-                          {isAdvancedTemplate(template.id) ? (
-                            <img 
-                              src={getTemplateThumbnail(template)} 
-                              alt={template.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-gray-400 text-sm">
-                              Preview do Template
-                            </span>
-                          )}
+                          <img 
+                            src={getTemplateThumbnail(template)} 
+                            alt={template.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div className="p-4 flex flex-col flex-grow">
                           <div className="flex justify-between items-center">
@@ -227,7 +237,7 @@ const TemplateSelector: React.FC = () => {
                     ))
                   ) : (
                     <div className="col-span-2 text-center py-8">
-                      <p className="text-muted-foreground">Nenhum template encontrado.</p>
+                      <p className="text-muted-foreground">Nenhum template encontrado nesta categoria.</p>
                     </div>
                   )}
                 </div>
