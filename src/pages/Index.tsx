@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -31,6 +32,7 @@ const Index = () => {
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
+  const { session, user } = useAuth();
   const { 
     success: storeConnected, 
     storeName, 
@@ -93,7 +95,16 @@ const Index = () => {
     return () => {
       clearInterval(templateRefreshInterval);
     };
-  }, [loadTemplates]);
+  }, [loadTemplates, toast]);
+
+  // Debug para autenticação
+  useEffect(() => {
+    if (session) {
+      console.log("Usuário está autenticado:", user?.id);
+    } else {
+      console.log("Usuário não está autenticado");
+    }
+  }, [session, user]);
 
   const handleNuvemshopDisconnect = () => {
     handleDisconnectNuvemshop();
