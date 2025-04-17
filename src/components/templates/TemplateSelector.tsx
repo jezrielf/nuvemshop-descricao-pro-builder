@@ -14,7 +14,7 @@ import TemplateGrid from './TemplateGrid';
 import useTemplateUtils from './useTemplateUtils';
 
 const TemplateSelector: React.FC = () => {
-  const { templates, categories, selectCategory, selectedCategory, loadTemplates, searchTemplates } = useTemplateStore();
+  const { templates, categories, setSelectedCategory, selectedCategory, loadTemplates, searchTemplates } = useTemplateStore();
   const { loadTemplate } = useEditorStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +119,7 @@ const TemplateSelector: React.FC = () => {
             <CategoryFilter
               categories={categories}
               selectedCategory={selectedCategory}
-              onSelectCategory={selectCategory}
+              onSelectCategory={setSelectedCategory}
               categoryNames={categoryNames}
             />
             

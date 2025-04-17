@@ -9,7 +9,7 @@ interface TemplateSelectionProps {
 }
 
 const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate }) => {
-  const { templates, categories, selectedCategory, selectCategory } = useTemplateStore();
+  const { templates, categories, selectedCategory, setSelectedCategory } = useTemplateStore();
   
   // Get templates for the selected category
   const filteredTemplates = selectedCategory
@@ -21,7 +21,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate 
       <div className="mb-4">
         <div className="flex flex-wrap gap-2 mb-4">
           <button
-            onClick={() => selectCategory(null)}
+            onClick={() => setSelectedCategory(null)}
             className={`px-3 py-1.5 text-sm rounded-full ${
               selectedCategory === null
                 ? 'bg-primary text-primary-foreground'
@@ -34,7 +34,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate 
           {categories.map(category => (
             <button
               key={category}
-              onClick={() => selectCategory(category)}
+              onClick={() => setSelectedCategory(category)}
               className={`px-3 py-1.5 text-sm rounded-full capitalize ${
                 selectedCategory === category
                   ? 'bg-primary text-primary-foreground'

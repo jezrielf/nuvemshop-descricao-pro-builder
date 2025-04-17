@@ -1,45 +1,49 @@
 
-import { useMemo } from 'react';
-import { Template } from '@/types/editor';
+import { useState, useEffect, useMemo } from 'react';
+import { ProductCategory } from '@/types/editor';
+import { advancedTemplates } from '@/utils/templates';
 
-export const useTemplateUtils = () => {
-  // Category display names
-  const categoryNames: Record<string, string> = {
-    supplements: 'Suplementos',
-    clothing: 'Roupas',
-    accessories: 'Acessórios',
-    shoes: 'Calçados',
-    electronics: 'Eletrônicos',
-    energy: 'Energéticos',
-    other: 'Outros',
-    'Casa e decoração': 'Casa e decoração'
+interface CategoryNamesMap {
+  [key: string]: string;
+}
+
+export default function useTemplateUtils() {
+  // Category mapping for display purposes
+  const categoryNames: CategoryNamesMap = useMemo(() => ({
+    'supplements': 'Suplementos',
+    'clothing': 'Vestuário',
+    'accessories': 'Acessórios',
+    'shoes': 'Calçados',
+    'electronics': 'Eletrônicos',
+    'energy': 'Energia',
+    'Casa e decoração': 'Casa e decoração',
+    'other': 'Outros'
+  }), []);
+
+  // Check if a template is from the advanced collection
+  const isAdvancedTemplate = (id: string): boolean => {
+    return advancedTemplates.some(template => template.id === id);
   };
-  
-  // Check if template is advanced
-  const isAdvancedTemplate = (id: string) => id.startsWith('adv-');
-  
-  // Generate template thumbnail
-  const getTemplateThumbnail = (template: Template) => {
-    const category = template.category;
-    
-    // Category-specific thumbnails
-    if (category === 'supplements') {
-      return 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd';
-    } else if (category === 'clothing') {
-      return 'https://images.unsplash.com/photo-1560243563-062bfc001d68';
-    } else if (category === 'shoes') {
-      return 'https://images.unsplash.com/photo-1542291026-7eec264c27ff';
-    } else if (category === 'electronics') {
-      return 'https://images.unsplash.com/photo-1498049794561-7780e7231661';
-    } else if (category === 'energy') {
-      return 'https://images.unsplash.com/photo-1596803244618-8dbee441d70b';
-    } else if (category === 'accessories') {
-      return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30';
-    } else if (category === 'Casa e decoração') {
-      return 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92';
-    } else {
-      return 'https://images.unsplash.com/photo-1553531384-411a247cce73';
+
+  // Get a thumbnail for a template
+  const getTemplateThumbnail = (template: { category: ProductCategory, thumbnail?: string }): string => {
+    if (template.thumbnail && template.thumbnail !== '/placeholder.svg') {
+      return template.thumbnail;
     }
+    
+    // Default thumbnails based on category
+    const categoryThumbnails: Record<ProductCategory, string> = {
+      'supplements': '/assets/thumbnails/supplements.jpg',
+      'clothing': '/assets/thumbnails/clothing.jpg',
+      'accessories': '/assets/thumbnails/accessories.jpg',
+      'shoes': '/assets/thumbnails/shoes.jpg',
+      'electronics': '/assets/thumbnails/electronics.jpg',
+      'energy': '/assets/thumbnails/energy.jpg',
+      'Casa e decoração': '/assets/thumbnails/home.jpg',
+      'other': '/assets/thumbnails/generic.jpg'
+    };
+    
+    return categoryThumbnails[template.category] || '/placeholder.svg';
   };
 
   return {
@@ -47,6 +51,4 @@ export const useTemplateUtils = () => {
     isAdvancedTemplate,
     getTemplateThumbnail
   };
-};
-
-export default useTemplateUtils;
+}
