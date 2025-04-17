@@ -18,12 +18,14 @@ export type ProductCategory =
   | 'water-purifiers'   // Purificadores de água
   | 'other';            // Outros
 
+export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'extra-large' | 'small' | 'medium' | 'large';
+
 export interface BlockStyle {
   backgroundColor?: string;
   textColor?: string;
   headingColor?: string;
   padding?: 'sm' | 'md' | 'lg' | 'none';
-  blockSpacing?: 'sm' | 'md' | 'lg' | 'none';
+  blockSpacing?: BlockSpacing;
   borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   borderWidth?: 'none' | 'sm' | 'md' | 'lg';
   borderColor?: string;
@@ -31,7 +33,7 @@ export interface BlockStyle {
   fontFamily?: string;
   textAlign?: 'left' | 'center' | 'right';
   
-  // Additional missing properties
+  // Additional properties
   imageFit?: 'contain' | 'cover';
   fontSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
   fontWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
@@ -41,6 +43,12 @@ export interface BlockStyle {
   hasBorder?: boolean;
   hasShadow?: boolean;
   headingWeight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  
+  // Additional background properties
+  backgroundImage?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+  lineHeight?: string;
 }
 
 export interface BlockBase {
@@ -52,7 +60,7 @@ export interface BlockBase {
   style?: BlockStyle;
 }
 
-// Define the ProductDescription interface
+// Define the ProductDescription interface and export it
 export interface ProductDescription {
   id: string;
   name: string;

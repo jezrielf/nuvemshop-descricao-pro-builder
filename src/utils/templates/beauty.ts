@@ -1,17 +1,19 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Template, Block } from '@/types/editor';
-import { createHeroBlock } from '../blockCreators/blocks/heroBlock';
-import { createTextBlock } from '../blockCreators/blocks/textBlock';
-import { createImageBlock } from '../blockCreators/blocks/imageBlock';
-import { createGalleryBlock } from '../blockCreators/blocks/galleryBlock';
-import { createVideoBlock } from '../blockCreators/blocks/videoBlock';
-import { createImageTextBlock } from '../blockCreators/blocks/imageTextBlock';
-import { createTextImageBlock } from '../blockCreators/blocks/textImageBlock';
-import { createCTABlock } from '../blockCreators/blocks/ctaBlock';
-import { createFAQBlock } from '../blockCreators/blocks/faqBlock';
-import { createFeaturesBlock } from '../blockCreators/blocks/featuresBlock';
-import { createBenefitsBlock } from '../blockCreators/blocks/benefitsBlock';
+import { 
+  createHeroBlock, 
+  createTextBlock, 
+  createImageBlock, 
+  createGalleryBlock, 
+  createVideoBlock, 
+  createImageTextBlock, 
+  createTextImageBlock, 
+  createCTABlock, 
+  createFAQBlock, 
+  createFeaturesBlock, 
+  createBenefitsBlock 
+} from '../blockCreators/blocks';
 
 // Create 3 beauty templates
 export const beautyTemplates: Template[] = [
@@ -30,12 +32,14 @@ export const beautyTemplates: Template[] = [
         buttonText: 'Descobrir produtos',
         buttonUrl: '#products'
       },
+      
       // Text introduction
       {
         ...createTextBlock(1),
         heading: 'Cuidado real com sua pele',
         content: '<p>Nossa linha de skincare foi desenvolvida para nutrir, proteger e regenerar sua pele utilizando apenas o que a natureza tem de melhor. Sem ingredientes sintéticos, parabenos ou fragrâncias artificiais.</p><p>Cada produto é formulado com ingredientes orgânicos certificados, ativamente benéficos para todos os tipos de pele e testados apenas em voluntários humanos.</p>'
       },
+      
       // Video about formulation
       {
         ...createVideoBlock(1),
@@ -44,6 +48,7 @@ export const beautyTemplates: Template[] = [
         videoUrl: 'https://www.youtube.com/watch?v=gOkLxv0vAOw',
         description: 'Conheça o processo de seleção de ingredientes e formulação de nossos produtos, desde o cultivo orgânico até o envase consciente.'
       },
+      
       // Key ingredients
       {
         ...createFeaturesBlock(3),
@@ -69,6 +74,7 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
       // Gallery of products
       {
         ...createGalleryBlock(1),
@@ -100,6 +106,7 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
       // Sustainable practices
       {
         ...createImageTextBlock(1),
@@ -110,6 +117,7 @@ export const beautyTemplates: Template[] = [
           alt: 'Produção sustentável'
         }
       },
+      
       // Skincare routine
       {
         ...createTextImageBlock(1),
@@ -120,6 +128,7 @@ export const beautyTemplates: Template[] = [
           alt: 'Rotina de skincare'
         }
       },
+      
       // Tutorial video
       {
         ...createVideoBlock(1),
@@ -128,6 +137,7 @@ export const beautyTemplates: Template[] = [
         videoUrl: 'https://www.youtube.com/watch?v=GiJ9_P8pUCM',
         description: 'Nossa especialista em dermatologia mostra o passo a passo para uma rotina de skincare eficiente para diferentes tipos de pele.'
       },
+      
       // Benefits section
       {
         ...createBenefitsBlock(2),
@@ -159,17 +169,19 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
       // Testimonials
       {
         ...createTextBlock(1),
         heading: 'O que nossos clientes dizem',
         content: '<blockquote>"Depois de anos lutando contra irritações e alergias, finalmente encontrei produtos que acalmam minha pele sensível. Faz toda diferença usar ingredientes que realmente nutrem a pele." - Camila R.</blockquote><blockquote>"Nunca acreditei que produtos naturais pudessem ser tão eficazes. Minha pele está mais firme, hidratada e luminosa desde que comecei a usar a linha completa." - Thiago M.</blockquote>'
       },
+      
       // FAQ section
       {
         ...createFAQBlock(1),
         heading: 'Perguntas Frequentes',
-        faqs: [
+        questions: [
           {
             id: uuidv4(),
             question: 'Produtos naturais funcionam para pele oleosa?',
@@ -192,6 +204,7 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
       // Call to action
       {
         ...createCTABlock(1),
@@ -202,14 +215,14 @@ export const beautyTemplates: Template[] = [
       }
     ]
   },
-  // You can add more beauty templates following the same pattern
+  // Second template - Maquiagem Vegana
   {
     id: uuidv4(),
     name: 'Cosméticos - Maquiagem Vegana',
     category: 'beauty',
     thumbnail: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9',
     blocks: [
-      // Add blocks for this template
+      // Hero section
       {
         ...createHeroBlock(1),
         heading: 'Beleza Ética e Colorida',
@@ -218,13 +231,15 @@ export const beautyTemplates: Template[] = [
         buttonText: 'Ver cores',
         buttonUrl: '#colors'
       },
-      // Add more blocks here
+      
+      // Introduction text
       {
         ...createTextBlock(1),
         heading: 'Colorido sem crueldade',
         content: '<p>Nossa linha de maquiagem combina alto poder de pigmentação, longa duração e fórmulas livres de crueldade animal. Cada produto é desenvolvido com ingredientes veganos e ativos naturais que beneficiam sua pele enquanto realçam sua beleza.</p><p>Somos certificados internacionalmente como veganos e cruelty-free, honrando nosso compromisso com a ética e o bem-estar animal.</p>'
       },
-      // Add 8+ more blocks for this template
+      
+      // Video block
       {
         ...createVideoBlock(1),
         title: 'Arte e pigmentos',
@@ -232,6 +247,8 @@ export const beautyTemplates: Template[] = [
         videoUrl: 'https://www.youtube.com/watch?v=ipUQE8EUPlU',
         description: 'Veja como extraímos e desenvolvemos pigmentos vibrantes a partir de fontes naturais e minerais, sem ingredientes de origem animal.'
       },
+      
+      // Vegan makeup features
       {
         ...createFeaturesBlock(3),
         heading: 'Por que escolher maquiagem vegana',
@@ -256,6 +273,8 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // Product gallery
       {
         ...createGalleryBlock(1),
         title: 'Coleção Rainbow',
@@ -286,6 +305,8 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // Image + Text block
       {
         ...createImageTextBlock(1),
         heading: 'Ingredientes que fazem diferença',
@@ -295,6 +316,8 @@ export const beautyTemplates: Template[] = [
           alt: 'Ingredientes naturais'
         }
       },
+      
+      // Text + Image block
       {
         ...createTextImageBlock(1),
         heading: 'Embalagens conscientes',
@@ -304,6 +327,8 @@ export const beautyTemplates: Template[] = [
           alt: 'Embalagens ecológicas'
         }
       },
+      
+      // Tutorial video
       {
         ...createVideoBlock(1),
         title: 'Tutorial de maquiagem',
@@ -311,6 +336,8 @@ export const beautyTemplates: Template[] = [
         videoUrl: 'https://www.youtube.com/watch?v=QAgSMSV87Lo',
         description: 'Nossa maquiadora demonstra como criar looks diversos e impactantes utilizando apenas produtos veganos e cruelty-free.'
       },
+      
+      // Benefits
       {
         ...createBenefitsBlock(2),
         heading: 'Benefícios para você e o planeta',
@@ -341,10 +368,12 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // FAQ
       {
         ...createFAQBlock(1),
         heading: 'Perguntas Frequentes',
-        faqs: [
+        questions: [
           {
             id: uuidv4(),
             question: 'Maquiagem vegana tem boa fixação?',
@@ -367,6 +396,8 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // CTA
       {
         ...createCTABlock(1),
         heading: 'Beleza com propósito',
@@ -376,13 +407,14 @@ export const beautyTemplates: Template[] = [
       }
     ]
   },
+  // Third template - Perfumaria Artesanal
   {
     id: uuidv4(),
     name: 'Cosméticos - Perfumaria Artesanal',
     category: 'beauty',
     thumbnail: 'https://images.unsplash.com/photo-1615289646521-4fd40a38f469',
     blocks: [
-      // Add blocks for this template
+      // Hero section
       {
         ...createHeroBlock(1),
         heading: 'Fragrâncias que Contam Histórias',
@@ -391,13 +423,15 @@ export const beautyTemplates: Template[] = [
         buttonText: 'Descobrir fragrâncias',
         buttonUrl: '#fragrances'
       },
-      // Add more blocks here
+      
+      // Introduction text
       {
         ...createTextBlock(1),
         heading: 'A arte da perfumaria natural',
         content: '<p>Nossas fragrâncias são criadas por mestres perfumistas que combinam técnicas tradicionais com ingredientes sustentáveis e naturais. Cada perfume é uma obra de arte olfativa que evolui ao longo do dia, revelando diferentes notas e sensações.</p><p>Utilizamos óleos essenciais extraídos por métodos artesanais, respeitando o tempo da natureza e as comunidades produtoras ao redor do mundo.</p>'
       },
-      // Add 8+ more blocks for this template
+      
+      // Video
       {
         ...createVideoBlock(1),
         title: 'A magia dos perfumes',
@@ -405,6 +439,8 @@ export const beautyTemplates: Template[] = [
         videoUrl: 'https://www.youtube.com/watch?v=1oWHLaKPjps',
         description: 'Acompanhe o processo de criação de um perfume artesanal, desde a colheita das matérias-primas até a maturação final da fragrância.'
       },
+      
+      // Features
       {
         ...createFeaturesBlock(3),
         heading: 'O que torna nossos perfumes especiais',
@@ -429,6 +465,8 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // Gallery
       {
         ...createGalleryBlock(1),
         title: 'Coleção Elementos',
@@ -459,6 +497,8 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // Image + Text
       {
         ...createImageTextBlock(1),
         heading: 'Ingredientes nobres',
@@ -468,6 +508,8 @@ export const beautyTemplates: Template[] = [
           alt: 'Ingredientes para perfumes'
         }
       },
+      
+      // Text + Image
       {
         ...createTextImageBlock(1),
         heading: 'O processo de criação',
@@ -477,6 +519,8 @@ export const beautyTemplates: Template[] = [
           alt: 'Laboratório de perfumaria'
         }
       },
+      
+      // Video tutorial
       {
         ...createVideoBlock(1),
         title: 'A arte de usar perfume',
@@ -484,6 +528,8 @@ export const beautyTemplates: Template[] = [
         videoUrl: 'https://www.youtube.com/watch?v=pldqvM4dQ8k',
         description: 'Nosso mestre perfumista compartilha segredos sobre como aplicar, combinar e preservar fragrâncias naturais.'
       },
+      
+      // Benefits
       {
         ...createBenefitsBlock(2),
         heading: 'Vantagens da perfumaria natural',
@@ -514,10 +560,12 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // FAQ
       {
         ...createFAQBlock(1),
         heading: 'Perguntas Frequentes',
-        faqs: [
+        questions: [
           {
             id: uuidv4(),
             question: 'Perfumes naturais têm boa fixação?',
@@ -540,6 +588,8 @@ export const beautyTemplates: Template[] = [
           }
         ]
       },
+      
+      // CTA
       {
         ...createCTABlock(1),
         heading: 'Encontre sua assinatura olfativa',
