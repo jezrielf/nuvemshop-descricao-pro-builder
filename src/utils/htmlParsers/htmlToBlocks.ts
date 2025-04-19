@@ -1,5 +1,4 @@
-
-import { Block } from '@/types/editor';
+import { Block, TextBlock } from '@/types/editor';
 import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { v4 as uuidv4 } from 'uuid';
 import { createBlock } from '@/utils/blockCreators/createBlock';
@@ -212,7 +211,8 @@ const determineBlockType = (element: Element): string => {
  */
 const createBasicTextBlock = (htmlContent: string, blocks: Block[]): void => {
   try {
-    const textBlock = createBlock('text');
+    // Explicitamente tipar como TextBlock para garantir que o TypeScript reconheça a propriedade content
+    const textBlock = createBlock('text') as TextBlock;
     
     // Limpar o HTML
     htmlContent = cleanupHtml(htmlContent);
@@ -227,6 +227,7 @@ const createBasicTextBlock = (htmlContent: string, blocks: Block[]): void => {
       heading.remove(); // Remove o heading para não duplicar no conteúdo
     }
     
+    // Agora o TypeScript reconhece que textBlock tem uma propriedade content
     textBlock.content = tempElement.innerHTML.trim();
     blocks.push(textBlock);
   } catch (error) {
