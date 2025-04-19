@@ -8,7 +8,7 @@ interface Window {
 }
 
 // Define types for the Nexo responses
-interface NexoStoreInfo {
+export interface NexoStoreInfo {
   id: string;
   name: string;
   url: string;
@@ -17,7 +17,7 @@ interface NexoStoreInfo {
   currency: string;
 }
 
-interface NexoNavigateSyncResponse {
+export interface NexoNavigateSyncResponse {
   path: string;
   replace?: boolean;
 }

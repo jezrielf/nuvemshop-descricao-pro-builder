@@ -1,5 +1,20 @@
 
-import { NexoStoreInfo } from '@/types/nexo';
+// Helper functions for Nexo SDK
+
+// Define types for Nexo responses
+export interface NexoStoreInfo {
+  id: string;
+  name: string;
+  url: string;
+  country: string;
+  language: string;
+  currency: string;
+}
+
+export interface NexoNavigateSyncResponse {
+  path: string;
+  replace?: boolean;
+}
 
 // Helper functions for Nexo SDK
 export const connect = async (nexoClient: any, timeout: number = 3000): Promise<void> => {
