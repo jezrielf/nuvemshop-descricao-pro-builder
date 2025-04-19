@@ -46,7 +46,7 @@ const ProductPerformance: React.FC = () => {
               <TableRow key={product.id}>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>
-                  <Badge variant={product.performance.seoScore >= 80 ? "success" : "warning"}>
+                  <Badge variant={product.performance.seoScore >= 80 ? "default" : "outline"}>
                     {product.performance.seoScore}/100
                   </Badge>
                 </TableCell>
@@ -77,3 +77,4 @@ const ProductPerformance: React.FC = () => {
 };
 
 export default ProductPerformance;
+
