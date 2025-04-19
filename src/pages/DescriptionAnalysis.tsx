@@ -9,6 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 import SEODashboard from '@/components/admin/seo/SEODashboard';
 import ProductPerformance from '@/components/admin/seo/ProductPerformance';
 import SEOHistory from '@/components/admin/seo/SEOHistory';
+import ProductsKeywordsAnalysis from '@/components/admin/seo/ProductsKeywordsAnalysis';
 
 const DescriptionAnalysis: React.FC = () => {
   const { description } = useEditorStore();
@@ -34,6 +35,7 @@ const DescriptionAnalysis: React.FC = () => {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="products">Produtos</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="history">Histórico</TabsTrigger>
         </TabsList>
@@ -41,6 +43,12 @@ const DescriptionAnalysis: React.FC = () => {
         <TabsContent value="overview">
           <Card className="p-6">
             <SEODashboard />
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="products">
+          <Card className="p-6">
+            <ProductsKeywordsAnalysis />
           </Card>
         </TabsContent>
 
