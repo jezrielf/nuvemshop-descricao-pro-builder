@@ -3,7 +3,7 @@ import { Block } from '@/types/editor';
 import { isSimpleTextFragment, createSimpleTextBlock } from './utils/textFragmentAnalyzer';
 import { findExplicitSections, findCommonStructures } from './utils/sectionFinder';
 import { createFallbackBlock } from './utils/fallbackAnalyzer';
-import { splitContentIntoParts } from './contentSplitter';
+import { splitContentIntoParts, processImageOrWrapper, analyzeContent } from './contentSplitter';
 import { processHeroSection, processGallerySection, processFeatureSection, processFAQSection, processCTASection, processImageTextSection } from './sectionAnalyzers';
 import { extractMetadataFromElement } from './metadataExtractor';
 
@@ -123,7 +123,5 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
     return;
   }
   
-  // Import analyzeContent from contentSplitter instead of defining it here
-  const { analyzeContent } = require('./contentSplitter');
   analyzeContent(section, blocks);
 };
