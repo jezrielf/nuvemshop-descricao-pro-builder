@@ -8,8 +8,7 @@ import Admin from './pages/Admin';
 import AdminAuth from './pages/AdminAuth';
 import AdminTemplates from './pages/AdminTemplates';
 import Plans from './pages/Plans';
-import NuvemshopAuth from './pages/NuvemshopAuth';
-import NuvemshopProducts from './pages/NuvemshopProducts';
+import NuvemshopConnect from './pages/NuvemshopConnect';
 
 const App: React.FC = () => {
   return (
@@ -22,8 +21,7 @@ const App: React.FC = () => {
         <Route path="/admin-auth" element={<AdminAuth />} />
         <Route path="/admin-templates" element={<AdminTemplates />} />
         <Route path="/plans" element={<Plans />} />
-        <Route path="/nuvemshop-auth" element={<NuvemshopAuth />} />
-        <Route path="/nuvemshop-products" element={<NuvemshopProducts />} />
+        <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
       </Routes>
     </Router>
   );
