@@ -79,7 +79,8 @@ const NexoAppContent = () => {
           console.log('Inicializando cliente Nexo...');
           
           // Cria uma instância do Nexo conforme documentação
-          const nexo = window.Nexo.create({
+          // Use a type assertion here to tell TypeScript about the structure
+          const nexo = (window.Nexo as any).create({
             clientId: '17194',
             log: true // Ativa logs para depuração
           });
