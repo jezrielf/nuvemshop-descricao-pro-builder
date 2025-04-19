@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { BadgeAlert, BadgeCheck, Crown, Plus, Save, Lock, ListTodo } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Plus, Save, Lock, ListTodo, Settings } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
@@ -114,23 +114,27 @@ const Header: React.FC = () => {
               canCreateMoreDescriptions={canCreateMoreDescriptions}
             />
             
-            {isPremiumUser && (
-              <SavedDescriptionsDialog 
-                isPremium={isPremium}
-                descriptionCount={descriptionCount}
-                savedDescriptions={savedDescriptions}
-              />
+            <SavedDescriptionsDialog 
+              isPremium={isPremium}
+              descriptionCount={descriptionCount}
+              savedDescriptions={savedDescriptions}
+            />
+            
+            {description && (
+              <>
+                <HtmlOutputDialog />
+                <Button variant="outline" asChild>
+                  <Link to="/description-analysis" className="flex items-center">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Análise SEO
+                  </Link>
+                </Button>
+              </>
             )}
             
-            {description && <HtmlOutputDialog />}
-            
             <div className="flex items-center gap-2">
-              
-              
               <AIGeneratorButton />
-              
               <TutorialManager />
-              
               <UserButton />
             </div>
           </div>

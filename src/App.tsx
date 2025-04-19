@@ -1,69 +1,32 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Auth from './pages/Auth';
+import DescriptionAnalysis from './pages/DescriptionAnalysis';
+import Admin from './pages/Admin';
+import AdminAuth from './pages/AdminAuth';
+import AdminTemplates from './pages/AdminTemplates';
+import Plans from './pages/Plans';
+import NuvemshopIntegration from './pages/NuvemshopIntegration';
+import NuvemshopAuth from './pages/NuvemshopAuth';
+import NuvemshopProducts from './pages/NuvemshopProducts';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
-import ErrorBoundary from "./components/ErrorBoundary";
-import Index from "./pages/Index";
-import Admin from "./pages/Admin";
-import AdminAuth from "./pages/AdminAuth";
-import AdminTemplates from "./pages/AdminTemplates";
-import Plans from "./pages/Plans";
-import Success from "./pages/Success";
-import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
-import NuvemshopConnect from "./pages/NuvemshopConnect";
-import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      staleTime: 5 * 60 * 1000,
-    },
-  },
-});
-
-const App = () => {
-  console.log("App component renderizado");
-  
+const App: React.FC = () => {
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Routes>
-              <Route path="/" element={
-                <ProtectedRoute requireAuth={false}>
-                  <Index />
-                </ProtectedRoute>
-              } />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/plans" element={<Plans />} />
-              <Route path="/success" element={<Success />} />
-              <Route path="/admin" element={
-                <ProtectedRoute requireAuth={true} requiredRole="admin">
-                  <Admin />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin-templates" element={
-                <ProtectedRoute requireAuth={true} requiredRole="admin">
-                  <AdminTemplates />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin-auth" element={<AdminAuth />} />
-              <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/description-analysis" element={<DescriptionAnalysis />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin-auth" element={<AdminAuth />} />
+        <Route path="/admin-templates" element={<AdminTemplates />} />
+        <Route path="/plans" element={<Plans />} />
+        <Route path="/nuvemshop-integration" element={<NuvemshopIntegration />} />
+        <Route path="/nuvemshop-auth" element={<NuvemshopAuth />} />
+        <Route path="/nuvemshop-products" element={<NuvemshopProducts />} />
+      </Routes>
+    </Router>
   );
 };
 
