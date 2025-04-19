@@ -1,4 +1,3 @@
-
 import { BlockType } from '@/types/editor';
 
 export interface SectionMetadata {
@@ -8,15 +7,35 @@ export interface SectionMetadata {
   description?: string;
 }
 
-/**
- * Extracts metadata from HTML elements to identify section types
- */
 export const extractMetadataFromElement = (element: Element): SectionMetadata | null => {
   // Default metadata with low confidence
   let metadata: SectionMetadata = {
     type: 'text',
     confidence: 10
   };
+
+  // Check if this is just a simple text fragment
+  const isSimpleText = element.children.length <= 3 && 
+                      !element.querySelector('section, article, aside, nav, footer');
+
+  if (isSimpleText) {
+    metadata.type = 'text';
+    metadata.confidence = 90;
+    
+    // Try to extract heading
+    const heading = element.querySelector('h1, h2, h3');
+    if (heading) {
+      metadata.heading = heading.textContent?.trim();
+    }
+    
+    // Try to extract description
+    const paragraph = element.querySelector('p');
+    if (paragraph) {
+      metadata.description = paragraph.textContent?.trim();
+    }
+    
+    return metadata;
+  }
 
   // Check for class names and IDs that might indicate section type
   const className = element.className || '';
