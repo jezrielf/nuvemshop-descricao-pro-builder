@@ -1,4 +1,3 @@
-
 import { Block, TextBlock } from '@/types/editor';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import { sanitizeHtmlContent } from './utils';
@@ -6,32 +5,77 @@ import { processHeroSection, processGallerySection, processFeatureSection, proce
 import { extractMetadataFromElement } from './metadataExtractor';
 
 export const analyzeDocument = (body: Element, blocks: Block[]): void => {
-  // Primeiro, procuramos por divisões explícitas de seção
+  // First, detect if this is a simple text fragment without proper HTML structure
+  if (isSimpleTextFragment(body)) {
+    createSimpleTextBlock(body, blocks);
+    return;
+  }
+  
+  // Then, look for explicit section divisions
   const explicits = findExplicitSections(body);
   
   if (explicits.length > 0) {
-    console.log('Encontradas seções explícitas:', explicits.length);
+    console.log('Found explicit sections:', explicits.length);
     explicits.forEach(section => analyzeSection(section, blocks));
   } else {
-    // Se não há divisões explícitas, tentamos identificar estruturas comuns
+    // If no explicit divisions, try to identify common structures
     const commonStructures = findCommonStructures(body);
     
     if (commonStructures.length > 0) {
-      console.log('Encontradas estruturas comuns:', commonStructures.length);
+      console.log('Found common structures:', commonStructures.length);
       commonStructures.forEach(section => analyzeSection(section, blocks));
     } else {
-      // Se não encontramos estruturas comuns, dividimos por parágrafos ou elementos
-      console.log('Dividindo conteúdo em partes menores');
+      // If we don't find common structures, divide by paragraphs or elements
+      console.log('Dividing content into smaller parts');
       splitContentIntoParts(body, blocks);
     }
   }
   
-  // Se não conseguimos criar nenhum bloco, tentamos como último recurso
+  // If we couldn't create any blocks, try as a last resort
   if (blocks.length === 0) {
-    console.log('Nenhum bloco criado, tentando último recurso');
+    console.log('No blocks created, trying last resort');
     createFallbackBlock(body, blocks);
   }
 };
+
+/**
+ * Checks if the content is a simple text fragment without proper HTML structure
+ */
+const isSimpleTextFragment = (element: Element): boolean => {
+  // Check if the element only contains simple text nodes, basic headings and paragraphs
+  const hasComplexElements = element.querySelector('div > div, section, article, aside, nav, footer, header');
+  if (hasComplexElements) return false;
+  
+  // Check if it's just text with basic formatting
+  const childCount = element.children.length;
+  const textLength = element.textContent?.trim().length || 0;
+  
+  // If it has few elements and is short text, it's likely a simple fragment
+  return (childCount <= 5 && textLength < 500);
+}
+
+/**
+ * Creates a simple text block from a basic HTML fragment
+ */
+const createSimpleTextBlock = (element: Element, blocks: Block[]): void => {
+  const textBlock = createBlock('text') as TextBlock;
+  
+  // Look for a title in a heading element
+  const heading = element.querySelector('h1, h2, h3');
+  if (heading) {
+    textBlock.title = heading.textContent?.trim() || 'Texto';
+  } else {
+    // If no heading, use first line or generic title
+    const firstLine = element.textContent?.trim().split('\n')[0];
+    textBlock.title = firstLine?.length > 30 ? 'Texto' : (firstLine || 'Texto');
+  }
+  
+  // Use the whole content, properly sanitized
+  textBlock.content = sanitizeHtmlContent(element.innerHTML);
+  
+  blocks.push(textBlock);
+  console.log('Created simple text block');
+}
 
 /**
  * Encontra seções explícitas no HTML, como div, section, article, etc.
@@ -171,11 +215,11 @@ const createFallbackBlock = (container: Element, blocks: Block[]): void => {
 };
 
 export const analyzeSection = (section: Element, blocks: Block[]): void => {
-  // Primeiro check se há metadados explícitos sobre o tipo de seção
+  // First check if there are explicit metadata about the section type
   const metadata = extractMetadataFromElement(section);
   
   if (metadata && metadata.confidence > 50) {
-    // Use o tipo identificado para processar a seção
+    // Use the identified type to process the section
     switch (metadata.type) {
       case 'hero':
         processHeroSection(section, blocks);
@@ -209,8 +253,14 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
           analyzeContent(section, blocks);
         }
         return;
-      // Para outros tipos, continua com a análise heurística
+      // For other types, continue with the heuristic analysis
     }
+  }
+  
+  // If no specific type identified, analyze as simple text if it looks like one
+  if (isSimpleTextFragment(section)) {
+    createSimpleTextBlock(section, blocks);
+    return;
   }
   
   // Análise heurística baseada no conteúdo

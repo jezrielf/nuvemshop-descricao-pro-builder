@@ -1,95 +1,104 @@
 
+import { BlockType } from '@/types/editor';
+
 export interface SectionMetadata {
-  type: string;
+  type: BlockType;
   confidence: number;
+  heading?: string;
+  description?: string;
 }
 
-export function extractMetadataFromElement(element: Element): SectionMetadata | null {
-  // Try to identify the section type based on class names, IDs, and content
-  const classNames = element.className.split(' ');
-  const elementId = element.id;
-  const innerText = element.textContent || '';
-  
-  // Create a scoring system for different section types
-  const typeScores: Record<string, number> = {
-    hero: 0,
-    text: 0,
-    features: 0,
-    benefits: 0,
-    specifications: 0,
-    image: 0,
-    gallery: 0,
-    imageText: 0,
-    textImage: 0,
-    faq: 0,
-    cta: 0,
-    video: 0
+/**
+ * Extracts metadata from HTML elements to identify section types
+ */
+export const extractMetadataFromElement = (element: Element): SectionMetadata | null => {
+  // Default metadata with low confidence
+  let metadata: SectionMetadata = {
+    type: 'text',
+    confidence: 10
   };
+
+  // Check for class names and IDs that might indicate section type
+  const className = element.className || '';
+  const id = element.id || '';
+  const tagName = element.tagName.toLowerCase();
+  const textContent = element.textContent || '';
   
-  // Score based on class names
-  classNames.forEach(className => {
-    const cl = className.toLowerCase();
-    
-    // Check for explicit types in class names
-    if (cl.includes('hero') || cl.includes('banner')) typeScores.hero += 30;
-    if (cl.includes('text') || cl.includes('content')) typeScores.text += 20;
-    if (cl.includes('feature')) typeScores.features += 30;
-    if (cl.includes('benefit')) typeScores.benefits += 30;
-    if (cl.includes('spec')) typeScores.specifications += 30;
-    if (cl.includes('image') && !cl.includes('text')) typeScores.image += 20;
-    if (cl.includes('gallery') || cl.includes('carousel')) typeScores.gallery += 30;
-    if ((cl.includes('image') && cl.includes('text')) || cl.includes('media-text')) typeScores.imageText += 30;
-    if (cl.includes('faq') || cl.includes('question') || cl.includes('accordion')) typeScores.faq += 30;
-    if (cl.includes('cta') || cl.includes('call-to-action')) typeScores.cta += 30;
-    if (cl.includes('video')) typeScores.video += 30;
-  });
-  
-  // Score based on element ID
-  if (elementId) {
-    const id = elementId.toLowerCase();
-    if (id.includes('hero') || id.includes('banner')) typeScores.hero += 20;
-    if (id.includes('text') || id.includes('content')) typeScores.text += 15;
-    if (id.includes('feature')) typeScores.features += 20;
-    if (id.includes('benefit')) typeScores.benefits += 20;
-    if (id.includes('spec')) typeScores.specifications += 20;
-    if (id.includes('image') && !id.includes('text')) typeScores.image += 15;
-    if (id.includes('gallery') || id.includes('carousel')) typeScores.gallery += 20;
-    if ((id.includes('image') && id.includes('text')) || id.includes('media-text')) typeScores.imageText += 20;
-    if (id.includes('faq') || id.includes('question') || id.includes('accordion')) typeScores.faq += 20;
-    if (id.includes('cta') || id.includes('call-to-action')) typeScores.cta += 20;
-    if (id.includes('video')) typeScores.video += 20;
+  // Look for heading elements
+  const heading = element.querySelector('h1, h2, h3');
+  if (heading) {
+    metadata.heading = heading.textContent?.trim();
   }
-  
-  // Score based on content elements
-  if (element.querySelector('h1, h2.hero')) typeScores.hero += 15;
-  if (element.querySelectorAll('p').length > 2) typeScores.text += 10;
-  if (element.querySelectorAll('li, .feature, .features').length > 2) typeScores.features += 15;
-  if (element.querySelectorAll('.benefit, .benefits').length > 0) typeScores.benefits += 15;
-  if (element.querySelectorAll('table, .specification, dl').length > 0) typeScores.specifications += 15;
-  
-  const images = element.querySelectorAll('img');
-  if (images.length === 1 && element.querySelectorAll('p').length < 2) typeScores.image += 15;
-  if (images.length > 2) typeScores.gallery += 20;
-  if (images.length === 1 && element.querySelectorAll('p').length >= 2) typeScores.imageText += 15;
-  
-  if (element.querySelectorAll('details, summary, .question, .answer').length > 0) typeScores.faq += 15;
-  if (element.querySelectorAll('a.button, button, .btn').length > 0 && innerText.length < 300) typeScores.cta += 15;
-  if (element.querySelector('video, iframe[src*="youtube"], iframe[src*="vimeo"]')) typeScores.video += 25;
-  
-  // Find the highest scoring type
-  let highestScore = 0;
-  let highestType = 'text'; // Default to text
-  
-  Object.entries(typeScores).forEach(([type, score]) => {
-    if (score > highestScore) {
-      highestScore = score;
-      highestType = type;
-    }
-  });
-  
-  // Only return a result if the confidence is above a threshold
-  return highestScore > 10 ? {
-    type: highestType,
-    confidence: highestScore
-  } : null;
+
+  // Look for paragraph elements as description
+  const paragraph = element.querySelector('p');
+  if (paragraph) {
+    metadata.description = paragraph.textContent?.trim();
+  }
+
+  // Check for footer content
+  if (
+    className.includes('footer') || 
+    id.includes('footer') || 
+    (textContent.includes('direitos reservados') || textContent.includes('copyright') || textContent.includes('©'))
+  ) {
+    metadata.type = 'text';
+    metadata.confidence = 80;
+    return metadata;
+  }
+
+  // Check for header/hero elements
+  if (
+    className.includes('header') || 
+    className.includes('hero') || 
+    id.includes('header') || 
+    id.includes('hero') ||
+    tagName === 'header' ||
+    element.querySelector('h1')
+  ) {
+    metadata.type = 'hero';
+    metadata.confidence = 70;
+    return metadata;
+  }
+
+  // Check for contact information
+  if (
+    className.includes('contact') || 
+    id.includes('contact') ||
+    textContent.includes('contato') || 
+    textContent.includes('fale conosco') ||
+    element.querySelector('form')
+  ) {
+    metadata.type = 'cta';
+    metadata.confidence = 60;
+    return metadata;
+  }
+
+  // Check for about us sections
+  if (
+    className.includes('about') || 
+    id.includes('about') ||
+    textContent.toLowerCase().includes('sobre nós') || 
+    textContent.toLowerCase().includes('nossa empresa') ||
+    textContent.toLowerCase().includes('quem somos')
+  ) {
+    metadata.type = 'text';
+    metadata.confidence = 60;
+    return metadata;
+  }
+
+  // Check for copyright notices or disclaimers (typically footer content)
+  if (
+    textContent.includes('©') || 
+    textContent.includes('copyright') ||
+    textContent.includes('todos os direitos') ||
+    textContent.toLowerCase().includes('meramente ilustrativas')
+  ) {
+    metadata.type = 'text';
+    metadata.confidence = 75;
+    return metadata;
+  }
+
+  // If we can't determine a specific type with confidence, return null
+  return metadata.confidence > 30 ? metadata : null;
 }
