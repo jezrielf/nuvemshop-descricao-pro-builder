@@ -1,6 +1,6 @@
 
 import { Block } from '@/types/editor';
-import { analyzeSection } from './sectionAnalyzer';
+import { analyzeSection } from './documentAnalyzer';
 import { createBasicTextBlock } from '../creators/sectionCreators';
 
 export const splitContentIntoParts = (container: Element, blocks: Block[]): void => {
