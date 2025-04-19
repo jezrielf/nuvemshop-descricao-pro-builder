@@ -13,7 +13,8 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
-import * as nexoHelpers from '@tiendanube/nexo/helpers';
+// Import our custom helpers
+import * as nexoHelpers from './nexoHelpers';
 
 // Create a new React Query client
 const queryClient = new QueryClient({
