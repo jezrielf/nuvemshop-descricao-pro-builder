@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNimbusAuth } from '../hooks/useNimbusAuth';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner'; // Changed to default import
 
 export const NimbusAuthStatus: React.FC = () => {
   const {
