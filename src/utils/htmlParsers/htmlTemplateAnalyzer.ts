@@ -16,7 +16,8 @@ export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCateg
     const scripts = doc.querySelectorAll('script');
     scripts.forEach(script => script.remove());
 
-    analyzeDocument(doc, parsedBlocks);
+    // Pass doc.body instead of doc to analyzeDocument, as it expects an Element, not a Document
+    analyzeDocument(doc.body, parsedBlocks);
 
     if (parsedBlocks.length === 0) {
       const textBlock = createBlock('text', 1) as TextBlock;
