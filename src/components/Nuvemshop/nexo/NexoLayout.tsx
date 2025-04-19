@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useNexo } from './NexoProvider';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -8,11 +7,21 @@ import { Button } from '@/components/ui/button';
 
 interface NexoLayoutProps {
   children: React.ReactNode;
+  isLoading?: boolean;
+  error?: string | null;
+  storeInfo?: {
+    name?: string;
+    id?: string | number;
+    url?: string;
+  } | null;
 }
 
-export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
-  const { isNexoEnabled, isLoading, error, store } = useNexo();
-
+export const NexoLayout: React.FC<NexoLayoutProps> = ({ 
+  children, 
+  isLoading = false,
+  error = null,
+  storeInfo = null
+}) => {
   // Se estiver carregando, mostra o spinner
   if (isLoading) {
     return (
@@ -55,39 +64,29 @@ export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
     );
   }
 
-  // Se estiver no ambiente Nexo, renderizar uma interface adaptada para o painel
-  if (isNexoEnabled) {
-    return (
-      <div className="nexo-app-container p-4">
-        <div className="nexo-app-header mb-4">
-          {store && (
-            <div className="nexo-store-info mb-2">
-              <h2 className="text-lg font-medium">Loja: {store.name}</h2>
-              <p className="text-sm text-gray-500">ID: {store.id} • URL: {store.url}</p>
-            </div>
-          )}
-        </div>
-        <div className="nexo-app-content">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
-  // Se não estiver no ambiente Nexo, renderizar uma mensagem informativa
+  // Renderizar o conteúdo do aplicativo com informações da loja (se disponíveis)
   return (
-    <div className="p-4">
-      <Alert className="mb-4 border-amber-200 bg-amber-50">
-        <AlertCircle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-600 font-medium">
-          Ambiente Nexo não detectado
-        </AlertTitle>
-        <AlertDescription className="text-amber-700 mt-2">
-          <p>Esta aplicação deve ser acessada através do painel administrativo da Nuvemshop.</p>
-          <p className="mt-2">Para utilizar todas as funcionalidades, instale este aplicativo na sua loja Nuvemshop.</p>
-        </AlertDescription>
-      </Alert>
-      {children}
+    <div className="nexo-app-container p-4">
+      {storeInfo && (
+        <div className="nexo-app-header mb-4 bg-gray-50 p-3 rounded-md border">
+          <div className="nexo-store-info">
+            <h2 className="text-lg font-medium">
+              {storeInfo.name ? `Loja: ${storeInfo.name}` : 'Loja Nuvemshop'}
+            </h2>
+            {(storeInfo.id || storeInfo.url) && (
+              <p className="text-sm text-gray-500">
+                {storeInfo.id && `ID: ${storeInfo.id}`} 
+                {storeInfo.url && storeInfo.id && ' • '} 
+                {storeInfo.url && `URL: ${storeInfo.url}`}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+      
+      <div className="nexo-app-content">
+        {children}
+      </div>
     </div>
   );
 };

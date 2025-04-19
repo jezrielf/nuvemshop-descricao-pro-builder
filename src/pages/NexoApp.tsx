@@ -16,7 +16,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => (
     <h2 className="text-2xl font-bold text-red-600 mb-4">Ocorreu um erro com o aplicativo Descrição PRO</h2>
     <p className="mb-4 text-gray-700">Não foi possível carregar o aplicativo neste momento.</p>
     <pre className="p-4 bg-gray-100 rounded text-left overflow-auto my-4 max-h-48 text-sm">
-      {error.message}
+      {error.message || "Erro desconhecido"}
     </pre>
     <div className="flex gap-4">
       <button
@@ -43,12 +43,14 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => (
   </div>
 );
 
+// Componente principal da aplicação Nexo
 const NexoApp: React.FC = () => {
   return (
     <>
       <Helmet>
         <title>Descritor Pro - Nexo</title>
         <meta name="description" content="Versão Nexo do Descritor Pro para integração com a Nuvemshop" />
+        <script src="https://nexo.nuvemshop.com.br/sdk.js" async></script>
       </Helmet>
       
       <ErrorBoundary
