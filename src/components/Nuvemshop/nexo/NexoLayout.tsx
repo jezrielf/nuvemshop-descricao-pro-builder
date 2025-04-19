@@ -2,6 +2,9 @@
 import React from 'react';
 import { useNexo } from './NexoProvider';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface NexoLayoutProps {
   children: React.ReactNode;
@@ -14,7 +17,7 @@ export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <LoadingSpinner />
+        <LoadingSpinner text="Inicializando Nexo..." />
       </div>
     );
   }
@@ -22,11 +25,19 @@ export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
   // Se ocorrer um erro na integração com o Nexo
   if (error) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center">
-        <div className="text-xl font-semibold text-red-600 mb-2">
-          Erro de Integração
-        </div>
-        <p className="text-gray-600">{error}</p>
+      <div className="flex h-screen w-full flex-col items-center justify-center p-4">
+        <Alert className="max-w-lg border-red-200 bg-red-50">
+          <AlertCircle className="h-5 w-5 text-red-600" />
+          <AlertTitle className="text-red-600 text-lg font-medium">
+            Erro de Integração
+          </AlertTitle>
+          <AlertDescription className="mt-2 text-gray-600">
+            <p className="mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }

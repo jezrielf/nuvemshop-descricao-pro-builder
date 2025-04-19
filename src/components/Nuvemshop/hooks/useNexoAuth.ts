@@ -18,6 +18,7 @@ export const useNexoAuth = () => {
       
       try {
         setIsAuthenticating(true);
+        console.log('Tentando registrar loja via Nexo:', store.name);
         
         // Verifica se a loja já está registrada
         const { data: existingStores, error: queryError } = await supabase
@@ -27,12 +28,25 @@ export const useNexoAuth = () => {
           .eq('platform', 'nimbus');
         
         if (queryError) {
+          console.error('Erro ao verificar loja existente:', queryError);
           throw new Error(`Erro ao verificar loja existente: ${queryError.message}`);
         }
         
         // Se a loja já existe no banco, atualiza o status para autenticado
         if (existingStores && existingStores.length > 0) {
           console.log("Loja já registrada:", existingStores[0]);
+          
+          // Atualiza o token de acesso para garantir que está atualizado
+          const { error: updateError } = await supabase
+            .from('ecommerce_stores')
+            .update({ access_token: accessToken })
+            .eq('store_id', store.id)
+            .eq('platform', 'nimbus');
+            
+          if (updateError) {
+            console.warn('Erro ao atualizar token de acesso:', updateError);
+          }
+          
           setIsAuthenticated(true);
           return;
         }
@@ -52,6 +66,7 @@ export const useNexoAuth = () => {
           });
           
         if (insertError) {
+          console.error('Erro ao inserir loja:', insertError);
           throw new Error(`Erro ao inserir loja: ${insertError.message}`);
         }
         
@@ -62,7 +77,8 @@ export const useNexoAuth = () => {
         });
       } catch (err) {
         console.error('Erro ao registrar loja via Nexo:', err);
-        setAuthError(err instanceof Error ? err.message : 'Não foi possível conectar automaticamente com a loja');
+        const errorMessage = err instanceof Error ? err.message : 'Não foi possível conectar automaticamente com a loja';
+        setAuthError(errorMessage);
         toast({
           title: 'Erro de conexão',
           description: 'Não foi possível registrar automaticamente a loja.',
@@ -90,7 +106,10 @@ export const useNexoAuth = () => {
         .eq('store_id', store.id)
         .eq('platform', 'nimbus');
         
-      if (error) throw new Error(`Erro ao excluir registro: ${error.message}`);
+      if (error) {
+        console.error('Erro ao excluir registro da loja:', error);
+        throw new Error(`Erro ao excluir registro: ${error.message}`);
+      }
       
       setIsAuthenticated(false);
       toast({
@@ -110,6 +129,7 @@ export const useNexoAuth = () => {
   // Agregar erros para mostrar ao usuário
   useEffect(() => {
     if (nexoError) {
+      console.log('Erro do Nexo detectado:', nexoError);
       setAuthError(nexoError);
     }
   }, [nexoError]);
