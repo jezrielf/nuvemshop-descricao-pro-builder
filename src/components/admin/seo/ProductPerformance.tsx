@@ -1,58 +1,58 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { getTextContentFromDescription } from '@/components/SEO/utils/contentUtils';
+import { Eye } from 'lucide-react';
+import { ProductDescription } from '@/types/editor';
 
 const ProductPerformance: React.FC = () => {
   const { savedDescriptions } = useEditorStore();
+  const [selectedProduct, setSelectedProduct] = useState<ProductDescription | null>(null);
   
-  // Generate actual metrics based on real description data
   const productsData = useMemo(() => {
     return savedDescriptions.map(desc => {
-      // Get actual text content from description
       const textContent = getTextContentFromDescription(desc);
       const wordCount = textContent.split(/\s+/).filter(Boolean).length;
       
-      // Calculate real SEO score based on content length and block types
-      let seoScore = 60; // Base score
+      let seoScore = 60;
       
-      // Longer content = better score
       if (wordCount > 100) seoScore += 5;
       if (wordCount > 200) seoScore += 5;
       if (wordCount > 300) seoScore += 10;
       
-      // Different block types = better score
       const blockTypes = new Set(desc.blocks.map(b => b.type));
-      seoScore += Math.min(blockTypes.size * 3, 15); // Up to 15 points for variety
+      seoScore += Math.min(blockTypes.size * 3, 15);
       
-      // Images or galleries = better score
       if (desc.blocks.some(b => b.type === 'image' || b.type === 'gallery')) {
         seoScore += 5;
       }
       
-      // Extract real keywords from text content
       const keywords = extractKeywords(textContent);
       
       return {
         ...desc,
         performance: {
-          views: Math.floor(50 + Math.random() * 50 * (1 + wordCount/100)), // More content = more views
-          conversions: Math.floor(5 + Math.random() * 15 * (seoScore/80)), // Better SEO = more conversions
+          views: Math.floor(50 + Math.random() * 50 * (1 + wordCount/100)),
+          conversions: Math.floor(5 + Math.random() * 15 * (seoScore/80)),
           seoScore,
           lastUpdated: new Date(desc.updatedAt),
-          keywords: keywords.slice(0, 3) // Top 3 keywords
+          keywords: keywords.slice(0, 3),
+          wordCount,
+          blockTypes: Array.from(blockTypes),
+          hasImages: desc.blocks.some(b => b.type === 'image' || b.type === 'gallery'),
         }
       };
     });
   }, [savedDescriptions]);
 
-  // Extract keywords from text
   const extractKeywords = (text: string): string[] => {
     // Remove common words and get potential keywords
     const stopWords = ['de', 'a', 'o', 'que', 'e', 'do', 'da', 'em', 'um', 'para', 'com', 'não', 'uma', 'os', 'no', 'se', 'na', 'por', 'mais', 'as', 'dos', 'como', 'mas', 'ao', 'ele', 'das', 'à', 'seu', 'sua', 'ou', 'quando', 'muito', 'nos', 'já', 'eu', 'também', 'só', 'pelo', 'pela', 'até', 'isso', 'ela', 'entre', 'depois', 'sem', 'mesmo', 'aos', 'ter', 'seus', 'quem', 'nas', 'me', 'esse', 'eles', 'você', 'essa', 'num', 'nem', 'suas', 'meu', 'às', 'minha', 'numa', 'pelos', 'elas', 'qual', 'nós', 'lhe', 'deles', 'essas', 'esses', 'pelas', 'este', 'dele', 'tu', 'te', 'vocês', 'vos', 'lhes', 'meus', 'minhas', 'teu', 'tua', 'teus', 'tuas', 'nosso', 'nossa', 'nossos', 'nossas', 'dela', 'delas', 'esta', 'estes', 'estas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'isto', 'aquilo', 'estou', 'está', 'estamos', 'estão', 'estive', 'esteve', 'estivemos', 'estiveram', 'estava', 'estávamos', 'estavam', 'estivera', 'estivéramos', 'esteja', 'estejamos', 'estejam', 'estivesse', 'estivéssemos', 'estivessem', 'estiver', 'estivermos', 'estiverem', 'hei', 'há', 'havemos', 'hão', 'houve', 'houvemos', 'houveram', 'houvera', 'houvéramos', 'haja', 'hajamos', 'hajam', 'houvesse', 'houvéssemos', 'houvessem', 'houver', 'houvermos', 'houverem', 'houverei', 'houverá', 'houveremos', 'houverão', 'houveria', 'houveríamos', 'houveriam', 'sou', 'somos', 'são', 'era', 'éramos', 'eram', 'fui', 'foi', 'fomos', 'foram', 'fora', 'fôramos', 'seja', 'sejamos', 'sejam', 'fosse', 'fôssemos', 'fossem', 'for', 'formos', 'forem', 'serei', 'será', 'seremos', 'serão', 'seria', 'seríamos', 'seriam', 'tenho', 'tem', 'temos', 'tém', 'tinha', 'tínhamos', 'tinham', 'tive', 'teve', 'tivemos', 'tiveram', 'tivera', 'tivéramos', 'tenha', 'tenhamos', 'tenham', 'tivesse', 'tivéssemos', 'tivessem', 'tiver', 'tivermos', 'tiverem', 'terei', 'terá', 'teremos', 'terão', 'teria', 'teríamos', 'teriam'];
@@ -73,6 +73,94 @@ const ProductPerformance: React.FC = () => {
       .sort((a, b) => wordCount[b] - wordCount[a])
       .slice(0, 10); // Get top 10 keywords
   };
+
+  const ProductAnalysisDialog = ({ product, onClose }: { product: any, onClose: () => void }) => (
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Análise Detalhada - {product.name}</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-6 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Métricas Gerais</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="space-y-2">
+                <div className="flex justify-between">
+                  <dt>Score SEO:</dt>
+                  <dd className="font-medium">{product.performance.seoScore}/100</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>Total de palavras:</dt>
+                  <dd className="font-medium">{product.performance.wordCount}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>Visualizações:</dt>
+                  <dd className="font-medium">{product.performance.views}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>Conversões:</dt>
+                  <dd className="font-medium">{product.performance.conversions}</dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Palavras-chave</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {product.performance.keywords.map((keyword: string, idx: number) => (
+                  <Badge key={idx} variant="outline">{keyword}</Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Estrutura do Conteúdo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <p>Tipos de blocos utilizados:</p>
+                <div className="flex flex-wrap gap-2">
+                  {product.performance.blockTypes.map((type: string, idx: number) => (
+                    <Badge key={idx} variant="outline">{type}</Badge>
+                  ))}
+                </div>
+                <p className="mt-4">
+                  {product.performance.hasImages ? "✓ Contém imagens" : "✗ Não contém imagens"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Recomendações</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 list-disc list-inside">
+                {product.performance.wordCount < 200 && (
+                  <li>Aumente o conteúdo para pelo menos 200 palavras</li>
+                )}
+                {!product.performance.hasImages && (
+                  <li>Adicione imagens para melhorar o engajamento</li>
+                )}
+                {product.performance.blockTypes.length < 3 && (
+                  <li>Utilize mais tipos diferentes de blocos para variar o conteúdo</li>
+                )}
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </DialogContent>
+  );
 
   if (productsData.length === 0) {
     return (
@@ -101,6 +189,7 @@ const ProductPerformance: React.FC = () => {
               <TableHead>Conversões</TableHead>
               <TableHead>Palavras-chave</TableHead>
               <TableHead>Última Atualização</TableHead>
+              <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -129,11 +218,30 @@ const ProductPerformance: React.FC = () => {
                     locale: ptBR
                   })}
                 </TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedProduct(product)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Analisar
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </ScrollArea>
+
+      {selectedProduct && (
+        <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+          <ProductAnalysisDialog 
+            product={selectedProduct} 
+            onClose={() => setSelectedProduct(null)} 
+          />
+        </Dialog>
+      )}
     </div>
   );
 };
