@@ -2,6 +2,7 @@
 import { Block } from '@/types/editor';
 import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { v4 as uuidv4 } from 'uuid';
+import { createBlock } from '@/utils/blockCreators/createBlock';
 
 /**
  * Analisa descrições HTML de produtos e converte em blocos editáveis
@@ -91,7 +92,7 @@ const processCustomBlocks = (doc: Document, blocks: Block[]): void => {
         }
       }
       
-      // Passa para o analisador de blocos para criar o bloco apropriado
+      // Passa para o analisador de seções para criar o bloco apropriado
       analyzeSection(element, blocks, blockType, blockId);
     });
   } else {
@@ -137,7 +138,7 @@ const analyzeSection = (element: Element, blocks: Block[], forcedType: string = 
         case 'image':
           const img = element.querySelector('img');
           if (img) {
-            processImageTextSection(element, img, blocks, false, true);
+            processImageTextSection(element, img, blocks, false);
           } else {
             createBasicTextBlock(element.innerHTML, blocks);
           }
@@ -210,35 +211,27 @@ const determineBlockType = (element: Element): string => {
  * Cria um bloco de texto básico com o conteúdo HTML fornecido
  */
 const createBasicTextBlock = (htmlContent: string, blocks: Block[]): void => {
-  import('@/utils/blockCreators/createBlock').then(({ createBlock }) => {
-    import('@/types/editor').then(({ TextBlock }) => {
-      try {
-        const textBlock = createBlock('text') as TextBlock;
-        
-        // Limpar o HTML
-        htmlContent = cleanupHtml(htmlContent);
-        
-        // Extrair título se houver
-        const tempElement = document.createElement('div');
-        tempElement.innerHTML = htmlContent;
-        
-        const heading = tempElement.querySelector('h1, h2, h3');
-        if (heading) {
-          textBlock.heading = heading.textContent?.trim() || 'Texto';
-          heading.remove(); // Remove o heading para não duplicar no conteúdo
-        }
-        
-        textBlock.content = tempElement.innerHTML.trim();
-        blocks.push(textBlock);
-      } catch (error) {
-        console.error('Erro ao criar bloco de texto básico:', error);
-      }
-    }).catch(error => {
-      console.error('Erro ao importar tipos:', error);
-    });
-  }).catch(error => {
-    console.error('Erro ao importar createBlock:', error);
-  });
+  try {
+    const textBlock = createBlock('text');
+    
+    // Limpar o HTML
+    htmlContent = cleanupHtml(htmlContent);
+    
+    // Extrair título se houver
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = htmlContent;
+    
+    const heading = tempElement.querySelector('h1, h2, h3');
+    if (heading) {
+      textBlock.title = heading.textContent?.trim() || 'Texto';
+      heading.remove(); // Remove o heading para não duplicar no conteúdo
+    }
+    
+    textBlock.content = tempElement.innerHTML.trim();
+    blocks.push(textBlock);
+  } catch (error) {
+    console.error('Erro ao criar bloco de texto básico:', error);
+  }
 };
 
 /**
@@ -274,4 +267,3 @@ const cleanupHtml = (html: string): string => {
   
   return tempElement.innerHTML;
 };
-

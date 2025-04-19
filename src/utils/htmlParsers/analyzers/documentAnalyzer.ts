@@ -5,8 +5,8 @@ import { sanitizeHtmlContent } from './utils';
 import { processHeroSection, processGallerySection, processFeatureSection, processFAQSection, processCTASection, processImageTextSection } from './sectionAnalyzers';
 import { extractMetadataFromElement } from './metadataExtractor';
 
-export const analyzeDocument = (doc: Document, blocks: Block[]): void => {
-  const body = doc.body;
+export const analyzeDocument = (doc: Document | Element, blocks: Block[]): void => {
+  const body = doc instanceof Document ? doc.body : doc;
   
   // Primeiro, procuramos por divisões explícitas de seção
   const explicits = findExplicitSections(body);
@@ -253,7 +253,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
   const hasCTA = 
     section.classList.contains('cta') || 
     (section.querySelector('a.button, .btn, button') !== null && 
-     section.textContent && section.textContent.length < 300);
+     section.textContent && section.textContent.trim().length < 300);
   
   if (hasCTA) {
     processCTASection(section, blocks);
@@ -275,13 +275,13 @@ export const analyzeContent = (element: Element, blocks: Block[]): void => {
   
   // Verifica o tipo de conteúdo
   const hasLists = element.querySelectorAll('li').length > 3;
-  const hasImages = element.querySelectorAll('img').length > 0;
+  const hasImagesCount = element.querySelectorAll('img').length;
   const hasHeadings = element.querySelectorAll('h1, h2, h3, h4, h5, h6').length > 0;
   
-  if (hasImages && hasImages > 2) {
+  if (hasImagesCount && hasImagesCount > 2) {
     const images = element.querySelectorAll('img');
     processGallerySection(element, images, blocks);
-  } else if (hasImages === 1) {
+  } else if (hasImagesCount === 1) {
     const image = element.querySelector('img');
     if (image) {
       processImageTextSection(element, image, blocks);
