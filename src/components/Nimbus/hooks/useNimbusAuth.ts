@@ -13,15 +13,19 @@ export const useNimbusAuth = () => {
   const { toast } = useToast();
 
   const handleConnect = useCallback(async () => {
-    // Implementar o fluxo de autorização da Nimbus
-    // Documentação: https://dev.nuvemshop.com.br/docs/developer-tools/nimbus/authorization
     setAuthenticating(true);
     setError(null);
 
     try {
-      // TODO: Implementar redirect para URL de autorização da Nimbus
-      const authorizationUrl = 'https://api.nuvemshop.com.br/v1/authorize?...';
-      window.location.href = authorizationUrl;
+      // Configurar URL de autorização da Nimbus
+      const clientId = '17194';
+      const redirectUri = `${window.location.origin}/nuvemshop-connect`;
+      const scopes = 'write_products read_products read_store_info';
+      
+      const authUrl = `https://auth.nuvemshop.com.br/oauth/authorize?client_id=${clientId}&scope=${scopes}&response_type=code&redirect_uri=${redirectUri}`;
+      
+      // Redirecionar para autorização
+      window.location.href = authUrl;
     } catch (err) {
       console.error('Erro ao iniciar conexão com Nimbus:', err);
       setError('Não foi possível iniciar a conexão com a Nimbus');
@@ -69,7 +73,6 @@ export const useNimbusAuth = () => {
   }, [toast]);
 
   const handleCallback = useCallback(async (code: string) => {
-    // Implementar troca de código de autorização por token
     setAuthenticating(true);
     setError(null);
 
@@ -91,7 +94,7 @@ export const useNimbusAuth = () => {
             store_id: parseInt(user_id),
             name: store_name,
             platform: 'nimbus',
-            url: 'https://nimbus.com.br' // URL temporária
+            url: `https://${store_name}.lojanuvem.com.br`
           });
 
         if (storeError) throw storeError;
