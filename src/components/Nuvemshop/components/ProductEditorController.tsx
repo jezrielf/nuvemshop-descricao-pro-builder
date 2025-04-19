@@ -7,7 +7,7 @@ import { useNuvemshopProducts } from '../hooks/useNuvemshopProducts';
 import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Save, RefreshCw } from 'lucide-react';
+import { Save, RefreshCw, AlertTriangle } from 'lucide-react';
 import { parseHtmlToBlocks } from '@/utils/htmlParsers';
 
 interface ProductEditorControllerProps {
@@ -20,11 +20,20 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   product
 }) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [conversionError, setConversionError] = useState(false);
   const { accessToken, userId } = useNuvemshopAuth();
   const { updateProductDescription } = useNuvemshopProducts(accessToken, userId);
   const { toast } = useToast();
   const { description, getHtmlOutput, createNewDescription, loadDescription } = useEditorStore();
   const [hasCustomBlocks, setHasCustomBlocks] = useState(false);
+
+  // Rastreamento local de produtos já personalizados
+  const [customizedProducts, setCustomizedProducts] = useState<Record<number, boolean>>(() => {
+    // Recupera do localStorage se disponível
+    const saved = localStorage.getItem('customizedProducts');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Função para detectar se a descrição HTML contém estrutura de blocos personalizada
   const detectCustomBlocks = (html: string): boolean => {
@@ -34,9 +43,24 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
            html.includes('class="nuvemshop-product-description"');
   };
 
+  // Salva o estado de produtos personalizados no localStorage
+  useEffect(() => {
+    localStorage.setItem('customizedProducts', JSON.stringify(customizedProducts));
+  }, [customizedProducts]);
+
+  // Verifica se o produto atual já está marcado como personalizado
+  useEffect(() => {
+    if (product && product.id) {
+      setHasCustomBlocks(!!customizedProducts[product.id]);
+    }
+  }, [product, customizedProducts]);
+
   // Carrega a descrição do produto
-  const loadProductDescription = (product: NuvemshopProduct) => {
+  const loadProductDescription = async (product: NuvemshopProduct) => {
     try {
+      setIsImporting(true);
+      setConversionError(false);
+      
       const productName = typeof product.name === 'string' 
         ? product.name
         : (product.name?.pt || 'Novo Produto');
@@ -54,12 +78,24 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
           try {
             console.log('Analisando descrição HTML:', htmlDescription);
             
-            // Verifica se a descrição tem blocos personalizados
-            const hasCustom = detectCustomBlocks(htmlDescription);
-            setHasCustomBlocks(hasCustom);
+            // Verifica se a descrição tem blocos personalizados ou se o produto está marcado como personalizado
+            const isAlreadyCustomized = detectCustomBlocks(htmlDescription) || customizedProducts[product.id];
+            setHasCustomBlocks(isAlreadyCustomized);
+            
+            // Se for um produto personalizado, atualize o registro
+            if (isAlreadyCustomized && !customizedProducts[product.id]) {
+              setCustomizedProducts(prev => ({
+                ...prev,
+                [product.id]: true
+              }));
+            }
             
             // Converte HTML em blocos
             const blocks = parseHtmlToBlocks(htmlDescription);
+            
+            if (blocks.length === 0) {
+              throw new Error('Nenhum bloco pôde ser extraído do HTML');
+            }
             
             // Cria um objeto de descrição com os blocos analisados
             const parsedDescription = {
@@ -74,17 +110,18 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
             loadDescription(parsedDescription);
             
             toast({
-              title: hasCustom ? 'Descrição personalizada carregada' : 'Descrição convertida em blocos',
-              description: hasCustom 
+              title: isAlreadyCustomized ? 'Descrição personalizada carregada' : 'Descrição convertida em blocos',
+              description: isAlreadyCustomized 
                 ? 'A descrição personalizada anterior foi restaurada.'
                 : 'A descrição do produto foi convertida em blocos editáveis.',
             });
           } catch (parseError) {
             console.error('Erro ao analisar descrição HTML:', parseError);
+            setConversionError(true);
             toast({
               variant: 'destructive',
-              title: 'Erro ao carregar descrição',
-              description: 'Não foi possível converter a descrição HTML.',
+              title: 'Erro ao converter descrição',
+              description: 'Não foi possível converter a descrição HTML em blocos editáveis.',
             });
           }
         }
@@ -96,11 +133,14 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
       }
     } catch (error) {
       console.error('Erro ao carregar descrição do produto:', error);
+      setConversionError(true);
       toast({
         variant: 'destructive',
         title: 'Erro',
         description: 'Não foi possível carregar a descrição do produto.',
       });
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -131,7 +171,14 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
       const success = await updateProductDescription(product.id, htmlOutput);
       
       if (success) {
-        setHasCustomBlocks(true); // Marca que agora temos blocos personalizados
+        // Marca que este produto agora tem uma descrição personalizada
+        setCustomizedProducts(prev => ({
+          ...prev,
+          [product.id]: true
+        }));
+        
+        setHasCustomBlocks(true);
+        
         toast({
           title: 'Descrição salva',
           description: 'A descrição do produto foi atualizada na Nuvemshop com sucesso!',
@@ -146,6 +193,12 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleRefreshDescription = () => {
+    if (product) {
+      loadProductDescription(product);
     }
   };
 
@@ -165,13 +218,31 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
             Descrição personalizada
           </Badge>
         )}
+        {conversionError && (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+            <AlertTriangle className="h-3 w-3 mr-1" />
+            Problema na conversão
+          </Badge>
+        )}
       </div>
       
       <div className="flex items-center space-x-2">
+        {conversionError && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRefreshDescription}
+            disabled={isImporting}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isImporting ? 'animate-spin' : ''}`} />
+            Tentar novamente
+          </Button>
+        )}
+        
         <Button
           size="sm"
           variant="outline"
-          disabled={isSaving || !description}
+          disabled={isSaving || !description || isImporting}
           onClick={handleSaveToNuvemshop}
         >
           {isSaving ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
@@ -183,4 +254,3 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
 };
 
 export default ProductEditorController;
-
