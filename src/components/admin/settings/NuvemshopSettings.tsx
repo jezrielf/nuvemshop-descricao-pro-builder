@@ -9,6 +9,7 @@ import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { NimbusAuthStatus } from '@/components/Nimbus/components/NimbusAuthStatus';
+import { NexoStatus } from '@/components/Nimbus/components/NexoStatus';
 
 interface NuvemshopSettingsProps {
   settings: {
@@ -44,6 +45,7 @@ export const NuvemshopSettings: React.FC<NuvemshopSettingsProps> = ({
           <TabsList>
             <TabsTrigger value="nuvemshop">Nuvemshop</TabsTrigger>
             <TabsTrigger value="nimbus">Nimbus</TabsTrigger>
+            <TabsTrigger value="nexo">Nexo</TabsTrigger>
           </TabsList>
 
           <TabsContent value="nuvemshop">
@@ -109,6 +111,35 @@ export const NuvemshopSettings: React.FC<NuvemshopSettingsProps> = ({
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>A integração com a Nimbus está em fase de testes</li>
                   <li>Para mais informações, entre em contato com o suporte</li>
+                </ul>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="nexo">
+            <div className="space-y-6">
+              <div className="bg-gray-50 p-4 rounded-md">
+                <h3 className="font-medium mb-2">Status da Integração Nexo</h3>
+                <NexoStatus />
+              </div>
+              
+              <div className="flex items-center gap-2 mt-4">
+                <Button 
+                  onClick={() => window.open('/nexo', '_blank')} 
+                  variant="outline"
+                  className="flex items-center"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Abrir App no Nexo
+                </Button>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-md text-blue-800 text-sm">
+                <p><strong>Informações sobre a integração Nexo:</strong></p>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>O Nexo permite que a aplicação seja executada dentro do painel administrativo da Nuvemshop</li>
+                  <li>Para usar o Nexo, você precisa instalar o aplicativo na sua loja Nuvemshop</li>
+                  <li>Depois da instalação, esta aplicação estará disponível diretamente no seu painel Nuvemshop</li>
                 </ul>
               </div>
             </div>

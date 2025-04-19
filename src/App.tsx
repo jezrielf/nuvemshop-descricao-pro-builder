@@ -14,6 +14,7 @@ import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import NuvemshopConnect from "./pages/NuvemshopConnect";
+import NexoApp from "./pages/NexoApp";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DescriptionsView from "./pages/DescriptionsView";
@@ -62,6 +63,7 @@ const App = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+                <Route path="/nexo" element={<NexoApp />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
