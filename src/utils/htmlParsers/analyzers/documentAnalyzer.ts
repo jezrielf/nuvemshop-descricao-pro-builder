@@ -5,9 +5,7 @@ import { sanitizeHtmlContent } from './utils';
 import { processHeroSection, processGallerySection, processFeatureSection, processFAQSection, processCTASection, processImageTextSection } from './sectionAnalyzers';
 import { extractMetadataFromElement } from './metadataExtractor';
 
-export const analyzeDocument = (doc: Document | Element, blocks: Block[]): void => {
-  const body = doc instanceof Document ? doc.body : doc;
-  
+export const analyzeDocument = (body: Element, blocks: Block[]): void => {
   // Primeiro, procuramos por divisões explícitas de seção
   const explicits = findExplicitSections(body);
   
@@ -106,7 +104,7 @@ const splitContentIntoParts = (container: Element, blocks: Block[]): void => {
   if (images.length > 0) {
     images.forEach(img => {
       const parent = img.parentElement || container;
-      processImageOrWrapper(parent, img, blocks);
+      processImageOrWrapper(parent, img as HTMLImageElement, blocks);
     });
     return;
   }
@@ -198,7 +196,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
       case 'imageText':
         const imgEl = section.querySelector('img');
         if (imgEl) {
-          processImageTextSection(section, imgEl, blocks);
+          processImageTextSection(section, imgEl as HTMLImageElement, blocks);
         } else {
           analyzeContent(section, blocks);
         }
@@ -206,7 +204,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
       case 'textImage':
         const imgEl2 = section.querySelector('img');
         if (imgEl2) {
-          processImageTextSection(section, imgEl2, blocks, true);
+          processImageTextSection(section, imgEl2 as HTMLImageElement, blocks, true);
         } else {
           analyzeContent(section, blocks);
         }
@@ -234,7 +232,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
   
   const hasFeatures = 
     section.querySelectorAll('.features, .benefits, [class*="feature"], [class*="benefit"]').length > 0 ||
-    (section.querySelectorAll('li').length >= 3 && section.querySelector('ul, ol'));
+    (section.querySelectorAll('li').length >= 3 && section.querySelector('ul, ol') !== null);
   
   if (hasFeatures) {
     processFeatureSection(section, blocks);
@@ -253,7 +251,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
   const hasCTA = 
     section.classList.contains('cta') || 
     (section.querySelector('a.button, .btn, button') !== null && 
-     section.textContent && section.textContent.trim().length < 300);
+     section.textContent && section.textContent.length < 300);
   
   if (hasCTA) {
     processCTASection(section, blocks);
@@ -261,7 +259,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
   }
   
   if (images.length === 1 && section.textContent && section.textContent.trim().length > 50) {
-    processImageTextSection(section, images[0], blocks);
+    processImageTextSection(section, images[0] as HTMLImageElement, blocks);
     return;
   }
   
@@ -284,7 +282,7 @@ export const analyzeContent = (element: Element, blocks: Block[]): void => {
   } else if (hasImagesCount === 1) {
     const image = element.querySelector('img');
     if (image) {
-      processImageTextSection(element, image, blocks);
+      processImageTextSection(element, image as HTMLImageElement, blocks);
     }
   } else if (hasLists) {
     processFeatureSection(element, blocks);

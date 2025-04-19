@@ -1,3 +1,4 @@
+
 import { Block, TextBlock } from '@/types/editor';
 import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,7 +36,7 @@ export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
     } else {
       console.log('Convertendo HTML simples em blocos estruturados');
       // Para HTML normal, usa o analisador para identificar e converter seções
-      analyzeDocument(doc, parsedBlocks);
+      analyzeDocument(doc.body, parsedBlocks);
     }
 
     // Garantir que temos pelo menos um bloco
@@ -49,7 +50,10 @@ export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
     return parsedBlocks;
   } catch (error) {
     console.error('Erro ao analisar HTML em blocos:', error);
-    return [];
+    // Em caso de erro, retorna pelo menos um bloco de texto com o conteúdo original
+    const blocks: Block[] = [];
+    createBasicTextBlock(htmlContent, blocks);
+    return blocks;
   }
 };
 
@@ -91,84 +95,158 @@ const processCustomBlocks = (doc: Document, blocks: Block[]): void => {
         }
       }
       
-      // Passa para o analisador de seções para criar o bloco apropriado
-      analyzeSection(element, blocks, blockType, blockId);
+      // Analisa a seção para criar o bloco apropriado
+      analyzeCustomSection(element, blocks, blockType, blockId);
     });
   } else {
-    // Se não encontrar blocos marcados, analisa o conteúdo do container
+    // Se não encontrar blocos marcados, analisa o conteúdo do container como body
     analyzeDocument(container, blocks);
   }
 };
 
 /**
- * Analisa uma seção e cria o bloco apropriado
+ * Analisa uma seção personalizada e cria o bloco apropriado
  */
-const analyzeSection = (element: Element, blocks: Block[], forcedType: string = '', blockId: string = uuidv4()): void => {
-  // Importa os analisadores de seção
-  import('./analyzers/sectionAnalyzers').then(({ 
-    processHeroSection, 
-    processGallerySection, 
-    processFeatureSection, 
-    processFAQSection, 
-    processCTASection, 
-    processImageTextSection 
-  }) => {
+const analyzeCustomSection = (element: Element, blocks: Block[], forcedType: string = '', blockId: string = uuidv4()): void => {
+  try {
     // Aplica o tipo forçado se fornecido
     const type = forcedType || determineBlockType(element);
     
-    try {
-      switch (type) {
-        case 'hero':
-          processHeroSection(element, blocks);
-          break;
-        case 'gallery':
-          const images = element.querySelectorAll('img');
-          processGallerySection(element, images, blocks);
-          break;
-        case 'features':
-          processFeatureSection(element, blocks);
-          break;
-        case 'faq':
-          processFAQSection(element, blocks);
-          break;
-        case 'cta':
-          processCTASection(element, blocks);
-          break;
-        case 'image':
-          const img = element.querySelector('img');
-          if (img) {
-            processImageTextSection(element, img, blocks, false);
-          } else {
-            createBasicTextBlock(element.innerHTML, blocks);
-          }
-          break;
-        case 'imageText':
-          const imgEl = element.querySelector('img');
-          if (imgEl) {
-            processImageTextSection(element, imgEl, blocks);
-          } else {
-            createBasicTextBlock(element.innerHTML, blocks);
-          }
-          break;
-        case 'textImage':
-          const imgEl2 = element.querySelector('img');
-          if (imgEl2) {
-            processImageTextSection(element, imgEl2, blocks, true);
-          } else {
-            createBasicTextBlock(element.innerHTML, blocks);
-          }
-          break;
-        default:
+    switch (type) {
+      case 'hero':
+        processHeroSection(element, blocks);
+        break;
+      case 'gallery':
+        const images = element.querySelectorAll('img');
+        processGallerySection(element, images, blocks);
+        break;
+      case 'features':
+        processFeaturesSection(element, blocks);
+        break;
+      case 'faq':
+        processFAQSection(element, blocks);
+        break;
+      case 'cta':
+        processCTASection(element, blocks);
+        break;
+      case 'image':
+        const img = element.querySelector('img');
+        if (img) {
+          processImageTextSection(element, img, blocks, false);
+        } else {
           createBasicTextBlock(element.innerHTML, blocks);
-      }
-    } catch (error) {
-      console.error(`Erro ao processar seção do tipo ${type}:`, error);
-      createBasicTextBlock(element.innerHTML, blocks);
+        }
+        break;
+      case 'imageText':
+        const imgEl = element.querySelector('img');
+        if (imgEl) {
+          processImageTextSection(element, imgEl, blocks);
+        } else {
+          createBasicTextBlock(element.innerHTML, blocks);
+        }
+        break;
+      case 'textImage':
+        const imgEl2 = element.querySelector('img');
+        if (imgEl2) {
+          processImageTextSection(element, imgEl2, blocks, true);
+        } else {
+          createBasicTextBlock(element.innerHTML, blocks);
+        }
+        break;
+      default:
+        createBasicTextBlock(element.innerHTML, blocks);
     }
-  }).catch(error => {
-    console.error('Erro ao importar analisadores de seção:', error);
+  } catch (error) {
+    console.error(`Erro ao processar seção do tipo ${forcedType}:`, error);
     createBasicTextBlock(element.innerHTML, blocks);
-  });
+  }
+};
+
+/**
+ * Importa dinamicamente e processa as seções especializadas
+ */
+const processHeroSection = (element: Element, blocks: Block[]): void => {
+  try {
+    import('./analyzers/sectionAnalyzers').then(module => {
+      module.processHeroSection(element, blocks);
+    }).catch(error => {
+      console.error('Erro ao importar processador de heróis:', error);
+      createBasicTextBlock(element.innerHTML, blocks);
+    });
+  } catch (error) {
+    console.error('Erro ao processar seção hero:', error);
+    createBasicTextBlock(element.innerHTML, blocks);
+  }
+};
+
+const processGallerySection = (element: Element, images: NodeListOf<HTMLImageElement>, blocks: Block[]): void => {
+  try {
+    import('./analyzers/sectionAnalyzers').then(module => {
+      module.processGallerySection(element, images, blocks);
+    }).catch(error => {
+      console.error('Erro ao importar processador de galeria:', error);
+      createBasicTextBlock(element.innerHTML, blocks);
+    });
+  } catch (error) {
+    console.error('Erro ao processar seção de galeria:', error);
+    createBasicTextBlock(element.innerHTML, blocks);
+  }
+};
+
+const processFeaturesSection = (element: Element, blocks: Block[]): void => {
+  try {
+    import('./analyzers/sectionAnalyzers').then(module => {
+      module.processFeatureSection(element, blocks);
+    }).catch(error => {
+      console.error('Erro ao importar processador de recursos:', error);
+      createBasicTextBlock(element.innerHTML, blocks);
+    });
+  } catch (error) {
+    console.error('Erro ao processar seção de recursos:', error);
+    createBasicTextBlock(element.innerHTML, blocks);
+  }
+};
+
+const processFAQSection = (element: Element, blocks: Block[]): void => {
+  try {
+    import('./analyzers/sectionAnalyzers').then(module => {
+      module.processFAQSection(element, blocks);
+    }).catch(error => {
+      console.error('Erro ao importar processador de FAQ:', error);
+      createBasicTextBlock(element.innerHTML, blocks);
+    });
+  } catch (error) {
+    console.error('Erro ao processar seção de FAQ:', error);
+    createBasicTextBlock(element.innerHTML, blocks);
+  }
+};
+
+const processCTASection = (element: Element, blocks: Block[]): void => {
+  try {
+    import('./analyzers/sectionAnalyzers').then(module => {
+      module.processCTASection(element, blocks);
+    }).catch(error => {
+      console.error('Erro ao importar processador de CTA:', error);
+      createBasicTextBlock(element.innerHTML, blocks);
+    });
+  } catch (error) {
+    console.error('Erro ao processar seção de CTA:', error);
+    createBasicTextBlock(element.innerHTML, blocks);
+  }
+};
+
+const processImageTextSection = (element: Element, image: HTMLImageElement, blocks: Block[], isReversed: boolean = false): void => {
+  try {
+    import('./analyzers/sectionAnalyzers').then(module => {
+      module.processImageTextSection(element, image, blocks, isReversed);
+    }).catch(error => {
+      console.error('Erro ao importar processador de imagem com texto:', error);
+      createBasicTextBlock(element.innerHTML, blocks);
+    });
+  } catch (error) {
+    console.error('Erro ao processar seção de imagem com texto:', error);
+    createBasicTextBlock(element.innerHTML, blocks);
+  }
 };
 
 /**
@@ -232,6 +310,15 @@ const createBasicTextBlock = (htmlContent: string, blocks: Block[]): void => {
     blocks.push(textBlock);
   } catch (error) {
     console.error('Erro ao criar bloco de texto básico:', error);
+    try {
+      // Tenta criar um bloco de fallback mais simples
+      const fallbackBlock = createBlock('text') as TextBlock;
+      fallbackBlock.title = 'Texto Importado';
+      fallbackBlock.content = '<p>Conteúdo importado</p>';
+      blocks.push(fallbackBlock);
+    } catch (e) {
+      console.error('Erro crítico ao criar bloco de fallback:', e);
+    }
   }
 };
 

@@ -40,7 +40,8 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
     // Procura por comentários ou atributos que indicam blocos personalizados
     return html.includes('data-block-type') || 
            html.includes('<!-- BLOCK:') || 
-           html.includes('class="nuvemshop-product-description"');
+           html.includes('class="nuvemshop-product-description"') ||
+           html.includes('<!-- Descrição gerada pelo Editor');
   };
 
   // Salva o estado de produtos personalizados no localStorage
@@ -90,11 +91,38 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
               }));
             }
             
-            // Converte HTML em blocos
-            const blocks = parseHtmlToBlocks(htmlDescription);
+            // Converte HTML em blocos - adicionando tratamento adicional de erro
+            let blocks = [];
+            try {
+              blocks = parseHtmlToBlocks(htmlDescription);
+              console.log('Blocos analisados:', blocks);
+            } catch (parseErr) {
+              console.error('Erro interno ao analisar blocos:', parseErr);
+              // Tenta usar o fallback para HTML simples
+              const fallbackBlock = {
+                id: uuidv4(),
+                type: 'text',
+                title: productName,
+                content: htmlDescription,
+                visible: true,
+                columns: 'full',
+                style: {}
+              };
+              blocks = [fallbackBlock];
+            }
             
+            // Se não gerou blocos, cria pelo menos um bloco de texto básico
             if (blocks.length === 0) {
-              throw new Error('Nenhum bloco pôde ser extraído do HTML');
+              const fallbackBlock = {
+                id: uuidv4(),
+                type: 'text',
+                title: productName,
+                content: htmlDescription,
+                visible: true,
+                columns: 'full',
+                style: {}
+              };
+              blocks = [fallbackBlock];
             }
             
             // Cria um objeto de descrição com os blocos analisados
@@ -118,10 +146,30 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
           } catch (parseError) {
             console.error('Erro ao analisar descrição HTML:', parseError);
             setConversionError(true);
+            
+            // Mesmo com erro, tenta criar um bloco de texto simples
+            const fallbackDescription = {
+              id: 'error-' + Date.now(),
+              name: `Descrição: ${productName}`,
+              blocks: [{
+                id: uuidv4(),
+                type: 'text',
+                title: 'Conteúdo Importado',
+                content: `<p>${htmlDescription.substring(0, 500)}${htmlDescription.length > 500 ? '...' : ''}</p>`,
+                visible: true,
+                columns: 'full',
+                style: {}
+              }],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            
+            loadDescription(fallbackDescription);
+            
             toast({
               variant: 'destructive',
               title: 'Erro ao converter descrição',
-              description: 'Não foi possível converter a descrição HTML em blocos editáveis.',
+              description: 'Criamos um bloco de texto básico com o conteúdo original.',
             });
           }
         }
@@ -205,6 +253,15 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const productName = typeof product.name === 'string'
     ? product.name
     : (product.name?.pt || 'Produto');
+
+  // Função auxiliar para gerar id único
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0, 
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 
   return (
     <div className={`flex items-center justify-between p-2 bg-green-50 border-b border-green-100 ${className}`}>
