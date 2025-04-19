@@ -14,8 +14,11 @@ interface TextBlockProps {
 }
 
 const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
-  const { updateBlock, selectedBlockId } = useEditorStore();
+  const { updateBlock, selectedBlockId, description } = useEditorStore();
   const isEditing = selectedBlockId === block.id && !isPreview;
+  
+  // Obtém o título do bloco ou usa o nome da descrição como fallback
+  const blockTitle = block.heading || (description?.name ? description.name.replace('Descrição: ', '') : 'Título do Texto');
   
   const handleUpdateHeading = (heading: string) => {
     updateBlock(block.id, { heading });
@@ -50,7 +53,7 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
     return (
       <div className="w-full p-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
+          <h2 className="text-2xl font-bold mb-4">{blockTitle}</h2>
           <div 
             dangerouslySetInnerHTML={{ __html: sanitizeHtmlContent(block.content) }} 
             className="prose max-w-none" 
@@ -74,7 +77,7 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
               />
             </div>
             <Input
-              value={block.heading}
+              value={block.heading || blockTitle}
               onChange={(e) => handleUpdateHeading(e.target.value)}
               placeholder="Digite o título do bloco de texto"
             />

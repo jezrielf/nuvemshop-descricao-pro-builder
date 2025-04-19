@@ -1,4 +1,3 @@
-
 import { Block, TextBlock } from '@/types/editor';
 import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { v4 as uuidv4 } from 'uuid';
@@ -101,6 +100,44 @@ const processCustomBlocks = (doc: Document, blocks: Block[]): void => {
   } else {
     // Se não encontrar blocos marcados, analisa o conteúdo do container como body
     analyzeDocument(container, blocks);
+  }
+};
+
+const createBasicTextBlock = (htmlContent: string, blocks: Block[], title?: string): void => {
+  try {
+    // Explicitamente tipar como TextBlock para garantir que o TypeScript reconheça a propriedade content
+    const textBlock = createBlock('text') as TextBlock;
+    
+    // Limpar o HTML
+    htmlContent = cleanupHtml(htmlContent);
+    
+    // Extrair título se houver
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = htmlContent;
+    
+    const heading = tempElement.querySelector('h1, h2, h3');
+    if (heading) {
+      textBlock.heading = heading.textContent?.trim() || title || 'Texto';
+      heading.remove(); // Remove o heading para não duplicar no conteúdo
+    } else if (title) {
+      textBlock.heading = title;
+    }
+    
+    // Agora o TypeScript reconhece que textBlock tem uma propriedade content
+    textBlock.content = tempElement.innerHTML.trim() || '<p>Adicione conteúdo aqui</p>';
+    blocks.push(textBlock);
+  } catch (error) {
+    console.error('Erro ao criar bloco de texto básico:', error);
+    try {
+      // Tenta criar um bloco de fallback mais simples
+      const fallbackBlock = createBlock('text') as TextBlock;
+      fallbackBlock.title = title || 'Texto Importado';
+      fallbackBlock.heading = title || 'Texto Importado';
+      fallbackBlock.content = '<p>Conteúdo importado</p>';
+      blocks.push(fallbackBlock);
+    } catch (e) {
+      console.error('Erro crítico ao criar bloco de fallback:', e);
+    }
   }
 };
 
@@ -282,44 +319,6 @@ const determineBlockType = (element: Element): string => {
   }
   
   return 'text';
-};
-
-/**
- * Cria um bloco de texto básico com o conteúdo HTML fornecido
- */
-const createBasicTextBlock = (htmlContent: string, blocks: Block[]): void => {
-  try {
-    // Explicitamente tipar como TextBlock para garantir que o TypeScript reconheça a propriedade content
-    const textBlock = createBlock('text') as TextBlock;
-    
-    // Limpar o HTML
-    htmlContent = cleanupHtml(htmlContent);
-    
-    // Extrair título se houver
-    const tempElement = document.createElement('div');
-    tempElement.innerHTML = htmlContent;
-    
-    const heading = tempElement.querySelector('h1, h2, h3');
-    if (heading) {
-      textBlock.title = heading.textContent?.trim() || 'Texto';
-      heading.remove(); // Remove o heading para não duplicar no conteúdo
-    }
-    
-    // Agora o TypeScript reconhece que textBlock tem uma propriedade content
-    textBlock.content = tempElement.innerHTML.trim();
-    blocks.push(textBlock);
-  } catch (error) {
-    console.error('Erro ao criar bloco de texto básico:', error);
-    try {
-      // Tenta criar um bloco de fallback mais simples
-      const fallbackBlock = createBlock('text') as TextBlock;
-      fallbackBlock.title = 'Texto Importado';
-      fallbackBlock.content = '<p>Conteúdo importado</p>';
-      blocks.push(fallbackBlock);
-    } catch (e) {
-      console.error('Erro crítico ao criar bloco de fallback:', e);
-    }
-  }
 };
 
 /**

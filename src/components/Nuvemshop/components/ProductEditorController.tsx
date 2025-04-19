@@ -95,6 +95,18 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
             let blocks = [];
             try {
               blocks = parseHtmlToBlocks(htmlDescription);
+              
+              // Verifica se há blocos de texto e adiciona o título do produto como título dos blocos
+              blocks = blocks.map(block => {
+                if (block.type === 'text' && (!block.heading || block.heading === 'Título do Texto')) {
+                  return {
+                    ...block,
+                    heading: productName
+                  };
+                }
+                return block;
+              });
+              
               console.log('Blocos analisados:', blocks);
             } catch (parseErr) {
               console.error('Erro interno ao analisar blocos:', parseErr);
@@ -103,6 +115,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
                 id: uuidv4(),
                 type: 'text',
                 title: productName,
+                heading: productName,
                 content: htmlDescription,
                 visible: true,
                 columns: 'full',
@@ -117,6 +130,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
                 id: uuidv4(),
                 type: 'text',
                 title: productName,
+                heading: productName,
                 content: htmlDescription,
                 visible: true,
                 columns: 'full',
@@ -155,6 +169,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
                 id: uuidv4(),
                 type: 'text',
                 title: 'Conteúdo Importado',
+                heading: productName,
                 content: `<p>${htmlDescription.substring(0, 500)}${htmlDescription.length > 500 ? '...' : ''}</p>`,
                 visible: true,
                 columns: 'full',
@@ -174,6 +189,26 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
           }
         }
       } else {
+        // Se não houver descrição, cria um bloco de texto básico com o título do produto
+        const newDescription = {
+          id: 'new-' + Date.now(),
+          name: `Descrição: ${productName}`,
+          blocks: [{
+            id: uuidv4(),
+            type: 'text',
+            title: 'Conteúdo do Produto',
+            heading: productName,
+            content: '<p>Adicione aqui a descrição do seu produto.</p>',
+            visible: true,
+            columns: 'full',
+            style: {}
+          }],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        loadDescription(newDescription);
+        
         toast({
           title: 'Nova descrição criada',
           description: 'Este produto não tinha uma descrição. Criamos uma nova para você editar.',
