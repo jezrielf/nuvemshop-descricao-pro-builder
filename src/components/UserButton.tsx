@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { LogOut, Shield, Settings, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getRoles } from '@/utils/roleUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export const UserButton: React.FC = () => {
   const { 
@@ -25,15 +26,27 @@ export const UserButton: React.FC = () => {
     isPremium, 
     isBusiness, 
     openCustomerPortal,
-    refreshProfile
+    refreshProfile,
+    lastRefresh
   } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { toast } = useToast();
 
   // Handle manual profile refresh
   const handleRefreshProfile = async () => {
     setIsRefreshing(true);
     try {
       await refreshProfile();
+      toast({
+        title: "Perfil atualizado",
+        description: "Suas informações foram atualizadas com sucesso",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: "Não foi possível atualizar suas informações",
+        variant: "destructive",
+      });
     } finally {
       // Add a small delay to show the refresh icon animation
       setTimeout(() => setIsRefreshing(false), 500);
@@ -54,8 +67,11 @@ export const UserButton: React.FC = () => {
   // Display the appropriate roles as badges
   const roles = getRoles(profile?.role);
   const mainRole = roles.includes('admin') ? 'admin' : 
-                    roles.includes('premium') ? 'premium' : 
-                    'user';
+                   roles.includes('premium') ? 'premium' : 
+                   'user';
+
+  // Format the last refresh time
+  const lastRefreshTime = new Date(lastRefresh).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
   return (
     <DropdownMenu>
@@ -72,7 +88,7 @@ export const UserButton: React.FC = () => {
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium leading-none">{profile?.nome || 'Usuário'}</p>
-              <Badge variant={mainRole === 'admin' ? 'default' : 'secondary'} className="ml-2">
+              <Badge variant={mainRole === 'admin' ? 'default' : mainRole === 'premium' ? 'secondary' : 'outline'} className="ml-2">
                 {mainRole}
               </Badge>
             </div>
@@ -86,6 +102,7 @@ export const UserButton: React.FC = () => {
                 ))}
               </div>
             )}
+            <p className="text-xs text-muted-foreground mt-1">Última atualização: {lastRefreshTime}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

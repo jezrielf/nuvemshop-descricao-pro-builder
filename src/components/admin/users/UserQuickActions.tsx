@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Crown, Star, User, X } from 'lucide-react';
+import { Crown, Star, User, X, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { getRoles } from '@/utils/roleUtils';
@@ -18,12 +18,15 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
   onUpdateRole 
 }) => {
   const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Convert current role to array for easier handling
   const roles = getRoles(currentRole);
   
   const handleRoleChange = async (role: string) => {
     try {
+      setIsUpdating(true);
+      
       let newRoles: string[];
       
       // If the role already exists, remove it (except 'user')
@@ -39,6 +42,7 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
         newRoles = [...roles, role];
       } else {
         // No change needed
+        setIsUpdating(false);
         return;
       }
       
@@ -56,6 +60,8 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
         description: error instanceof Error ? error.message : 'Erro desconhecido',
         variant: 'destructive',
       });
+    } finally {
+      setIsUpdating(false);
     }
   };
   
@@ -87,7 +93,7 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
           variant="outline" 
           size="sm"
           onClick={() => handleRoleChange('user')}
-          disabled={roles.includes('user')}
+          disabled={roles.includes('user') || isUpdating}
         >
           <User className="w-3 h-3 mr-1" />
           Usuário
@@ -96,7 +102,7 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
           variant="outline" 
           size="sm"
           onClick={() => handleRoleChange('premium')}
-          disabled={roles.includes('premium')}
+          disabled={roles.includes('premium') || isUpdating}
         >
           <Star className="w-3 h-3 mr-1" />
           Premium
@@ -105,11 +111,18 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
           variant="outline" 
           size="sm"
           onClick={() => handleRoleChange('admin')}
-          disabled={roles.includes('admin')}
+          disabled={roles.includes('admin') || isUpdating}
         >
           <Crown className="w-3 h-3 mr-1" />
           Admin
         </Button>
+        
+        {isUpdating && (
+          <div className="flex items-center text-sm text-muted-foreground ml-2">
+            <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+            Atualizando...
+          </div>
+        )}
       </div>
     </div>
   );
