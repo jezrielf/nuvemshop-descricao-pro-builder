@@ -15,10 +15,12 @@ export const NexoStatus: React.FC = () => {
     isLoading
   } = useNexoAuth();
 
+  // Se o componente estiver carregando, mostra um spinner
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
+  // Se não estiver no ambiente Nexo, mostra uma mensagem
   if (!isNexoEnabled) {
     return (
       <div className="space-y-4">
@@ -32,6 +34,7 @@ export const NexoStatus: React.FC = () => {
     );
   }
 
+  // Se houver erro de autenticação, mostra a mensagem de erro
   if (authError) {
     return (
       <div className="space-y-4">
@@ -40,6 +43,7 @@ export const NexoStatus: React.FC = () => {
     );
   }
 
+  // Se estiver autenticado, mostra status de conectado
   if (isAuthenticated) {
     return (
       <div className="space-y-4">
@@ -53,6 +57,7 @@ export const NexoStatus: React.FC = () => {
     );
   }
 
+  // Estado de aguardando autenticação
   return (
     <div className="space-y-4">
       <p>Aguardando autenticação via Nexo...</p>

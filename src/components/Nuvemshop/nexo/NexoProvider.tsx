@@ -61,8 +61,8 @@ export const NexoProvider: React.FC<NexoProviderProps> = ({ children }) => {
   const checkIfNexoEnvironment = () => {
     return (
       typeof window !== 'undefined' && 
-      window.location.href.includes('mystore.nuvemshop.com.br') || 
-      window.location.href.includes('nimbus-app')
+      (window.location.href.includes('mystore.nuvemshop.com.br') || 
+       window.location.href.includes('nimbus-app'))
     );
   };
 
@@ -81,24 +81,32 @@ export const NexoProvider: React.FC<NexoProviderProps> = ({ children }) => {
           return;
         }
 
-        // Importar a SDK do Nexo dinamicamente
-        const Nexo = await import('@tiendanube/nexo/sdk');
-        
-        // Inicializar o cliente Nexo
-        const nexoClient = await Nexo.initialize();
-        
-        // Obter informações do app, loja e usuário
-        const appData = await nexoClient.app.getInfo();
-        const storeData = await nexoClient.store.getInfo();
-        const userData = await nexoClient.user.getInfo();
-        const token = await nexoClient.auth.getAccessToken();
-        
-        // Atualizar o estado
-        setApp(appData);
-        setStore(storeData);
-        setUser(userData);
-        setAccessToken(token);
-        
+        // Verificamos se o objeto Nexo está disponível no escopo global (window)
+        // Este é um padrão mais seguro para integração com scripts externos
+        if (typeof window !== 'undefined' && 'Nexo' in window) {
+          // @ts-ignore - O tipo global Nexo não está definido no TypeScript
+          const nexoClient = await window.Nexo.initialize();
+          
+          try {
+            // Obter informações do app, loja e usuário
+            const appData = await nexoClient.app.getInfo();
+            const storeData = await nexoClient.store.getInfo();
+            const userData = await nexoClient.user.getInfo();
+            const token = await nexoClient.auth.getAccessToken();
+            
+            // Atualizar o estado
+            setApp(appData);
+            setStore(storeData);
+            setUser(userData);
+            setAccessToken(token);
+          } catch (nexoError) {
+            console.error('Erro ao obter dados do Nexo:', nexoError);
+            setError('Não foi possível obter informações da loja no painel Nuvemshop');
+          }
+        } else {
+          console.log('Nexo SDK não disponível globalmente. Estamos em ambiente de desenvolvimento ou fora do contexto Nexo.');
+          setError('SDK do Nexo não disponível. Verifique se a aplicação está sendo executada dentro do painel Nuvemshop.');
+        }
       } catch (err) {
         console.error('Erro ao inicializar Nexo:', err);
         setError('Falha ao inicializar integração com o painel Nuvemshop');

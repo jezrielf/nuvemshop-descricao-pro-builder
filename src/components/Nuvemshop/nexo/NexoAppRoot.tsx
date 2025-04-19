@@ -1,19 +1,69 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NexoProvider } from './NexoProvider';
 import { NexoLayout } from './NexoLayout';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import Editor from '@/components/Editor';
 import Preview from '@/components/Preview';
 import ProductSearch from '@/components/Nuvemshop/components/ProductSearch';
 import ProductEditorController from '@/components/Nuvemshop/components/ProductEditorController';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
-import { useState } from 'react';
 import { useNexoAuth } from '../hooks/useNexoAuth';
+
+// Componente para carregar o script do Nexo
+const NexoScript: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
+
+  useEffect(() => {
+    // Verificar se já existe um script do Nexo carregado
+    if (document.getElementById('nexo-sdk-script')) {
+      setScriptLoaded(true);
+      return;
+    }
+
+    // Se estamos em ambiente de desenvolvimento ou produção fora do Nexo,
+    // não precisamos carregar o script, pois usaremos detecção de ambiente
+    const isNexoEnvironment = 
+      window.location.href.includes('mystore.nuvemshop.com.br') || 
+      window.location.href.includes('nimbus-app');
+
+    if (!isNexoEnvironment) {
+      setScriptLoaded(true);
+      return;
+    }
+
+    // Criar e adicionar o script à página
+    const script = document.createElement('script');
+    script.id = 'nexo-sdk-script';
+    script.src = 'https://nexo.nuvemshop.com.br/sdk.js';
+    script.async = true;
+    script.onload = () => setScriptLoaded(true);
+    script.onerror = () => setScriptError(true);
+    
+    document.body.appendChild(script);
+
+    // Limpeza
+    return () => {
+      if (document.getElementById('nexo-sdk-script')) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  if (scriptError) {
+    return (
+      <div className="p-4 bg-red-50 text-red-700 rounded-md">
+        Erro ao carregar o SDK do Nexo. Por favor, verifique se você está acessando a aplicação a partir do painel da Nuvemshop.
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+};
 
 // Criando um cliente de query para o React Query
 const queryClient = new QueryClient({
@@ -84,14 +134,16 @@ const NexoAppContent: React.FC = () => {
 export const NexoAppRoot: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <NexoProvider>
-        <TooltipProvider>
-          <NexoLayout>
-            <NexoAppContent />
-          </NexoLayout>
-          <Toaster />
-        </TooltipProvider>
-      </NexoProvider>
+      <NexoScript>
+        <NexoProvider>
+          <TooltipProvider>
+            <NexoLayout>
+              <NexoAppContent />
+            </NexoLayout>
+            <Toaster />
+          </TooltipProvider>
+        </NexoProvider>
+      </NexoScript>
     </QueryClientProvider>
   );
 };
