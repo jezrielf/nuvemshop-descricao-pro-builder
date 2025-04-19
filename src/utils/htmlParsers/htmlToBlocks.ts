@@ -1,11 +1,12 @@
 
-import { Block, TextBlock, ColumnLayout } from '@/types/editor';
+import { Block } from '@/types/editor';
+import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * Utility function to convert HTML content to editor blocks
- * @param htmlContent HTML content string to parse
- * @returns Array of editor blocks
+ * Analisa descrições HTML de produtos e converte em blocos editáveis
+ * @param htmlContent string HTML da descrição do produto
+ * @returns Array de blocos estruturados
  */
 export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
   if (!htmlContent.trim()) {
@@ -13,25 +14,26 @@ export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
   }
 
   try {
-    // For now, we'll implement a simple parser that creates a single text block
-    // In a more robust implementation, this would analyze the HTML structure
-    // and create appropriate blocks for different types of content
-    
-    // Create a basic text block with the HTML content
-    const textBlock: TextBlock = {
-      id: uuidv4(),
-      type: 'text',
-      title: 'Descrição Importada',
-      content: htmlContent,
-      heading: 'Descrição do Produto',
-      columns: 'full' as ColumnLayout,
-      visible: true,
-      style: {}
-    };
+    // Criar um documento DOM para analisar
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
 
-    return [textBlock];
+    // Remove scripts por segurança
+    const scripts = doc.querySelectorAll('script');
+    scripts.forEach(script => script.remove());
+
+    // Array para armazenar os blocos analisados
+    const parsedBlocks: Block[] = [];
+
+    // Usa o analisador de documentos existente para identificar e converter seções
+    analyzeDocument(doc, parsedBlocks);
+
+    console.log('Blocos gerados:', parsedBlocks);
+    return parsedBlocks;
+
   } catch (error) {
-    console.error('Error parsing HTML to blocks:', error);
+    console.error('Erro ao analisar HTML em blocos:', error);
     return [];
   }
 };
+

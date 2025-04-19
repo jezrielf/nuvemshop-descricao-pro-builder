@@ -7,7 +7,7 @@ import { useNuvemshopProducts } from '../hooks/useNuvemshopProducts';
 import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Save, RefreshCw, ExternalLink } from 'lucide-react';
+import { Save, RefreshCw } from 'lucide-react';
 import { parseHtmlToBlocks } from '@/utils/htmlParsers';
 
 interface ProductEditorControllerProps {
@@ -24,32 +24,44 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const { updateProductDescription } = useNuvemshopProducts(accessToken, userId);
   const { toast } = useToast();
   const { description, getHtmlOutput, createNewDescription, loadDescription } = useEditorStore();
+  const [hasCustomBlocks, setHasCustomBlocks] = useState(false);
 
-  // Parse product HTML description and convert to our block format
+  // Função para detectar se a descrição HTML contém estrutura de blocos personalizada
+  const detectCustomBlocks = (html: string): boolean => {
+    // Procura por comentários ou atributos que indicam blocos personalizados
+    return html.includes('data-block-type') || 
+           html.includes('<!-- BLOCK:') || 
+           html.includes('class="nuvemshop-product-description"');
+  };
+
+  // Carrega a descrição do produto
   const loadProductDescription = (product: NuvemshopProduct) => {
     try {
       const productName = typeof product.name === 'string' 
         ? product.name
         : (product.name?.pt || 'Novo Produto');
       
-      // First create a basic description with the product name
+      // Primeiro cria uma descrição básica com o nome do produto
       createNewDescription(`Descrição: ${productName}`);
       
-      // Check if the product has an existing description to load
+      // Verifica se o produto tem uma descrição existente para carregar
       if (product.description) {
-        // Get product description as HTML string
         const htmlDescription = typeof product.description === 'string'
           ? product.description
           : (product.description.pt || '');
           
         if (htmlDescription.trim()) {
           try {
-            console.log('Parsing HTML description:', htmlDescription);
+            console.log('Analisando descrição HTML:', htmlDescription);
             
-            // Use our new parseHtmlToBlocks function to convert HTML to block format
+            // Verifica se a descrição tem blocos personalizados
+            const hasCustom = detectCustomBlocks(htmlDescription);
+            setHasCustomBlocks(hasCustom);
+            
+            // Converte HTML em blocos
             const blocks = parseHtmlToBlocks(htmlDescription);
             
-            // Create a description object with the parsed blocks
+            // Cria um objeto de descrição com os blocos analisados
             const parsedDescription = {
               id: description?.id || 'imported-' + Date.now(),
               name: `Descrição: ${productName}`,
@@ -58,19 +70,21 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
               updatedAt: new Date().toISOString(),
             };
             
-            // Load the parsed description into the editor
+            // Carrega a descrição analisada no editor
             loadDescription(parsedDescription);
             
             toast({
-              title: 'Descrição carregada',
-              description: 'A descrição existente do produto foi carregada para edição.',
+              title: hasCustom ? 'Descrição personalizada carregada' : 'Descrição convertida em blocos',
+              description: hasCustom 
+                ? 'A descrição personalizada anterior foi restaurada.'
+                : 'A descrição do produto foi convertida em blocos editáveis.',
             });
           } catch (parseError) {
-            console.error('Error parsing HTML description:', parseError);
+            console.error('Erro ao analisar descrição HTML:', parseError);
             toast({
               variant: 'destructive',
               title: 'Erro ao carregar descrição',
-              description: 'Não foi possível converter a descrição HTML existente.',
+              description: 'Não foi possível converter a descrição HTML.',
             });
           }
         }
@@ -81,7 +95,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
         });
       }
     } catch (error) {
-      console.error('Error loading product description:', error);
+      console.error('Erro ao carregar descrição do produto:', error);
       toast({
         variant: 'destructive',
         title: 'Erro',
@@ -90,7 +104,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
     }
   };
 
-  // When product changes, load its description
+  // Quando o produto muda, carrega sua descrição
   useEffect(() => {
     if (product) {
       loadProductDescription(product);
@@ -110,20 +124,21 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
     try {
       setIsSaving(true);
       
-      // Get HTML output from the editor
+      // Obtém o HTML do editor
       const htmlOutput = getHtmlOutput();
       
-      // Update product description in Nuvemshop
+      // Atualiza a descrição do produto na Nuvemshop
       const success = await updateProductDescription(product.id, htmlOutput);
       
       if (success) {
+        setHasCustomBlocks(true); // Marca que agora temos blocos personalizados
         toast({
           title: 'Descrição salva',
           description: 'A descrição do produto foi atualizada na Nuvemshop com sucesso!',
         });
       }
     } catch (error) {
-      console.error('Error saving to Nuvemshop:', error);
+      console.error('Erro ao salvar na Nuvemshop:', error);
       toast({
         variant: 'destructive',
         title: 'Erro ao salvar',
@@ -140,11 +155,16 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
 
   return (
     <div className={`flex items-center justify-between p-2 bg-green-50 border-b border-green-100 ${className}`}>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-4">
         <Badge variant="outline" className="bg-white">
           Produto da Nuvemshop
         </Badge>
         <span className="font-medium truncate max-w-[200px]">{productName}</span>
+        {hasCustomBlocks && (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            Descrição personalizada
+          </Badge>
+        )}
       </div>
       
       <div className="flex items-center space-x-2">
@@ -163,3 +183,4 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
 };
 
 export default ProductEditorController;
+
