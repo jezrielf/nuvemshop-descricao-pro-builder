@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -28,7 +28,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const {
     subscriptionTier,
     subscriptionEnd,
-    setSubscriptionTier,
     refreshSubscription,
     openCustomerPortal
   } = useSubscription();
@@ -37,6 +36,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     descriptionCount,
     incrementDescriptionCount
   } = useDescriptionCount(user?.id);
+  
+  // Effect to refresh profile and subscription regularly
+  useEffect(() => {
+    // Refresh profile and subscription every 5 minutes when user is logged in
+    if (user) {
+      const refreshInterval = setInterval(() => {
+        refreshProfile();
+        refreshSubscription();
+      }, 5 * 60 * 1000); // 5 minutes
+      
+      return () => clearInterval(refreshInterval);
+    }
+  }, [user, refreshProfile, refreshSubscription]);
 
   // Memoize these values to prevent unnecessary re-renders
   const isAdminUser = Boolean(profile?.role && isAdmin(profile.role));

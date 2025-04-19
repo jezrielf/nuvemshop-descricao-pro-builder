@@ -28,9 +28,9 @@ export const useAuthSession = () => {
         return;
       }
 
+      console.log("Perfil carregado:", data);
       setProfile(data as Profile);
       profileFetchedRef.current = true;
-      console.log("Perfil carregado:", data);
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
     }
@@ -38,6 +38,7 @@ export const useAuthSession = () => {
   
   const refreshProfile = useCallback(async () => {
     if (user) {
+      console.log("Atualizando perfil do usuário...");
       profileFetchedRef.current = false;
       return fetchProfile(user.id);
     }

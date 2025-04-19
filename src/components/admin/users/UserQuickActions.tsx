@@ -20,7 +20,6 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
   const { toast } = useToast();
 
   // Convert current role to array for easier handling
-  // Handle comma-separated string roles
   const roles = getRoles(currentRole);
   
   const handleRoleChange = async (role: string) => {
@@ -44,7 +43,7 @@ const UserQuickActions: React.FC<UserQuickActionsProps> = ({
       }
       
       console.log(`Changing role: current=${roles.join(',')}, new=${newRoles.join(',')}`);
-      await onUpdateRole(profileId, newRoles);
+      await onUpdateRole(profileId, newRoles.join(','));
       
       toast({
         title: 'Papel atualizado',

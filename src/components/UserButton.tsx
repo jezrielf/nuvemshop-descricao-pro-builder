@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,11 +12,33 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, Shield, Settings } from 'lucide-react';
+import { LogOut, Shield, Settings, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getRoles } from '@/utils/roleUtils';
 
 export const UserButton: React.FC = () => {
-  const { user, profile, signOut, isAdmin, isPremium, isBusiness, openCustomerPortal } = useAuth();
+  const { 
+    user, 
+    profile, 
+    signOut, 
+    isAdmin, 
+    isPremium, 
+    isBusiness, 
+    openCustomerPortal,
+    refreshProfile
+  } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Handle manual profile refresh
+  const handleRefreshProfile = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshProfile();
+    } finally {
+      // Add a small delay to show the refresh icon animation
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+  };
 
   if (!user) {
     return (
@@ -28,6 +50,12 @@ export const UserButton: React.FC = () => {
 
   const userInitial = profile?.nome ? profile.nome[0].toUpperCase() : user.email?.[0].toUpperCase() || 'U';
   const isSubscribed = isPremium() || isBusiness();
+  
+  // Display the appropriate roles as badges
+  const roles = getRoles(profile?.role);
+  const mainRole = roles.includes('admin') ? 'admin' : 
+                    roles.includes('premium') ? 'premium' : 
+                    'user';
 
   return (
     <DropdownMenu>
@@ -44,15 +72,27 @@ export const UserButton: React.FC = () => {
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium leading-none">{profile?.nome || 'Usuário'}</p>
-              {profile?.role && (
-                <Badge variant={profile.role === 'admin' ? 'default' : 'secondary'} className="ml-2">
-                  {profile.role}
-                </Badge>
-              )}
+              <Badge variant={mainRole === 'admin' ? 'default' : 'secondary'} className="ml-2">
+                {mainRole}
+              </Badge>
             </div>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            {roles.length > 1 && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {roles.filter(r => r !== mainRole).map(role => (
+                  <Badge key={role} variant="outline" className="text-xs">
+                    {role}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleRefreshProfile} disabled={isRefreshing}>
+          <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <span>Atualizar Perfil</span>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         {isAdmin() && (
           <>
