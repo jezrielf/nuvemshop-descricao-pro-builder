@@ -3,7 +3,8 @@ import { Block } from '@/types/editor';
 import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { createBasicTextBlock } from './creators/sectionCreators';
 import { cleanupHtml } from './utils/htmlCleaner';
-import { isSimpleTextFragment } from './analyzers/sectionTypeDetector';
+import { isSimpleTextFragment } from './analyzers/utils/textFragmentAnalyzer';
+import { processCustomBlocks } from './analyzers/utils/customBlockProcessor';
 
 export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
   if (!htmlContent.trim()) {
@@ -41,24 +42,5 @@ export const parseHtmlToBlocks = (htmlContent: string): Block[] => {
     const blocks: Block[] = [];
     createBasicTextBlock(htmlContent, blocks);
     return blocks;
-  }
-};
-
-const processCustomBlocks = (doc: Document, blocks: Block[]): void => {
-  const container = doc.querySelector('.nuvemshop-product-description');
-  if (!container) return;
-  
-  const blockElements = container.querySelectorAll('[id^="product-block-"]');
-  
-  if (blockElements.length > 0) {
-    blockElements.forEach(element => {
-      if (isSimpleTextFragment(element)) {
-        createBasicTextBlock(element.innerHTML, blocks);
-      } else {
-        analyzeDocument(element, blocks);
-      }
-    });
-  } else {
-    analyzeDocument(container, blocks);
   }
 };

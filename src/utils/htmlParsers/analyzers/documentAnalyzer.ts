@@ -1,225 +1,46 @@
-import { Block, TextBlock } from '@/types/editor';
-import { createBlock } from '@/utils/blockCreators/createBlock';
-import { sanitizeHtmlContent } from './utils';
+
+import { Block } from '@/types/editor';
+import { isSimpleTextFragment, createSimpleTextBlock } from './utils/textFragmentAnalyzer';
+import { findExplicitSections, findCommonStructures } from './utils/sectionFinder';
+import { createFallbackBlock } from './utils/fallbackAnalyzer';
+import { processImageOrWrapper, analyzeContent } from './contentSplitter';
+import { splitContentIntoParts } from './contentSplitter';
 import { processHeroSection, processGallerySection, processFeatureSection, processFAQSection, processCTASection, processImageTextSection } from './sectionAnalyzers';
 import { extractMetadataFromElement } from './metadataExtractor';
 
 export const analyzeDocument = (body: Element, blocks: Block[]): void => {
-  // First, detect if this is a simple text fragment without proper HTML structure
   if (isSimpleTextFragment(body)) {
     createSimpleTextBlock(body, blocks);
     return;
   }
   
-  // Then, look for explicit section divisions
   const explicits = findExplicitSections(body);
   
   if (explicits.length > 0) {
     console.log('Found explicit sections:', explicits.length);
     explicits.forEach(section => analyzeSection(section, blocks));
   } else {
-    // If no explicit divisions, try to identify common structures
     const commonStructures = findCommonStructures(body);
     
     if (commonStructures.length > 0) {
       console.log('Found common structures:', commonStructures.length);
       commonStructures.forEach(section => analyzeSection(section, blocks));
     } else {
-      // If we don't find common structures, divide by paragraphs or elements
       console.log('Dividing content into smaller parts');
       splitContentIntoParts(body, blocks);
     }
   }
   
-  // If we couldn't create any blocks, try as a last resort
   if (blocks.length === 0) {
     console.log('No blocks created, trying last resort');
     createFallbackBlock(body, blocks);
   }
 };
 
-/**
- * Checks if the content is a simple text fragment without proper HTML structure
- */
-const isSimpleTextFragment = (element: Element): boolean => {
-  // Check if the element only contains simple text nodes, basic headings and paragraphs
-  const hasComplexElements = element.querySelector('div > div, section, article, aside, nav, footer, header');
-  if (hasComplexElements) return false;
-  
-  // Check if it's just text with basic formatting
-  const childCount = element.children.length;
-  const textLength = element.textContent?.trim().length || 0;
-  
-  // If it has few elements and is short text, it's likely a simple fragment
-  return (childCount <= 5 && textLength < 500);
-}
-
-/**
- * Creates a simple text block from a basic HTML fragment
- */
-const createSimpleTextBlock = (element: Element, blocks: Block[]): void => {
-  const textBlock = createBlock('text') as TextBlock;
-  
-  // Look for a title in a heading element
-  const heading = element.querySelector('h1, h2, h3');
-  if (heading) {
-    textBlock.title = heading.textContent?.trim() || 'Texto';
-  } else {
-    // If no heading, use first line or generic title
-    const firstLine = element.textContent?.trim().split('\n')[0];
-    textBlock.title = firstLine?.length > 30 ? 'Texto' : (firstLine || 'Texto');
-  }
-  
-  // Use the whole content, properly sanitized
-  textBlock.content = sanitizeHtmlContent(element.innerHTML);
-  
-  blocks.push(textBlock);
-  console.log('Created simple text block');
-}
-
-/**
- * Encontra seções explícitas no HTML, como div, section, article, etc.
- */
-const findExplicitSections = (container: Element): Element[] => {
-  const sections: Element[] = [];
-  
-  // Elementos que normalmente representam seções
-  const sectionElements = container.querySelectorAll('section, div, article, aside, main');
-  
-  // Filtrar para incluir apenas elementos de primeiro nível que têm conteúdo significativo
-  Array.from(sectionElements).forEach(element => {
-    // Verifica se é filho direto do container ou se tem classes de seção
-    const isDirectChild = element.parentElement === container;
-    const hasContent = element.textContent && element.textContent.trim().length > 30;
-    const hasImage = element.querySelector('img') !== null;
-    const hasSection = element.classList.contains('section') || 
-                       element.classList.contains('block') ||
-                       element.classList.contains('container');
-                       
-    if ((isDirectChild && (hasContent || hasImage)) || hasSection) {
-      sections.push(element);
-    }
-  });
-  
-  return sections;
-};
-
-/**
- * Procura por estruturas comuns como cabeçalhos seguidos de conteúdo
- */
-const findCommonStructures = (container: Element): Element[] => {
-  const structures: Element[] = [];
-  const headings = container.querySelectorAll('h1, h2, h3');
-  
-  if (headings.length === 0) {
-    return structures;
-  }
-  
-  // Para cada título, cria uma seção com ele e seu conteúdo seguinte
-  headings.forEach((heading, index) => {
-    const nextHeading = headings[index + 1];
-    const sectionElement = document.createElement('div');
-    sectionElement.appendChild(heading.cloneNode(true));
-    
-    // Adiciona todos os elementos entre este título e o próximo
-    let current = heading.nextElementSibling;
-    while (current && current !== nextHeading) {
-      sectionElement.appendChild(current.cloneNode(true));
-      current = current.nextElementSibling;
-    }
-    
-    // Só adiciona se tiver conteúdo significativo
-    if (sectionElement.textContent && sectionElement.textContent.trim().length > 20) {
-      structures.push(sectionElement);
-    }
-  });
-  
-  return structures;
-};
-
-/**
- * Divide o conteúdo em partes menores para análise
- */
-const splitContentIntoParts = (container: Element, blocks: Block[]): void => {
-  // Tentamos diferentes abordagens de divisão
-  
-  // 1. Dividir por imagens (cada imagem pode ser um bloco)
-  const images = container.querySelectorAll('img');
-  if (images.length > 0) {
-    images.forEach(img => {
-      const parent = img.parentElement || container;
-      processImageOrWrapper(parent, img as HTMLImageElement, blocks);
-    });
-    return;
-  }
-  
-  // 2. Dividir por parágrafos agrupados
-  const paragraphs = container.querySelectorAll('p');
-  if (paragraphs.length > 2) {
-    // Agrupa parágrafos em blocos de texto (máximo 3 por bloco)
-    for (let i = 0; i < paragraphs.length; i += 3) {
-      const groupElement = document.createElement('div');
-      for (let j = i; j < i + 3 && j < paragraphs.length; j++) {
-        groupElement.appendChild(paragraphs[j].cloneNode(true));
-      }
-      
-      // Cria um bloco de texto para este grupo
-      const textBlock = createBlock('text') as TextBlock;
-      textBlock.content = sanitizeHtmlContent(groupElement.innerHTML);
-      blocks.push(textBlock);
-    }
-    return;
-  }
-  
-  // 3. Se ainda não criamos blocos, processa o contêiner inteiro
-  analyzeContent(container, blocks);
-};
-
-/**
- * Processa uma imagem ou seu contêiner como um bloco
- */
-const processImageOrWrapper = (parent: Element, img: HTMLImageElement, blocks: Block[]): void => {
-  const wrapper = document.createElement('div');
-  
-  // Se o pai só tem a imagem e talvez algum texto pequeno, usamos o pai
-  if (parent.childElementCount <= 3) {
-    wrapper.innerHTML = parent.innerHTML;
-  } else {
-    // Caso contrário, criamos um wrapper com apenas a imagem
-    wrapper.appendChild(img.cloneNode(true));
-    
-    // Adicionamos o texto próximo, se existir
-    let nextElement = img.nextElementSibling;
-    if (nextElement && nextElement.tagName === 'P') {
-      wrapper.appendChild(nextElement.cloneNode(true));
-    }
-    
-    let prevElement = img.previousElementSibling;
-    if (prevElement && (prevElement.tagName === 'H2' || prevElement.tagName === 'H3')) {
-      wrapper.insertBefore(prevElement.cloneNode(true), wrapper.firstChild);
-    }
-  }
-  
-  // Processa esse wrapper como uma seção
-  analyzeSection(wrapper, blocks);
-};
-
-/**
- * Cria um bloco de fallback quando nenhuma outra técnica funcionou
- */
-const createFallbackBlock = (container: Element, blocks: Block[]): void => {
-  const textBlock = createBlock('text') as TextBlock;
-  textBlock.content = sanitizeHtmlContent(container.innerHTML);
-  textBlock.title = 'Conteúdo Importado';
-  blocks.push(textBlock);
-};
-
 export const analyzeSection = (section: Element, blocks: Block[]): void => {
-  // First check if there are explicit metadata about the section type
   const metadata = extractMetadataFromElement(section);
   
   if (metadata && metadata.confidence > 50) {
-    // Use the identified type to process the section
     switch (metadata.type) {
       case 'hero':
         processHeroSection(section, blocks);
@@ -238,32 +59,22 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
         processCTASection(section, blocks);
         return;
       case 'imageText':
+      case 'textImage':
         const imgEl = section.querySelector('img');
         if (imgEl) {
-          processImageTextSection(section, imgEl as HTMLImageElement, blocks);
+          processImageTextSection(section, imgEl as HTMLImageElement, blocks, metadata.type === 'textImage');
         } else {
           analyzeContent(section, blocks);
         }
         return;
-      case 'textImage':
-        const imgEl2 = section.querySelector('img');
-        if (imgEl2) {
-          processImageTextSection(section, imgEl2 as HTMLImageElement, blocks, true);
-        } else {
-          analyzeContent(section, blocks);
-        }
-        return;
-      // For other types, continue with the heuristic analysis
     }
   }
   
-  // If no specific type identified, analyze as simple text if it looks like one
   if (isSimpleTextFragment(section)) {
     createSimpleTextBlock(section, blocks);
     return;
   }
   
-  // Análise heurística baseada no conteúdo
   const hasHeroFeatures = 
     section.classList.contains('hero') || 
     section.classList.contains('banner') ||
@@ -313,42 +124,7 @@ export const analyzeSection = (section: Element, blocks: Block[]): void => {
     return;
   }
   
-  // Se não identificou nenhum tipo específico, processa como conteúdo genérico
   analyzeContent(section, blocks);
 };
 
-export const analyzeContent = (element: Element, blocks: Block[]): void => {
-  const text = element.textContent?.trim();
-  if (!text || text.length === 0) return;
-  
-  // Verifica o tipo de conteúdo
-  const hasLists = element.querySelectorAll('li').length > 3;
-  const hasImagesCount = element.querySelectorAll('img').length;
-  const hasHeadings = element.querySelectorAll('h1, h2, h3, h4, h5, h6').length > 0;
-  
-  if (hasImagesCount && hasImagesCount > 2) {
-    const images = element.querySelectorAll('img');
-    processGallerySection(element, images, blocks);
-  } else if (hasImagesCount === 1) {
-    const image = element.querySelector('img');
-    if (image) {
-      processImageTextSection(element, image as HTMLImageElement, blocks);
-    }
-  } else if (hasLists) {
-    processFeatureSection(element, blocks);
-  } else {
-    // Cria um bloco de texto simples
-    const textBlock = createBlock('text') as TextBlock;
-    
-    // Define o título se houver um cabeçalho
-    if (hasHeadings) {
-      const heading = element.querySelector('h1, h2, h3, h4, h5, h6');
-      if (heading) {
-        textBlock.title = heading.textContent || textBlock.title;
-      }
-    }
-    
-    textBlock.content = sanitizeHtmlContent(element.innerHTML);
-    blocks.push(textBlock);
-  }
-};
+export { analyzeContent };
