@@ -31,7 +31,8 @@ export const splitContentIntoParts = (container: Element, blocks: Block[]): void
   analyzeContent(container, blocks);
 };
 
-const processImageOrWrapper = (parent: Element, img: HTMLImageElement, blocks: Block[]): void => {
+// Add export to this function to fix the error
+export const processImageOrWrapper = (parent: Element, img: HTMLImageElement, blocks: Block[]): void => {
   const wrapper = document.createElement('div');
   
   if (parent.childElementCount <= 3) {
