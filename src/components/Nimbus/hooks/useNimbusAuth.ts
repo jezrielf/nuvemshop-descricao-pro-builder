@@ -13,48 +13,18 @@ export const useNimbusAuth = () => {
   const { toast } = useToast();
 
   const handleConnect = useCallback(async () => {
+    // Implementar o fluxo de autorização da Nimbus
+    // Documentação: https://dev.nuvemshop.com.br/docs/developer-tools/nimbus/authorization
     setAuthenticating(true);
     setError(null);
 
     try {
-      // TODO: Implement Nimbus OAuth flow
-      // This is a placeholder that simulates authentication
-      const mockCode = "nimbus_test_code";
-      
-      const { data, error: authError } = await supabase.functions.invoke('nimbus-auth', {
-        body: { code: mockCode }
-      });
-
-      if (authError) throw authError;
-
-      if (data) {
-        const { access_token, user_id, store_name } = data;
-
-        const { error: storeError } = await supabase
-          .from('ecommerce_stores')
-          .insert({
-            access_token,
-            user_id: user_id,
-            store_id: parseInt(user_id),
-            name: store_name,
-            platform: 'nimbus',
-            url: 'https://nimbus.example.com' // Placeholder URL
-          });
-
-        if (storeError) throw storeError;
-
-        setUserId(user_id);
-        setStoreName(store_name);
-        setSuccess(true);
-        
-        toast({
-          title: 'Loja conectada com sucesso',
-          description: `A loja ${store_name} foi conectada com sucesso.`
-        });
-      }
+      // TODO: Implementar redirect para URL de autorização da Nimbus
+      const authorizationUrl = 'https://api.nuvemshop.com.br/v1/authorize?...';
+      window.location.href = authorizationUrl;
     } catch (err) {
-      console.error('Error connecting to Nimbus:', err);
-      setError('Erro ao conectar com a Nimbus');
+      console.error('Erro ao iniciar conexão com Nimbus:', err);
+      setError('Não foi possível iniciar a conexão com a Nimbus');
       toast({
         title: 'Erro de conexão',
         description: 'Não foi possível conectar com a Nimbus.',
@@ -62,7 +32,6 @@ export const useNimbusAuth = () => {
       });
     } finally {
       setAuthenticating(false);
-      setLoading(false);
     }
   }, [toast]);
 
@@ -87,7 +56,7 @@ export const useNimbusAuth = () => {
         description: 'A loja Nimbus foi desconectada.'
       });
     } catch (err) {
-      console.error('Error disconnecting from Nimbus:', err);
+      console.error('Erro ao desconectar da Nimbus:', err);
       setError('Erro ao desconectar da Nimbus');
       toast({
         title: 'Erro ao desconectar',
@@ -95,6 +64,57 @@ export const useNimbusAuth = () => {
         variant: 'destructive'
       });
     } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  const handleCallback = useCallback(async (code: string) => {
+    // Implementar troca de código de autorização por token
+    setAuthenticating(true);
+    setError(null);
+
+    try {
+      const { data, error: authError } = await supabase.functions.invoke('nimbus-auth', {
+        body: { code }
+      });
+
+      if (authError) throw authError;
+
+      if (data) {
+        const { access_token, user_id, store_name } = data;
+
+        const { error: storeError } = await supabase
+          .from('ecommerce_stores')
+          .insert({
+            access_token,
+            user_id: user_id,
+            store_id: parseInt(user_id),
+            name: store_name,
+            platform: 'nimbus',
+            url: 'https://nimbus.com.br' // URL temporária
+          });
+
+        if (storeError) throw storeError;
+
+        setUserId(user_id);
+        setStoreName(store_name);
+        setSuccess(true);
+        
+        toast({
+          title: 'Loja conectada com sucesso',
+          description: `A loja ${store_name} foi conectada com sucesso.`
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao processar callback da Nimbus:', err);
+      setError('Erro ao conectar com a Nimbus');
+      toast({
+        title: 'Erro de conexão',
+        description: 'Não foi possível processar a autorização da Nimbus.',
+        variant: 'destructive'
+      });
+    } finally {
+      setAuthenticating(false);
       setLoading(false);
     }
   }, [toast]);
@@ -107,6 +127,7 @@ export const useNimbusAuth = () => {
     userId,
     storeName,
     handleConnect,
-    handleDisconnect
+    handleDisconnect,
+    handleCallback
   };
 };

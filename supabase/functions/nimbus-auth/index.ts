@@ -15,30 +15,30 @@ serve(async (req) => {
     const { code } = await req.json()
 
     if (!code) {
-      return new Response(JSON.stringify({ error: 'Authorization code is required' }), { 
+      return new Response(JSON.stringify({ error: 'Código de autorização da Nimbus é obrigatório' }), { 
         status: 400, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       })
     }
 
-    console.log(`Received authorization code: ${code}`)
+    console.log(`Código de autorização Nimbus recebido: ${code}`)
 
-    // TODO: Implement Nimbus OAuth flow once we have their API credentials
-    // This is a placeholder that returns mock data for now
+    // TODO: Implementar troca de código por token na API da Nimbus
     const mockData = {
       access_token: "nimbus_mock_token",
       user_id: "nimbus_user_123",
-      store_name: "Nimbus Test Store",
+      store_name: "Loja Teste Nimbus",
+      expires_in: 3600
     }
 
     return new Response(JSON.stringify(mockData), { 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     })
   } catch (error) {
-    console.error('Error processing request:', error)
+    console.error('Erro ao processar solicitação:', error)
     
     return new Response(JSON.stringify({ 
-      error: 'Internal server error', 
+      error: 'Erro interno do servidor', 
       details: error.message 
     }), { 
       status: 500, 
