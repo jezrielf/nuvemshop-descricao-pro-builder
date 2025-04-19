@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNexoAuth } from '@/components/Nuvemshop/hooks/useNexoAuth';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { AlertCircle, CheckCircle, ExternalLink } from 'lucide-react';
+import { AlertCircle, CheckCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export const NexoStatus: React.FC = () => {
@@ -57,7 +57,12 @@ export const NexoStatus: React.FC = () => {
         <AlertDescription className="text-red-700 mt-2">
           <p>{authError}</p>
           <div className="mt-4">
-            <Button onClick={() => window.location.reload()} variant="outline" className="text-red-600 border-red-300">
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="outline" 
+              className="text-red-600 border-red-300 flex items-center"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
               Tentar novamente
             </Button>
           </div>

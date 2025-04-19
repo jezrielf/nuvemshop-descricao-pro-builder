@@ -13,12 +13,37 @@ import ProductEditorController from '@/components/Nuvemshop/components/ProductEd
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { useNexoAuth } from '../hooks/useNexoAuth';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { ErrorBoundary } from 'react-error-boundary';
+
+// Componente para exibir erros de script
+const ScriptErrorFallback = ({ error, resetErrorBoundary }) => (
+  <div className="p-8 text-center">
+    <Alert className="max-w-2xl mx-auto border-red-200 bg-red-50">
+      <AlertCircle className="h-5 w-5 text-red-600" />
+      <AlertTitle className="text-red-600 text-lg font-medium">
+        Erro ao carregar SDK do Nexo
+      </AlertTitle>
+      <AlertDescription className="mt-2 text-gray-600">
+        <p className="mb-4">Não foi possível carregar o SDK do Nexo: {error.message}</p>
+        <button 
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={resetErrorBoundary}
+        >
+          Tentar novamente
+        </button>
+      </AlertDescription>
+    </Alert>
+  </div>
+);
 
 // Componente para carregar o script do Nexo
 const NexoScript: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const [scriptError, setScriptError] = useState(false);
+  const [scriptError, setScriptError] = useState<Error | null>(null);
   const [loadRetries, setLoadRetries] = useState(0);
+  const maxRetries = 5;
 
   useEffect(() => {
     // Função para verificar se o script já está carregado
@@ -34,19 +59,19 @@ const NexoScript: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         return;
       }
 
-      // Verifica se já existe um script do Nexo carregado
+      // Remove qualquer tentativa anterior para evitar duplicação
       const existingScript = document.getElementById('nexo-sdk-script');
-      if (existingScript) {
-        console.log('Elemento script do Nexo já existe no DOM, aguardando carregamento.');
-        return;
+      if (existingScript && existingScript.parentNode) {
+        existingScript.parentNode.removeChild(existingScript);
       }
 
       // Se estamos em ambiente de desenvolvimento ou produção fora do Nexo,
       // não precisamos carregar o script, pois usaremos detecção de ambiente
-      const isNexoEnvironment = 
-        window.location.href.includes('mystore.nuvemshop.com.br') || 
-        window.location.href.includes('mystore.tiendanube.com') || 
-        window.location.href.includes('nimbus-app');
+      const isNexoEnvironment = window.location.href.includes('mystore.nuvemshop.com.br') || 
+                               window.location.href.includes('mystore.tiendanube.com') || 
+                               window.location.href.includes('admin/v2/apps/17194') ||
+                               window.location.href.includes('admin/apps/17194') ||
+                               window.location.href.includes('nimbus-app');
 
       if (!isNexoEnvironment) {
         console.log('Não estamos em ambiente Nexo, pulando carregamento do script.');
@@ -55,7 +80,7 @@ const NexoScript: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       }
 
       // Criar e adicionar o script à página
-      console.log('Carregando SDK do Nexo...');
+      console.log(`Tentativa ${loadRetries + 1} de ${maxRetries} para carregar o SDK do Nexo...`);
       const script = document.createElement('script');
       script.id = 'nexo-sdk-script';
       script.src = 'https://nexo.nuvemshop.com.br/sdk.js';
@@ -63,20 +88,22 @@ const NexoScript: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       script.onload = () => {
         console.log('SDK do Nexo carregado com sucesso!');
         setScriptLoaded(true);
+        setScriptError(null);
       };
       
-      script.onerror = (error) => {
-        console.error('Erro ao carregar SDK do Nexo:', error);
-        setScriptError(true);
+      script.onerror = (event) => {
+        console.error('Erro ao carregar SDK do Nexo:', event);
+        const error = new Error('Falha ao carregar o SDK do Nexo. Verifique sua conexão de internet ou se o SDK está disponível.');
+        setScriptError(error);
         
-        // Tenta recarregar o script até 3 vezes
-        if (loadRetries < 3) {
-          console.log(`Tentativa ${loadRetries + 1} de 3 para carregar o SDK do Nexo...`);
+        // Tenta recarregar o script até o número máximo de tentativas
+        if (loadRetries < maxRetries - 1) {
+          console.log(`Tentativa ${loadRetries + 1} de ${maxRetries} para carregar o SDK do Nexo falhou. Tentando novamente...`);
           setTimeout(() => {
             setLoadRetries(prev => prev + 1);
-            // Remove o script com erro para tentar novamente
-            document.body.removeChild(script);
           }, 2000);
+        } else {
+          console.error(`Todas as ${maxRetries} tentativas de carregar o SDK do Nexo falharam.`);
         }
       };
       
@@ -94,31 +121,14 @@ const NexoScript: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     };
   }, [loadRetries]);
 
-  if (scriptError && loadRetries >= 3) {
-    return (
-      <div className="p-4 bg-red-50 text-red-700 rounded-md">
-        <h3 className="font-bold mb-2">Erro ao carregar o SDK do Nexo</h3>
-        <p>Não foi possível carregar o SDK do Nexo após várias tentativas.</p>
-        <p className="mt-2">Verifique se:</p>
-        <ul className="list-disc list-inside mt-1">
-          <li>Você está acessando o aplicativo a partir do painel da Nuvemshop</li>
-          <li>O aplicativo está instalado corretamente na sua loja</li>
-          <li>Sua conexão de internet está estável</li>
-        </ul>
-        <button 
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={() => setLoadRetries(0)}
-        >
-          Tentar novamente
-        </button>
-      </div>
-    );
+  if (scriptError) {
+    throw scriptError;
   }
 
   if (!scriptLoaded) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <LoadingSpinner text="Carregando SDK do Nexo..." />
+        <LoadingSpinner text={`Carregando SDK do Nexo (tentativa ${loadRetries + 1}/${maxRetries})...`} />
       </div>
     );
   }
@@ -156,15 +166,28 @@ const NexoAppContent: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Descritor Pro</h1>
       
       {!isNexoEnabled ? (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
-          <p className="text-yellow-700">
-            Esta aplicação está sendo executada fora do ambiente Nexo da Nuvemshop.
-          </p>
-        </div>
+        <Alert className="mb-4 border-amber-200 bg-amber-50">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-600 font-medium">
+            Ambiente Nexo não detectado
+          </AlertTitle>
+          <AlertDescription className="text-amber-700 mt-2">
+            <p>
+              Esta aplicação está sendo executada fora do ambiente Nexo da Nuvemshop.
+              Para usar este aplicativo, acesse-o através do painel da sua loja Nuvemshop.
+            </p>
+          </AlertDescription>
+        </Alert>
       ) : authError ? (
-        <div className="bg-red-50 border border-red-200 p-4 rounded-md">
-          <p className="text-red-700">{authError}</p>
-        </div>
+        <Alert className="mb-4 border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertTitle className="text-red-600 font-medium">
+            Erro de autenticação
+          </AlertTitle>
+          <AlertDescription className="text-red-700 mt-2">
+            <p>{authError}</p>
+          </AlertDescription>
+        </Alert>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -200,16 +223,18 @@ const NexoAppContent: React.FC = () => {
 export const NexoAppRoot: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <NexoScript>
-        <NexoProvider>
-          <TooltipProvider>
-            <NexoLayout>
-              <NexoAppContent />
-            </NexoLayout>
-            <Toaster />
-          </TooltipProvider>
-        </NexoProvider>
-      </NexoScript>
+      <ErrorBoundary FallbackComponent={ScriptErrorFallback} onReset={() => window.location.reload()}>
+        <NexoScript>
+          <NexoProvider>
+            <TooltipProvider>
+              <NexoLayout>
+                <NexoAppContent />
+              </NexoLayout>
+              <Toaster />
+            </TooltipProvider>
+          </NexoProvider>
+        </NexoScript>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 };

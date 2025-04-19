@@ -33,9 +33,22 @@ export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
           </AlertTitle>
           <AlertDescription className="mt-2 text-gray-600">
             <p className="mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()} variant="outline">
-              Tentar novamente
-            </Button>
+            <p className="text-sm text-gray-500 mb-4">
+              Verifique se você está acessando este aplicativo através do painel da sua loja Nuvemshop 
+              e que possui as permissões necessárias.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Tentar novamente
+              </Button>
+              <Button 
+                onClick={() => window.open('https://ajuda.nuvemshop.com.br', '_blank')}
+                variant="outline" 
+                className="ml-2"
+              >
+                Central de Ajuda
+              </Button>
+            </div>
           </AlertDescription>
         </Alert>
       </div>
@@ -50,6 +63,7 @@ export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
           {store && (
             <div className="nexo-store-info mb-2">
               <h2 className="text-lg font-medium">Loja: {store.name}</h2>
+              <p className="text-sm text-gray-500">ID: {store.id} • URL: {store.url}</p>
             </div>
           )}
         </div>
@@ -60,6 +74,20 @@ export const NexoLayout: React.FC<NexoLayoutProps> = ({ children }) => {
     );
   }
 
-  // Se não estiver no ambiente Nexo, renderizar normalmente
-  return <>{children}</>;
+  // Se não estiver no ambiente Nexo, renderizar uma mensagem informativa
+  return (
+    <div className="p-4">
+      <Alert className="mb-4 border-amber-200 bg-amber-50">
+        <AlertCircle className="h-4 w-4 text-amber-600" />
+        <AlertTitle className="text-amber-600 font-medium">
+          Ambiente Nexo não detectado
+        </AlertTitle>
+        <AlertDescription className="text-amber-700 mt-2">
+          <p>Esta aplicação deve ser acessada através do painel administrativo da Nuvemshop.</p>
+          <p className="mt-2">Para utilizar todas as funcionalidades, instale este aplicativo na sua loja Nuvemshop.</p>
+        </AlertDescription>
+      </Alert>
+      {children}
+    </div>
+  );
 };

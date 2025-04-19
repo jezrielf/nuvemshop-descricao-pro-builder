@@ -56,14 +56,22 @@ export const NexoProvider: React.FC<NexoProviderProps> = ({ children }) => {
   const [isNexoEnabled, setIsNexoEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [initAttempt, setInitAttempt] = useState(0);
+  const maxInitAttempts = 3;
 
   // Função para verificar se estamos executando dentro do Nexo
   const checkIfNexoEnvironment = () => {
+    const url = window.location.href.toLowerCase();
+    
+    // Verificar vários padrões de URL que podem indicar ambiente Nexo
     return (
       typeof window !== 'undefined' && 
-      (window.location.href.includes('mystore.nuvemshop.com.br') || 
-       window.location.href.includes('mystore.tiendanube.com') ||
-       window.location.href.includes('nimbus-app'))
+      (url.includes('mystore.nuvemshop.com.br') || 
+       url.includes('mystore.tiendanube.com') ||
+       url.includes('lojavirtualnuvem.com.br') ||
+       url.includes('admin/v2/apps/17194') ||
+       url.includes('admin/apps/17194') ||
+       url.includes('nimbus-app'))
     );
   };
 
@@ -77,6 +85,7 @@ export const NexoProvider: React.FC<NexoProviderProps> = ({ children }) => {
         setIsNexoEnabled(isNexoEnv);
         
         if (!isNexoEnv) {
+          console.log("Não estamos em ambiente Nexo. Pulando inicialização do SDK.");
           // Não estamos no ambiente Nexo, então finalizamos carregamento
           setIsLoading(false);
           return;
@@ -84,6 +93,8 @@ export const NexoProvider: React.FC<NexoProviderProps> = ({ children }) => {
 
         // Verificamos se o objeto Nexo está disponível no escopo global (window)
         if (typeof window !== 'undefined' && 'Nexo' in window) {
+          console.log(`Tentativa ${initAttempt + 1}/${maxInitAttempts} de inicializar Nexo...`);
+          
           try {
             // @ts-ignore - O tipo global Nexo não está definido no TypeScript
             const nexoClient = await window.Nexo.initialize();
@@ -102,28 +113,46 @@ export const NexoProvider: React.FC<NexoProviderProps> = ({ children }) => {
               setStore(storeData);
               setUser(userData);
               setAccessToken(token);
+              setError(null);
             } catch (nexoError) {
               console.error('Erro ao obter dados do Nexo:', nexoError);
-              setError('Não foi possível obter informações da loja no painel Nuvemshop');
+              setError('Não foi possível obter informações da loja no painel Nuvemshop. Verifique suas permissões.');
             }
           } catch (initError) {
             console.error('Erro ao inicializar cliente Nexo:', initError);
-            setError('Falha ao inicializar o cliente Nexo');
+            setError('Falha ao inicializar o cliente Nexo. Tente recarregar a página.');
+            
+            // Tenta novamente se ainda não atingiu o limite de tentativas
+            if (initAttempt < maxInitAttempts - 1) {
+              setTimeout(() => {
+                setInitAttempt(prev => prev + 1);
+              }, 2000);
+            }
           }
         } else {
-          console.log('Nexo SDK não disponível globalmente. Verificando se estamos em ambiente de desenvolvimento ou fora do contexto Nexo.');
-          setError('SDK do Nexo não disponível. Verifique se a aplicação está sendo executada dentro do painel Nuvemshop.');
+          console.log('Nexo SDK não disponível globalmente ou ainda não carregado.');
+          
+          if (initAttempt < maxInitAttempts - 1) {
+            // Se estamos em ambiente Nexo mas o SDK ainda não foi carregado, tenta novamente
+            setTimeout(() => {
+              setInitAttempt(prev => prev + 1);
+            }, 3000);
+          } else {
+            setError('SDK do Nexo não disponível após várias tentativas. Verifique se a aplicação está sendo executada dentro do painel Nuvemshop.');
+          }
         }
       } catch (err) {
         console.error('Erro ao inicializar Nexo:', err);
-        setError('Falha ao inicializar integração com o painel Nuvemshop');
+        setError('Falha ao inicializar integração com o painel Nuvemshop. Tente recarregar a página.');
       } finally {
-        setIsLoading(false);
+        if (initAttempt >= maxInitAttempts - 1 || !checkIfNexoEnvironment()) {
+          setIsLoading(false);
+        }
       }
     };
 
     initializeNexo();
-  }, []);
+  }, [initAttempt]);
 
   const value = {
     app,
