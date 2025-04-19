@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { NuvemshopProduct } from '../types';
 import { useEditorStore } from '@/store/editor';
@@ -24,17 +25,6 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const { toast } = useToast();
   const { description, getHtmlOutput, createNewDescription, loadDescription } = useEditorStore();
 
-  // Verifique se a descrição foi modificada anteriormente
-  const wasModifiedBefore = (description: string): boolean => {
-    try {
-      // Se a descrição contém nossa div wrapper, foi modificada
-      return description.includes('nuvemshop-product-description');
-    } catch (error) {
-      console.error('Error checking if description was modified:', error);
-      return false;
-    }
-  };
-
   // Parse product HTML description and convert to our block format
   const loadProductDescription = (product: NuvemshopProduct) => {
     try {
@@ -47,6 +37,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
       
       // Check if the product has an existing description to load
       if (product.description) {
+        // Get product description as HTML string
         const htmlDescription = typeof product.description === 'string'
           ? product.description
           : (product.description.pt || '');
@@ -55,40 +46,25 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
           try {
             console.log('Parsing HTML description:', htmlDescription);
             
-            // Se a descrição já foi modificada anteriormente, preserve a estrutura
-            if (wasModifiedBefore(htmlDescription)) {
-              console.log('Loading previously modified description');
-              // Use o analisador de documento para manter a estrutura
-              const blocks = parseHtmlToBlocks(htmlDescription, true);
-              loadDescription({
-                id: description?.id || 'imported-' + Date.now(),
-                name: `Descrição: ${productName}`,
-                blocks: blocks,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              });
-              
-              toast({
-                title: 'Descrição carregada',
-                description: 'A descrição existente do produto foi carregada para edição.',
-              });
-            } else {
-              console.log('Converting new description to blocks');
-              // Para novas descrições, use o analisador de documento mais detalhado
-              const blocks = parseHtmlToBlocks(htmlDescription, false);
-              loadDescription({
-                id: description?.id || 'imported-' + Date.now(),
-                name: `Descrição: ${productName}`,
-                blocks: blocks,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              });
-              
-              toast({
-                title: 'Descrição convertida',
-                description: 'A descrição do produto foi convertida em blocos editáveis.',
-              });
-            }
+            // Use our new parseHtmlToBlocks function to convert HTML to block format
+            const blocks = parseHtmlToBlocks(htmlDescription);
+            
+            // Create a description object with the parsed blocks
+            const parsedDescription = {
+              id: description?.id || 'imported-' + Date.now(),
+              name: `Descrição: ${productName}`,
+              blocks: blocks,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            
+            // Load the parsed description into the editor
+            loadDescription(parsedDescription);
+            
+            toast({
+              title: 'Descrição carregada',
+              description: 'A descrição existente do produto foi carregada para edição.',
+            });
           } catch (parseError) {
             console.error('Error parsing HTML description:', parseError);
             toast({

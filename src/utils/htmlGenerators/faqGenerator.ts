@@ -14,33 +14,39 @@ export const generateFAQHtml = (block: FAQBlock): string => {
         
         return `
           <div style="${itemBottomStyle}border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;">
-            <details class="faq-item">
-              <summary style="padding:12px 16px;background-color:#f9fafb;font-weight:500;cursor:pointer;position:relative;display:flex;justify-content:space-between;align-items:center;list-style:none;">
-                ${item.question}
-                <span style="font-size:18px;">+</span>
-              </summary>
-              <div style="padding:16px;background-color:white;">
-                ${item.answer}
-              </div>
-            </details>
+            <input type="checkbox" id="faq-${block.id}-${index}" style="display:none;">
+            <label for="faq-${block.id}-${index}" style="padding:12px 16px;background-color:#f9fafb;font-weight:500;cursor:pointer;position:relative;display:block;">
+              ${item.question}
+              <span style="position:absolute;right:16px;top:12px;font-size:18px;transition:transform 0.3s ease;">+</span>
+            </label>
+            <div style="max-height:0;overflow:hidden;background-color:white;transition:max-height 0.3s ease;">
+              <div style="padding:16px;">${item.answer}</div>
+            </div>
           </div>
         `;
       }).join('')
     : '';
   
-  // Additional CSS to style the details/summary elements
-  const faqStyle = `
-    <style>
-      .faq-item summary::-webkit-details-marker {
-        display: none;
-      }
-      .faq-item[open] summary span {
-        transform: rotate(45deg);
-      }
-      .faq-item summary span {
-        transition: transform 0.3s ease;
-      }
-    </style>
+  // JavaScript to handle the FAQ toggle behavior inline
+  const faqScript = `
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var toggles = document.querySelectorAll('#faq-block-${block.id} input[type="checkbox"]');
+        toggles.forEach(function(toggle) {
+          toggle.addEventListener('change', function() {
+            var answer = this.nextElementSibling.nextElementSibling;
+            var icon = this.nextElementSibling.querySelector('span');
+            if (this.checked) {
+              answer.style.maxHeight = '1000px';
+              icon.style.transform = 'rotate(45deg)';
+            } else {
+              answer.style.maxHeight = '0';
+              icon.style.transform = 'rotate(0)';
+            }
+          });
+        });
+      });
+    </script>
   `;
   
   // Complete FAQ block HTML with all styles inlined
@@ -50,7 +56,7 @@ export const generateFAQHtml = (block: FAQBlock): string => {
       <div style="border-radius:4px;">
         ${faqHtml}
       </div>
-      ${faqStyle}
+      ${faqScript}
     </div>
   `;
 };

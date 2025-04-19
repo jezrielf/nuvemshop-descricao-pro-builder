@@ -9,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Trash2, PlusCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface FAQBlockProps {
   block: FAQBlockType;
@@ -57,19 +56,16 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
     return (
       <div className="w-full p-4">
         <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
-        <div className="w-full space-y-2">
-          {block.questions && block.questions.map((item) => (
-            <Collapsible key={item.id} className="border rounded-md overflow-hidden">
-              <CollapsibleTrigger className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left flex justify-between items-center">
-                {item.question}
-                <span className="text-lg">+</span>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="p-4 bg-white">
+        <Accordion type="single" collapsible className="w-full">
+          {block.questions && block.questions.map((item, index) => (
+            <AccordionItem key={item.id} value={item.id}>
+              <AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
+              <AccordionContent>
                 <div dangerouslySetInnerHTML={{ __html: item.answer }} />
-              </CollapsibleContent>
-            </Collapsible>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </div>
     );
   }

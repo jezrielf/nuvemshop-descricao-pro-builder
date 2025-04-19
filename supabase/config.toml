@@ -6,8 +6,3 @@ project_id = "zeiodratpawnnbgnflvi"
 verify_jwt = false
 [functions.nuvemshop-products]
 verify_jwt = false
-[functions.sync-product-analytics]
-verify_jwt = true
-[functions.nimbus-auth]
-verify_jwt = false
-

@@ -1,11 +1,12 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 import { ProductDescription } from '@/types/editor';
 import { AnalyzerDialogHeader } from './components/AnalyzerDialogHeader';
 import { AnalyzerDialogContent } from './components/AnalyzerDialogContent';
 import { useSEODialog } from './hooks/useSEODialog';
-import { calculateDialogTiming, isDialogTimingAcceptable } from '../utils/contentUtils';
 
 interface SEOAnalyzerProps {
   description: ProductDescription | null;
@@ -22,40 +23,12 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
     handleAnalyze
   } = useSEODialog(description);
   
-  const openTimeRef = useRef<number>(0);
-  
-  useEffect(() => {
-    if (open) {
-      openTimeRef.current = Date.now();
-    } else if (openTimeRef.current > 0) {
-      const timing = calculateDialogTiming(openTimeRef.current);
-      const isAcceptable = isDialogTimingAcceptable(timing);
-      console.log(`Dialog timing: ${timing}ms (${isAcceptable ? 'acceptable' : 'slow'})`);
-      openTimeRef.current = 0;
-    }
-  }, [open]);
-  
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpen(true);
-  };
-  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button 
-          className="w-full text-left py-1.5 px-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          onClick={handleClick}
-          data-testid="seo-analyzer"
-        >
-          Analisador SEO
-        </button>
+        <span className="w-full">Ferramentas SEO</span>
       </DialogTrigger>
-      <DialogContent 
-        className="max-w-md max-h-[85vh] flex flex-col overflow-hidden p-3" 
-        onClick={(e) => e.stopPropagation()}
-      >
+      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
         <AnalyzerDialogHeader />
         <div className="flex-grow overflow-hidden">
           <AnalyzerDialogContent

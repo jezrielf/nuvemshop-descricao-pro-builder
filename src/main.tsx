@@ -2,6 +2,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 
 // Certifica-se de que o elemento root existe antes de renderizar
@@ -14,9 +15,11 @@ if (!rootElement) {
 const root = createRoot(rootElement);
 console.log("Root element encontrado, renderizando aplicação...");
 root.render(
-  <AuthProvider>
-    <App />
-  </AuthProvider>
+  <BrowserRouter>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </BrowserRouter>
 );
 
 // Adiciona um log para debug

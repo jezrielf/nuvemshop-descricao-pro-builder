@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProductDescription } from '@/types/editor';
@@ -11,26 +10,12 @@ interface ImageOptimizerProps {
 const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateImage }) => {
   const [open, setOpen] = useState(false);
   
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpen(true);
-  };
-  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button 
-          className="w-full text-left py-1.5 px-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          onClick={handleClick}
-        >
-          Otimizar Imagens
-        </button>
+        <span className="w-full">Otimizar Imagens</span>
       </DialogTrigger>
-      <DialogContent 
-        className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
         <h2 className="text-xl font-bold mb-4">Otimizador de Imagens</h2>
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
@@ -53,8 +38,9 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                           <span className="font-medium">{block.title || 'Imagem'}</span>
                           <button 
                             className="text-xs text-blue-600 hover:underline"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
+                              // Optimize image logic would go here
+                              // For now, just a placeholder
                               onUpdateImage(block.id, 'imageUrl', block.imageUrl);
                             }}
                           >
@@ -93,8 +79,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                         </div>
                         <button 
                           className="text-xs text-blue-600 hover:underline"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                          onClick={() => {
                             // Optimize gallery logic would go here
                           }}
                         >
@@ -111,8 +96,8 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                           <span className="font-medium">Banner Hero</span>
                           <button 
                             className="text-xs text-blue-600 hover:underline"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
+                              // Optimize hero image logic would go here
                               onUpdateImage(block.id, 'imageUrl', block.imageUrl);
                             }}
                           >

@@ -18,23 +18,15 @@ export const useDeletePlan = (
     try {
       setLoading(true);
       
-      const result = await adminService.deletePlan(plan.id);
+      await adminService.deletePlan(plan.id);
       
-      if (result.success) {
-        toast({
-          title: 'Plano excluído',
-          description: `O plano "${plan.name}" foi excluído com sucesso.`,
-        });
-        
-        // Refresh plans list
-        await fetchPlans();
-      } else {
-        toast({
-          title: 'Erro ao excluir plano',
-          description: result.error || 'Ocorreu um erro ao excluir o plano.',
-          variant: 'destructive',
-        });
-      }
+      toast({
+        title: 'Plano excluído',
+        description: `O plano "${plan.name}" foi excluído com sucesso.`,
+      });
+      
+      // Refresh plans list
+      await fetchPlans();
       
       // Close the dialog
       setIsDeleteDialogOpen(false);

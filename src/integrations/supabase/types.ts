@@ -9,52 +9,12 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      analytics_snapshots: {
-        Row: {
-          created_at: string | null
-          date: string
-          id: string
-          platform: string
-          product_id: number
-          revenue: number | null
-          sales: number | null
-          store_id: number
-          user_id: string
-          visits: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          date: string
-          id?: string
-          platform?: string
-          product_id: number
-          revenue?: number | null
-          sales?: number | null
-          store_id: number
-          user_id: string
-          visits?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          date?: string
-          id?: string
-          platform?: string
-          product_id?: number
-          revenue?: number | null
-          sales?: number | null
-          store_id?: number
-          user_id?: string
-          visits?: number | null
-        }
-        Relationships: []
-      }
-      ecommerce_stores: {
+      nuvemshop_stores: {
         Row: {
           access_token: string
           connected_at: string
           id: string
           name: string
-          platform: string
           scope: string | null
           store_id: number
           url: string
@@ -65,7 +25,6 @@ export type Database = {
           connected_at?: string
           id?: string
           name: string
-          platform?: string
           scope?: string | null
           store_id: number
           url: string
@@ -76,53 +35,10 @@ export type Database = {
           connected_at?: string
           id?: string
           name?: string
-          platform?: string
           scope?: string | null
           store_id?: number
           url?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      product_performance: {
-        Row: {
-          created_at: string | null
-          description_updated_at: string | null
-          id: string
-          platform: string
-          product_id: number
-          revenue: number | null
-          sales: number | null
-          store_id: number
-          updated_at: string | null
-          user_id: string
-          visits: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          description_updated_at?: string | null
-          id?: string
-          platform?: string
-          product_id: number
-          revenue?: number | null
-          sales?: number | null
-          store_id: number
-          updated_at?: string | null
-          user_id: string
-          visits?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          description_updated_at?: string | null
-          id?: string
-          platform?: string
-          product_id?: number
-          revenue?: number | null
-          sales?: number | null
-          store_id?: number
-          updated_at?: string | null
-          user_id?: string
-          visits?: number | null
         }
         Relationships: []
       }
@@ -281,7 +197,6 @@ export type Database = {
           connected_at: string
           id: string
           name: string
-          platform: string
           scope: string | null
           store_id: number
           url: string

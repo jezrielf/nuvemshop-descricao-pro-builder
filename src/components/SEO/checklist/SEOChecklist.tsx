@@ -1,12 +1,14 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProductDescription } from '@/types/editor';
+import { CheckCircle, Circle, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useSEOChecklist } from './hooks/useSEOChecklist';
-import { CategoryChecks } from './components/CategoryChecks';
-import { X } from 'lucide-react';
 
 interface SEOChecklistProps {
   description: ProductDescription | null;
@@ -15,63 +17,70 @@ interface SEOChecklistProps {
 const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
   const [open, setOpen] = useState(false);
   const { checklistItems, progress } = useSEOChecklist(description);
-  const openTimeRef = useRef<number>(0);
-  
-  useEffect(() => {
-    if (open) {
-      openTimeRef.current = Date.now();
-    } else if (openTimeRef.current > 0) {
-      const timing = Date.now() - openTimeRef.current;
-      const isAcceptable = timing <= 500; // 500ms is ideal timing
-      console.log(`Checklist dialog timing: ${timing}ms (${isAcceptable ? 'acceptable' : 'slow'})`);
-      openTimeRef.current = 0;
-    }
-  }, [open]);
-  
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpen(true);
-  };
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button 
-          className="w-full text-left py-1.5 px-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          onClick={handleClick}
-          data-testid="seo-checklist"
-        >
-          Checklist SEO
-        </button>
+        <span className="w-full">Checklist SEO</span>
       </DialogTrigger>
-      <DialogContent 
-        className="max-w-sm p-0 overflow-auto max-h-[85vh] border rounded-md shadow-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-between items-center p-3 border-b">
-          <h2 className="text-base font-semibold">Checklist SEO</h2>
+      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Checklist SEO</h2>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium">{Math.round(progress)}%</span>
-            <Progress value={progress} className="w-16 h-1.5" />
+            <span className="text-sm font-medium">{Math.round(progress)}%</span>
+            <Progress value={progress} className="w-24 h-2" />
           </div>
         </div>
         
-        <div className="p-3">
-          {checklistItems.map((section) => (
-            <div key={section.title} className="mb-3">
-              <h3 className="font-medium text-xs text-gray-700 mb-1">{section.title}</h3>
-              {section.items.map((item) => (
-                <CategoryChecks key={item.id} check={item} />
-              ))}
-            </div>
-          ))}
-        </div>
+        <Separator className="mb-4" />
         
-        <div className="border-t p-2 flex justify-end">
-          <Button variant="default" size="sm" className="px-2 py-1 h-auto text-xs" onClick={() => setOpen(false)}>
-            Fechar
-          </Button>
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-4">
+            {checklistItems.map((section, index) => (
+              <div key={index} className="space-y-2">
+                <h3 className="font-semibold text-md">{section.title}</h3>
+                <div className="space-y-2">
+                  {section.items.map((item, itemIndex) => (
+                    <div 
+                      key={itemIndex} 
+                      className={cn(
+                        "flex items-start p-3 rounded-md border",
+                        item.status === 'pass' && "bg-green-50 border-green-200",
+                        item.status === 'warning' && "bg-yellow-50 border-yellow-200",
+                        item.status === 'fail' && "bg-red-50 border-red-200"
+                      )}
+                    >
+                      <div className="mt-0.5 mr-3">
+                        {item.status === 'pass' && (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        )}
+                        {item.status === 'warning' && (
+                          <AlertCircle className="h-5 w-5 text-yellow-600" />
+                        )}
+                        {item.status === 'fail' && (
+                          <AlertCircle className="h-5 w-5 text-red-600" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{item.title}</p>
+                        <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                        {item.suggestion && (
+                          <div className="mt-2 p-2 bg-white rounded border text-sm">
+                            <span className="font-medium">Sugestão: </span>
+                            {item.suggestion}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+        
+        <div className="mt-4 pt-4 border-t flex justify-end">
+          <Button onClick={() => setOpen(false)}>Fechar</Button>
         </div>
       </DialogContent>
     </Dialog>

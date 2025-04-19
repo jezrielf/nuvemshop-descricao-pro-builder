@@ -24,11 +24,6 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
   description,
   onUpdateImage
 }) => {
-  const handleToolClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-  };
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -38,10 +33,10 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-48 p-2.5" onClick={handleToolClick}>
+      <PopoverContent align="end" className="w-64 p-3">
         <div className="space-y-2">
-          <h4 className="text-xs font-medium">Otimização de SEO</h4>
-          <div className="grid gap-1">
+          <h4 className="text-sm font-medium">Otimização de SEO</h4>
+          <div className="grid gap-1.5">
             <SEOToolButton>
               <SEOAnalyzer description={description} />
             </SEOToolButton>
@@ -62,10 +57,10 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
             </SEOToolButton>
           </div>
           
-          <Separator className="my-1.5" />
+          <Separator className="my-2" />
           
-          <h4 className="text-xs font-medium">Recursos de IA</h4>
-          <div className="grid gap-1">
+          <h4 className="text-sm font-medium">Recursos de IA</h4>
+          <div className="grid gap-1.5">
             <SEOToolButton>
               <AIContentRecommender description={description} />
             </SEOToolButton>
@@ -79,7 +74,7 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
 // Componente auxiliar para simplificar a estrutura
 const SEOToolButton: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="w-full text-sm" onClick={(e) => e.stopPropagation()}>
+    <div className="w-full">
       {children}
     </div>
   );

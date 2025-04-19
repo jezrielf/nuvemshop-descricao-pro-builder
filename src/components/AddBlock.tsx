@@ -9,8 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import BlockTypeSelector from './BlockTypeSelector';
 import BlockConfigForm from './BlockConfigForm';
 import { blockTypeInfo } from '@/utils/blockTypeInfo';
-import { createBlock } from '@/utils/blockCreators/createBlock';
-import { ensureBlockType } from '@/utils/typeConversion';
+import { createBlock } from '@/utils/blockCreators';
 
 const AddBlock: React.FC = () => {
   const { addBlock } = useEditorStore();
@@ -23,39 +22,28 @@ const AddBlock: React.FC = () => {
     if (!selectedType) return;
     
     try {
-      console.log(`Creating new block of type: ${selectedType}`);
-      // Create the block with the selected type and columns
-      const newBlock = createBlock(selectedType, columns);
+      const blockData = createBlock(selectedType, columns);
       
-      if (newBlock) {
-        console.log('Block created:', newBlock);
+      if (blockData) {
+        // Convert this block to the expected type for addBlock
+        const blockToAdd = {
+          ...blockData,
+          type: selectedType,
+          title: blockData.title,
+          columns: columns,
+          visible: true
+        };
         
-        // Use try-catch to ensure validation doesn't break the app
-        try {
-          // Ensure the block has all required properties
-          const validatedBlock = ensureBlockType(newBlock);
-          console.log('Block validated:', validatedBlock);
-          
-          // Add the block to the editor
-          addBlock(validatedBlock);
-          
-          toast({
-            title: "Bloco adicionado",
-            description: `${blockTypeInfo[selectedType].name} foi adicionado à sua descrição.`,
-          });
-          
-          setSelectedType(null);
-          setColumns('full');
-          setOpen(false);
-        } catch (validationError) {
-          console.error('Block validation error:', validationError);
-          
-          toast({
-            title: "Erro ao validar bloco",
-            description: `O bloco ${selectedType} não pôde ser validado. Detalhes: ${validationError.message}`,
-            variant: "destructive"
-          });
-        }
+        addBlock(blockToAdd);
+        
+        toast({
+          title: "Bloco adicionado",
+          description: `${blockTypeInfo[selectedType].name} foi adicionado à sua descrição.`,
+        });
+        
+        setSelectedType(null);
+        setColumns('full');
+        setOpen(false);
       }
     } catch (error) {
       console.error('Error creating block:', error);
