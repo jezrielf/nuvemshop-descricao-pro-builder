@@ -5,7 +5,6 @@ import { useSEOMetrics } from '@/hooks/seo/useSEOMetrics';
 import { MetricsOverview } from './MetricsOverview';
 import { KeywordAnalysis } from './KeywordAnalysis';
 import { ReadabilityScore } from './ReadabilityScore';
-import { PerformanceComparison } from './PerformanceComparison';
 
 const SEODashboard: React.FC = () => {
   const { metrics, loading } = useSEOMetrics();
@@ -25,7 +24,6 @@ const SEODashboard: React.FC = () => {
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="keywords">Palavras-chave</TabsTrigger>
           <TabsTrigger value="readability">Legibilidade</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -38,10 +36,6 @@ const SEODashboard: React.FC = () => {
 
         <TabsContent value="readability">
           <ReadabilityScore />
-        </TabsContent>
-
-        <TabsContent value="performance">
-          <PerformanceComparison />
         </TabsContent>
       </Tabs>
     </div>

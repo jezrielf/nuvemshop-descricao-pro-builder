@@ -1,30 +1,113 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useEditorStore } from '@/store/editor';
+import { getTextContentFromDescription } from '@/components/SEO/utils/contentUtils';
 
 export const ReadabilityScore: React.FC = () => {
-  // Dados simulados para o score de legibilidade
-  const readabilityData = {
-    overallScore: 76,
-    averageSentenceLength: 15.8,
-    longSentencesPercentage: 14,
-    complexWordsPercentage: 12,
-    readingTime: 3.2,
-    breakdown: [
-      { metric: 'Tamanho médio das sentenças', score: 82, ideal: '10-20 palavras' },
-      { metric: 'Palavras complexas', score: 70, ideal: 'Menos de 10%' },
-      { metric: 'Voz ativa', score: 85, ideal: 'Mais de 80%' },
-      { metric: 'Parágrafos curtos', score: 72, ideal: '1-3 sentenças' },
-      { metric: 'Densidade de palavras-chave', score: 68, ideal: '1-2%' },
-    ]
+  const { savedDescriptions } = useEditorStore();
+  
+  const calculateReadabilityMetrics = () => {
+    if (savedDescriptions.length === 0) {
+      return null;
+    }
+
+    let totalScore = 0;
+    let totalSentenceLength = 0;
+    let totalLongSentences = 0;
+    let totalSentences = 0;
+    let totalComplexWords = 0;
+    let totalWords = 0;
+    let totalReadingTime = 0;
+
+    savedDescriptions.forEach(desc => {
+      const content = getTextContentFromDescription(desc);
+      const sentences = content.split(/[.!?]+/).filter(Boolean);
+      const words = content.split(/\s+/).filter(Boolean);
+      
+      totalSentences += sentences.length;
+      totalWords += words.length;
+      
+      // Calculate long sentences (>20 words)
+      sentences.forEach(sentence => {
+        const wordCount = sentence.split(/\s+/).filter(Boolean).length;
+        if (wordCount > 20) totalLongSentences++;
+        totalSentenceLength += wordCount;
+      });
+
+      // Calculate complex words (>3 syllables)
+      words.forEach(word => {
+        if (countSyllables(word) > 3) totalComplexWords++;
+      });
+
+      // Estimate reading time (words per minute)
+      totalReadingTime += words.length / 200; // Average reading speed
+    });
+
+    const averageSentenceLength = totalSentenceLength / totalSentences;
+    const longSentencesPercentage = (totalLongSentences / totalSentences) * 100;
+    const complexWordsPercentage = (totalComplexWords / totalWords) * 100;
+
+    // Calculate overall score
+    const lengthScore = 100 - Math.min(50, Math.abs(averageSentenceLength - 15) * 2);
+    const complexityScore = 100 - Math.min(50, complexWordsPercentage * 2);
+    const overallScore = Math.round((lengthScore + complexityScore) / 2);
+
+    return {
+      overallScore,
+      averageSentenceLength: averageSentenceLength.toFixed(1),
+      longSentencesPercentage: Math.round(longSentencesPercentage),
+      complexWordsPercentage: Math.round(complexWordsPercentage),
+      readingTime: (totalReadingTime / savedDescriptions.length).toFixed(1),
+      breakdown: [
+        { 
+          metric: 'Tamanho médio das sentenças',
+          score: Math.round(lengthScore),
+          ideal: '10-20 palavras'
+        },
+        {
+          metric: 'Palavras complexas',
+          score: Math.round(complexityScore),
+          ideal: 'Menos de 10%'
+        }
+      ]
+    };
   };
 
-  // Função para determinar cor com base no score
+  const readabilityData = calculateReadabilityMetrics();
+
+  // Simple syllable counter for Portuguese
+  function countSyllables(word: string): number {
+    const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'á', 'é', 'í', 'ó', 'ú', 'â', 'ê', 'î', 'ô', 'û', 'ã', 'õ'];
+    let count = 0;
+    let isPreviousVowel = false;
+
+    word.toLowerCase().split('').forEach(char => {
+      const isVowel = vowels.includes(char);
+      if (isVowel && !isPreviousVowel) count++;
+      isPreviousVowel = isVowel;
+    });
+
+    return count || 1;
+  }
+
+  // Function to determine color based on score
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-500';
     if (score >= 60) return 'text-amber-500';
     return 'text-red-500';
   };
+
+  if (!readabilityData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[300px] text-center p-8">
+        <h3 className="text-lg font-medium mb-2">Sem dados de legibilidade</h3>
+        <p className="text-muted-foreground mb-4">
+          Adicione algumas descrições para ver a análise de legibilidade.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
