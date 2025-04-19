@@ -8,4 +8,6 @@ verify_jwt = false
 verify_jwt = false
 [functions.sync-product-analytics]
 verify_jwt = true
+[functions.nimbus-auth]
+verify_jwt = false
 

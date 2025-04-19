@@ -14,6 +14,7 @@ export type Database = {
           created_at: string | null
           date: string
           id: string
+          platform: string
           product_id: number
           revenue: number | null
           sales: number | null
@@ -25,6 +26,7 @@ export type Database = {
           created_at?: string | null
           date: string
           id?: string
+          platform?: string
           product_id: number
           revenue?: number | null
           sales?: number | null
@@ -36,6 +38,7 @@ export type Database = {
           created_at?: string | null
           date?: string
           id?: string
+          platform?: string
           product_id?: number
           revenue?: number | null
           sales?: number | null
@@ -45,12 +48,13 @@ export type Database = {
         }
         Relationships: []
       }
-      nuvemshop_stores: {
+      ecommerce_stores: {
         Row: {
           access_token: string
           connected_at: string
           id: string
           name: string
+          platform: string
           scope: string | null
           store_id: number
           url: string
@@ -61,6 +65,7 @@ export type Database = {
           connected_at?: string
           id?: string
           name: string
+          platform?: string
           scope?: string | null
           store_id: number
           url: string
@@ -71,6 +76,7 @@ export type Database = {
           connected_at?: string
           id?: string
           name?: string
+          platform?: string
           scope?: string | null
           store_id?: number
           url?: string
@@ -83,6 +89,7 @@ export type Database = {
           created_at: string | null
           description_updated_at: string | null
           id: string
+          platform: string
           product_id: number
           revenue: number | null
           sales: number | null
@@ -95,6 +102,7 @@ export type Database = {
           created_at?: string | null
           description_updated_at?: string | null
           id?: string
+          platform?: string
           product_id: number
           revenue?: number | null
           sales?: number | null
@@ -107,6 +115,7 @@ export type Database = {
           created_at?: string | null
           description_updated_at?: string | null
           id?: string
+          platform?: string
           product_id?: number
           revenue?: number | null
           sales?: number | null
@@ -272,6 +281,7 @@ export type Database = {
           connected_at: string
           id: string
           name: string
+          platform: string
           scope: string | null
           store_id: number
           url: string
