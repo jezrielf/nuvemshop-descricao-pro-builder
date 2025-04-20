@@ -75,24 +75,26 @@ const SEODashboard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <Tabs>
-            <Tabs.Item 
-              onClick={() => setActiveTab('overview')}
-              selected={activeTab === 'overview'} 
-            >
-              Visão Geral
-            </Tabs.Item>
-            <Tabs.Item 
-              onClick={() => setActiveTab('keywords')}
-              selected={activeTab === 'keywords'} 
-            >
-              Palavras-chave
-            </Tabs.Item>
-            <Tabs.Item 
-              onClick={() => setActiveTab('readability')}
-              selected={activeTab === 'readability'} 
-            >
-              Legibilidade
-            </Tabs.Item>
+            <Tabs.List>
+              <Tabs.Item 
+                onClick={() => setActiveTab('overview')}
+                active={activeTab === 'overview'} 
+              >
+                Visão Geral
+              </Tabs.Item>
+              <Tabs.Item 
+                onClick={() => setActiveTab('keywords')}
+                active={activeTab === 'keywords'} 
+              >
+                Palavras-chave
+              </Tabs.Item>
+              <Tabs.Item 
+                onClick={() => setActiveTab('readability')}
+                active={activeTab === 'readability'} 
+              >
+                Legibilidade
+              </Tabs.Item>
+            </Tabs.List>
 
             <div className="pt-4">
               {activeTab === 'overview' && <MetricsOverview metrics={readabilityMetrics} />}

@@ -31,10 +31,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
+    // Make sure we're passing a valid size for Nimbus Input
+    const validatedSize = (size === "small" || size === "medium") ? size : "medium";
+    
     return (
       <NimbusInput
         ref={ref}
-        size={size}
+        size={validatedSize}
         label={label}
         hint={hint}
         error={error}

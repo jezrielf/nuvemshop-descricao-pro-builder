@@ -56,23 +56,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ? mappedVariant 
       : "primary";
 
-    // Pass props that Nimbus Button accepts
-    return (
-      <NimbusButton
-        ref={ref}
-        size={nimbusSize as "small" | "medium" | "large"}
-        variant={nimbusVariant as "primary" | "secondary" | "tertiary" | "danger"}
-        full={full}
-        loading={loading}
-        disabled={disabled}
-        leftIcon={leftIcon}
-        rightIcon={rightIcon}
-        className={className}
-        {...props}
-      >
-        {children}
-      </NimbusButton>
-    );
+    // Only pass props that Nimbus Button accepts and are valid
+    const nimbusProps = {
+      ref,
+      size: nimbusSize as "small" | "medium" | "large",
+      variant: nimbusVariant as "primary" | "secondary" | "tertiary" | "danger",
+      full,
+      loading,
+      disabled,
+      leftIcon,
+      rightIcon,
+      className,
+      ...props
+    };
+
+    return <NimbusButton {...nimbusProps}>{children}</NimbusButton>;
   }
 );
 
