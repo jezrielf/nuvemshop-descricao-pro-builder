@@ -5,13 +5,13 @@ import { useSEOMetrics } from '@/hooks/seo/useSEOMetrics';
 import { MetricsOverview } from './MetricsOverview';
 import { KeywordAnalysis } from './KeywordAnalysis';
 import { ReadabilityScore } from './ReadabilityScore';
-import { PerformanceComparison } from './PerformanceComparison';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const SEODashboard: React.FC = () => {
   const { metrics, loading } = useSEOMetrics();
 
   if (loading) {
-    return <div className="flex items-center justify-center p-8">Carregando métricas...</div>;
+    return <LoadingSpinner text="Calculando métricas SEO..." />;
   }
 
   return (
@@ -25,7 +25,6 @@ const SEODashboard: React.FC = () => {
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="keywords">Palavras-chave</TabsTrigger>
           <TabsTrigger value="readability">Legibilidade</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -38,10 +37,6 @@ const SEODashboard: React.FC = () => {
 
         <TabsContent value="readability">
           <ReadabilityScore />
-        </TabsContent>
-
-        <TabsContent value="performance">
-          <PerformanceComparison />
         </TabsContent>
       </Tabs>
     </div>

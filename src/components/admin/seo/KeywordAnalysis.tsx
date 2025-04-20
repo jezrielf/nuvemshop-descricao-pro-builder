@@ -2,16 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useSEOMetrics } from '@/hooks/seo/useSEOMetrics';
 
 export const KeywordAnalysis: React.FC = () => {
-  // Dados simulados para a análise de palavras-chave
-  const keywordData = [
-    { keyword: 'produto', occurrences: 24, relevance: 85 },
-    { keyword: 'qualidade', occurrences: 18, relevance: 72 },
-    { keyword: 'tecnologia', occurrences: 15, relevance: 68 },
-    { keyword: 'inovação', occurrences: 12, relevance: 60 },
-    { keyword: 'desempenho', occurrences: 10, relevance: 55 },
-  ];
+  const { metrics } = useSEOMetrics();
 
   return (
     <div className="space-y-6">
@@ -25,11 +19,11 @@ export const KeywordAnalysis: React.FC = () => {
           </p>
 
           <div className="space-y-4">
-            {keywordData.map((keyword) => (
+            {metrics.keywordMetrics.map((keyword) => (
               <div key={keyword.keyword} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">{keyword.keyword}</span>
-                  <span className="text-muted-foreground">{keyword.occurrences} ocorrências</span>
+                  <span className="text-muted-foreground">{keyword.frequency} ocorrências</span>
                 </div>
                 <Progress value={keyword.relevance} className="h-2" />
                 <div className="flex justify-between text-xs">
@@ -43,19 +37,31 @@ export const KeywordAnalysis: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Sugestões de Palavras-chave</CardTitle>
+          <CardTitle>Sugestões de Otimização</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Com base nas suas descrições, sugerimos adicionar estas palavras-chave para melhorar o SEO:
+            Com base na análise das suas descrições, aqui estão algumas sugestões para melhorar o SEO:
           </p>
-          <div className="flex flex-wrap gap-2">
-            {['premium', 'exclusivo', 'garantia', 'durabilidade', 'sustentável', 'econômico'].map((tag) => (
-              <div key={tag} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs">
-                {tag}
-              </div>
-            ))}
-          </div>
+          <ul className="space-y-2">
+            {metrics.keywordMetrics.length > 0 ? (
+              metrics.keywordMetrics
+                .filter(k => k.relevance < 70)
+                .map(keyword => (
+                  <li key={keyword.keyword} className="flex items-start gap-2 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5"></div>
+                    <span>
+                      Otimize o uso da palavra-chave "{keyword.keyword}" - 
+                      atualmente com relevância de {keyword.relevance}%
+                    </span>
+                  </li>
+                ))
+            ) : (
+              <li className="text-muted-foreground">
+                Nenhuma sugestão disponível no momento.
+              </li>
+            )}
+          </ul>
         </CardContent>
       </Card>
     </div>

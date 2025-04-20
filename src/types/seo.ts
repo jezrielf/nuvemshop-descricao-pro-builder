@@ -10,4 +10,15 @@ export interface SEOMetrics {
     seoScore: number;
     readabilityScore: number;
   }[];
+  keywordMetrics: {
+    keyword: string;
+    frequency: number;
+    relevance: number;
+  }[];
+}
+
+export interface ReadabilityMetrics {
+  averageSentenceLength: number;
+  averageWordLength: number;
+  syllablesPerWord: number;
 }

@@ -1,10 +1,11 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { SEOMetrics } from '@/types/seo';
 import { getTextContentFromDescription } from '@/components/SEO/utils/contentUtils';
-import { format, subDays, parseISO } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { getKeywordDensity } from '@/components/SEO/utils/seoUtils';
+import { useQuery } from '@tanstack/react-query';
 
 export function useSEOMetrics() {
   const [metrics, setMetrics] = useState<SEOMetrics>({
@@ -14,9 +15,24 @@ export function useSEOMetrics() {
     averageSEOScore: 0,
     averageReadabilityScore: 0,
     historicalData: [],
+    keywordMetrics: []
   });
-  const [loading, setLoading] = useState(true);
+
   const { description, savedDescriptions } = useEditorStore();
+
+  // Fetch performance data from Supabase
+  const { data: performanceData } = useQuery({
+    queryKey: ['productPerformance'],
+    queryFn: async () => {
+      // Use the current API context to fetch performance data
+      const response = await fetch('/api/product-performance');
+      if (!response.ok) {
+        throw new Error('Failed to fetch performance data');
+      }
+      return response.json();
+    },
+    enabled: false // Initially disabled
+  });
 
   useEffect(() => {
     const calculateMetrics = () => {
@@ -37,14 +53,22 @@ export function useSEOMetrics() {
         return createdAt >= today;
       }).length;
 
-      // Calculate actual metrics from descriptions
+      // Analyze keywords and content for all descriptions
+      const keywordFrequencies: { [key: string]: number } = {};
+
       allDescriptions.forEach(desc => {
         const content = getTextContentFromDescription(desc);
-        const wordCount = content.split(/\s+/).filter(Boolean).length;
-        totalWords += wordCount;
+        const words = content.split(/\s+/).filter(Boolean);
+        totalWords += words.length;
 
-        // Calculate real SEO score based on content quality and blocks
-        const seoScore = calculateSEOScore(desc, content, wordCount);
+        // Update keyword frequencies
+        const keywordDensity = getKeywordDensity(content);
+        Object.entries(keywordDensity).forEach(([keyword, frequency]) => {
+          keywordFrequencies[keyword] = (keywordFrequencies[keyword] || 0) + frequency;
+        });
+
+        // Calculate SEO score based on content quality
+        const seoScore = calculateSEOScore(desc, content, words.length);
         totalSEOScore += seoScore;
 
         // Calculate readability score
@@ -52,7 +76,17 @@ export function useSEOMetrics() {
         totalReadability += readabilityScore;
       });
 
-      // Generate historical data from saved descriptions
+      // Process keyword metrics
+      const keywordMetrics = Object.entries(keywordFrequencies)
+        .map(([keyword, frequency]) => ({
+          keyword,
+          frequency,
+          relevance: calculateKeywordRelevance(keyword, frequency, totalWords)
+        }))
+        .sort((a, b) => b.frequency - a.frequency)
+        .slice(0, 10); // Top 10 keywords
+
+      // Generate historical data
       const historicalData = generateHistoricalData(savedDescriptions);
 
       setMetrics({
@@ -62,15 +96,23 @@ export function useSEOMetrics() {
         averageSEOScore: totalDesc > 0 ? Math.round(totalSEOScore / totalDesc) : 0,
         averageReadabilityScore: totalDesc > 0 ? Math.round(totalReadability / totalDesc) : 0,
         historicalData,
+        keywordMetrics
       });
-
-      setLoading(false);
     };
 
     calculateMetrics();
-  }, [description, savedDescriptions]);
+  }, [description, savedDescriptions, performanceData]);
 
-  return { metrics, loading };
+  return { metrics, loading: false };
+}
+
+// Helper functions for metric calculations
+function calculateKeywordRelevance(keyword: string, frequency: number, totalWords: number): number {
+  const density = (frequency / totalWords) * 100;
+  // Ideal keyword density is between 0.5% and 2.5%
+  if (density < 0.5) return Math.round(50 * (density / 0.5));
+  if (density > 2.5) return Math.round(100 - (50 * ((density - 2.5) / 2.5)));
+  return Math.round(50 + (50 * (density - 0.5) / 2));
 }
 
 // Helper function to calculate SEO score
