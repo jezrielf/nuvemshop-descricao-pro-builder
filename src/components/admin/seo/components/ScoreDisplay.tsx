@@ -16,7 +16,7 @@ export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ score, readingTime }
         <h3 className={`text-lg font-medium ${getScoreColor(score)}`}>
           {score >= 80 ? 'Excelente' : score >= 60 ? 'Bom' : 'Precisa melhorar'}
         </h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground mt-1">
           Tempo de leitura médio: {readingTime} minutos
         </p>
       </div>
