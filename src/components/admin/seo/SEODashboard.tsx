@@ -75,7 +75,7 @@ const SEODashboard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <Tabs>
-            <Tabs.Group>
+            <Tabs.List>
               <Tabs.Item 
                 selected={activeTab === 'overview'} 
                 onClick={() => setActiveTab('overview')}
@@ -94,7 +94,7 @@ const SEODashboard: React.FC = () => {
               >
                 Legibilidade
               </Tabs.Item>
-            </Tabs.Group>
+            </Tabs.List>
 
             <div className="pt-4">
               {activeTab === 'overview' && <MetricsOverview metrics={readabilityMetrics} />}

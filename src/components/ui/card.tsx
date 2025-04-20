@@ -6,15 +6,13 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <NimbusCard ref={ref} {...props}>
-        {children}
-      </NimbusCard>
-    );
-  }
-);
+const Card = ({ children, className, ...props }: CardProps) => {
+  return (
+    <NimbusCard {...props}>
+      {children}
+    </NimbusCard>
+  );
+};
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<

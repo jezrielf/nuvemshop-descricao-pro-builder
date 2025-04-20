@@ -3,7 +3,7 @@ import React from 'react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { Button } from '@/components/ui/button';
 import { Card, Text, Icon } from '@nimbus-ds/components';
-import { ProgressBar } from '@nimbus-ds/components';
+import { Progress } from '@/components/ui/progress';
 import { 
   ArrowUpCircle, 
   Image,
@@ -58,7 +58,7 @@ const ImageUpload: React.FC = () => {
           <div className="space-y-4">
             {uploading ? (
               <div className="space-y-2">
-                <ProgressBar value={uploadProgress} max={100} />
+                <Progress value={uploadProgress} max={100} />
                 <Text fontSize="caption" className="text-center text-neutral-textLow">
                   Enviando... {uploadProgress}%
                 </Text>
