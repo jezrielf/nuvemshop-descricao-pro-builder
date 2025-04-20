@@ -1,79 +1,56 @@
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-import * as React from "react";
-import { Button as NimbusButton } from "@nimbus-ds/components";
+import { cn } from "@/lib/utils"
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "tertiary" | "danger" | "outline" | "ghost" | "default" | "destructive";
-  size?: "small" | "medium" | "large" | "sm" | "md" | "lg" | "icon";
-  full?: boolean;
-  loading?: boolean;
-  disabled?: boolean;
-  children: React.ReactNode;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  asChild?: boolean; // Add this to prevent TypeScript errors but we won't use it
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
-const buttonVariantMap = {
-  outline: "secondary",
-  ghost: "tertiary",
-  default: "primary",
-  destructive: "danger",
-} as const;
-
-const buttonSizeMap = {
-  sm: "small",
-  md: "medium",
-  lg: "large",
-  icon: "small", // Map icon size to small
-} as const;
-
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    variant = "primary", 
-    size = "medium", 
-    full = false, 
-    loading = false, 
-    disabled = false, 
-    children, 
-    leftIcon, 
-    rightIcon,
-    className,
-    asChild, // We accept this but don't use it
-    ...props 
-  }, ref) => {
-    // Map variant from shadcn to Nimbus
-    const mappedVariant = buttonVariantMap[variant as keyof typeof buttonVariantMap] || variant;
-    
-    // Map size from shadcn to Nimbus
-    const mappedSize = buttonSizeMap[size as keyof typeof buttonSizeMap] || size;
-    
-    // Ensure size is one of the valid Nimbus sizes
-    const nimbusSize = ["small", "medium", "large"].includes(mappedSize as string) ? mappedSize : "medium";
-    
-    // Ensure variant is one of the valid Nimbus variants
-    const nimbusVariant = ["primary", "secondary", "tertiary", "danger"].includes(mappedVariant as string) 
-      ? mappedVariant 
-      : "primary";
-
-    // Only pass props that Nimbus Button accepts and are valid
-    const nimbusProps = {
-      ref,
-      size: nimbusSize as "small" | "medium" | "large",
-      variant: nimbusVariant as "primary" | "secondary" | "tertiary" | "danger",
-      full,
-      loading,
-      disabled,
-      leftIcon,
-      rightIcon,
-      className,
-      ...props
-    };
-
-    return <NimbusButton {...nimbusProps}>{children}</NimbusButton>;
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
   }
-);
+)
+Button.displayName = "Button"
 
-Button.displayName = "Button";
-
-export { Button, buttonVariantMap, buttonSizeMap };
+export { Button, buttonVariants }

@@ -1,10 +1,10 @@
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useDescriptionCount } from '@/hooks/useDescriptionCount';
-import { hasRole, isAdmin, isPremium, isBusiness, getRoles } from '@/utils/roleUtils';
+import { hasRole, isAdmin, isPremium, isBusiness } from '@/utils/roleUtils';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -37,47 +37,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     incrementDescriptionCount
   } = useDescriptionCount(user?.id);
   
-  // Add a state to track the last refresh time
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-  
-  // Combine refresh functions into one for better control
-  const refreshAll = useCallback(async () => {
-    if (user) {
-      await refreshProfile();
-      await refreshSubscription();
-      setLastRefresh(new Date());
-    }
-  }, [user, refreshProfile, refreshSubscription]);
-  
   // Effect to refresh profile and subscription regularly
   useEffect(() => {
     // Refresh profile and subscription every 5 minutes when user is logged in
     if (user) {
-      // Initial refresh when component mounts or user changes
-      refreshAll();
-      
       const refreshInterval = setInterval(() => {
-        refreshAll();
+        refreshProfile();
+        refreshSubscription();
       }, 5 * 60 * 1000); // 5 minutes
       
       return () => clearInterval(refreshInterval);
     }
-  }, [user, refreshAll]);
+  }, [user, refreshProfile, refreshSubscription]);
 
-  // Get roles from profile as array for easier handling
-  const userRoles = profile?.role ? getRoles(profile.role) : ['user'];
-  
   // Memoize these values to prevent unnecessary re-renders
-  const isAdminUser = userRoles.includes('admin');
+  const isAdminUser = Boolean(profile?.role && isAdmin(profile.role));
 
-  const isPremiumUser = userRoles.includes('premium') || 
-                        isAdminUser || 
-                        subscriptionTier === 'premium' || 
-                        subscriptionTier === 'admin';
+  const isPremiumUser = Boolean(
+    (profile?.role && isPremium(profile.role)) || 
+    isAdminUser || 
+    subscriptionTier === 'premium' || 
+    subscriptionTier === 'admin'
+  );
 
-  const isBusinessUser = userRoles.includes('business') || 
-                         isPremiumUser || 
-                         subscriptionTier === 'business';
+  const isBusinessUser = Boolean(
+    (profile?.role && isBusiness(profile.role)) || 
+    isPremiumUser || 
+    subscriptionTier === 'business'
+  );
 
   const isSubscribedUser = Boolean(subscriptionTier && subscriptionTier.toLowerCase() !== 'free');
 
@@ -107,8 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     descriptionCount,
     incrementDescriptionCount,
     canCreateMoreDescriptions: () => canCreateMoreDescriptionsValue,
-    refreshProfile: refreshAll,
-    lastRefresh
+    refreshProfile
   };
 
   return (

@@ -59,7 +59,6 @@ serve(async (req) => {
     console.log('User role updated successfully for user:', userId);
     console.log('Updated profile:', profile);
 
-    // Return the updated profile
     return new Response(
       JSON.stringify({ 
         data: profile, 

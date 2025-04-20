@@ -64,31 +64,6 @@ const SEOHistory: React.FC = () => {
       });
     });
     
-    // Helper function to find the nearest data point before or after a given date
-    const findNearestDataPoint = (dateMap, targetDate, findBefore) => {
-      let nearestDate = null;
-      let nearestDistance = Infinity;
-      let nearestData = null;
-      
-      dateMap.forEach((data, dateKey) => {
-        const dateParts = dateKey.split('/');
-        // Assuming the current year for simplicity
-        const currentDate = new Date(new Date().getFullYear(), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
-        const distance = targetDate.getTime() - currentDate.getTime();
-        
-        if ((findBefore && distance > 0) || (!findBefore && distance < 0)) {
-          const absDistance = Math.abs(distance);
-          if (absDistance < nearestDistance) {
-            nearestDistance = absDistance;
-            nearestDate = currentDate;
-            nearestData = data;
-          }
-        }
-      });
-      
-      return nearestDate ? { date: nearestDate, data: nearestData } : null;
-    };
-    
     // Fill in missing dates with interpolated data
     for (let i = 30; i >= 0; i--) {
       const date = subDays(today, i);
@@ -103,7 +78,7 @@ const SEOHistory: React.FC = () => {
           // Interpolate between known data points
           const totalDays = (nextDataPoint.date.getTime() - prevDataPoint.date.getTime()) / (24 * 60 * 60 * 1000);
           const daysFromPrev = (date.getTime() - prevDataPoint.date.getTime()) / (24 * 60 * 60 * 1000);
-          const ratio = totalDays > 0 ? daysFromPrev / totalDays : 0;
+          const ratio = daysFromPrev / totalDays;
           
           dateMap.set(dateKey, {
             date: dateKey,
@@ -155,6 +130,31 @@ const SEOHistory: React.FC = () => {
       });
     }
     return data;
+  };
+
+  // Helper function to find the nearest data point before or after a given date
+  const findNearestDataPoint = (dateMap: Map<string, any>, targetDate: Date, findBefore: boolean) => {
+    let nearestDate = null;
+    let nearestDistance = Infinity;
+    let nearestData = null;
+    
+    dateMap.forEach((data, dateKey) => {
+      const dateParts = dateKey.split('/');
+      // Assuming the current year for simplicity
+      const currentDate = new Date(new Date().getFullYear(), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
+      const distance = targetDate.getTime() - currentDate.getTime();
+      
+      if ((findBefore && distance > 0) || (!findBefore && distance < 0)) {
+        const absDistance = Math.abs(distance);
+        if (absDistance < nearestDistance) {
+          nearestDistance = absDistance;
+          nearestDate = currentDate;
+          nearestData = data;
+        }
+      }
+    });
+    
+    return nearestDate ? { date: nearestDate, data: nearestData } : null;
   };
 
   if (savedDescriptions.length === 0) {
