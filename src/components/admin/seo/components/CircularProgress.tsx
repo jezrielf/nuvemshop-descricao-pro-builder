@@ -27,6 +27,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({ score }) => 
           strokeWidth="10" 
           strokeDasharray={`${2 * Math.PI * 45 * score / 100} ${2 * Math.PI * 45 * (1 - score / 100)}`}
           strokeDashoffset="0"
+          className="transition-all duration-700 ease-out"
         />
       </svg>
       <div className="absolute flex flex-col items-center">
