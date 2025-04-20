@@ -1,5 +1,6 @@
 
-import React from 'react-dom/client'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
@@ -10,7 +11,7 @@ if (!rootElement) {
   throw new Error("Failed to find the root element");
 }
 
-const root = rootElement.createRoot ? rootElement.createRoot(rootElement) : React.createRoot(rootElement);
+const root = ReactDOM.createRoot(rootElement);
 console.log("Root element encontrado, renderizando aplicação...");
 root.render(<App />);
 
