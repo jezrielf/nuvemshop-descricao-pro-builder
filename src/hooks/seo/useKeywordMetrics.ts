@@ -86,33 +86,38 @@ function generateMockKeywordsData(content: string): KeywordData {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
   
-  // Generate density data
+  // Generate density data - Create a mutable array with the same structure
   const densityData = [
     {
       category: 'Palavras-chave principais',
       value: Math.round(Math.random() * 5 + 2),
       optimal: 3,
       status: Math.random() > 0.7 ? 'optimal' : (Math.random() > 0.5 ? 'low' : 'high')
-    },
+    } as const,
     {
       category: 'Palavras-chave secundárias',
       value: Math.round(Math.random() * 5 + 5),
       optimal: 7,
       status: Math.random() > 0.7 ? 'optimal' : (Math.random() > 0.5 ? 'low' : 'high')
-    },
+    } as const,
     {
       category: 'Densidade de palavras-chave',
       value: Math.round(Math.random() * 3 + 1),
       optimal: 2,
       status: Math.random() > 0.7 ? 'optimal' : (Math.random() > 0.5 ? 'low' : 'high')
-    },
+    } as const,
     {
       category: 'Repetição de palavras',
       value: Math.round(Math.random() * 10 + 10),
       optimal: 15,
       status: Math.random() > 0.7 ? 'optimal' : (Math.random() > 0.5 ? 'low' : 'high')
-    }
-  ] as const;
+    } as const
+  ].map(item => ({
+    category: item.category,
+    value: item.value,
+    optimal: item.optimal,
+    status: item.status
+  }));
   
   return {
     topKeywords: sortedWords,
