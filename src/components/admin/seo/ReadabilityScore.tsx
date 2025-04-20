@@ -59,8 +59,7 @@ export const ReadabilityScore: React.FC = () => {
       totalReadingTime += words.length / 200; // Average reading speed
       totalScore += individualScore;
       
-      // Here's the fix: using name property instead of title
-      // The ProductDescription type has 'name' field, not 'title'
+      // Fixed: using name property instead of title
       return {
         id: index,
         title: desc.name || `Descrição ${index + 1}`,
@@ -103,8 +102,6 @@ export const ReadabilityScore: React.FC = () => {
     };
   };
 
-  const readabilityData = calculateReadabilityMetrics();
-
   // Simple syllable counter for Portuguese
   function countSyllables(word: string): number {
     const vowels = ['a', 'e', 'i', 'o', 'u', 'y', 'á', 'é', 'í', 'ó', 'ú', 'â', 'ê', 'î', 'ô', 'û', 'ã', 'õ'];
@@ -132,6 +129,8 @@ export const ReadabilityScore: React.FC = () => {
     if (score >= 60) return 'bg-amber-500';
     return 'bg-red-500';
   };
+
+  const readabilityData = calculateReadabilityMetrics();
 
   if (!readabilityData) {
     return (
