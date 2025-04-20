@@ -1,6 +1,4 @@
 
-@import "@nimbus-ds/styles/dist/index.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
