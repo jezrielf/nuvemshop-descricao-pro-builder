@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { AuthContextProps } from '@/types/authContext';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } = useDescriptionCount(user?.id);
   
   // Effect to refresh profile and subscription regularly
-  useEffect(() => {
+  React.useEffect(() => {
     // Refresh profile and subscription every 5 minutes when user is logged in
     if (user) {
       const refreshInterval = setInterval(() => {

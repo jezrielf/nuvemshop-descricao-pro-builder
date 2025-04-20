@@ -14,21 +14,23 @@ import { AuthProvider } from './contexts/AuthContext';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/description-analysis" element={<DescriptionAnalysis />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin-auth" element={<AdminAuth />} />
-          <Route path="/admin-templates" element={<AdminTemplates />} />
-          <Route path="/plans" element={<Plans />} />
-          <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-          <Route path="/success" element={<Success />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <React.StrictMode>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/description-analysis" element={<DescriptionAnalysis />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin-auth" element={<AdminAuth />} />
+            <Route path="/admin-templates" element={<AdminTemplates />} />
+            <Route path="/plans" element={<Plans />} />
+            <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+            <Route path="/success" element={<Success />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </React.StrictMode>
   );
 };
 
