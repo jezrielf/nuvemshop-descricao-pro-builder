@@ -5,7 +5,6 @@ import { MetricsOverview } from './MetricsOverview';
 import { KeywordAnalysis } from './KeywordAnalysis';
 import { ReadabilityScore } from './ReadabilityScore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { ReadabilityMetrics } from './types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -16,7 +15,7 @@ const SEODashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Spinner size="medium" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
         <span className="ml-3 text-lg">Carregando métricas...</span>
       </div>
     );
