@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Tabs } from '@nimbus-ds/components';
 import { useSEOMetrics } from '@/hooks/seo/useSEOMetrics';
 import { MetricsOverview } from './MetricsOverview';
 import { KeywordAnalysis } from './KeywordAnalysis';
@@ -8,6 +7,7 @@ import { ReadabilityScore } from './ReadabilityScore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { ReadabilityMetrics } from './types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SEODashboard: React.FC = () => {
   const { metrics, loading } = useSEOMetrics();
@@ -74,18 +74,18 @@ const SEODashboard: React.FC = () => {
           </p>
         </CardHeader>
         <CardContent>
-          <Tabs onChange={(e) => setActiveTab(e.target.value)} value={activeTab}>
-            <Tabs.List>
-              <Tabs.Item value="overview">
+          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="overview">
                 Visão Geral
-              </Tabs.Item>
-              <Tabs.Item value="keywords">
+              </TabsTrigger>
+              <TabsTrigger value="keywords">
                 Palavras-chave
-              </Tabs.Item>
-              <Tabs.Item value="readability">
+              </TabsTrigger>
+              <TabsTrigger value="readability">
                 Legibilidade
-              </Tabs.Item>
-            </Tabs.List>
+              </TabsTrigger>
+            </TabsList>
 
             <div className="pt-4">
               {activeTab === 'overview' && <MetricsOverview metrics={readabilityMetrics} />}
