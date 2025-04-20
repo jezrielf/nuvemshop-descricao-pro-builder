@@ -3,11 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useEditorStore } from '@/store/editor';
 import { getTextContentFromDescription } from '@/components/SEO/utils/contentUtils';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { ScoreDisplay } from './components/ScoreDisplay';
+import { MetricsBreakdown } from './components/MetricsBreakdown';
+import { ReadabilityMetrics, DescriptionMetric } from './types';
 
 export const ReadabilityScore: React.FC = () => {
   const { savedDescriptions } = useEditorStore();
   
-  const calculateReadabilityMetrics = () => {
+  const calculateReadabilityMetrics = (): ReadabilityMetrics | null => {
     if (savedDescriptions.length === 0) {
       return null;
     }
@@ -85,7 +88,7 @@ export const ReadabilityScore: React.FC = () => {
       complexWordsPercentage: Math.round(complexWordsPercentage),
       readingTime: (totalReadingTime / savedDescriptions.length).toFixed(1),
       breakdown: [
-        { 
+        {
           metric: 'Tamanho médio das sentenças',
           score: Math.round(lengthScore),
           ideal: '10-20 palavras',
@@ -153,72 +156,11 @@ export const ReadabilityScore: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center mb-8">
-            <div className="relative w-40 h-40 flex items-center justify-center mb-4">
-              <svg className="w-full h-full" viewBox="0 0 100 100">
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="45" 
-                  fill="none" 
-                  stroke="#e2e8f0" 
-                  strokeWidth="10" 
-                />
-                <circle 
-                  cx="50" 
-                  cy="50" 
-                  r="45" 
-                  fill="none" 
-                  stroke={readabilityData.overallScore >= 80 ? "#22c55e" : 
-                          readabilityData.overallScore >= 60 ? "#f59e0b" : "#ef4444"} 
-                  strokeWidth="10" 
-                  strokeDasharray={`${2 * Math.PI * 45 * readabilityData.overallScore / 100} ${2 * Math.PI * 45 * (1 - readabilityData.overallScore / 100)}`}
-                  strokeDashoffset={2 * Math.PI * 45 * 0.25}
-                />
-              </svg>
-              <div className="absolute flex flex-col items-center">
-                <span className={`text-4xl font-bold ${getScoreColor(readabilityData.overallScore)}`}>
-                  {readabilityData.overallScore}
-                </span>
-                <span className="text-xs text-muted-foreground">de 100</span>
-              </div>
-            </div>
-            <div className="text-center">
-              <h3 className={`text-lg font-medium ${getScoreColor(readabilityData.overallScore)}`}>
-                {readabilityData.overallScore >= 80 ? 'Excelente' : 
-                 readabilityData.overallScore >= 60 ? 'Bom' : 'Precisa melhorar'}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Tempo de leitura médio: {readabilityData.readingTime} minutos
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-5">
-            <h3 className="text-sm font-medium mb-3">Detalhamento</h3>
-            {readabilityData.breakdown.map((item, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <span className="text-sm font-medium">{item.metric}</span>
-                    <div className="flex items-center mt-1">
-                      <span className="text-xs mr-2">Atual: {item.current}</span>
-                      <span className="text-xs text-muted-foreground">Ideal: {item.ideal}</span>
-                    </div>
-                  </div>
-                  <div className={`px-2 py-1 rounded-md ${getScoreBg(item.score)} text-white text-xs font-medium`}>
-                    {item.score}
-                  </div>
-                </div>
-                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full ${getScoreBg(item.score)}`} 
-                    style={{ width: `${item.score}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+          <ScoreDisplay 
+            score={readabilityData.overallScore} 
+            readingTime={readabilityData.readingTime}
+          />
+          <MetricsBreakdown items={readabilityData.breakdown} />
         </CardContent>
       </Card>
 
