@@ -3,8 +3,8 @@ import * as React from "react";
 import { Button as NimbusButton } from "@nimbus-ds/components";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "tertiary" | "danger";
-  size?: "small" | "medium" | "large";
+  variant?: "primary" | "secondary" | "tertiary" | "danger" | "outline" | "ghost";
+  size?: "small" | "medium" | "large" | "sm" | "md" | "lg";
   full?: boolean;
   loading?: boolean;
   disabled?: boolean;
@@ -40,14 +40,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }, ref) => {
     // Map variant from shadcn to Nimbus
     const mappedVariant = buttonVariantMap[variant as keyof typeof buttonVariantMap] || variant;
+    
     // Map size from shadcn to Nimbus
     const mappedSize = buttonSizeMap[size as keyof typeof buttonSizeMap] || size;
+    
+    // Ensure size is one of the valid Nimbus sizes
+    const nimbusSize = ["small", "medium", "large"].includes(mappedSize) ? mappedSize : "medium";
+    
+    // Ensure variant is one of the valid Nimbus variants
+    const nimbusVariant = ["primary", "secondary", "tertiary", "danger"].includes(mappedVariant) ? mappedVariant : "primary";
 
     return (
       <NimbusButton
         ref={ref}
-        variant={mappedVariant}
-        size={mappedSize}
+        variant={nimbusVariant}
+        size={nimbusSize}
         full={full}
         loading={loading}
         disabled={disabled}

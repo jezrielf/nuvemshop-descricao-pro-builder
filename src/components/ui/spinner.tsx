@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Loader } from '@nimbus-ds/components';
+import { Spinner as NimbusSpinner } from '@nimbus-ds/components';
 import { cn } from '@/lib/utils';
 
 interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -14,7 +14,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
 }) => {
   return (
     <div className={cn("flex items-center justify-center", className)} {...props}>
-      <Loader size={size} />
+      <NimbusSpinner size={size} />
     </div>
   );
 };
