@@ -1,14 +1,12 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { Spinner as NimbusSpinner } from '@nimbus-ds/components';
 
-interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface SpinnerProps {
+  size?: 'small' | 'medium' | 'large';
+  className?: string;
+}
 
-export const Spinner: React.FC<SpinnerProps> = ({ className, ...props }) => {
-  return (
-    <div
-      className={cn("animate-spin rounded-full h-4 w-4 border-b-2 border-white", className)}
-      {...props}
-    />
-  );
+export const Spinner = ({ size = 'medium', className }: SpinnerProps) => {
+  return <NimbusSpinner size={size} className={className} />;
 };

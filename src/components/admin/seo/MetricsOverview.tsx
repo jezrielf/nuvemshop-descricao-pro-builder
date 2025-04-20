@@ -1,102 +1,60 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SEOMetrics } from '@/types/seo';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+import { Card, CardContent } from '@/components/ui/card';
+import { ReadabilityMetrics } from './types';
+import { CircularProgress } from './components/CircularProgress';
+import { getScoreColor } from './utils/scoreUtils';
 
 interface MetricsOverviewProps {
-  metrics: SEOMetrics;
+  metrics: ReadabilityMetrics;
 }
 
 export const MetricsOverview: React.FC<MetricsOverviewProps> = ({ metrics }) => {
+  const overviewItems = [
+    {
+      label: 'Pontuação Geral',
+      value: metrics.overallScore,
+      type: 'score'
+    },
+    {
+      label: 'Tempo de Leitura',
+      value: metrics.readingTime,
+      type: 'text'
+    },
+    {
+      label: 'Tamanho Médio das Frases',
+      value: metrics.averageSentenceLength,
+      type: 'text'
+    },
+    {
+      label: 'Palavras Complexas',
+      value: `${metrics.complexWordsPercentage}%`,
+      type: 'text'
+    }
+  ];
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total de Descrições</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.totalDescriptions}</div>
-          <p className="text-xs text-muted-foreground">
-            +{metrics.newDescriptionsToday} hoje
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Média de Palavras</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.averageWordCount}</div>
-          <p className="text-xs text-muted-foreground">
-            por descrição
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Score SEO Médio</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.averageSEOScore}/100</div>
-          <p className="text-xs text-muted-foreground">
-            baseado em {metrics.totalDescriptions} descrições
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Score de Legibilidade</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.averageReadabilityScore}/100</div>
-          <p className="text-xs text-muted-foreground">
-            média geral
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="col-span-full">
-        <CardHeader>
-          <CardTitle>Evolução dos Scores</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[300px]">
-          <ChartContainer
-            className="h-[300px]"
-            config={{
-              score: {
-                label: "Score SEO",
-                theme: {
-                  light: "#0ea5e9",
-                  dark: "#0ea5e9",
-                },
-              },
-              readability: {
-                label: "Legibilidade",
-                theme: {
-                  light: "#84cc16",
-                  dark: "#84cc16",
-                },
-              },
-            }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={metrics.historicalData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="seoScore" name="Score SEO" fill="var(--color-score)" />
-                <Bar dataKey="readabilityScore" name="Legibilidade" fill="var(--color-readability)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {overviewItems.map((item, index) => (
+        <Card key={index} className="border rounded-lg overflow-hidden">
+          <CardContent className="p-4 flex flex-col items-center justify-center h-full">
+            <h3 className="text-sm font-medium text-[#68737D] mb-2">{item.label}</h3>
+            
+            {item.type === 'score' ? (
+              <div className="flex flex-col items-center">
+                <CircularProgress score={item.value as number} />
+                <span className={`text-lg font-bold ${getScoreColor(item.value as number)}`}>
+                  {item.value}
+                </span>
+              </div>
+            ) : (
+              <div className="text-xl font-bold text-[#303846] mt-2">
+                {item.value}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

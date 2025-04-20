@@ -2,87 +2,96 @@
 import React from 'react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { Button } from '@/components/ui/button';
+import { Card, Text, Icon } from '@nimbus-ds/components';
 import { Progress } from '@/components/ui/progress';
-import { Upload, Image as ImageIcon, Check } from 'lucide-react';
+import { 
+  ArrowUpCircle, 
+  Image,
+  CheckCircle
+} from 'lucide-react';
 
 const ImageUpload: React.FC = () => {
   const { uploading, uploadProgress, imageUrl, handleFileChange } = useImageUpload();
   
   return (
-    <div className="w-full max-w-md mx-auto p-4 border rounded-lg shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Upload de Imagem</h2>
+    <Card className="w-full max-w-md mx-auto">
+      <Card.Header>
+        <Text fontSize="base" fontWeight="bold">Upload de Imagem</Text>
+      </Card.Header>
       
-      {imageUrl ? (
-        <div className="space-y-4">
-          <div className="relative bg-gray-50 p-2 rounded-md">
-            <img 
-              src={imageUrl} 
-              alt="Imagem enviada" 
-              className="w-full h-auto object-contain rounded-md"
-            />
-          </div>
-          <div className="flex items-center justify-center text-green-600">
-            <Check className="mr-2 h-5 w-5" />
-            <span>Upload realizado com sucesso!</span>
-          </div>
-          <div className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() => {
-                const inputElement = document.getElementById('image-input') as HTMLInputElement;
-                if (inputElement) inputElement.click();
-              }}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Enviar outra imagem
-            </Button>
-            
-            <Button
-              variant="secondary"
-              onClick={() => navigator.clipboard.writeText(imageUrl)}
-            >
-              <ImageIcon className="h-4 w-4 mr-2" />
-              Copiar URL
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {uploading ? (
-            <div className="space-y-2">
-              <Progress value={uploadProgress} className="h-2" />
-              <p className="text-sm text-center text-gray-500">
-                Enviando... {uploadProgress}%
-              </p>
-            </div>
-          ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <input
-                id="image-input"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
+      <Card.Body>
+        {imageUrl ? (
+          <div className="space-y-4">
+            <div className="relative bg-gray-50 p-2 rounded-md">
+              <img 
+                src={imageUrl} 
+                alt="Imagem enviada" 
+                className="w-full h-auto object-contain rounded-md"
               />
+            </div>
+            <div className="flex items-center justify-center text-green-600">
+              <Icon source={<CheckCircle className="text-success-interactive" />} />
+              <Text className="ml-2">Upload realizado com sucesso!</Text>
+            </div>
+            <div className="flex justify-between">
               <Button
-                variant="ghost"
-                className="w-full h-32 flex flex-col items-center justify-center"
+                variant="secondary"
+                leftIcon={<Icon source={<ArrowUpCircle />} />}
                 onClick={() => {
                   const inputElement = document.getElementById('image-input') as HTMLInputElement;
                   if (inputElement) inputElement.click();
                 }}
               >
-                <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                <span className="text-gray-500">Clique para enviar uma imagem</span>
-                <span className="text-xs text-gray-400 mt-1">
-                  Formatos aceitos: JPG, PNG, GIF
-                </span>
+                Enviar outra imagem
+              </Button>
+              
+              <Button
+                variant="tertiary"
+                leftIcon={<Icon source={<Image />} />}
+                onClick={() => navigator.clipboard.writeText(imageUrl)}
+              >
+                Copiar URL
               </Button>
             </div>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {uploading ? (
+              <div className="space-y-2">
+                <Progress value={uploadProgress} max={100} />
+                <Text fontSize="caption" className="text-center text-neutral-textLow">
+                  Enviando... {uploadProgress}%
+                </Text>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <input
+                  id="image-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <Button
+                  variant="tertiary"
+                  className="w-full h-32 flex flex-col items-center justify-center"
+                  onClick={() => {
+                    const inputElement = document.getElementById('image-input') as HTMLInputElement;
+                    if (inputElement) inputElement.click();
+                  }}
+                >
+                  <Icon source={<ArrowUpCircle className="text-neutral-textLow" />} />
+                  <Text className="mt-2 text-neutral-textLow">Clique para enviar uma imagem</Text>
+                  <Text fontSize="caption" className="mt-1 text-neutral-textLow">
+                    Formatos aceitos: JPG, PNG, GIF
+                  </Text>
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </Card.Body>
+    </Card>
   );
 };
 
