@@ -76,20 +76,20 @@ const SEODashboard: React.FC = () => {
         <CardContent>
           <Tabs>
             <Tabs.Item 
-              selected={activeTab === 'overview'} 
               onClick={() => setActiveTab('overview')}
+              selected={activeTab === 'overview'} 
             >
               Visão Geral
             </Tabs.Item>
             <Tabs.Item 
-              selected={activeTab === 'keywords'} 
               onClick={() => setActiveTab('keywords')}
+              selected={activeTab === 'keywords'} 
             >
               Palavras-chave
             </Tabs.Item>
             <Tabs.Item 
-              selected={activeTab === 'readability'} 
               onClick={() => setActiveTab('readability')}
+              selected={activeTab === 'readability'} 
             >
               Legibilidade
             </Tabs.Item>

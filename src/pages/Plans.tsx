@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -153,7 +154,7 @@ const Plans: React.FC = () => {
   if (plansLoading) {
     return (
       <div className="container mx-auto py-8 px-4">
-        <LoadingSpinner size="lg" text="Carregando planos..." />
+        <LoadingSpinner size="large" text="Carregando planos..." />
       </div>
     );
   }
