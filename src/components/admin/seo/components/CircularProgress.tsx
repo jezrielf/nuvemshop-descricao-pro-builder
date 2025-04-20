@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { getScoreColor, getScoreBg } from '../utils/scoreUtils';
+import { getScoreColor } from '../utils/scoreUtils';
 
 interface CircularProgressProps {
   score: number;

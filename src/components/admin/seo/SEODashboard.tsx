@@ -25,7 +25,7 @@ const SEODashboard: React.FC = () => {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-2xl font-bold">Dashboard SEO</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[#68737D]">
             Análise e otimização do conteúdo das suas descrições de produto
           </p>
         </CardHeader>

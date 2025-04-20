@@ -27,8 +27,8 @@ const DescriptionAnalysis: React.FC = () => {
           Voltar ao Editor
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Análise de Descrição</h1>
-          <p className="text-muted-foreground">Visualize métricas detalhadas e análise SEO da sua descrição</p>
+          <h1 className="text-2xl font-bold text-[#303846]">Análise de Descrição</h1>
+          <p className="text-[#68737D]">Visualize métricas detalhadas e análise SEO da sua descrição</p>
         </div>
       </div>
 
