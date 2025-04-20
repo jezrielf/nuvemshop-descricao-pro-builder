@@ -11,19 +11,10 @@ export const useAuthSession = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const profileFetchedRef = useRef<boolean>(false);
-  const refreshInProgressRef = useRef<boolean>(false);
   const { toast } = useToast();
 
   // Memoize fetchProfile to prevent recreating this function on each render
   const fetchProfile = useCallback(async (userId: string) => {
-    // Skip if already in progress
-    if (refreshInProgressRef.current) {
-      console.log('Profile refresh already in progress, skipping duplicate request');
-      return profile;
-    }
-    
-    refreshInProgressRef.current = true;
-    
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
@@ -34,20 +25,16 @@ export const useAuthSession = () => {
 
       if (error) {
         console.error('Erro ao buscar perfil:', error);
-        return profile;
+        return;
       }
 
       console.log("Perfil carregado:", data);
       setProfile(data as Profile);
       profileFetchedRef.current = true;
-      return data as Profile;
     } catch (error) {
       console.error('Erro ao buscar perfil:', error);
-      return profile;
-    } finally {
-      refreshInProgressRef.current = false;
     }
-  }, [profile]);
+  }, []);
   
   const refreshProfile = useCallback(async () => {
     if (user) {
@@ -55,14 +42,13 @@ export const useAuthSession = () => {
       profileFetchedRef.current = false;
       return fetchProfile(user.id);
     }
-    return Promise.resolve(profile);
-  }, [user, fetchProfile, profile]);
+    return Promise.resolve();
+  }, [user, fetchProfile]);
 
   useEffect(() => {
     // Reset profileFetchedRef when component unmounts
     return () => {
       profileFetchedRef.current = false;
-      refreshInProgressRef.current = false;
     };
   }, []);
 

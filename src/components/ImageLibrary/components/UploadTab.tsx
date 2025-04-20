@@ -40,7 +40,7 @@ const UploadTab: React.FC<UploadTabProps> = ({
             />
             <Button
               variant="ghost" 
-              size="small"
+              size="icon"
               className="absolute top-2 right-2 bg-white/80 hover:bg-white/90 rounded-full"
               onClick={onCancel}
             >

@@ -49,7 +49,7 @@ serve(async (req) => {
       if (!user?.email) throw new Error("User not authenticated or email not available");
       logStep("User authenticated", { userId: user.id, email: user.email });
 
-      // Check for roles in profile
+      // Check for admin or premium role in profile
       const { data: profileData, error: profileError } = await supabaseClient
         .from('profiles')
         .select('role')
@@ -59,69 +59,44 @@ serve(async (req) => {
       if (!profileError && profileData) {
         logStep("User profile found", { role: profileData.role });
         
-        // Extract roles from profile
-        let roles: string[] = [];
+        // Check if user has a role that grants premium access
         if (profileData.role) {
-          if (typeof profileData.role === 'string') {
-            // Handle comma-separated roles
-            roles = profileData.role.split(',').map(r => r.trim());
-          } else if (Array.isArray(profileData.role)) {
-            roles = profileData.role;
-          } else {
-            roles = [String(profileData.role)];
+          const roles = typeof profileData.role === 'string' 
+            ? profileData.role.split(',') 
+            : Array.isArray(profileData.role) ? profileData.role : [profileData.role];
+          
+          if (roles.includes('admin')) {
+            logStep("User has admin role, granting admin subscription tier");
+            return new Response(
+              JSON.stringify({
+                subscribed: true,
+                subscription_tier: "admin",
+                subscription_end: null, // Admin access never expires
+              }),
+              {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                status: 200,
+              }
+            );
           }
-        }
-        
-        // Check for admin role which grants admin privileges
-        if (roles.includes('admin')) {
-          logStep("User has admin role, granting admin subscription tier");
-          return new Response(
-            JSON.stringify({
-              subscribed: true,
-              subscription_tier: "admin",
-              subscription_end: null, // Admin access never expires
-            }),
-            {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 200,
-            }
-          );
-        }
-        
-        // Check for premium role which grants premium privileges
-        if (roles.includes('premium')) {
-          logStep("User has premium role, granting premium subscription tier");
-          return new Response(
-            JSON.stringify({
-              subscribed: true,
-              subscription_tier: "premium",
-              subscription_end: null, // Role-based premium access never expires
-            }),
-            {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 200,
-            }
-          );
-        }
-        
-        // Check for business role which grants business privileges
-        if (roles.includes('business')) {
-          logStep("User has business role, granting business subscription tier");
-          return new Response(
-            JSON.stringify({
-              subscribed: true,
-              subscription_tier: "business",
-              subscription_end: null, // Role-based business access never expires
-            }),
-            {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 200,
-            }
-          );
+          
+          if (roles.includes('premium')) {
+            logStep("User has premium role, granting premium subscription tier");
+            return new Response(
+              JSON.stringify({
+                subscribed: true,
+                subscription_tier: "premium",
+                subscription_end: null, // Role-based premium access never expires
+              }),
+              {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                status: 200,
+              }
+            );
+          }
         }
       }
 
-      // If no role-based privileges, check Stripe for subscription
       const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
       
       // Check if the customer exists in Stripe

@@ -16,21 +16,21 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({ template }) =>
     <div className="flex justify-end space-x-2">
       <Button 
         variant="ghost" 
-        size="small"
+        size="icon"
         onClick={() => openPreviewDialog(template)}
       >
         <Eye className="h-4 w-4" />
       </Button>
       <Button 
         variant="ghost" 
-        size="small"
+        size="icon"
         onClick={() => openEditDialog(template)}
       >
         <Pencil className="h-4 w-4" />
       </Button>
       <Button 
         variant="ghost" 
-        size="small"
+        size="icon"
         onClick={() => openDeleteDialog(template)}
       >
         <Trash className="h-4 w-4" />
