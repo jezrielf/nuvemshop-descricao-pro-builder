@@ -13,6 +13,18 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   rightIcon?: React.ReactNode;
 }
 
+const buttonVariantMap = {
+  outline: "secondary",
+  ghost: "tertiary",
+  default: "primary",
+} as const;
+
+const buttonSizeMap = {
+  sm: "small",
+  md: "medium",
+  lg: "large",
+} as const;
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ 
     variant = "primary", 
@@ -22,15 +34,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     disabled = false, 
     children, 
     leftIcon, 
-    rightIcon, 
+    rightIcon,
     className,
     ...props 
   }, ref) => {
+    // Map variant from shadcn to Nimbus
+    const mappedVariant = buttonVariantMap[variant as keyof typeof buttonVariantMap] || variant;
+    // Map size from shadcn to Nimbus
+    const mappedSize = buttonSizeMap[size as keyof typeof buttonSizeMap] || size;
+
     return (
       <NimbusButton
         ref={ref}
-        variant={variant}
-        size={size}
+        variant={mappedVariant}
+        size={mappedSize}
         full={full}
         loading={loading}
         disabled={disabled}
