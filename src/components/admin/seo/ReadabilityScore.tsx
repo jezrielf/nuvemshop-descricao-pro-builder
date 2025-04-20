@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useEditorStore } from '@/store/editor';
@@ -60,9 +59,11 @@ export const ReadabilityScore: React.FC = () => {
       totalReadingTime += words.length / 200; // Average reading speed
       totalScore += individualScore;
       
+      // Here's the fix: using name property instead of title
+      // The ProductDescription type has 'name' field, not 'title'
       return {
         id: index,
-        title: desc.title || `Descrição ${index + 1}`,
+        title: desc.name || `Descrição ${index + 1}`,
         score: individualScore,
         avgSentenceLength: avgSentenceLength.toFixed(1),
         complexWordsPerc: Math.round(complexWordsPerc)
