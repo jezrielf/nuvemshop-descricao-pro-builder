@@ -55,7 +55,7 @@ export const UserButton: React.FC = () => {
 
   if (!user) {
     return (
-      <Button variant="outline" asChild size="sm" className="h-8 text-xs sm:text-sm">
+      <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm">
         <Link to="/auth">Entrar</Link>
       </Button>
     );
@@ -113,7 +113,7 @@ export const UserButton: React.FC = () => {
         <DropdownMenuSeparator />
         {isAdmin() && (
           <>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem>
               <Link to="/admin" className="flex items-center cursor-pointer">
                 <Shield className="mr-2 h-4 w-4" />
                 <span>Painel Admin</span>

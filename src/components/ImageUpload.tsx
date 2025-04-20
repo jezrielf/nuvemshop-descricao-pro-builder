@@ -3,12 +3,12 @@ import React from 'react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { Button } from '@/components/ui/button';
 import { Card, Text, Icon } from '@nimbus-ds/components';
-import { Progress } from '@nimbus-ds/components';
+import { ProgressBar } from '@nimbus-ds/components';
 import { 
-  ArrowUpIcon, 
-  ImageIcon,
-  CheckCircleIcon 
-} from '@nimbus-ds/icons';
+  ArrowUpCircle, 
+  Image,
+  CheckCircle
+} from 'lucide-react';
 
 const ImageUpload: React.FC = () => {
   const { uploading, uploadProgress, imageUrl, handleFileChange } = useImageUpload();
@@ -30,13 +30,13 @@ const ImageUpload: React.FC = () => {
               />
             </div>
             <div className="flex items-center justify-center text-green-600">
-              <Icon source={<CheckCircleIcon />} color="success-interactive" />
+              <Icon source={<CheckCircle className="text-success-interactive" />} />
               <Text className="ml-2">Upload realizado com sucesso!</Text>
             </div>
             <div className="flex justify-between">
               <Button
                 variant="secondary"
-                leftIcon={<Icon source={<ArrowUpIcon />} />}
+                leftIcon={<Icon source={<ArrowUpCircle />} />}
                 onClick={() => {
                   const inputElement = document.getElementById('image-input') as HTMLInputElement;
                   if (inputElement) inputElement.click();
@@ -47,7 +47,7 @@ const ImageUpload: React.FC = () => {
               
               <Button
                 variant="tertiary"
-                leftIcon={<Icon source={<ImageIcon />} />}
+                leftIcon={<Icon source={<Image />} />}
                 onClick={() => navigator.clipboard.writeText(imageUrl)}
               >
                 Copiar URL
@@ -58,7 +58,7 @@ const ImageUpload: React.FC = () => {
           <div className="space-y-4">
             {uploading ? (
               <div className="space-y-2">
-                <Progress value={uploadProgress} max={100} />
+                <ProgressBar value={uploadProgress} max={100} />
                 <Text fontSize="caption" className="text-center text-neutral-textLow">
                   Enviando... {uploadProgress}%
                 </Text>
@@ -80,7 +80,7 @@ const ImageUpload: React.FC = () => {
                     if (inputElement) inputElement.click();
                   }}
                 >
-                  <Icon source={<ArrowUpIcon />} size="large" color="neutral-textLow" />
+                  <Icon source={<ArrowUpCircle className="text-neutral-textLow" />} />
                   <Text className="mt-2 text-neutral-textLow">Clique para enviar uma imagem</Text>
                   <Text fontSize="caption" className="mt-1 text-neutral-textLow">
                     Formatos aceitos: JPG, PNG, GIF

@@ -12,9 +12,12 @@ export const Spinner: React.FC<SpinnerProps> = ({
   size = 'medium',
   ...props 
 }) => {
+  // Make sure size is a valid Nimbus spinner size
+  const spinnerSize = ['small', 'medium', 'large'].includes(size) ? size : 'medium';
+  
   return (
     <div className={cn("flex items-center justify-center", className)} {...props}>
-      <NimbusSpinner size={size} />
+      <NimbusSpinner size={spinnerSize} />
     </div>
   );
 };
