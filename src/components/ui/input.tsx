@@ -31,24 +31,25 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    // Ensure size is always a valid Nimbus Input size
+    // Define the validated size with correct type
     const validatedSize: "small" | "medium" = size === "small" ? "small" : "medium";
     
-    return (
-      <NimbusInput
-        ref={ref}
-        size={validatedSize}
-        label={label}
-        hint={hint}
-        error={error}
-        disabled={disabled}
-        readOnly={readOnly}
-        full={full}
-        leftIcon={leftIcon}
-        rightIcon={rightIcon}
-        {...props}
-      />
-    );
+    // NimbusInput expects specific props, so we'll create a properly typed object
+    const nimbusProps = {
+      ref,
+      size: validatedSize,
+      label,
+      hint,
+      error,
+      disabled,
+      readOnly,
+      full,
+      leftIcon,
+      rightIcon,
+      ...props
+    };
+    
+    return <NimbusInput {...nimbusProps} />;
   }
 );
 
