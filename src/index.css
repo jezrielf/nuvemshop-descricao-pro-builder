@@ -1,6 +1,4 @@
 
-@import "@nimbus-ds/styles/dist/index.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -60,5 +58,35 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Nimbus DS fallback styles */
+.nimbus-spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: nimbus-spin 0.6s linear infinite;
+}
+
+.nimbus-spinner.small {
+  width: 16px;
+  height: 16px;
+}
+
+.nimbus-spinner.medium {
+  width: 24px;
+  height: 24px;
+}
+
+.nimbus-spinner.large {
+  width: 32px;
+  height: 32px;
+}
+
+@keyframes nimbus-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

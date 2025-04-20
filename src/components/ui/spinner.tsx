@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Spinner as NimbusSpinner } from '@nimbus-ds/components';
+import { cn } from '@/lib/utils';
 
 interface SpinnerProps {
   size?: 'small' | 'medium' | 'large';
@@ -8,5 +8,14 @@ interface SpinnerProps {
 }
 
 export const Spinner = ({ size = 'medium', className }: SpinnerProps) => {
-  return <NimbusSpinner size={size} className={className} />;
+  return (
+    <div 
+      className={cn(
+        'nimbus-spinner', 
+        size,
+        className
+      )}
+      aria-label="Loading"
+    />
+  );
 };
