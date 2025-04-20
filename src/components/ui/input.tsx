@@ -1,22 +1,54 @@
-import * as React from "react"
 
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { Input as NimbusInput } from "@nimbus-ds/components";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+  size?: "small" | "medium";
+  label?: string;
+  hint?: string;
+  error?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  full?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      size = "medium",
+      label,
+      hint,
+      error,
+      disabled,
+      readOnly,
+      full = false,
+      leftIcon,
+      rightIcon,
+      ...props
+    },
+    ref
+  ) => {
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
-        )}
+      <NimbusInput
         ref={ref}
+        size={size}
+        label={label}
+        hint={hint}
+        error={error}
+        disabled={disabled}
+        readOnly={readOnly}
+        full={full}
+        leftIcon={leftIcon}
+        rightIcon={rightIcon}
         {...props}
       />
-    )
+    );
   }
-)
-Input.displayName = "Input"
+);
 
-export { Input }
+Input.displayName = "Input";
+
+export { Input };

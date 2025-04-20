@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs } from '@nimbus-ds/components';
 import { useSEOMetrics } from '@/hooks/seo/useSEOMetrics';
 import { MetricsOverview } from './MetricsOverview';
 import { KeywordAnalysis } from './KeywordAnalysis';
@@ -11,11 +11,12 @@ import { ReadabilityMetrics } from './types';
 
 const SEODashboard: React.FC = () => {
   const { metrics, loading } = useSEOMetrics();
+  const [activeTab, setActiveTab] = React.useState('overview');
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Spinner className="h-8 w-8 border-primary" />
+        <Spinner size="medium" />
         <span className="ml-3 text-lg">Carregando métricas...</span>
       </div>
     );
@@ -73,24 +74,33 @@ const SEODashboard: React.FC = () => {
           </p>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="w-full justify-start">
-              <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-              <TabsTrigger value="keywords">Palavras-chave</TabsTrigger>
-              <TabsTrigger value="readability">Legibilidade</TabsTrigger>
-            </TabsList>
+          <Tabs>
+            <Tabs.List>
+              <Tabs.Item 
+                active={activeTab === 'overview'} 
+                onClick={() => setActiveTab('overview')}
+              >
+                Visão Geral
+              </Tabs.Item>
+              <Tabs.Item 
+                active={activeTab === 'keywords'} 
+                onClick={() => setActiveTab('keywords')}
+              >
+                Palavras-chave
+              </Tabs.Item>
+              <Tabs.Item 
+                active={activeTab === 'readability'} 
+                onClick={() => setActiveTab('readability')}
+              >
+                Legibilidade
+              </Tabs.Item>
+            </Tabs.List>
 
-            <TabsContent value="overview" className="pt-4">
-              <MetricsOverview metrics={readabilityMetrics} />
-            </TabsContent>
-
-            <TabsContent value="keywords" className="pt-4">
-              <KeywordAnalysis />
-            </TabsContent>
-
-            <TabsContent value="readability" className="pt-4">
-              <ReadabilityScore />
-            </TabsContent>
+            <div className="pt-4">
+              {activeTab === 'overview' && <MetricsOverview metrics={readabilityMetrics} />}
+              {activeTab === 'keywords' && <KeywordAnalysis />}
+              {activeTab === 'readability' && <ReadabilityScore />}
+            </div>
           </Tabs>
         </CardContent>
       </Card>

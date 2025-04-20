@@ -7,6 +7,8 @@ interface CircularProgressProps {
 }
 
 export const CircularProgress: React.FC<CircularProgressProps> = ({ score }) => {
+  // Nimbus não tem um componente circular progress diretamente,
+  // então vamos manter esta implementação personalizada
   return (
     <div className="relative w-40 h-40 flex items-center justify-center mb-4">
       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
