@@ -64,10 +64,6 @@ const SEODashboard: React.FC = () => {
     }))
   };
 
-  const handleTabChange = (tabValue: string) => {
-    setActiveTab(tabValue);
-  };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -78,8 +74,8 @@ const SEODashboard: React.FC = () => {
           </p>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onChange={handleTabChange}>
-            <Tabs.Group>
+          <Tabs onChange={(e) => setActiveTab(e.target.value)} value={activeTab}>
+            <Tabs.List>
               <Tabs.Item value="overview">
                 Visão Geral
               </Tabs.Item>
@@ -89,7 +85,7 @@ const SEODashboard: React.FC = () => {
               <Tabs.Item value="readability">
                 Legibilidade
               </Tabs.Item>
-            </Tabs.Group>
+            </Tabs.List>
 
             <div className="pt-4">
               {activeTab === 'overview' && <MetricsOverview metrics={readabilityMetrics} />}
