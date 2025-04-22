@@ -38,19 +38,19 @@ const DescriptionAnalysis: React.FC = () => {
           <TabsTrigger value="history">Histórico</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview">
+        <TabsContent value="overview" className="mt-4">
           <Card className="p-6">
             <SEODashboard />
           </Card>
         </TabsContent>
 
-        <TabsContent value="performance">
+        <TabsContent value="performance" className="mt-4">
           <Card className="p-6">
             <ProductPerformance />
           </Card>
         </TabsContent>
 
-        <TabsContent value="history">
+        <TabsContent value="history" className="mt-4">
           <Card className="p-6">
             <SEOHistory />
           </Card>

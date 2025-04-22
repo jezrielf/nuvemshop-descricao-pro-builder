@@ -15,14 +15,15 @@ import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import NimbusDemo from '@/components/NimbusDemo';
 
-const placeholderImages = [
-  '/tutorial/welcome.png',
-  '/tutorial/add-blocks.png',
-  '/tutorial/templates.png',
-  '/tutorial/customize.png',
-  '/tutorial/preview.png',
-  '/tutorial/export.png'
-];
+// Remove these placeholders since the images are not available
+// const placeholderImages = [
+//   '/tutorial/welcome.png',
+//   '/tutorial/add-blocks.png',
+//   '/tutorial/templates.png',
+//   '/tutorial/customize.png',
+//   '/tutorial/preview.png',
+//   '/tutorial/export.png'
+// ];
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -81,11 +82,7 @@ const Index = () => {
         .catch(err => console.error("Erro ao atualizar templates no background:", err));
     }, 5 * 60 * 1000); // 5 minutos
     
-    // Pré-carrega as imagens do tutorial
-    placeholderImages.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
+    // Removed the preloading of tutorial images since they're not available
     
     // Limpar o intervalo quando o componente for desmontado
     return () => {

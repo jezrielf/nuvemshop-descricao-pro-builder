@@ -5,4 +5,5 @@ export interface TextBlock extends BlockBase {
   type: 'text';
   heading: string;
   content: string;
+  style?: Record<string, any>;
 }
