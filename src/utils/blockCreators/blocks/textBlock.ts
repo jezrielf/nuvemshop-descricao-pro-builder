@@ -11,6 +11,6 @@ export const createTextBlock = (columns: ColumnLayout, title?: string): Block =>
     visible: true,
     heading: title || 'Título do Texto',
     content: '<p>Insira o conteúdo aqui. Você pode adicionar informações detalhadas sobre seu produto ou serviço.</p>',
-    style: {} // Adding style property to ensure block has all required properties
+    style: {} // This is now consistently required, and we're initializing it with an empty object
   } as TextBlock;
 };
