@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -13,17 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
-import NimbusDemo from '@/components/NimbusDemo';
 
-// Remove these placeholders since the images are not available
-// const placeholderImages = [
-//   '/tutorial/welcome.png',
-//   '/tutorial/add-blocks.png',
-//   '/tutorial/templates.png',
-//   '/tutorial/customize.png',
-//   '/tutorial/preview.png',
-//   '/tutorial/export.png'
-// ];
+// Removido: import NimbusDemo from '@/components/NimbusDemo';
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -82,7 +74,7 @@ const Index = () => {
         .catch(err => console.error("Erro ao atualizar templates no background:", err));
     }, 5 * 60 * 1000); // 5 minutos
     
-    // Removed the preloading of tutorial images since they're not available
+    // Removida a pre-carga de imagens do tutorial do Nimbus
     
     // Limpar o intervalo quando o componente for desmontado
     return () => {
@@ -107,10 +99,10 @@ const Index = () => {
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
       
-      {/* Nimbus Demo */}
-      <div className="bg-gray-100 p-4 border-b">
+      {/* Nimbus Demo removido */}
+      {/* <div className="bg-gray-100 p-4 border-b">
         <NimbusDemo />
-      </div>
+      </div> */}
       
       <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
         <div className="flex-1">
@@ -185,3 +177,4 @@ const Index = () => {
 };
 
 export default Index;
+
