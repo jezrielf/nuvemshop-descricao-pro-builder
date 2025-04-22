@@ -13,23 +13,25 @@ const SEOHistory: React.FC = () => {
   // Generate historical SEO data based on real saved descriptions
   const historicalData = useMemo(() => {
     // If no descriptions, return empty historical data
-    if (!savedDescriptions.length) {
+    if (!savedDescriptions || !savedDescriptions.length) {
       return generateEmptyHistoricalData();
     }
 
     // Sort descriptions by updatedAt date
     const sortedDescriptions = [...savedDescriptions]
-      .sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt).getTime();
+        const dateB = new Date(b.updatedAt).getTime();
+        return dateA - dateB;
+      });
     
     // Generate data points for the chart
-    const data = [];
-    const today = new Date();
-    
-    // Create a map of dates to track changes
     const dateMap = new Map();
     
     // Add each description update as a data point
     sortedDescriptions.forEach(desc => {
+      if (!desc.updatedAt) return; // Skip if no updatedAt date
+      
       const updateDate = new Date(desc.updatedAt);
       const dateKey = format(updateDate, 'dd/MM', { locale: ptBR });
       
@@ -65,37 +67,75 @@ const SEOHistory: React.FC = () => {
     });
     
     // Fill in missing dates with interpolated data
+    const result = [];
+    const today = new Date();
+    
     for (let i = 30; i >= 0; i--) {
       const date = subDays(today, i);
       const dateKey = format(date, 'dd/MM', { locale: ptBR });
       
-      if (!dateMap.has(dateKey)) {
-        // For missing dates, generate data based on nearest known data points
-        const prevDataPoint = findNearestDataPoint(dateMap, date, true);
-        const nextDataPoint = findNearestDataPoint(dateMap, date, false);
+      if (dateMap.has(dateKey)) {
+        result.push(dateMap.get(dateKey));
+      } else {
+        // Find nearest data points
+        let prevData = null;
+        let nextData = null;
         
-        if (prevDataPoint && nextDataPoint) {
-          // Interpolate between known data points
-          const totalDays = (nextDataPoint.date.getTime() - prevDataPoint.date.getTime()) / (24 * 60 * 60 * 1000);
-          const daysFromPrev = (date.getTime() - prevDataPoint.date.getTime()) / (24 * 60 * 60 * 1000);
-          const ratio = daysFromPrev / totalDays;
+        // Find previous known data point
+        for (let j = i + 1; j <= 30; j++) {
+          const prevDate = subDays(today, j);
+          const prevKey = format(prevDate, 'dd/MM', { locale: ptBR });
+          if (dateMap.has(prevKey)) {
+            prevData = dateMap.get(prevKey);
+            break;
+          }
+        }
+        
+        // Find next known data point
+        for (let j = i - 1; j >= 0; j--) {
+          const nextDate = subDays(today, j);
+          const nextKey = format(nextDate, 'dd/MM', { locale: ptBR });
+          if (dateMap.has(nextKey)) {
+            nextData = dateMap.get(nextKey);
+            break;
+          }
+        }
+        
+        // Interpolate data
+        if (prevData && nextData) {
+          // Simple linear interpolation
+          const totalDays = 30 - i + (i - (30 - Object.keys(dateMap).length));
+          const daysFromPrev = i;
+          const ratio = daysFromPrev / totalDays || 0.5;
           
-          dateMap.set(dateKey, {
+          result.push({
             date: dateKey,
-            seoScore: Math.round(prevDataPoint.data.seoScore + (nextDataPoint.data.seoScore - prevDataPoint.data.seoScore) * ratio),
-            readabilityScore: Math.round(prevDataPoint.data.readabilityScore + (nextDataPoint.data.readabilityScore - prevDataPoint.data.readabilityScore) * ratio),
-            views: Math.round(prevDataPoint.data.views + (nextDataPoint.data.views - prevDataPoint.data.views) * ratio),
-            keywords: Math.round(prevDataPoint.data.keywords + (nextDataPoint.data.keywords - prevDataPoint.data.keywords) * ratio)
+            seoScore: Math.round(prevData.seoScore + (nextData.seoScore - prevData.seoScore) * ratio),
+            readabilityScore: Math.round(prevData.readabilityScore + (nextData.readabilityScore - prevData.readabilityScore) * ratio),
+            views: Math.round(prevData.views + (nextData.views - prevData.views) * ratio),
+            keywords: Math.round(prevData.keywords + (nextData.keywords - prevData.keywords) * ratio)
           });
-        } else if (prevDataPoint) {
-          // Use previous data point if no next data point
-          dateMap.set(dateKey, { ...prevDataPoint.data, date: dateKey });
-        } else if (nextDataPoint) {
-          // Use next data point if no previous data point
-          dateMap.set(dateKey, { ...nextDataPoint.data, date: dateKey });
+        } else if (prevData) {
+          // Use previous data
+          result.push({
+            date: dateKey,
+            seoScore: prevData.seoScore,
+            readabilityScore: prevData.readabilityScore,
+            views: prevData.views,
+            keywords: prevData.keywords
+          });
+        } else if (nextData) {
+          // Use next data
+          result.push({
+            date: dateKey,
+            seoScore: nextData.seoScore,
+            readabilityScore: nextData.readabilityScore,
+            views: nextData.views,
+            keywords: nextData.keywords
+          });
         } else {
-          // No data points at all - use default values
-          dateMap.set(dateKey, {
+          // No reference data, use default
+          result.push({
             date: dateKey,
             seoScore: 65,
             readabilityScore: 70,
@@ -106,23 +146,24 @@ const SEOHistory: React.FC = () => {
       }
     }
     
-    // Convert map to array and sort by date
-    const dataArray = Array.from(dateMap.entries()).map(([key, value]) => value);
-    dataArray.sort((a, b) => {
-      const dateA = parseISO(`2023/${a.date.split('/').reverse().join('/')}`);
-      const dateB = parseISO(`2023/${b.date.split('/').reverse().join('/')}`);
+    return result.sort((a, b) => {
+      const partsA = a.date.split('/');
+      const partsB = b.date.split('/');
+      // Create date objects with current year
+      const dateA = new Date(new Date().getFullYear(), parseInt(partsA[1]) - 1, parseInt(partsA[0]));
+      const dateB = new Date(new Date().getFullYear(), parseInt(partsB[1]) - 1, parseInt(partsB[0]));
       return dateA.getTime() - dateB.getTime();
     });
-    
-    return dataArray;
   }, [savedDescriptions]);
 
   // Helper function to generate empty historical data
   const generateEmptyHistoricalData = () => {
     const data = [];
+    const today = new Date();
+    
     for (let i = 30; i >= 0; i--) {
       data.push({
-        date: format(subDays(new Date(), i), 'dd/MM', { locale: ptBR }),
+        date: format(subDays(today, i), 'dd/MM', { locale: ptBR }),
         seoScore: 0,
         readabilityScore: 0,
         views: 0,
@@ -132,32 +173,7 @@ const SEOHistory: React.FC = () => {
     return data;
   };
 
-  // Helper function to find the nearest data point before or after a given date
-  const findNearestDataPoint = (dateMap: Map<string, any>, targetDate: Date, findBefore: boolean) => {
-    let nearestDate = null;
-    let nearestDistance = Infinity;
-    let nearestData = null;
-    
-    dateMap.forEach((data, dateKey) => {
-      const dateParts = dateKey.split('/');
-      // Assuming the current year for simplicity
-      const currentDate = new Date(new Date().getFullYear(), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
-      const distance = targetDate.getTime() - currentDate.getTime();
-      
-      if ((findBefore && distance > 0) || (!findBefore && distance < 0)) {
-        const absDistance = Math.abs(distance);
-        if (absDistance < nearestDistance) {
-          nearestDistance = absDistance;
-          nearestDate = currentDate;
-          nearestData = data;
-        }
-      }
-    });
-    
-    return nearestDate ? { date: nearestDate, data: nearestData } : null;
-  };
-
-  if (savedDescriptions.length === 0) {
+  if (!savedDescriptions || savedDescriptions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[300px] text-center p-8">
         <h3 className="text-lg font-medium mb-2">Sem histórico de SEO</h3>
