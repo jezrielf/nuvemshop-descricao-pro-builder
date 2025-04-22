@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -14,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
+import NimbusDemo from '@/components/NimbusDemo';
 
 const placeholderImages = [
   '/tutorial/welcome.png',
@@ -109,6 +109,11 @@ const Index = () => {
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
+      
+      {/* Nimbus Demo */}
+      <div className="bg-gray-100 p-4 border-b">
+        <NimbusDemo />
+      </div>
       
       <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
         <div className="flex-1">
