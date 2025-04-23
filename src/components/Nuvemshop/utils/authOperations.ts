@@ -31,6 +31,11 @@ export const exchangeCodeForToken = async (authCode: string): Promise<NuvemshopA
  * Generate the authorization URL for Nuvemshop
  */
 export const getNuvemshopAuthUrl = () => {
-  // Always return the specific URL provided by the user
-  return 'http://nuvemshop.com.br/apps/17194/authorize?state=csrf-code';
+  // Usar a URL correta de produção com os parâmetros necessários
+  const clientId = "17194";
+  const redirectUrl = encodeURIComponent(window.location.origin);
+  const state = "csrf-code"; // Para proteção CSRF
+  
+  // Construir a URL correta com parâmetros de redirecionamento
+  return `https://www.nuvemshop.com.br/apps/${clientId}/authorize?state=${state}&redirect_uri=${redirectUrl}`;
 };

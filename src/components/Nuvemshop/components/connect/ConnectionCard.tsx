@@ -74,27 +74,26 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
               <Button 
                 variant="outline"
                 onClick={handleClearCache}
-                className="text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100"
+                className="text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100 mb-4"
               >
                 Limpar Cache de Conexão
               </Button>
               
-              <div className="mt-4 space-y-4">
-                <div className="space-y-2">
-                  <Button
-                    variant="default"
-                    onClick={handleConnect}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    Conectar Loja Nuvemshop
-                  </Button>
-                  <p className="text-xs text-gray-500">
-                    Clique para conectar sua loja Nuvemshop usando o link direto de autorização.
-                  </p>
-                </div>
+              <div className="space-y-2">
+                <Button
+                  variant="default"
+                  onClick={handleConnect}
+                  className="bg-green-600 hover:bg-green-700 w-full"
+                >
+                  Conectar Loja Nuvemshop
+                </Button>
+                <p className="text-xs text-gray-500">
+                  Clique para conectar sua loja Nuvemshop automaticamente. Você será redirecionado para autorizar o acesso.
+                </p>
               </div>
               
-              <div className="mt-6">
+              <div className="mt-8 pt-4 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Modo avançado (se o automático falhar)</h3>
                 <AuthenticationPanel
                   redirectUrl={redirectUrl}
                   setRedirectUrl={setRedirectUrl}

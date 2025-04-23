@@ -1,12 +1,15 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
 import { useNuvemshopCodeExtractor } from '@/components/Nuvemshop/hooks/useNuvemshopCodeExtractor';
 import { ConnectionCard } from '@/components/Nuvemshop/components/connect/ConnectionCard';
 import { ProductsCard } from '@/components/Nuvemshop/components/connect/ProductsCard';
+import { useToast } from '@/hooks/use-toast';
 
 const NuvemshopConnect: React.FC = () => {
+  const { toast } = useToast();
+  
   // Custom hooks for functionality
   const {
     loading,
@@ -45,6 +48,21 @@ const NuvemshopConnect: React.FC = () => {
     copyToClipboard
   } = useNuvemshopCodeExtractor(setTestCode);
 
+  // Verificar se há código no URL e automaticamente processar
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const codeParam = query.get('code');
+    
+    if (codeParam && !success && !authenticating) {
+      console.log("Código detectado no URL durante carregamento:", codeParam);
+      setTestCode(codeParam);
+      toast({
+        title: 'Código encontrado',
+        description: 'Um código de autorização foi detectado na URL.',
+      });
+    }
+  }, []);
+
   // Handlers
   const handleTestCodeClick = () => {
     handleTestCode(testCode);
@@ -67,7 +85,7 @@ const NuvemshopConnect: React.FC = () => {
     
     // Limpar cache antes de conectar
     clearAuthCache(false);
-    // Connect using the hardcoded URL
+    // Connect using the correct URL
     handleConnect();
   };
 

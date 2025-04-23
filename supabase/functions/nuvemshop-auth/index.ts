@@ -52,6 +52,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'DescricaoPro comercial@weethub.com'
       },
       body: formData.toString(),
     });

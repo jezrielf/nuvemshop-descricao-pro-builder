@@ -12,7 +12,7 @@ export function useNuvemshopAuth() {
   const [success, setSuccess] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [testCode, setTestCode] = useState('e39f0b78582c53585b1bafa6a02fc0cb70e94031');
+  const [testCode, setTestCode] = useState('');
   const [storeName, setStoreName] = useState<string | null>(null);
   
   const location = useLocation();
@@ -28,13 +28,8 @@ export function useNuvemshopAuth() {
       setUserId(storedUserId);
       setStoreName(storedStoreName);
       setSuccess(true);
-      
-      // Redirect to homepage if we're on the nuvemshop-connect page
-      if (location.pathname === '/nuvemshop-connect') {
-        navigate('/', { replace: true });
-      }
     }
-  }, [location.pathname, navigate]);
+  }, []);
 
   // Handle the redirect from Nuvemshop with the authorization code
   useEffect(() => {
@@ -44,12 +39,17 @@ export function useNuvemshopAuth() {
       const codeParam = query.get('code');
       
       if (codeParam && !authenticating && !success) {
+        console.log("Código de autorização detectado na URL:", codeParam);
         await processAuthCode(codeParam);
+        
+        // Limpar o código da URL após processá-lo para evitar reprocessamento
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
       }
     };
     
     handleAuthorizationCode();
-  }, [location.search, authenticating, success, navigate, toast]);
+  }, [location.search, authenticating, success]);
 
   const processAuthCode = async (authCode: string) => {
     try {
@@ -71,9 +71,6 @@ export function useNuvemshopAuth() {
         title: 'Loja conectada com sucesso!',
         description: 'Sua loja Nuvemshop foi conectada com sucesso.',
       });
-      
-      // Redirect to the homepage after successful connection
-      navigate('/', { replace: true });
     } catch (err: any) {
       console.error('Authentication error:', err);
       setError(err.message);
@@ -89,11 +86,12 @@ export function useNuvemshopAuth() {
 
   const handleConnect = () => {
     setLoading(true);
-    // Limpar o cache antes de conectar - SEMPRE fazer isso para garantir
-    // que não estamos usando dados de uma conexão anterior
+    // Limpar o cache antes de conectar
     clearAuthCache(false);
     // Redirect to Nuvemshop authorization URL
-    window.location.href = getNuvemshopAuthUrl();
+    const authUrl = getNuvemshopAuthUrl();
+    console.log("Redirecionando para URL de autorização:", authUrl);
+    window.location.href = authUrl;
   };
   
   const handleTestCode = async (code: string) => {
@@ -130,15 +128,7 @@ export function useNuvemshopAuth() {
         title: 'Cache limpo',
         description: 'O cache de conexão com a Nuvemshop foi limpo com sucesso.',
       });
-      
-      // Reload the page to ensure a clean state
-      window.location.reload();
     }
-  };
-
-  // Utility function to reset the store URL name state (not needed anymore but kept for API compatibility)
-  const resetStoreUrlName = () => {
-    // Function kept for API compatibility
   };
 
   return {
@@ -156,6 +146,6 @@ export function useNuvemshopAuth() {
     handleDisconnect,
     clearAuthCache,
     storeName,
-    resetStoreUrlName
+    resetStoreUrlName: () => {} // Function kept for API compatibility
   };
 }
