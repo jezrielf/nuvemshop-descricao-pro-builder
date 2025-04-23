@@ -25,9 +25,21 @@ export const UserButton: React.FC = () => {
     isPremium, 
     isBusiness, 
     openCustomerPortal,
-    refreshProfile
+    refreshProfile,
+    subscriptionTier
   } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Debug log para verificar os papéis do usuário
+  useEffect(() => {
+    if (profile) {
+      console.log('UserButton - Perfil:', profile);
+      console.log('UserButton - Roles:', profile.role);
+      console.log('UserButton - isPremium:', isPremium());
+      console.log('UserButton - isAdmin:', isAdmin());
+      console.log('UserButton - subscriptionTier:', subscriptionTier);
+    }
+  }, [profile, isPremium, isAdmin, subscriptionTier]);
 
   // Handle manual profile refresh
   const handleRefreshProfile = async () => {

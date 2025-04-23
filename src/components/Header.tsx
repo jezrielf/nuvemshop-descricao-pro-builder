@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,9 +23,22 @@ const Header: React.FC = () => {
     isSubscribed, 
     descriptionCount, 
     canCreateMoreDescriptions, 
-    subscriptionTier 
+    subscriptionTier,
+    profile
   } = auth;
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile';
+  
+  // Log para debug dos papéis e status
+  useEffect(() => {
+    if (profile) {
+      console.log('Header - Perfil do usuário:', profile);
+      console.log('Header - Roles:', profile.role);
+      console.log('Header - isPremium:', isPremium());
+      console.log('Header - isBusiness:', isBusiness());
+      console.log('Header - isSubscribed:', isSubscribed());
+      console.log('Header - subscriptionTier:', subscriptionTier);
+    }
+  }, [profile, isPremium, isBusiness, isSubscribed, subscriptionTier]);
   
   // Verificar se há uma loja Nuvemshop conectada
   const isNuvemshopConnected = !!localStorage.getItem('nuvemshop_access_token');
@@ -49,16 +61,10 @@ const Header: React.FC = () => {
 
   // Memoize the subscription badge to prevent unnecessary re-renders
   const subscriptionBadge = useMemo(() => {
-    if (subscriptionTier === 'free') {
-      return (
-        <Badge variant="outline" className="ml-2 bg-yellow-50 text-yellow-700 border-yellow-300">
-          <BadgeAlert className="mr-1 h-3 w-3" />
-          Modo Grátis ({descriptionCount}/3)
-        </Badge>
-      );
-    }
+    // Debug log
+    console.log('Rendering subscription badge with tier:', subscriptionTier, 'isPremium:', isPremiumUser);
     
-    if (subscriptionTier === 'premium') {
+    if (isPremiumUser) {
       return (
         <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-300">
           <BadgeCheck className="mr-1 h-3 w-3" />
@@ -67,7 +73,7 @@ const Header: React.FC = () => {
       );
     }
     
-    if (subscriptionTier === 'business') {
+    if (isBusinessUser) {
       return (
         <Badge variant="outline" className="ml-2 bg-purple-50 text-purple-700 border-purple-300">
           <Crown className="mr-1 h-3 w-3" />
@@ -76,8 +82,15 @@ const Header: React.FC = () => {
       );
     }
     
-    return <div className="h-6 w-0 ml-2" aria-hidden="true"></div>;
-  }, [subscriptionTier, descriptionCount]);
+    // Usuário gratuito
+    return (
+      <Badge variant="outline" className="ml-2 bg-yellow-50 text-yellow-700 border-yellow-300">
+        <BadgeAlert className="mr-1 h-3 w-3" />
+        Modo Grátis ({descriptionCount}/3)
+      </Badge>
+    );
+  }, [subscriptionTier, isPremiumUser, isBusinessUser, descriptionCount]);
+  
   
   return (
     <header className="border-b bg-white shadow-sm px-3 sm:px-6 py-4 w-full">
