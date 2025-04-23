@@ -12,12 +12,17 @@ export const useDeletePlan = (
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleDeleteConfirm = async (plan: Plan | null) => {
-    if (!plan) return;
-    
+  const handleDeleteConfirm = async () => {
     try {
       setIsSubmitting(true);
       setLoading(true);
+      
+      // Get the plan from the parent component's state instead of as parameter
+      const plan = window.selectedPlanToDelete;
+      if (!plan) {
+        console.error("No plan selected for deletion");
+        return;
+      }
       
       console.log("Excluindo plano:", plan.id);
       await adminService.deletePlan(plan.id);
@@ -29,6 +34,9 @@ export const useDeletePlan = (
       
       // Refresh plans list
       await fetchPlans();
+      
+      // Clear the selected plan
+      window.selectedPlanToDelete = null;
       
       // Close the dialog
       setIsDeleteDialogOpen(false);
@@ -48,3 +56,15 @@ export const useDeletePlan = (
 
   return { handleDeleteConfirm, isSubmitting };
 };
+
+// Declare global window property for TypeScript
+declare global {
+  interface Window {
+    selectedPlanToDelete: Plan | null;
+  }
+}
+
+// Initialize the global variable
+if (typeof window !== 'undefined') {
+  window.selectedPlanToDelete = null;
+}

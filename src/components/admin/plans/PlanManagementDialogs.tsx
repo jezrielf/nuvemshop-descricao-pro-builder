@@ -42,7 +42,7 @@ const PlanManagementDialogs: React.FC<PlanManagementDialogsProps> = ({
       <PlanDetailsDialog
         open={isViewOpen}
         onOpenChange={onViewOpenChange}
-        plan={selectedPlan}
+        selectedPlan={selectedPlan}
       />
 
       {/* Diálogo de confirmação para exclusão */}
