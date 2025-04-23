@@ -165,7 +165,7 @@ serve(async (req) => {
       
       logStep("User authenticated", { userId: user.id, email: user.email });
       
-      // Check if user is admin
+      // Check if user is admin by properly retrieving and checking roles
       const { data: profile, error: profileError } = await supabaseClient
         .from('profiles')
         .select('role')
@@ -183,7 +183,22 @@ serve(async (req) => {
         });
       }
       
-      if (profile.role !== 'admin') {
+      // Debug log the complete profile role value
+      logStep("User role check", { role: profile.role });
+      
+      // Improved role check - handles both string and array roles
+      let isAdmin = false;
+      if (profile.role) {
+        if (typeof profile.role === 'string') {
+          // Check if 'admin' is in comma-separated string
+          isAdmin = profile.role.split(',').map(r => r.trim()).includes('admin');
+        } else if (Array.isArray(profile.role)) {
+          // Check if 'admin' is in array
+          isAdmin = profile.role.includes('admin');
+        }
+      }
+      
+      if (!isAdmin) {
         logStep("ERROR: User is not an admin", { role: profile.role });
         return new Response(JSON.stringify({ 
           error: "Unauthorized: Admin access required", 

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from '@/components/admin/AdminLayout';
 import UsersPanel from '@/components/admin/UsersPanel';
 import SettingsPanel from '@/components/admin/SettingsPanel';
@@ -17,17 +18,31 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, session, isAdmin } = useAuth();
   
   useEffect(() => {
-    // Verificar se o admin está autenticado
-    const adminAuth = localStorage.getItem('adminAuth');
-    if (adminAuth !== 'true') {
-      navigate('/admin-auth');
+    // Verificar se o usuário está autenticado e é administrador
+    if (!user) {
+      toast({
+        title: "Acesso negado",
+        description: "Você precisa estar logado para acessar o painel administrativo.",
+        variant: "destructive"
+      });
+      navigate('/auth');
+    } else if (!isAdmin()) {
+      toast({
+        title: "Acesso negado",
+        description: "Você não tem permissão de administrador.",
+        variant: "destructive"
+      });
+      navigate('/');
     } else {
+      // Usuário autenticado e com permissão de admin
       setIsAuthenticated(true);
+      localStorage.setItem('adminAuth', 'true');
     }
     setLoading(false);
-  }, [navigate]);
+  }, [user, isAdmin, navigate, toast]);
   
   // Observar a aba 'templates' e redirecionar
   useEffect(() => {

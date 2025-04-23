@@ -80,7 +80,7 @@ export const planService = {
     try {
       console.log("Criando novo plano:", planData.name);
       
-      // Get the current session
+      // Always get the most current session before making admin requests
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("Authentication required");
@@ -119,11 +119,13 @@ export const planService = {
     try {
       console.log("Atualizando plano:", planId);
       
-      // Get the current session
+      // Always get the most current session before making admin requests
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("Authentication required");
       }
+      
+      console.log("Token para autorização:", session.access_token.substring(0, 10) + "...");
       
       const { data, error } = await supabase.functions.invoke('manage-plans', {
         body: { 
@@ -159,7 +161,7 @@ export const planService = {
     try {
       console.log("Excluindo plano:", planId);
       
-      // Get the current session
+      // Always get the most current session before making admin requests
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("Authentication required");
