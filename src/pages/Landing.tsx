@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -14,6 +14,14 @@ import {
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // If user is logged in, redirect to editor
+  React.useEffect(() => {
+    if (user) {
+      navigate('/editor');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -28,19 +36,30 @@ const Landing: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/auth')}
-                className="px-4"
-              >
-                Entrar
-              </Button>
-              <Button 
-                onClick={() => navigate('/auth?signup=true')}
-                className="px-4"
-              >
-                Cadastrar
-              </Button>
+              {user ? (
+                <Button 
+                  onClick={() => navigate('/editor')}
+                  className="px-4"
+                >
+                  Ir para Editor
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate('/auth')}
+                    className="px-4"
+                  >
+                    Entrar
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/auth?signup=true')}
+                    className="px-4"
+                  >
+                    Cadastrar
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
