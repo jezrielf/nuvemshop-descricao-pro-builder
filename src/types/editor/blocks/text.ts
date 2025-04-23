@@ -5,5 +5,5 @@ export interface TextBlock extends BlockBase {
   type: 'text';
   heading: string;
   content: string;
-  style: Record<string, any>; // Changed from optional to required
+  style: BlockBase['style']; // Explicitly inheriting the style from BlockBase
 }

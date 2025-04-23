@@ -18,6 +18,8 @@ import { ensureValidBlock } from './validation';
 
 export const createBlock = (type: BlockType, columns: ColumnLayout = 'full'): Block => {
   try {
+    console.log(`Criando bloco do tipo: ${type} com layout: ${columns}`);
+    
     let block: Block;
     
     switch (type) {
@@ -71,14 +73,20 @@ export const createBlock = (type: BlockType, columns: ColumnLayout = 'full'): Bl
         
       default:
         // Provide a more detailed error message
-        throw new Error(`Unrecognized block type: ${type}`);
+        console.error(`Tipo de bloco não reconhecido: ${type}`);
+        throw new Error(`Tipo de bloco não reconhecido: ${type}`);
     }
+    
+    // Ensure the block has all required properties
+    if (!block.style) block.style = {};
+    
+    console.log(`Bloco criado com sucesso: ${block.id} (${block.type})`);
     
     // Validate the created block to ensure it has all required properties
     return ensureValidBlock(block, type);
   } catch (error) {
-    console.error(`Error creating block of type ${type}:`, error);
+    console.error(`Erro ao criar bloco do tipo ${type}:`, error);
     // Fallback to a text block with error information
-    return createTextBlock(columns);
+    return createTextBlock(columns, `Erro: Não foi possível criar bloco do tipo ${type}`);
   }
 };

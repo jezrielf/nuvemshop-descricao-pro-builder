@@ -2,15 +2,32 @@
 import { BlockBase, BlockType } from '@/types/editor/base';
 
 export function validateBaseBlock(block: any): boolean {
-  if (!block || typeof block !== 'object') return false;
+  if (!block || typeof block !== 'object') {
+    console.error('Block is not an object:', block);
+    return false;
+  }
   
   const requiredProperties = ['id', 'type', 'title', 'visible', 'columns', 'style'];
   
-  return requiredProperties.every(prop => prop in block);
+  const missingProps = requiredProperties.filter(prop => !(prop in block));
+  if (missingProps.length > 0) {
+    console.error(`Block is missing required properties: ${missingProps.join(', ')}`, block);
+    return false;
+  }
+  
+  // Style should be an object
+  if (!block.style || typeof block.style !== 'object') {
+    console.error('Block style is not an object:', block.style);
+    return false;
+  }
+  
+  return true;
 }
 
 export function validateBlockByType(block: any): boolean {
-  if (!validateBaseBlock(block)) return false;
+  if (!validateBaseBlock(block)) {
+    return false;
+  }
   
   const type = block.type as BlockType;
   
@@ -40,16 +57,19 @@ export function validateBlockByType(block: any): boolean {
     case 'video':
       return 'videoUrl' in block;
     default:
+      console.error(`Unknown block type: ${type}`);
       return false;
   }
 }
 
 export function ensureValidBlock(block: any, expectedType: BlockType): any {
   if (!block || typeof block !== 'object' || block.type !== expectedType) {
+    console.error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
     throw new Error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
   }
   
   if (!validateBlockByType(block)) {
+    console.error(`Block of type ${expectedType} is missing required properties`);
     throw new Error(`Block of type ${expectedType} is missing required properties`);
   }
   

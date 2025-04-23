@@ -24,6 +24,6 @@ export const createBenefitsBlock = (columns: ColumnLayout): BenefitsBlock => {
         icon: '✓' // Ensure icon is always provided
       }
     ],
-    style: {}
+    style: {} // Explicitly include the style property
   };
 };

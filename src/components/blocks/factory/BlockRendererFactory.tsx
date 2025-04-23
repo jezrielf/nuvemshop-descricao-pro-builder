@@ -116,13 +116,23 @@ export class BlockRendererFactory {
     }
     
     // Garante que tem um estilo
-    if (!fixedBlock.style) {
+    if (!fixedBlock.style || typeof fixedBlock.style !== 'object') {
       fixedBlock.style = {};
     }
     
     // Garante que tem um título
     if (!fixedBlock.title) {
       fixedBlock.title = this.getDefaultTitleForType(fixedBlock.type);
+    }
+
+    // Para blocos de texto, verifica se tem heading e content
+    if (fixedBlock.type === 'text') {
+      if (!fixedBlock.heading) {
+        fixedBlock.heading = 'Título do Texto';
+      }
+      if (!fixedBlock.content) {
+        fixedBlock.content = '<p>Insira o conteúdo aqui.</p>';
+      }
     }
     
     return fixedBlock as Block;
@@ -166,13 +176,19 @@ export class BlockRendererFactory {
    */
   public static createRecoveryComponent(block: any, isPreview: boolean): React.ReactNode {
     try {
+      console.log('Tentando recuperar bloco com problemas:', block);
+      
       // Tenta criar um novo bloco do mesmo tipo, mas válido
       const newBlock = createBlock(block.type as BlockType);
       
       // Copia propriedades seguras do bloco original, se existirem
       if (block.title) newBlock.title = block.title;
       if (block.id) newBlock.id = block.id;
-      if (block.style) newBlock.style = { ...block.style };
+      if (block.style && typeof block.style === 'object') newBlock.style = { ...block.style };
+      if (block.heading) newBlock.heading = block.heading;
+      if (block.content) newBlock.content = block.content;
+      
+      console.log('Bloco recuperado:', newBlock);
       
       // Renderiza um bloco de texto com o conteúdo original, se possível
       return (
@@ -185,7 +201,7 @@ export class BlockRendererFactory {
       );
     } catch (error) {
       console.error('Falha ao tentar recuperar bloco:', error);
-      return this.createErrorComponent(`Bloco do tipo "${block.type}" está faltando propriedades obrigatórias`);
+      return this.createErrorComponent(`Bloco do tipo "${block?.type || 'desconhecido'}" está faltando propriedades obrigatórias`);
     }
   }
 
@@ -193,6 +209,11 @@ export class BlockRendererFactory {
    * Validates if a block is valid before rendering
    */
   public static isValidBlock(block: any): boolean {
+    if (!block || typeof block !== 'object') {
+      console.error('Bloco inválido:', block);
+      return false;
+    }
+    
     try {
       return validateBaseBlock(block);
     } catch (error) {
@@ -215,7 +236,7 @@ export class BlockRendererFactory {
     try {
       return validateBlockByType(block);
     } catch (error) {
-      console.error(`Erro na validação do bloco tipo ${block.type}:`, error);
+      console.error(`Erro na validação do bloco tipo ${block?.type}:`, error);
       return false;
     }
   }

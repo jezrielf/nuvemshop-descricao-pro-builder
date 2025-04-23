@@ -19,6 +19,14 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
   const { selectedBlockId, selectBlock } = useEditorStore();
   const [isMinimized, setIsMinimized] = useState(false);
   
+  // Ensure block has all required properties
+  const isValid = block && 
+                  block.id && 
+                  block.type && 
+                  typeof block.visible === 'boolean' && 
+                  block.columns &&
+                  block.style && typeof block.style === 'object';
+  
   const isSelected = selectedBlockId === block.id;
   
   const handleSelectBlock = (e: React.MouseEvent) => {
@@ -31,8 +39,16 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
     setIsMinimized(prev => !prev);
   };
   
-  // We don't apply any style classes to the editor blocks themselves
-  // These will only be used in the preview
+  // If the block is invalid, show an error state
+  if (!isValid) {
+    console.error('Invalid block in BlockWrapper:', block);
+    return (
+      <div className="border border-red-300 bg-red-50 rounded-md p-4 mb-4">
+        <p className="text-red-600 font-medium">Bloco inválido</p>
+        <p className="text-sm text-red-500">Este bloco está com problemas e precisa ser substituído.</p>
+      </div>
+    );
+  }
   
   return (
     <div 

@@ -289,14 +289,14 @@ export type Database = {
         }[]
       }
       get_user_roles: {
-        Args: { user_id: string }
+        Args: Record<PropertyKey, never> | { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"][]
       }
       has_role: {
-        Args: {
-          user_id: string
-          role: Database["public"]["Enums"]["user_role"]
-        }
+        Args:
+          | { role_name: string }
+          | { user_id: number; role_name: string }
+          | { user_id: string; role: Database["public"]["Enums"]["user_role"] }
         Returns: boolean
       }
     }

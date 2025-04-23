@@ -17,7 +17,37 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
   const { updateBlock, selectedBlockId, description } = useEditorStore();
   const isEditing = selectedBlockId === block.id && !isPreview;
   
-  // Obtém o título do bloco ou usa o nome da descrição como fallback
+  // Ensure the block has all required properties and fix if needed
+  React.useEffect(() => {
+    if (block && block.id) {
+      // Check for missing properties and provide defaults if needed
+      const updates: Partial<TextBlockType> = {};
+      let hasUpdates = false;
+      
+      if (!block.heading) {
+        updates.heading = description?.name ? description.name.replace('Descrição: ', '') : 'Título do Texto';
+        hasUpdates = true;
+      }
+      
+      if (!block.content) {
+        updates.content = '<p>Insira o conteúdo aqui.</p>';
+        hasUpdates = true;
+      }
+      
+      if (!block.style || typeof block.style !== 'object') {
+        updates.style = {};
+        hasUpdates = true;
+      }
+      
+      // Apply updates if any property was missing
+      if (hasUpdates) {
+        console.log(`Corrigindo propriedades ausentes no bloco de texto ${block.id}:`, updates);
+        updateBlock(block.id, updates);
+      }
+    }
+  }, [block?.id, block.heading, block.content, block.style, description, updateBlock]);
+  
+  // Safely get the block title or use fallback
   const blockTitle = block.heading || (description?.name ? description.name.replace('Descrição: ', '') : 'Título do Texto');
   
   const handleUpdateHeading = (heading: string) => {
@@ -34,6 +64,7 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
   
   // Convert HTML to plain text for editing
   const getPlainTextContent = (html: string) => {
+    if (!html) return '';
     const temp = document.createElement('div');
     temp.innerHTML = html;
     return temp.innerText;
@@ -49,13 +80,14 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
     handleUpdateHeading(heading);
   };
   
+  // Preview mode
   if (isPreview) {
     return (
       <div className="w-full p-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-4">{blockTitle}</h2>
           <div 
-            dangerouslySetInnerHTML={{ __html: sanitizeHtmlContent(block.content) }} 
+            dangerouslySetInnerHTML={{ __html: sanitizeHtmlContent(block.content || '<p>Conteúdo não disponível</p>') }} 
             className="prose max-w-none" 
           />
         </div>
@@ -63,6 +95,7 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
     );
   }
   
+  // Edit mode
   return (
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">
@@ -93,7 +126,7 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
               />
             </div>
             <Textarea
-              value={getPlainTextContent(block.content)}
+              value={getPlainTextContent(block.content || '')}
               onChange={(e) => handleUpdateContent(e.target.value)}
               placeholder="Digite o conteúdo do bloco de texto"
               rows={8}
