@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Block, BlockType, TextBlock } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
-import TextBlock as TextBlockComponent from '../TextBlock';
+import TextBlockComponent from '../TextBlock';
 import FeaturesBlock from '../FeaturesBlock';
 import BenefitsBlock from '../BenefitsBlock';
 import SpecificationsBlock from '../SpecificationsBlock';
