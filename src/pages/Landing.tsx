@@ -104,7 +104,7 @@ const Landing: React.FC = () => {
                 className="rounded-lg shadow-lg border"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = "https://static.vecteezy.com/system/resources/previews/015/681/577/large_2x/e-commerce-product-isometric-illustration-suitable-for-mobile-app-website-banner-diagrams-infographics-and-other-graphic-assets-vector.jpg";
+                  target.src = "https://placehold.co/600x400?text=Editor+do+DescricaoPro";
                 }}
               />
             </div>
