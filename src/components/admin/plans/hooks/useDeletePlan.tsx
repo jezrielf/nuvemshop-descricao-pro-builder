@@ -11,15 +11,14 @@ export const useDeletePlan = (
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [planToDelete, setPlanToDelete] = useState<Plan | null>(null);
 
   const handleDeleteConfirm = async () => {
     try {
       setIsSubmitting(true);
       setLoading(true);
       
-      // Get the plan from the parent component's state instead of as parameter
-      const plan = window.selectedPlanToDelete;
-      if (!plan) {
+      if (!planToDelete) {
         console.error("No plan selected for deletion");
         toast({
           title: 'Erro ao excluir plano',
@@ -29,19 +28,19 @@ export const useDeletePlan = (
         return;
       }
       
-      console.log("Excluindo plano:", plan.id);
-      await adminService.deletePlan(plan.id);
+      console.log("Excluindo plano:", planToDelete.id);
+      await adminService.deletePlan(planToDelete.id);
       
       toast({
         title: 'Plano excluído',
-        description: `O plano "${plan.name}" foi excluído com sucesso.`,
+        description: `O plano "${planToDelete.name}" foi excluído com sucesso.`,
       });
       
       // Refresh plans list
       await fetchPlans();
       
       // Clear the selected plan
-      window.selectedPlanToDelete = null;
+      setPlanToDelete(null);
       
       // Close the dialog
       setIsDeleteDialogOpen(false);
@@ -59,17 +58,10 @@ export const useDeletePlan = (
     }
   };
 
-  return { handleDeleteConfirm, isSubmitting };
+  return { 
+    handleDeleteConfirm, 
+    isSubmitting, 
+    planToDelete, 
+    setPlanToDelete 
+  };
 };
-
-// Declare global window property for TypeScript
-declare global {
-  interface Window {
-    selectedPlanToDelete: Plan | null;
-  }
-}
-
-// Initialize the global variable
-if (typeof window !== 'undefined') {
-  window.selectedPlanToDelete = null;
-}

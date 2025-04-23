@@ -15,7 +15,11 @@ export const usePlanActions = (
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const { handleDeleteConfirm, isSubmitting: isDeleting } = useDeletePlan(
+  const { 
+    handleDeleteConfirm, 
+    isSubmitting: isDeleting, 
+    setPlanToDelete 
+  } = useDeletePlan(
     setLoading, 
     setIsDeleteDialogOpen, 
     fetchPlans
@@ -45,10 +49,7 @@ export const usePlanActions = (
 
   const handleDeleteClick = (plan: Plan) => {
     setSelectedPlan(plan);
-    // Store the plan to delete in the global variable
-    if (typeof window !== 'undefined') {
-      window.selectedPlanToDelete = plan;
-    }
+    setPlanToDelete(plan);
     setIsDeleteDialogOpen(true);
   };
 
