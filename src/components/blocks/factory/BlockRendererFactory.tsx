@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Block, BlockType, TextBlock } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
@@ -185,11 +186,17 @@ export class BlockRendererFactory {
       if (block.id) newBlock.id = block.id;
       if (block.style && typeof block.style === 'object') newBlock.style = { ...block.style };
       
-      // Checamos especificamente por cada propriedade para evitar erros de tipo
-      // Checar propriedades específicas do tipo TextBlock
+      // Verificação segura de propriedades específicas por tipo
       if (block.type === 'text') {
-        if ('heading' in block) (newBlock as TextBlock).heading = block.heading;
-        if ('content' in block) (newBlock as TextBlock).content = block.content;
+        if (block.heading !== undefined) (newBlock as TextBlock).heading = block.heading;
+        if (block.content !== undefined) (newBlock as TextBlock).content = block.content;
+      }
+      
+      // Para VideoBlock
+      if (block.type === 'video') {
+        if (block.videoUrl !== undefined) (newBlock as any).videoUrl = block.videoUrl;
+        if (block.title !== undefined) (newBlock as any).title = block.title;
+        if (block.description !== undefined) (newBlock as any).description = block.description;
       }
       
       console.log('Bloco recuperado:', newBlock);

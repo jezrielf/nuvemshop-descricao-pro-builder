@@ -29,7 +29,7 @@ export function generateFeaturesBlockHtml(block: FeaturesBlock): string {
   
   // Generate HTML for each feature with fixed width percentage
   const featuresHtml = features.map(feature => `
-    <div class="feature-item" style="display: inline-block; vertical-align: top; width: ${100/columnCount}%; padding: 8px; box-sizing: border-box;">
+    <div class="feature-item mb-4" style="display: inline-block; vertical-align: top; width: ${100/columnCount}%; padding: 8px; box-sizing: border-box;">
       <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; height: 100%; box-sizing: border-box;">
         ${feature.icon ? `<div style="${block.layout === 'vertical' ? 'text-align: center; margin-bottom: 8px;' : 'float: left; margin-right: 12px;'} font-size: 24px;">${feature.icon}</div>` : ''}
         <div style="${block.layout === 'vertical' ? 'text-align: center;' : ''}">

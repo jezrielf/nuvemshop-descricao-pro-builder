@@ -79,19 +79,25 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   };
   
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, imageId: string) => {
-    const result = await handleFileChange(e, imageId);
-    if (result) {
-      // Atualizar a imagem da galeria
-      handleUpdateImage(imageId, 'src', result.url);
-      handleUpdateImage(imageId, 'alt', result.alt);
+    try {
+      const result = await handleFileChange(e, imageId);
+      if (result) {
+        // Atualizar a imagem da galeria com URL e alt retornados
+        handleUpdateImage(imageId, 'src', result.url);
+        handleUpdateImage(imageId, 'alt', result.alt || 'Imagem da galeria');
+        console.log("Upload concluído, imagem atualizada:", result);
+      }
+    } catch (error) {
+      console.error("Erro ao processar upload:", error);
     }
   };
   
   const handleSelectImageFromLibrary = (imageId: string, imageUrl: string, alt: string) => {
+    console.log("Selecionada imagem da biblioteca:", { imageId, imageUrl, alt });
     // Atualizar a imagem específica na galeria
     const updatedImages = block.images.map(image => {
       if (image.id === imageId) {
-        return { ...image, src: imageUrl, alt: alt };
+        return { ...image, src: imageUrl, alt: alt || 'Imagem da galeria' };
       }
       return image;
     });

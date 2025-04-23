@@ -28,7 +28,7 @@ function isVimeoUrl(url: string): boolean {
 
 // Main function to generate HTML for a video block
 export function generateVideoBlockHtml(block: VideoBlock): string {
-  const { videoUrl, aspectRatio = '16:9', heading, caption } = block;
+  const { videoUrl, aspectRatio = '16:9', title, description } = block;
   const autoplay = block.autoplay ?? true;
   const muteAudio = block.muteAudio ?? false;
   
@@ -84,11 +84,11 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
   // Construct the full HTML for the video block
   return `
     <div class="video-block my-6" style="${containerStyle}">
-      ${heading ? `<h3 class="text-xl font-semibold mb-3" style="color: ${block.style?.headingColor || 'inherit'}">${heading}</h3>` : ''}
+      ${title ? `<h3 class="text-xl font-semibold mb-3" style="color: ${block.style?.headingColor || 'inherit'}">${title}</h3>` : ''}
       <div class="video-container relative ${aspectRatioClass}">
         ${embedCode}
       </div>
-      ${caption ? `<p class="text-sm mt-2 text-gray-600" style="color: ${block.style?.textColor || 'inherit'}">${caption}</p>` : ''}
+      ${description ? `<p class="text-sm mt-2 text-gray-600" style="color: ${block.style?.textColor || 'inherit'}">${description}</p>` : ''}
     </div>
   `;
 }
