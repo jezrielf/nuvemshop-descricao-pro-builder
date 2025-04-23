@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Block, BlockType } from '@/types/editor';
+import { Block, BlockType, TextBlock } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
-import TextBlock from '../TextBlock';
+import TextBlock as TextBlockComponent from '../TextBlock';
 import FeaturesBlock from '../FeaturesBlock';
 import BenefitsBlock from '../BenefitsBlock';
 import SpecificationsBlock from '../SpecificationsBlock';
@@ -53,7 +53,7 @@ export class BlockRendererFactory {
       case 'hero':
         return <HeroBlock block={block} isPreview={isPreview} />;
       case 'text':
-        return <TextBlock block={block} isPreview={isPreview} />;
+        return <TextBlockComponent block={block} isPreview={isPreview} />;
       case 'features':
         return <FeaturesBlock block={block} isPreview={isPreview} />;
       case 'benefits':
@@ -185,8 +185,13 @@ export class BlockRendererFactory {
       if (block.title) newBlock.title = block.title;
       if (block.id) newBlock.id = block.id;
       if (block.style && typeof block.style === 'object') newBlock.style = { ...block.style };
-      if (block.heading) newBlock.heading = block.heading;
-      if (block.content) newBlock.content = block.content;
+      
+      // Checamos especificamente por cada propriedade para evitar erros de tipo
+      // Checar propriedades específicas do tipo TextBlock
+      if (block.type === 'text') {
+        if ('heading' in block) (newBlock as TextBlock).heading = block.heading;
+        if ('content' in block) (newBlock as TextBlock).content = block.content;
+      }
       
       console.log('Bloco recuperado:', newBlock);
       
