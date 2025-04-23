@@ -40,7 +40,7 @@ const Success: React.FC = () => {
   }, [sessionId, refreshSubscription]);
   
   const handleContinue = () => {
-    navigate('/');
+    navigate('/editor');
   };
   
   return (
@@ -77,7 +77,7 @@ const Success: React.FC = () => {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button onClick={handleContinue} disabled={loading}>
-            Continuar para o App
+            Continuar para o Editor
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
