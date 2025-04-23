@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { detectAuthCode, clearAuthCodeFromUrl } from '../utils/authOperations';
 
 interface UseNuvemshopCodeExtractorProps {
   setTestCode: (code: string) => void;
@@ -19,6 +20,7 @@ export function useNuvemshopCodeExtractor({ setTestCode, handleTestCode }: UseNu
       const code = urlObj.searchParams.get('code');
       
       if (code) {
+        console.log("Código extraído da URL:", code);
         setTestCode(code);
         // Automatically test the code after extraction
         setTimeout(() => handleTestCode(), 100);
@@ -42,23 +44,20 @@ export function useNuvemshopCodeExtractor({ setTestCode, handleTestCode }: UseNu
     }
   };
 
-  // Extract from current URL on mount
+  // Auto-extract code on mount or URL change
   useEffect(() => {
-    // Check current URL first
-    const currentUrl = window.location.href;
-    if (currentUrl.includes('code=')) {
-      console.log("Encontrado código na URL atual:", currentUrl);
-      extractAndTestCode(currentUrl);
-    } 
-    // Check referrer second
-    else {
-      const referrer = document.referrer;
-      if (referrer && referrer.includes('code=')) {
-        console.log("Encontrado código no referrer:", referrer);
-        setRedirectUrl(referrer);
-        extractAndTestCode(referrer);
+    const autoExtract = () => {
+      const authCode = detectAuthCode();
+      if (authCode) {
+        console.log("Código detectado automaticamente:", authCode);
+        setTestCode(authCode);
+        if (authCode) {
+          setRedirectUrl(window.location.href);
+        }
       }
-    }
+    };
+    
+    autoExtract();
   }, []);
 
   // Watch for changes in redirectUrl and automatically extract and test code

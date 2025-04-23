@@ -1,8 +1,14 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { getAuthData, storeAuthData, clearAuthData } from '../utils/authStorage';
-import { exchangeCodeForToken, getNuvemshopAuthUrl } from '../utils/authOperations';
+import { 
+  exchangeCodeForToken, 
+  getNuvemshopAuthUrl, 
+  detectAuthCode,
+  clearAuthCodeFromUrl
+} from '../utils/authOperations';
 
 export function useNuvemshopAuth() {
   const [loading, setLoading] = useState(false);
@@ -13,6 +19,7 @@ export function useNuvemshopAuth() {
   const [userId, setUserId] = useState<string | null>(null);
   const [testCode, setTestCode] = useState('');
   const [storeName, setStoreName] = useState<string | null>(null);
+  const [autoAuthTriggered, setAutoAuthTriggered] = useState(false);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -27,80 +34,36 @@ export function useNuvemshopAuth() {
       setUserId(storedUserId);
       setStoreName(storedStoreName);
       setSuccess(true);
+      console.log("Autenticação restaurada do localStorage:", { storedToken, storedUserId, storedStoreName });
+    } else {
+      console.log("Sem autenticação armazenada, verificando código na URL");
+      // Try auto authentication on mount
+      tryAutoAuthentication();
     }
   }, []);
 
-  // Handle the redirect from Nuvemshop with the authorization code
-  useEffect(() => {
-    const handleAuthorizationCode = async () => {
-      // Check for code in URL parameters
-      const query = new URLSearchParams(window.location.search);
-      const codeParam = query.get('code');
-      
-      if (codeParam && !authenticating && !success) {
-        console.log("Código de autorização detectado na URL:", codeParam);
-        await processAuthCode(codeParam);
-        
-        // Limpar o código da URL após processá-lo para evitar reprocessamento
-        // Manter na mesma rota em que o usuário estava
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    };
+  // Auto authentication
+  const tryAutoAuthentication = async () => {
+    if (authenticating || success || autoAuthTriggered) return;
     
-    handleAuthorizationCode();
-  }, [location.search, authenticating, success]);
-
-  // Auto-connection handling
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        // Check for code in URL parameters first
-        const urlParams = new URLSearchParams(window.location.search);
-        const codeParam = urlParams.get('code');
-        
-        if (codeParam && !authenticating && !success) {
-          console.log("Código detectado na URL, processando automaticamente:", codeParam);
-          setAuthenticating(true);
-          await processAuthCode(codeParam);
-          
-          // Clear the code from URL after processing
-          window.history.replaceState({}, document.title, window.location.pathname);
-          return;
-        }
-        
-        // If no code in URL, check referrer
-        const referrer = document.referrer;
-        if (referrer && referrer.includes('code=')) {
-          const referrerUrl = new URL(referrer);
-          const referrerCode = referrerUrl.searchParams.get('code');
-          
-          if (referrerCode && !authenticating && !success) {
-            console.log("Código detectado no referrer, processando automaticamente:", referrerCode);
-            setAuthenticating(true);
-            await processAuthCode(referrerCode);
-          }
-        }
-      } catch (err: any) {
-        console.error('Erro na conexão automática:', err);
-        setError(err.message);
-        toast({
-          variant: 'destructive',
-          title: 'Erro na conexão',
-          description: err.message,
-        });
-      } finally {
-        setAuthenticating(false);
-      }
-    };
-
-    autoConnect();
-  }, []);
+    setAutoAuthTriggered(true);
+    const authCode = detectAuthCode();
+    
+    if (authCode) {
+      console.log("Iniciando autenticação automática com código:", authCode);
+      await processAuthCode(authCode);
+      clearAuthCodeFromUrl();
+    } else {
+      console.log("Nenhum código de autorização detectado para autenticação automática");
+    }
+  };
 
   const processAuthCode = async (authCode: string) => {
     try {
       setAuthenticating(true);
       setError(null);
       
+      console.log("Processando código de autorização:", authCode);
       const data = await exchangeCodeForToken(authCode);
       
       // Store the access token, user ID, and store name
@@ -114,16 +77,19 @@ export function useNuvemshopAuth() {
       
       toast({
         title: 'Loja conectada com sucesso!',
-        description: 'Sua loja Nuvemshop foi conectada com sucesso.',
+        description: `Sua loja ${data.store_name || 'Nuvemshop'} foi conectada com sucesso.`,
       });
+      
+      return true;
     } catch (err: any) {
-      console.error('Authentication error:', err);
+      console.error('Erro na autenticação:', err);
       setError(err.message);
       toast({
         variant: 'destructive',
         title: 'Erro ao conectar',
         description: err.message,
       });
+      return false;
     } finally {
       setAuthenticating(false);
     }
@@ -143,8 +109,9 @@ export function useNuvemshopAuth() {
     if (code) {
       // Limpar cache antes de testar um novo código
       clearAuthCache(false);
-      await processAuthCode(code);
+      return await processAuthCode(code);
     }
+    return false;
   };
   
   const handleDisconnect = () => {
@@ -191,6 +158,6 @@ export function useNuvemshopAuth() {
     handleDisconnect,
     clearAuthCache,
     storeName,
-    resetStoreUrlName: () => {} // Function kept for API compatibility
+    tryAutoAuthentication
   };
 }

@@ -6,6 +6,7 @@ import { useNuvemshopCodeExtractor } from '@/components/Nuvemshop/hooks/useNuvem
 import { ConnectionCard } from '@/components/Nuvemshop/components/connect/ConnectionCard';
 import { ProductsCard } from '@/components/Nuvemshop/components/connect/ProductsCard';
 import { useToast } from '@/hooks/use-toast';
+import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
 
 const NuvemshopConnect: React.FC = () => {
   const { toast } = useToast();
@@ -24,6 +25,7 @@ const NuvemshopConnect: React.FC = () => {
     handleDisconnect,
     clearAuthCache,
     storeName,
+    tryAutoAuthentication
   } = useNuvemshopAuth();
 
   const {
@@ -40,6 +42,7 @@ const NuvemshopConnect: React.FC = () => {
     resetProducts
   } = useNuvemshopProducts(accessToken, userId);
 
+  // Criando a função antes de usá-la
   const handleTestCodeClick = () => {
     if (testCode) {
       handleTestCode(testCode);
@@ -55,6 +58,24 @@ const NuvemshopConnect: React.FC = () => {
     setTestCode,
     handleTestCode: handleTestCodeClick
   });
+
+  // Auto authentication effect
+  useEffect(() => {
+    const attemptAutoAuth = async () => {
+      // Check for auth code in URL or referrer
+      const authCode = detectAuthCode();
+      if (authCode && !success && !authenticating) {
+        console.log("Tentando autenticação automática no carregamento da página");
+        setTestCode(authCode);
+        await handleTestCode(authCode);
+        clearAuthCodeFromUrl();
+      } else if (!success) {
+        console.log("Nenhum código de autorização encontrado para autenticação automática");
+      }
+    };
+    
+    attemptAutoAuth();
+  }, []);
 
   // Handlers
   const handleDisconnectClick = () => {
@@ -81,6 +102,13 @@ const NuvemshopConnect: React.FC = () => {
     clearAuthCache(true);
   };
 
+  // Função para extrair código manualmente
+  const extractCodeFromUrl = () => {
+    if (redirectUrl) {
+      extractAndTestCode(redirectUrl);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Integração com Nuvemshop</h1>
@@ -101,7 +129,7 @@ const NuvemshopConnect: React.FC = () => {
           setTestCode={setTestCode}
           redirectUrl={redirectUrl}
           setRedirectUrl={setRedirectUrl}
-          extractCodeFromUrl={() => extractAndTestCode(redirectUrl)}
+          extractCodeFromUrl={extractCodeFromUrl}
           handleTestCode={handleTestCodeClick}
           copyToClipboard={copyToClipboard}
           handleClearCache={handleClearCache}
