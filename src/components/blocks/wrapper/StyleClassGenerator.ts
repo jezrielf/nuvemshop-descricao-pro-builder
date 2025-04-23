@@ -18,7 +18,6 @@ export const getStyleClasses = (block: BlockBase): string => {
   
   // Background
   if (block.style.backgroundColor) {
-    // Use bracket notation for custom colors
     classes.push(`bg-[${block.style.backgroundColor}]`);
   }
   
@@ -113,9 +112,6 @@ export const getStyleClasses = (block: BlockBase): string => {
   if (block.style.hasShadow) {
     classes.push('shadow-md');
   }
-  
-  // Log the generated classes for debugging
-  console.log(`Style classes for block ${block.id}:`, classes.join(' '));
   
   return classes.join(' ');
 };

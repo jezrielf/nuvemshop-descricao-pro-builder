@@ -2,6 +2,7 @@
 import { EditorState } from '../types';
 import { Block } from '@/types/editor';
 import { generateBlockHtml } from '@/utils/htmlGenerators';
+import { getStylesFromBlock } from '@/utils/styleConverter';
 
 /**
  * Generates the complete HTML output for the product description
@@ -44,11 +45,39 @@ export const generateCompleteHtml = (state: EditorState): string => {
       }
       
       // Apply spacing only if not the last block
-      const marginClass = i < visibleBlocks.length - 1 ? `margin-bottom: ${marginBottom};` : '';
+      const marginStyle = i < visibleBlocks.length - 1 ? `margin-bottom: ${marginBottom};` : '';
+      
+      // Get all custom styles from block
+      const blockStyles = getStylesFromBlock(block);
+      
+      // Combine all styles
+      const combinedStyles = [
+        blockStyles,
+        marginStyle
+      ].filter(Boolean).join('; ');
+      
+      // Add CSS for heading colors and weights if specified
+      const headingStyles = block.style?.headingColor || block.style?.headingWeight ? 
+        `<style>
+          #product-block-${block.id} h1, 
+          #product-block-${block.id} h2, 
+          #product-block-${block.id} h3, 
+          #product-block-${block.id} h4, 
+          #product-block-${block.id} h5, 
+          #product-block-${block.id} h6 {
+            ${block.style?.headingColor ? `color: ${block.style.headingColor};` : ''}
+            ${block.style?.headingWeight ? `font-weight: ${
+              block.style.headingWeight === 'normal' ? '400' : 
+              block.style.headingWeight === 'medium' ? '500' : 
+              block.style.headingWeight === 'semibold' ? '600' : 
+              '700'
+            };` : ''}
+          }
+        </style>` : '';
       
       // Add block HTML with metadata in attributes for later parsing
-      blocksHtml += `<div 
-        style="${marginClass}" 
+      blocksHtml += `${headingStyles}<div 
+        style="${combinedStyles}" 
         id="product-block-${block.id}" 
         data-block-type="${block.type}" 
         data-block-columns="${block.columns}"

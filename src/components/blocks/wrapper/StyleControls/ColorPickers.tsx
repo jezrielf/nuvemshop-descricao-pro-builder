@@ -11,17 +11,8 @@ interface ColorPickersProps {
 
 const ColorPickers: React.FC<ColorPickersProps> = ({ block, updateStyle }) => {
   const handleColorChange = (type: 'backgroundColor' | 'textColor' | 'headingColor', value: string) => {
-    // Create a new style object with the updated value
-    const updatedStyle = {
-      ...block.style,
-      [type]: value
-    };
-    
-    // Update the style
+    console.log(`Updated ${type} to ${value} for block ${block.id}`);
     updateStyle({ [type]: value });
-    
-    // Log the change for debugging
-    console.log(`Updated ${type} to ${value} for block ${block.id}`, updatedStyle);
   };
 
   return (

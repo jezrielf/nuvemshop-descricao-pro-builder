@@ -52,6 +52,22 @@ export const getStylesFromBlock = (block: Block): string => {
   if (style.textAlign) styleProps.push(`text-align: ${style.textAlign}`);
   if (style.lineHeight) styleProps.push(`line-height: ${style.lineHeight}`);
   
+  // Heading color style - for internal wrapper to apply to all h tags
+  if (style.headingColor) {
+    styleProps.push(`--heading-color: ${style.headingColor}`); // CSS variable for heading color
+  }
+  
+  // Heading weight style - for internal wrapper to apply to all h tags
+  if (style.headingWeight) {
+    const headingWeightMap = {
+      'normal': '400',
+      'medium': '500',
+      'semibold': '600',
+      'bold': '700'
+    };
+    styleProps.push(`--heading-weight: ${headingWeightMap[style.headingWeight]}`); // CSS variable for heading weight
+  }
+  
   // Spacing styles
   if (style.padding) {
     const paddingMap = {

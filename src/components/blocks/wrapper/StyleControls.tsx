@@ -29,6 +29,7 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
   
   const updateStyle = (styleUpdates: Partial<BlockStyle>) => {
     const currentStyle = block.style || {};
+    console.log('Updating block styles:', styleUpdates);
     updateBlock(block.id, { 
       style: {
         ...currentStyle,

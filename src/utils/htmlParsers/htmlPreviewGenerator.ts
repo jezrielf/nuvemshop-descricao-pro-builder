@@ -1,6 +1,7 @@
 
 import { Template } from "@/types/editor";
 import { generateBlockHtml } from "../htmlGenerators";
+import { getStylesFromBlock } from "../styleConverter";
 
 /**
  * Generates an HTML preview for a template by rendering all its blocks
@@ -33,7 +34,35 @@ export const generateTemplatePreview = (template: Template): string => {
       // Apply spacing only if not the last block
       const marginStyle = index < template.blocks.length - 1 ? `margin-bottom: ${marginBottom};` : '';
       
-      htmlOutput += `<div style="${marginStyle}" id="product-block-${block.id}">\n`;
+      // Get all custom styles from block
+      const blockStyles = getStylesFromBlock(block);
+      
+      // Combine all styles
+      const combinedStyles = [
+        blockStyles,
+        marginStyle
+      ].filter(Boolean).join('; ');
+      
+      // Add CSS for heading colors and weights if specified
+      const headingStyles = block.style?.headingColor || block.style?.headingWeight ? 
+        `<style>
+          #product-block-${block.id} h1, 
+          #product-block-${block.id} h2, 
+          #product-block-${block.id} h3, 
+          #product-block-${block.id} h4, 
+          #product-block-${block.id} h5, 
+          #product-block-${block.id} h6 {
+            ${block.style?.headingColor ? `color: ${block.style.headingColor};` : ''}
+            ${block.style?.headingWeight ? `font-weight: ${
+              block.style.headingWeight === 'normal' ? '400' : 
+              block.style.headingWeight === 'medium' ? '500' : 
+              block.style.headingWeight === 'semibold' ? '600' : 
+              '700'
+            };` : ''}
+          }
+        </style>` : '';
+      
+      htmlOutput += `${headingStyles}<div style="${combinedStyles}" id="product-block-${block.id}">\n`;
       htmlOutput += blockHtml;
       htmlOutput += '</div>\n';
     } catch (error) {
