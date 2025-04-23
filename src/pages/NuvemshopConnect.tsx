@@ -64,9 +64,11 @@ const NuvemshopConnect: React.FC = () => {
     if (codeParam && !success && !authenticating) {
       console.log("Código detectado no URL durante carregamento:", codeParam);
       setTestCode(codeParam);
+      handleTestCode(codeParam);
+      
       toast({
         title: 'Código encontrado',
-        description: 'Um código de autorização foi detectado na URL.',
+        description: 'Um código de autorização foi detectado na URL e está sendo processado automaticamente.',
       });
     }
   }, []);

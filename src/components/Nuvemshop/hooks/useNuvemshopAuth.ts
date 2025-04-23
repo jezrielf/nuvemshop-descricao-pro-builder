@@ -35,7 +35,7 @@ export function useNuvemshopAuth() {
   useEffect(() => {
     const handleAuthorizationCode = async () => {
       // Check for code in URL parameters
-      const query = new URLSearchParams(location.search);
+      const query = new URLSearchParams(window.location.search);
       const codeParam = query.get('code');
       
       if (codeParam && !authenticating && !success) {
@@ -43,8 +43,8 @@ export function useNuvemshopAuth() {
         await processAuthCode(codeParam);
         
         // Limpar o código da URL após processá-lo para evitar reprocessamento
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
+        // Manter na mesma rota em que o usuário estava
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
     

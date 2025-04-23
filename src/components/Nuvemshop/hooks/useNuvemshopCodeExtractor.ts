@@ -42,28 +42,31 @@ export function useNuvemshopCodeExtractor({ setTestCode, handleTestCode }: UseNu
     }
   };
 
+  // Extract from current URL on mount
+  useEffect(() => {
+    // Check current URL first
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('code=')) {
+      console.log("Encontrado código na URL atual:", currentUrl);
+      extractAndTestCode(currentUrl);
+    } 
+    // Check referrer second
+    else {
+      const referrer = document.referrer;
+      if (referrer && referrer.includes('code=')) {
+        console.log("Encontrado código no referrer:", referrer);
+        setRedirectUrl(referrer);
+        extractAndTestCode(referrer);
+      }
+    }
+  }, []);
+
   // Watch for changes in redirectUrl and automatically extract and test code
   useEffect(() => {
     if (redirectUrl) {
       extractAndTestCode(redirectUrl);
     }
   }, [redirectUrl]);
-
-  // Extract from referrer on mount
-  useEffect(() => {
-    const referrer = document.referrer;
-    if (referrer && referrer.includes('descricaopro.com.br') && referrer.includes('code=')) {
-      setRedirectUrl(referrer);
-    }
-  }, []);
-
-  // Auto extract from current URL if code is present
-  useEffect(() => {
-    const currentUrl = window.location.href;
-    if (currentUrl.includes('code=')) {
-      extractAndTestCode(currentUrl);
-    }
-  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
