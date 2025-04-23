@@ -27,6 +27,7 @@ export const usePlansData = () => {
       }
       
       console.log("Planos buscados com sucesso:", plansData.length);
+      // Importante: não estamos filtrando por isActive aqui, mostrar todos os planos
       setPlans(plansData);
     } catch (error: any) {
       console.error("Erro ao buscar planos:", error);

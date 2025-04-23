@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,6 +76,7 @@ const Plans: React.FC = () => {
         return;
       }
       
+      // Importante: Filtramos apenas planos ativos para a página pública
       const activePlans = data.products
         .filter((product: any) => product.isActive)
         .sort((a: any, b: any) => a.price - b.price)

@@ -1,111 +1,87 @@
-
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Plan, PlanFeature, defaultFeaturesTemplate } from '../types';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { Plan } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
-// Moved schema to the hook for better organization
-const formSchema = z.object({
-  name: z.string().min(3, {
-    message: 'O nome do plano deve ter pelo menos 3 caracteres.',
-  }),
-  description: z.string().optional(),
-  price: z.coerce.number().min(0, {
-    message: 'O preço deve ser um número positivo.',
-  }),
-  isActive: z.boolean().default(true),
-  isDefault: z.boolean().default(false),
-  features: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    included: z.boolean(),
-  })),
-});
-
-export type PlanFormValues = z.infer<typeof formSchema>;
+export interface PlanFormValues {
+  name: string;
+  description: string;
+  price: number;
+  isActive: boolean;
+  isDefault: boolean;
+  features: Array<{ id: string; name: string; included: boolean }>;
+}
 
 export const usePlanForm = (
   initialData: Plan | null,
   onSubmit: (data: Plan | Omit<Plan, 'id'>) => void,
-  onOpenChange: (open: boolean) => void
+  onClose: (open: boolean) => void
 ) => {
   const [newFeatureName, setNewFeatureName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const defaultValues: PlanFormValues = {
-    name: '',
-    description: '',
-    price: 0,
-    isActive: true,
-    isDefault: false,
-    features: [...defaultFeaturesTemplate],
-  };
 
   const form = useForm<PlanFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      name: initialData?.name || '',
+      description: initialData?.description || '',
+      price: initialData?.price || 0,
+      isActive: initialData ? initialData.isActive : true,
+      isDefault: initialData ? initialData.isDefault : false,
+      features: initialData?.features || [],
+    }
   });
 
-  const handleSubmit = async (values: PlanFormValues) => {
-    try {
-      setIsLoading(true);
-      
-      if (initialData) {
-        const planData: Plan = {
-          id: initialData.id,
-          name: values.name,
-          description: values.description,
-          price: values.price,
-          isActive: values.isActive,
-          isDefault: values.isDefault,
-          features: values.features.map(feature => ({
-            id: feature.id,
-            name: feature.name,
-            included: feature.included
-          })),
-          priceId: initialData.priceId || ''
-        };
-        
-        await onSubmit(planData);
-      } else {
-        const newPlan: Omit<Plan, 'id'> = {
-          name: values.name,
-          description: values.description,
-          price: values.price,
-          isActive: values.isActive,
-          isDefault: values.isDefault,
-          features: values.features.map(feature => ({
-            id: feature.id,
-            name: feature.name,
-            included: feature.included
-          }))
-        };
-        
-        await onSubmit(newPlan);
-      }
-      
-      form.reset();
-      setNewFeatureName('');
-    } catch (error) {
-      console.error("Error submitting plan form:", error);
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao salvar o plano. Tente novamente.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+  // Function to handle form submission
+  const handleSubmit = form.handleSubmit((data) => {
+    console.log("Submitting form data:", data);
+
+    // If we have initialData, this is an edit operation
+    if (initialData) {
+      // Make sure we're keeping the id when submitting
+      onSubmit({
+        ...data,
+        id: initialData.id,
+        priceId: initialData.priceId
+      } as Plan);
+    } else {
+      // For new plans, don't include an id (server will generate one)
+      onSubmit(data);
     }
+  });
+
+  // Add a new feature to the form
+  const addFeature = () => {
+    if (!newFeatureName.trim()) return;
+    
+    const currentFeatures = form.getValues('features') || [];
+    form.setValue('features', [
+      ...currentFeatures,
+      { id: uuidv4(), name: newFeatureName, included: true }
+    ]);
+    
+    setNewFeatureName('');
+  };
+
+  // Remove a feature from the form
+  const removeFeature = (featureId: string) => {
+    const currentFeatures = form.getValues('features');
+    form.setValue('features', currentFeatures.filter(f => f.id !== featureId));
+  };
+
+  // Toggle a feature's included status
+  const toggleFeatureIncluded = (featureId: string) => {
+    const currentFeatures = form.getValues('features');
+    form.setValue('features', currentFeatures.map(f => 
+      f.id === featureId ? { ...f, included: !f.included } : f
+    ));
   };
 
   return {
     form,
-    isLoading,
     newFeatureName,
     setNewFeatureName,
-    handleSubmit: form.handleSubmit(handleSubmit),
+    addFeature,
+    removeFeature,
+    toggleFeatureIncluded,
+    handleSubmit,
   };
 };

@@ -15,7 +15,6 @@ import { PlanBasicInfo } from './components/PlanBasicInfo';
 import { PlanStatusToggles } from './components/PlanStatusToggles';
 import { PlanFeaturesManager } from './components/PlanFeaturesManager';
 import { usePlanForm } from './hooks/usePlanForm';
-import { useToast } from '@/hooks/use-toast';
 
 interface PlanFormDialogProps {
   open: boolean;
@@ -34,8 +33,6 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   initialData,
   isSubmitting,
 }) => {
-  const { toast } = useToast();
-  
   const {
     form,
     newFeatureName,
@@ -44,26 +41,30 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   } = usePlanForm(initialData, onSubmit, onOpenChange);
 
   useEffect(() => {
-    if (open && initialData) {
-      console.log("Carregando plano para edição:", initialData);
-      form.reset({
-        name: initialData.name,
-        description: initialData.description || '',
-        price: initialData.price,
-        isActive: initialData.isActive,
-        isDefault: initialData.isDefault,
-        features: initialData.features,
-      });
-      
-      toast({
-        title: "Plano carregado",
-        description: "Os dados do plano foram carregados para edição",
-      });
-    } else if (open && !initialData) {
-      // Reset form when opening for creating a new plan
-      form.reset();
+    if (open) {
+      if (initialData) {
+        console.log("Carregando plano para edição:", initialData);
+        form.reset({
+          name: initialData.name,
+          description: initialData.description || '',
+          price: initialData.price,
+          isActive: initialData.isActive,
+          isDefault: initialData.isDefault,
+          features: initialData.features,
+        });
+      } else {
+        // Reset form when opening for creating a new plan
+        form.reset({
+          name: '',
+          description: '',
+          price: 0,
+          isActive: true,
+          isDefault: false,
+          features: [],
+        });
+      }
     }
-  }, [open, initialData, form, toast]);
+  }, [open, initialData, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
