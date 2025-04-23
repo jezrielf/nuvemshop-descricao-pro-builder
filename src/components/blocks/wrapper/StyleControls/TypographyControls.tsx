@@ -24,7 +24,9 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
   
   const handleTextAlignChange = (value: string) => {
     console.log('Changing text align to:', value);
-    updateStyle({ textAlign: value });
+    // Ensure the value is one of the allowed types for textAlign
+    const textAlign = value as 'left' | 'center' | 'right' | 'justify';
+    updateStyle({ textAlign });
   };
   
   const handleFontWeightChange = (value: string) => {
