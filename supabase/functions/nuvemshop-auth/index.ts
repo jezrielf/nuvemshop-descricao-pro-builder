@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const NUVEMSHOP_CLIENT_ID = "17194";
 const NUVEMSHOP_CLIENT_SECRET = "148c58e8c8e6280d3bc15230ff6758dd3a9ce4fad34d4d0b";
+const REDIRECT_URI = "https://descricaopro.com.br/editor";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -43,6 +44,7 @@ serve(async (req) => {
     formData.append('client_secret', NUVEMSHOP_CLIENT_SECRET);
     formData.append('grant_type', 'authorization_code');
     formData.append('code', code);
+    formData.append('redirect_uri', REDIRECT_URI);
 
     console.log('Preparing request to Nuvemshop token endpoint');
     console.log('Request body:', formData.toString());

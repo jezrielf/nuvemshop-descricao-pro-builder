@@ -32,14 +32,14 @@ export const exchangeCodeForToken = async (authCode: string): Promise<NuvemshopA
  */
 export const getNuvemshopAuthUrl = () => {
   const clientId = "17194";
-  // Use the origin plus /editor path for redirect
-  const rootUrl = window.location.origin + "/editor";
-  const redirectUrl = encodeURIComponent(rootUrl);
+  // Use the exact URL that is registered in the Nuvemshop app settings
+  const redirectUri = "https://descricaopro.com.br/editor";
+  const encodedRedirectUri = encodeURIComponent(redirectUri);
   const state = "csrf-code";
   
-  console.log("Redirect URL for Nuvemshop:", rootUrl);
+  console.log("Redirect URL for Nuvemshop:", redirectUri);
   
-  return `https://www.nuvemshop.com.br/apps/${clientId}/authorize?state=${state}&redirect_uri=${redirectUrl}`;
+  return `https://www.nuvemshop.com.br/apps/${clientId}/authorize?state=${state}&redirect_uri=${encodedRedirectUri}`;
 };
 
 /**
