@@ -1,82 +1,137 @@
-import React, { useState } from 'react';
-import LandingPageImageManager from './LandingPageImageManager';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 
-interface LandingContent {
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import LandingPageImageManager from './LandingPageImageManager';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, Info } from 'lucide-react';
+import { useLandingPageContent } from '@/hooks/useLandingPageContent';
+
+// Import section components
+import { HeroSection } from './landing-page/sections/HeroSection';
+import { FeaturesSection } from './landing-page/sections/FeaturesSection';
+import { ExclusiveFeaturesSection } from './landing-page/sections/ExclusiveFeaturesSection';
+import { HowItWorksSection } from './landing-page/sections/HowItWorksSection';
+import { BenefitsSection } from './landing-page/sections/BenefitsSection';
+import { TestimonialsSection } from './landing-page/sections/TestimonialsSection';
+import { CTASection } from './landing-page/sections/CTASection';
+import { FooterSection } from './landing-page/sections/FooterSection';
+
+const defaultContent = {
   hero: {
-    title: string;
-    subtitle: string;
-    description: string;
-  };
+    title: 'Título Principal',
+    subtitle: 'Subtítulo da página',
+    cta_primary: 'Botão Principal',
+    cta_secondary: 'Botão Secundário'
+  },
   features: {
-    title: string;
-    items: { title: string; description: string }[];
-  };
-  about: {
-    title: string;
-    content: string;
-  };
-}
+    title: 'Recursos da Plataforma',
+    description: 'Descrição dos recursos',
+    items: []
+  },
+  exclusive_features: {
+    title: 'Recursos Exclusivos',
+    items: []
+  },
+  how_it_works: {
+    title: 'Como Funciona',
+    description: 'Descrição de como funciona',
+    steps: []
+  },
+  benefits: {
+    title: 'Por que usar nosso produto?',
+    items: []
+  },
+  testimonials: {
+    title: 'O que nossos clientes dizem',
+    items: []
+  },
+  cta: {
+    title: 'Pronto para começar?',
+    description: 'Descrição para o call-to-action',
+    cta_primary: 'Começar agora',
+    cta_secondary: 'Saiba mais'
+  },
+  footer: {
+    main_text: 'Descrição da empresa',
+    company_name: 'Nome da Empresa',
+    copyright: 'Todos os direitos reservados'
+  }
+};
 
 const LandingPagePanel: React.FC = () => {
-  const { toast } = useToast();
-  const [content, setContent] = useState<LandingContent>({
-    hero: {
-      title: 'DescriçãoPRO',
-      subtitle: 'Gere descrições profissionais para seus produtos',
-      description: 'Uma ferramenta completa para criar descrições otimizadas e atraentes para seu e-commerce.'
-    },
-    features: {
-      title: 'Recursos',
-      items: [
-        { title: 'Editor Visual', description: 'Interface intuitiva para criar descrições.' },
-        { title: 'SEO Otimizado', description: 'Ferramentas para melhorar seu ranking.' },
-        { title: 'Integração com Nuvemshop', description: 'Conecte-se facilmente com sua loja.' }
-      ]
-    },
-    about: {
-      title: 'Sobre Nós',
-      content: 'Somos uma plataforma dedicada a ajudar lojistas a criar conteúdo de qualidade.'
+  const { content, loading, updateSection } = useLandingPageContent();
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [savingSections, setSavingSections] = useState<Record<string, boolean>>({});
+
+  // Function to get content for a section with fallback to default
+  const getSectionContent = (section: string) => {
+    if (!content || !content[section]) {
+      return defaultContent[section as keyof typeof defaultContent] || {};
     }
-  });
+    return content[section];
+  };
 
-  const handleContentChange = (section: keyof LandingContent, field: string, value: string) => {
-    setContent(prev => ({
+  // Update local section content
+  const [localContent, setLocalContent] = useState<Record<string, any>>({});
+  
+  // Initialize local content when content loads from database
+  React.useEffect(() => {
+    if (!loading && content) {
+      setLocalContent(content);
+    }
+  }, [content, loading]);
+
+  // Update local content for a section
+  const updateLocalContent = (section: string, newContent: any) => {
+    setLocalContent(prev => ({
       ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: value
-      }
+      [section]: newContent
     }));
   };
 
-  const handleFeatureChange = (index: number, field: 'title' | 'description', value: string) => {
-    setContent(prev => ({
-      ...prev,
-      features: {
-        ...prev.features,
-        items: prev.features.items.map((item, i) => 
-          i === index ? { ...item, [field]: value } : item
-        )
-      }
-    }));
+  // Save a section
+  const saveSection = async (section: string) => {
+    setSavingSections(prev => ({ ...prev, [section]: true }));
+    
+    try {
+      await updateSection(section, localContent[section]);
+    } finally {
+      setSavingSections(prev => ({ ...prev, [section]: false }));
+    }
   };
 
-  const handleSave = () => {
-    // TODO: Implement saving to backend
-    toast({
-      title: "Conteúdo salvo",
-      description: "As alterações foram salvas com sucesso.",
-    });
+  // Handle accordion state
+  const handleAccordionChange = (value: string) => {
+    setActiveSection(value === activeSection ? null : value);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-lg">Carregando conteúdo da página...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Editor da Landing Page</h1>
+      <div>
+        <h1 className="text-2xl font-bold">Editor da Landing Page</h1>
+        <p className="text-muted-foreground">
+          Personalize o conteúdo da sua página inicial aqui.
+        </p>
+      </div>
+
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Dica</AlertTitle>
+        <AlertDescription>
+          Todas as alterações feitas aqui serão exibidas na página inicial do seu site.
+          Lembre-se de salvar cada seção após fazer as alterações.
+        </AlertDescription>
+      </Alert>
       
       <Tabs defaultValue="content" className="space-y-4">
         <TabsList>
@@ -85,104 +140,109 @@ const LandingPagePanel: React.FC = () => {
           <TabsTrigger value="style">Estilo</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="content" className="space-y-8">
-          {/* Seção Hero */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Seção Principal (Hero)</h3>
-            <div className="grid gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Título</label>
-                <Input 
-                  value={content.hero.title}
-                  onChange={(e) => handleContentChange('hero', 'title', e.target.value)}
-                  placeholder="Título principal"
+        <TabsContent value="content" className="space-y-4">
+          <Accordion 
+            type="single" 
+            collapsible 
+            value={activeSection || undefined}
+            onValueChange={handleAccordionChange}
+          >
+            <AccordionItem value="hero">
+              <AccordionTrigger>Seção Hero (Principal)</AccordionTrigger>
+              <AccordionContent>
+                <HeroSection 
+                  content={getSectionContent('hero')}
+                  onChange={(newContent) => updateLocalContent('hero', newContent)}
+                  onSave={() => saveSection('hero')}
+                  saving={savingSections['hero']}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Subtítulo</label>
-                <Input 
-                  value={content.hero.subtitle}
-                  onChange={(e) => handleContentChange('hero', 'subtitle', e.target.value)}
-                  placeholder="Subtítulo"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Descrição</label>
-                <Textarea 
-                  value={content.hero.description}
-                  onChange={(e) => handleContentChange('hero', 'description', e.target.value)}
-                  placeholder="Descrição principal"
-                  rows={3}
-                />
-              </div>
-            </div>
-          </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Seção de Recursos */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Recursos</h3>
-            <div>
-              <label className="block text-sm font-medium mb-1">Título da Seção</label>
-              <Input 
-                value={content.features.title}
-                onChange={(e) => handleContentChange('features', 'title', e.target.value)}
-                placeholder="Título dos recursos"
-              />
-            </div>
-            <div className="space-y-4">
-              {content.features.items.map((item, index) => (
-                <div key={index} className="grid gap-3 p-4 border rounded-md">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Título do Recurso {index + 1}</label>
-                    <Input 
-                      value={item.title}
-                      onChange={(e) => handleFeatureChange(index, 'title', e.target.value)}
-                      placeholder={`Título do recurso ${index + 1}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Descrição do Recurso</label>
-                    <Textarea 
-                      value={item.description}
-                      onChange={(e) => handleFeatureChange(index, 'description', e.target.value)}
-                      placeholder="Descrição do recurso"
-                      rows={2}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Seção Sobre */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Sobre Nós</h3>
-            <div className="grid gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Título</label>
-                <Input 
-                  value={content.about.title}
-                  onChange={(e) => handleContentChange('about', 'title', e.target.value)}
-                  placeholder="Título da seção sobre"
+            <AccordionItem value="features">
+              <AccordionTrigger>Seção de Recursos</AccordionTrigger>
+              <AccordionContent>
+                <FeaturesSection 
+                  content={getSectionContent('features')}
+                  onChange={(newContent) => updateLocalContent('features', newContent)}
+                  onSave={() => saveSection('features')}
+                  saving={savingSections['features']}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Conteúdo</label>
-                <Textarea 
-                  value={content.about.content}
-                  onChange={(e) => handleContentChange('about', 'content', e.target.value)}
-                  placeholder="Conteúdo da seção sobre"
-                  rows={4}
-                />
-              </div>
-            </div>
-          </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          <div className="flex justify-end pt-4">
-            <Button onClick={handleSave}>
-              Salvar Alterações
-            </Button>
-          </div>
+            <AccordionItem value="exclusive_features">
+              <AccordionTrigger>Recursos Exclusivos</AccordionTrigger>
+              <AccordionContent>
+                <ExclusiveFeaturesSection 
+                  content={getSectionContent('exclusive_features')}
+                  onChange={(newContent) => updateLocalContent('exclusive_features', newContent)}
+                  onSave={() => saveSection('exclusive_features')}
+                  saving={savingSections['exclusive_features']}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="how_it_works">
+              <AccordionTrigger>Como Funciona</AccordionTrigger>
+              <AccordionContent>
+                <HowItWorksSection 
+                  content={getSectionContent('how_it_works')}
+                  onChange={(newContent) => updateLocalContent('how_it_works', newContent)}
+                  onSave={() => saveSection('how_it_works')}
+                  saving={savingSections['how_it_works']}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="benefits">
+              <AccordionTrigger>Benefícios</AccordionTrigger>
+              <AccordionContent>
+                <BenefitsSection 
+                  content={getSectionContent('benefits')}
+                  onChange={(newContent) => updateLocalContent('benefits', newContent)}
+                  onSave={() => saveSection('benefits')}
+                  saving={savingSections['benefits']}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="testimonials">
+              <AccordionTrigger>Depoimentos</AccordionTrigger>
+              <AccordionContent>
+                <TestimonialsSection 
+                  content={getSectionContent('testimonials')}
+                  onChange={(newContent) => updateLocalContent('testimonials', newContent)}
+                  onSave={() => saveSection('testimonials')}
+                  saving={savingSections['testimonials']}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="cta">
+              <AccordionTrigger>CTA (Call to Action)</AccordionTrigger>
+              <AccordionContent>
+                <CTASection 
+                  content={getSectionContent('cta')}
+                  onChange={(newContent) => updateLocalContent('cta', newContent)}
+                  onSave={() => saveSection('cta')}
+                  saving={savingSections['cta']}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="footer">
+              <AccordionTrigger>Rodapé</AccordionTrigger>
+              <AccordionContent>
+                <FooterSection 
+                  content={getSectionContent('footer')}
+                  onChange={(newContent) => updateLocalContent('footer', newContent)}
+                  onSave={() => saveSection('footer')}
+                  saving={savingSections['footer']}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </TabsContent>
 
         <TabsContent value="images">
@@ -190,8 +250,8 @@ const LandingPagePanel: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="style">
-          <div className="text-muted-foreground">
-            Seção de personalização de estilo em desenvolvimento...
+          <div className="p-4 border rounded-md text-center text-muted-foreground">
+            <p>Seção de personalização de estilo em desenvolvimento...</p>
           </div>
         </TabsContent>
       </Tabs>

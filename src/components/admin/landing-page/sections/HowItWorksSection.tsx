@@ -8,26 +8,27 @@ import { Save, Plus, Trash2 } from 'lucide-react';
 import ImageLibrary from '@/components/ImageLibrary/ImageLibrary';
 import { useToast } from '@/hooks/use-toast';
 
-interface FeatureItem {
+interface Step {
+  number: number;
   title: string;
   description: string;
   image: string;
 }
 
-interface FeaturesContent {
+interface HowItWorksContent {
   title: string;
   description: string;
-  items: FeatureItem[];
+  steps: Step[];
 }
 
-interface FeaturesSectionProps {
-  content: FeaturesContent;
-  onChange: (content: FeaturesContent) => void;
+interface HowItWorksSectionProps {
+  content: HowItWorksContent;
+  onChange: (content: HowItWorksContent) => void;
   onSave: () => void;
   saving?: boolean;
 }
 
-export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ 
+export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ 
   content, 
   onChange, 
   onSave,
@@ -40,37 +41,43 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
     onChange({ ...content, [field]: value });
   };
 
-  const updateFeatureItem = (index: number, field: keyof FeatureItem, value: string) => {
-    const updatedItems = [...content.items];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
-    onChange({ ...content, items: updatedItems });
+  const updateStep = (index: number, field: keyof Step, value: any) => {
+    const updatedSteps = [...content.steps];
+    updatedSteps[index] = { ...updatedSteps[index], [field]: value };
+    onChange({ ...content, steps: updatedSteps });
   };
 
-  const addFeatureItem = () => {
-    const newItem = {
-      title: 'Novo Recurso',
-      description: 'Descrição do recurso',
+  const addStep = () => {
+    const newNumber = content.steps.length > 0 
+      ? Math.max(...content.steps.map(step => step.number)) + 1
+      : 1;
+    
+    const newStep = {
+      number: newNumber,
+      title: `Passo ${newNumber}`,
+      description: 'Descrição do passo',
       image: '/placeholder.svg'
     };
-    onChange({ ...content, items: [...content.items, newItem] });
+    
+    onChange({ ...content, steps: [...content.steps, newStep] });
     toast({
-      title: "Item adicionado",
-      description: "Um novo recurso foi adicionado. Personalize-o conforme necessário."
+      title: "Passo adicionado",
+      description: `Passo ${newNumber} foi adicionado. Personalize-o conforme necessário.`
     });
   };
 
-  const removeFeatureItem = (index: number) => {
-    const updatedItems = content.items.filter((_, i) => i !== index);
-    onChange({ ...content, items: updatedItems });
+  const removeStep = (index: number) => {
+    const updatedSteps = content.steps.filter((_, i) => i !== index);
+    onChange({ ...content, steps: updatedSteps });
     toast({
-      title: "Item removido",
-      description: "O recurso foi removido com sucesso."
+      title: "Passo removido",
+      description: "O passo foi removido com sucesso."
     });
   };
 
   const handleImageSelect = (imageUrl: string) => {
     if (activeImageIndex !== null) {
-      updateFeatureItem(activeImageIndex, 'image', imageUrl);
+      updateStep(activeImageIndex, 'image', imageUrl);
       setActiveImageIndex(null);
     }
   };
@@ -78,7 +85,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   return (
     <Card className="mb-6">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl">Seção de Recursos</CardTitle>
+        <CardTitle className="text-xl">Como Funciona</CardTitle>
         <Button 
           onClick={onSave} 
           disabled={saving}
@@ -105,42 +112,52 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Itens de Recursos</h3>
+            <h3 className="text-lg font-medium">Passos</h3>
             <Button 
-              onClick={addFeatureItem} 
+              onClick={addStep} 
               variant="outline" 
               size="sm"
             >
-              <Plus className="h-4 w-4 mr-1" /> Adicionar Item
+              <Plus className="h-4 w-4 mr-1" /> Adicionar Passo
             </Button>
           </div>
           
-          {content.items.map((item, index) => (
+          {content.steps.map((step, index) => (
             <Card key={index} className="p-4">
               <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
                 <div className="space-y-2">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">Número</label>
+                    <input 
+                      type="number"
+                      className="w-full p-2 border rounded"
+                      value={step.number}
+                      onChange={(e) => updateStep(index, 'number', parseInt(e.target.value))}
+                      min="1"
+                    />
+                  </div>
                   <ImageUploadPreview 
-                    src={item.image}
-                    alt={item.title}
+                    src={step.image}
+                    alt={step.title}
                     onEdit={() => setActiveImageIndex(index)}
-                    onRemove={() => updateFeatureItem(index, 'image', '/placeholder.svg')}
+                    onRemove={() => updateStep(index, 'image', '/placeholder.svg')}
                   />
                 </div>
                 <div className="space-y-4">
                   <SectionEditor
                     label="Título"
-                    value={item.title}
-                    onChange={(value) => updateFeatureItem(index, 'title', value)}
+                    value={step.title}
+                    onChange={(value) => updateStep(index, 'title', value)}
                   />
                   <SectionEditor
                     label="Descrição"
-                    value={item.description}
-                    onChange={(value) => updateFeatureItem(index, 'description', value)}
+                    value={step.description}
+                    onChange={(value) => updateStep(index, 'description', value)}
                     multiline
                   />
                   <div className="flex justify-end">
                     <Button 
-                      onClick={() => removeFeatureItem(index)} 
+                      onClick={() => removeStep(index)} 
                       variant="destructive"
                       size="sm"
                     >

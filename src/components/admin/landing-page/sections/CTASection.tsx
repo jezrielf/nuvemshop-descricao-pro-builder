@@ -5,34 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 
-interface HeroContent {
+interface CTAContent {
   title: string;
-  subtitle: string;
+  description: string;
   cta_primary: string;
   cta_secondary: string;
 }
 
-interface HeroSectionProps {
-  content: HeroContent;
-  onChange: (content: HeroContent) => void;
+interface CTASectionProps {
+  content: CTAContent;
+  onChange: (content: CTAContent) => void;
   onSave: () => void;
   saving?: boolean;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ 
+export const CTASection: React.FC<CTASectionProps> = ({ 
   content, 
   onChange, 
   onSave,
   saving = false 
 }) => {
-  const updateField = (field: keyof HeroContent, value: string) => {
+  const updateField = (field: keyof CTAContent, value: string) => {
     onChange({ ...content, [field]: value });
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl">Seção Hero</CardTitle>
+        <CardTitle className="text-xl">Seção CTA (Call to Action)</CardTitle>
         <Button 
           onClick={onSave} 
           disabled={saving}
@@ -44,14 +44,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         <SectionEditor
-          label="Título Principal"
+          label="Título"
           value={content.title}
           onChange={(value) => updateField('title', value)}
         />
         <SectionEditor
-          label="Subtítulo"
-          value={content.subtitle}
-          onChange={(value) => updateField('subtitle', value)}
+          label="Descrição"
+          value={content.description}
+          onChange={(value) => updateField('description', value)}
           multiline
         />
         <SectionEditor

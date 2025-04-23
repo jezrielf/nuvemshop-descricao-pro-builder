@@ -8,26 +8,26 @@ import { Save, Plus, Trash2 } from 'lucide-react';
 import ImageLibrary from '@/components/ImageLibrary/ImageLibrary';
 import { useToast } from '@/hooks/use-toast';
 
-interface FeatureItem {
-  title: string;
-  description: string;
+interface TestimonialItem {
+  name: string;
+  company: string;
   image: string;
+  text: string;
 }
 
-interface FeaturesContent {
+interface TestimonialsContent {
   title: string;
-  description: string;
-  items: FeatureItem[];
+  items: TestimonialItem[];
 }
 
-interface FeaturesSectionProps {
-  content: FeaturesContent;
-  onChange: (content: FeaturesContent) => void;
+interface TestimonialsSectionProps {
+  content: TestimonialsContent;
+  onChange: (content: TestimonialsContent) => void;
   onSave: () => void;
   saving?: boolean;
 }
 
-export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ 
+export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ 
   content, 
   onChange, 
   onSave,
@@ -36,41 +36,42 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   const { toast } = useToast();
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
   
-  const updateField = (field: 'title' | 'description', value: string) => {
+  const updateField = (field: 'title', value: string) => {
     onChange({ ...content, [field]: value });
   };
 
-  const updateFeatureItem = (index: number, field: keyof FeatureItem, value: string) => {
+  const updateTestimonialItem = (index: number, field: keyof TestimonialItem, value: string) => {
     const updatedItems = [...content.items];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
     onChange({ ...content, items: updatedItems });
   };
 
-  const addFeatureItem = () => {
+  const addTestimonialItem = () => {
     const newItem = {
-      title: 'Novo Recurso',
-      description: 'Descrição do recurso',
-      image: '/placeholder.svg'
+      name: 'Nome do Cliente',
+      company: 'Nome da Empresa',
+      image: '/placeholder.svg',
+      text: 'Depoimento do cliente sobre nossa plataforma.'
     };
     onChange({ ...content, items: [...content.items, newItem] });
     toast({
-      title: "Item adicionado",
-      description: "Um novo recurso foi adicionado. Personalize-o conforme necessário."
+      title: "Depoimento adicionado",
+      description: "Um novo depoimento foi adicionado."
     });
   };
 
-  const removeFeatureItem = (index: number) => {
+  const removeTestimonialItem = (index: number) => {
     const updatedItems = content.items.filter((_, i) => i !== index);
     onChange({ ...content, items: updatedItems });
     toast({
-      title: "Item removido",
-      description: "O recurso foi removido com sucesso."
+      title: "Depoimento removido",
+      description: "O depoimento foi removido com sucesso."
     });
   };
 
   const handleImageSelect = (imageUrl: string) => {
     if (activeImageIndex !== null) {
-      updateFeatureItem(activeImageIndex, 'image', imageUrl);
+      updateTestimonialItem(activeImageIndex, 'image', imageUrl);
       setActiveImageIndex(null);
     }
   };
@@ -78,7 +79,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   return (
     <Card className="mb-6">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl">Seção de Recursos</CardTitle>
+        <CardTitle className="text-xl">Depoimentos</CardTitle>
         <Button 
           onClick={onSave} 
           disabled={saving}
@@ -95,52 +96,51 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
             value={content.title}
             onChange={(value) => updateField('title', value)}
           />
-          <SectionEditor
-            label="Descrição"
-            value={content.description}
-            onChange={(value) => updateField('description', value)}
-            multiline
-          />
         </div>
         
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Itens de Recursos</h3>
+            <h3 className="text-lg font-medium">Depoimentos de Clientes</h3>
             <Button 
-              onClick={addFeatureItem} 
+              onClick={addTestimonialItem} 
               variant="outline" 
               size="sm"
             >
-              <Plus className="h-4 w-4 mr-1" /> Adicionar Item
+              <Plus className="h-4 w-4 mr-1" /> Adicionar Depoimento
             </Button>
           </div>
           
           {content.items.map((item, index) => (
             <Card key={index} className="p-4">
-              <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
-                <div className="space-y-2">
+              <div className="grid gap-4 md:grid-cols-[1fr_3fr]">
+                <div className="space-y-4">
                   <ImageUploadPreview 
                     src={item.image}
-                    alt={item.title}
+                    alt={item.name}
                     onEdit={() => setActiveImageIndex(index)}
-                    onRemove={() => updateFeatureItem(index, 'image', '/placeholder.svg')}
+                    onRemove={() => updateTestimonialItem(index, 'image', '/placeholder.svg')}
                   />
                 </div>
                 <div className="space-y-4">
                   <SectionEditor
-                    label="Título"
-                    value={item.title}
-                    onChange={(value) => updateFeatureItem(index, 'title', value)}
+                    label="Nome"
+                    value={item.name}
+                    onChange={(value) => updateTestimonialItem(index, 'name', value)}
                   />
                   <SectionEditor
-                    label="Descrição"
-                    value={item.description}
-                    onChange={(value) => updateFeatureItem(index, 'description', value)}
+                    label="Empresa/Negócio"
+                    value={item.company}
+                    onChange={(value) => updateTestimonialItem(index, 'company', value)}
+                  />
+                  <SectionEditor
+                    label="Depoimento"
+                    value={item.text}
+                    onChange={(value) => updateTestimonialItem(index, 'text', value)}
                     multiline
                   />
                   <div className="flex justify-end">
                     <Button 
-                      onClick={() => removeFeatureItem(index)} 
+                      onClick={() => removeTestimonialItem(index)} 
                       variant="destructive"
                       size="sm"
                     >

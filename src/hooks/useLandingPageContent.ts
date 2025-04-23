@@ -3,6 +3,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+export type LandingPageSection = 
+  | 'hero' 
+  | 'features' 
+  | 'exclusive_features' 
+  | 'how_it_works' 
+  | 'benefits' 
+  | 'testimonials' 
+  | 'cta'
+  | 'footer';
+
 export const useLandingPageContent = () => {
   const [content, setContent] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
@@ -10,6 +20,8 @@ export const useLandingPageContent = () => {
 
   const fetchContent = async () => {
     try {
+      setLoading(true);
+      
       const { data, error } = await supabase
         .from('landing_page_content')
         .select('*');
@@ -23,7 +35,9 @@ export const useLandingPageContent = () => {
       }), {});
 
       setContent(contentMap);
+      console.log("Loaded landing page content:", contentMap);
     } catch (error: any) {
+      console.error("Error loading landing page content:", error);
       toast({
         title: "Erro ao carregar conteúdo",
         description: error.message,
@@ -36,6 +50,8 @@ export const useLandingPageContent = () => {
 
   const updateSection = async (section: string, newContent: any) => {
     try {
+      console.log(`Updating section ${section} with:`, newContent);
+      
       const { error } = await supabase
         .from('landing_page_content')
         .update({ content: newContent })
@@ -52,12 +68,18 @@ export const useLandingPageContent = () => {
         title: "Seção atualizada",
         description: "As alterações foram salvas com sucesso."
       });
+      
+      return true;
     } catch (error: any) {
+      console.error("Error updating section:", error);
+      
       toast({
         title: "Erro ao salvar",
         description: error.message,
         variant: "destructive"
       });
+      
+      return false;
     }
   };
 
@@ -68,6 +90,7 @@ export const useLandingPageContent = () => {
   return {
     content,
     loading,
-    updateSection
+    updateSection,
+    refreshContent: fetchContent
   };
 };
