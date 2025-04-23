@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
@@ -40,6 +41,11 @@ const NuvemshopConnect: React.FC = () => {
     resetProducts
   } = useNuvemshopProducts(accessToken, userId);
 
+  // Define handleTestCodeClick before using it
+  const handleTestCodeClick = () => {
+    handleTestCode(testCode);
+  };
+
   const {
     redirectUrl,
     setRedirectUrl,
@@ -50,7 +56,7 @@ const NuvemshopConnect: React.FC = () => {
     handleTestCode: handleTestCodeClick
   });
 
-  // Verificar se há código no URL e automaticamente processar
+  // Verify if there's a code in the URL and automatically process it
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const codeParam = query.get('code');
@@ -66,10 +72,6 @@ const NuvemshopConnect: React.FC = () => {
   }, []);
 
   // Handlers
-  const handleTestCodeClick = () => {
-    handleTestCode(testCode);
-  };
-
   const handleDisconnectClick = () => {
     handleDisconnect();
     resetProducts();
@@ -85,7 +87,7 @@ const NuvemshopConnect: React.FC = () => {
       e.preventDefault();
     }
     
-    // Limpar cache antes de conectar
+    // Clear cache before connecting
     clearAuthCache(false);
     // Connect using the correct URL
     handleConnect();
@@ -118,7 +120,7 @@ const NuvemshopConnect: React.FC = () => {
           setTestCode={setTestCode}
           redirectUrl={redirectUrl}
           setRedirectUrl={setRedirectUrl}
-          extractCodeFromUrl={extractAndTestCode}
+          extractCodeFromUrl={() => extractAndTestCode(redirectUrl)}
           handleTestCode={handleTestCodeClick}
           copyToClipboard={copyToClipboard}
           handleClearCache={handleClearCache}
