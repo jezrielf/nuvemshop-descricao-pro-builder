@@ -10,6 +10,21 @@ interface SpacingControlsProps {
 }
 
 const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle }) => {
+  const handlePaddingChange = (value: string) => {
+    console.log('Changing padding to:', value);
+    updateStyle({ padding: value });
+  };
+
+  const handleMarginChange = (value: string) => {
+    console.log('Changing margin to:', value);
+    updateStyle({ margin: value });
+  };
+
+  const handleBlockSpacingChange = (value: string) => {
+    console.log('Changing block spacing to:', value);
+    updateStyle({ blockSpacing: value });
+  };
+
   return (
     <div className="space-y-2">
       <h5 className="text-sm font-medium">Espaçamento</h5>
@@ -18,7 +33,7 @@ const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle })
           <Label htmlFor="padding">Padding</Label>
           <Select 
             value={block.style?.padding || 'md'} 
-            onValueChange={(value: any) => updateStyle({ padding: value })}
+            onValueChange={handlePaddingChange}
           >
             <SelectTrigger id="padding">
               <SelectValue placeholder="Padding" />
@@ -36,7 +51,7 @@ const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle })
           <Label htmlFor="margin">Margem</Label>
           <Select 
             value={block.style?.margin || 'md'} 
-            onValueChange={(value: any) => updateStyle({ margin: value })}
+            onValueChange={handleMarginChange}
           >
             <SelectTrigger id="margin">
               <SelectValue placeholder="Margem" />
@@ -52,12 +67,12 @@ const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle })
         </div>
       </div>
       
-      {/* Novo controle para espaçamento entre blocos */}
+      {/* Controle para espaçamento entre blocos */}
       <div className="mt-3">
         <Label htmlFor="blockSpacing">Espaçamento entre blocos</Label>
         <Select 
           value={block.style?.blockSpacing || 'md'} 
-          onValueChange={(value: any) => updateStyle({ blockSpacing: value })}
+          onValueChange={handleBlockSpacingChange}
         >
           <SelectTrigger id="blockSpacing">
             <SelectValue placeholder="Espaçamento entre blocos" />

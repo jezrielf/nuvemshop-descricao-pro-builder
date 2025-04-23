@@ -18,10 +18,20 @@ export const generateTemplatePreview = (template: Template): string => {
     try {
       const blockHtml = generateBlockHtml(block);
       
-      // Add the same wrapper divs and styling that will be used in the export
-      const marginStyle = block.style?.blockSpacing === 'none' 
-        ? 'margin-bottom: 0;' 
-        : (index < template.blocks.length - 1 ? 'margin-bottom: 1.5rem;' : '');
+      // Apply spacing based on block style
+      let marginBottom = '1.5rem';
+      if (block.style?.blockSpacing === 'none') {
+        marginBottom = '0';
+      } else if (block.style?.blockSpacing === 'xs' || block.style?.blockSpacing === 'small') {
+        marginBottom = '0.75rem';
+      } else if (block.style?.blockSpacing === 'md' || block.style?.blockSpacing === 'large') {
+        marginBottom = '2.25rem';
+      } else if (block.style?.blockSpacing === 'lg' || block.style?.blockSpacing === 'xl' || block.style?.blockSpacing === 'extra-large') {
+        marginBottom = '3rem';
+      }
+      
+      // Apply spacing only if not the last block
+      const marginStyle = index < template.blocks.length - 1 ? `margin-bottom: ${marginBottom};` : '';
       
       htmlOutput += `<div style="${marginStyle}" id="product-block-${block.id}">\n`;
       htmlOutput += blockHtml;

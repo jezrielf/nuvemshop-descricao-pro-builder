@@ -12,6 +12,41 @@ interface TypographyControlsProps {
 }
 
 const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateStyle }) => {
+  const handleFontFamilyChange = (value: string) => {
+    console.log('Changing font family to:', value);
+    updateStyle({ fontFamily: value });
+  };
+  
+  const handleFontSizeChange = (value: string) => {
+    console.log('Changing font size to:', value);
+    updateStyle({ fontSize: value });
+  };
+  
+  const handleTextAlignChange = (value: string) => {
+    console.log('Changing text align to:', value);
+    updateStyle({ textAlign: value });
+  };
+  
+  const handleFontWeightChange = (value: string) => {
+    console.log('Changing font weight to:', value);
+    updateStyle({ fontWeight: value });
+  };
+  
+  const handleFontStyleChange = (value: string) => {
+    console.log('Changing font style to:', value);
+    updateStyle({ fontStyle: value });
+  };
+  
+  const handleTextDecorationChange = (value: string) => {
+    console.log('Changing text decoration to:', value);
+    updateStyle({ textDecoration: value });
+  };
+  
+  const handleHeadingWeightChange = (value: string) => {
+    console.log('Changing heading weight to:', value);
+    updateStyle({ headingWeight: value });
+  };
+  
   return (
     <div className="space-y-2">
       <h5 className="text-sm font-medium">Tipografia</h5>
@@ -20,7 +55,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
           <Label htmlFor="fontFamily">Família da fonte</Label>
           <Select 
             value={block.style?.fontFamily || 'sans'} 
-            onValueChange={(value: 'sans' | 'serif' | 'mono') => updateStyle({ fontFamily: value })}
+            onValueChange={handleFontFamilyChange}
           >
             <SelectTrigger id="fontFamily">
               <SelectValue placeholder="Família da fonte" />
@@ -36,7 +71,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
           <Label htmlFor="fontSize">Tamanho da fonte</Label>
           <Select 
             value={block.style?.fontSize || 'base'} 
-            onValueChange={(value: any) => updateStyle({ fontSize: value })}
+            onValueChange={handleFontSizeChange}
           >
             <SelectTrigger id="fontSize">
               <SelectValue placeholder="Tamanho da fonte" />
@@ -57,7 +92,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
         <Label htmlFor="textAlign">Alinhamento</Label>
         <Select 
           value={block.style?.textAlign || 'left'} 
-          onValueChange={(value: any) => updateStyle({ textAlign: value })}
+          onValueChange={handleTextAlignChange}
         >
           <SelectTrigger id="textAlign">
             <SelectValue placeholder="Alinhamento" />
@@ -74,7 +109,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
       <div>
         <Label htmlFor="fontWeight">Estilo do texto</Label>
         <div className="flex space-x-2 mt-1">
-          <ToggleGroup type="single" value={block.style?.fontWeight || 'normal'} onValueChange={(value) => updateStyle({ fontWeight: value as any })}>
+          <ToggleGroup type="single" value={block.style?.fontWeight || 'normal'} onValueChange={handleFontWeightChange}>
             <ToggleGroupItem value="normal" aria-label="Normal">Normal</ToggleGroupItem>
             <ToggleGroupItem value="medium" aria-label="Médio">Médio</ToggleGroupItem>
             <ToggleGroupItem value="semibold" aria-label="Semi-negrito">Semi</ToggleGroupItem>
@@ -86,7 +121,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
       <div>
         <Label>Formatação</Label>
         <div className="flex items-center space-x-2 mt-1">
-          <ToggleGroup type="single" value={block.style?.fontStyle || 'normal'} onValueChange={(value) => updateStyle({ fontStyle: value as any })}>
+          <ToggleGroup type="single" value={block.style?.fontStyle || 'normal'} onValueChange={handleFontStyleChange}>
             <ToggleGroupItem value="normal" aria-label="Normal">
               <span className="mr-2">Aa</span>
             </ToggleGroupItem>
@@ -95,7 +130,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
             </ToggleGroupItem>
           </ToggleGroup>
           
-          <ToggleGroup type="single" value={block.style?.textDecoration || 'none'} onValueChange={(value) => updateStyle({ textDecoration: value as any })}>
+          <ToggleGroup type="single" value={block.style?.textDecoration || 'none'} onValueChange={handleTextDecorationChange}>
             <ToggleGroupItem value="none" aria-label="Sem decoração">
               <span className="mr-2">Aa</span>
             </ToggleGroupItem>
@@ -110,7 +145,7 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
         <Label htmlFor="headingWeight">Estilo dos títulos</Label>
         <Select 
           value={block.style?.headingWeight || 'bold'} 
-          onValueChange={(value: any) => updateStyle({ headingWeight: value })}
+          onValueChange={handleHeadingWeightChange}
         >
           <SelectTrigger id="headingWeight">
             <SelectValue placeholder="Estilo dos títulos" />

@@ -32,9 +32,19 @@ export const generateCompleteHtml = (state: EditorState): string => {
       const blockHtml = generateBlockHtml(block);
       
       // Determine spacing based on block style
-      const marginClass = block.style?.blockSpacing === 'none' 
-        ? 'margin-bottom: 0;' 
-        : (i < visibleBlocks.length - 1 ? 'margin-bottom: 1.5rem;' : '');
+      let marginBottom = '1.5rem';
+      if (block.style?.blockSpacing === 'none') {
+        marginBottom = '0';
+      } else if (block.style?.blockSpacing === 'xs' || block.style?.blockSpacing === 'small') {
+        marginBottom = '0.75rem';
+      } else if (block.style?.blockSpacing === 'md' || block.style?.blockSpacing === 'large') {
+        marginBottom = '2.25rem';
+      } else if (block.style?.blockSpacing === 'lg' || block.style?.blockSpacing === 'xl' || block.style?.blockSpacing === 'extra-large') {
+        marginBottom = '3rem';
+      }
+      
+      // Apply spacing only if not the last block
+      const marginClass = i < visibleBlocks.length - 1 ? `margin-bottom: ${marginBottom};` : '';
       
       // Add block HTML with metadata in attributes for later parsing
       blocksHtml += `<div 

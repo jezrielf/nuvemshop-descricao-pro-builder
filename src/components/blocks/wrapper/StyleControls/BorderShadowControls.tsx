@@ -12,6 +12,26 @@ interface BorderShadowControlsProps {
 }
 
 const BorderShadowControls: React.FC<BorderShadowControlsProps> = ({ block, updateStyle }) => {
+  const handleBorderToggle = (checked: boolean) => {
+    console.log('Toggling border to:', checked);
+    updateStyle({ hasBorder: checked });
+  };
+
+  const handleBorderColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Changing border color to:', e.target.value);
+    updateStyle({ borderColor: e.target.value });
+  };
+
+  const handleShadowToggle = (checked: boolean) => {
+    console.log('Toggling shadow to:', checked);
+    updateStyle({ hasShadow: checked });
+  };
+
+  const handleBorderRadiusChange = (value: string) => {
+    console.log('Changing border radius to:', value);
+    updateStyle({ borderRadius: value });
+  };
+
   return (
     <div className="space-y-2">
       <h5 className="text-sm font-medium">Borda e Sombra</h5>
@@ -20,7 +40,7 @@ const BorderShadowControls: React.FC<BorderShadowControlsProps> = ({ block, upda
         <Switch 
           id="hasBorder"
           checked={block.style?.hasBorder || false} 
-          onCheckedChange={(checked) => updateStyle({ hasBorder: checked })}
+          onCheckedChange={handleBorderToggle}
         />
       </div>
       
@@ -31,7 +51,7 @@ const BorderShadowControls: React.FC<BorderShadowControlsProps> = ({ block, upda
             id="borderColor"
             type="color" 
             value={block.style?.borderColor || '#e5e7eb'} 
-            onChange={(e) => updateStyle({ borderColor: e.target.value })}
+            onChange={handleBorderColorChange}
           />
         </div>
       )}
@@ -41,7 +61,7 @@ const BorderShadowControls: React.FC<BorderShadowControlsProps> = ({ block, upda
         <Switch 
           id="hasShadow"
           checked={block.style?.hasShadow || false} 
-          onCheckedChange={(checked) => updateStyle({ hasShadow: checked })}
+          onCheckedChange={handleShadowToggle}
         />
       </div>
       
@@ -49,7 +69,7 @@ const BorderShadowControls: React.FC<BorderShadowControlsProps> = ({ block, upda
         <Label htmlFor="borderRadius">Arredondamento</Label>
         <Select 
           value={block.style?.borderRadius || 'md'} 
-          onValueChange={(value: any) => updateStyle({ borderRadius: value })}
+          onValueChange={handleBorderRadiusChange}
         >
           <SelectTrigger id="borderRadius">
             <SelectValue placeholder="Arredondamento" />

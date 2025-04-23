@@ -25,6 +25,7 @@ export const generateTextHtml = (block: TextBlock): string => {
     headingStyle = headingColor + headingWeight;
   }
   
+  // Format the content with the appropriate styles
   // Apply heading color and weight to headings if defined
   let content = block.content;
   if (block.style?.headingColor || block.style?.headingWeight) {
@@ -51,6 +52,55 @@ export const generateTextHtml = (block: TextBlock): string => {
     }
   }
   
+  // Format text according to the style settings
+  let textStyle = '';
+  
+  // Apply font family
+  if (block.style?.fontFamily) {
+    const fontFamilyMap = {
+      'sans': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      'serif': 'Georgia, Cambria, "Times New Roman", Times, serif',
+      'mono': 'SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace'
+    };
+    
+    textStyle += `font-family: ${fontFamilyMap[block.style.fontFamily]};`;
+  }
+  
+  // Apply font size
+  if (block.style?.fontSize) {
+    const fontSizeMap = {
+      'xs': '0.75rem',
+      'sm': '0.875rem',
+      'base': '1rem',
+      'lg': '1.125rem',
+      'xl': '1.25rem',
+      '2xl': '1.5rem'
+    };
+    
+    textStyle += `font-size: ${fontSizeMap[block.style.fontSize]};`;
+  }
+  
+  // Apply font style
+  if (block.style?.fontStyle === 'italic') {
+    textStyle += 'font-style: italic;';
+  }
+  
+  // Apply text decoration
+  if (block.style?.textDecoration === 'underline') {
+    textStyle += 'text-decoration: underline;';
+  }
+  
+  // Get content wrapper style
+  let contentWrapperStyle = '';
+  
+  // Apply text alignment
+  if (block.style?.textAlign) {
+    contentWrapperStyle += `text-align: ${block.style.textAlign};`;
+  }
+  
+  // Get content wrapper classes
+  const contentWrapperClasses = ['text-block-content'];
+  
   // Include the heading in the HTML output
   const headingHtml = block.heading ? 
     `<h2 style="margin-bottom: 0.75rem; font-weight: 600; font-size: 1.5rem; line-height: 1.2; ${headingStyle}">${block.heading}</h2>` : '';
@@ -58,7 +108,9 @@ export const generateTextHtml = (block: TextBlock): string => {
   return `
     <div class="text-block" style="${blockStyles}">
       ${headingHtml}
-      <div style="line-height: 1.6;">${content}</div>
+      <div class="${contentWrapperClasses.join(' ')}" style="${contentWrapperStyle} line-height: 1.6;">
+        ${content}
+      </div>
     </div>
   `;
 };
