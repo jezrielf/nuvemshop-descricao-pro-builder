@@ -1,5 +1,6 @@
 
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
 import { useNuvemshopCodeExtractor } from '@/components/Nuvemshop/hooks/useNuvemshopCodeExtractor';
@@ -9,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
 
 const NuvemshopConnect: React.FC = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   
   const {
@@ -67,8 +69,15 @@ const NuvemshopConnect: React.FC = () => {
       if (authCode && !success && !authenticating) {
         console.log("Tentando autenticação automática no carregamento da página");
         setTestCode(authCode);
-        await handleTestCode(authCode);
+        const authResult = await handleTestCode(authCode);
         clearAuthCodeFromUrl();
+        
+        // Se a autenticação foi bem-sucedida e estamos na página de conexão, redireciona para o editor
+        if (authResult && window.location.pathname.includes('nuvemshop-connect')) {
+          setTimeout(() => {
+            navigate('/editor');
+          }, 2000);
+        }
       } else if (!success) {
         console.log("Nenhum código de autorização encontrado para autenticação automática");
       }

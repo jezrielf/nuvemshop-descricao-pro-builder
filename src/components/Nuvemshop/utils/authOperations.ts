@@ -32,8 +32,8 @@ export const exchangeCodeForToken = async (authCode: string): Promise<NuvemshopA
  */
 export const getNuvemshopAuthUrl = () => {
   const clientId = "17194";
-  // Always use the root origin for redirect, ignoring any path
-  const rootUrl = window.location.origin;
+  // Use the origin plus /editor path for redirect
+  const rootUrl = window.location.origin + "/editor";
   const redirectUrl = encodeURIComponent(rootUrl);
   const state = "csrf-code";
   

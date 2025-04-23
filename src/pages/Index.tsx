@@ -15,6 +15,7 @@ import { CheckCircle2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
+import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -28,10 +29,20 @@ const Index = () => {
     storeName, 
     userId: storeId, 
     handleConnect: handleConnectNuvemshop,
-    handleDisconnect: handleDisconnectNuvemshop
+    handleDisconnect: handleDisconnectNuvemshop,
+    tryAutoAuthentication,
+    handleTestCode
   } = useNuvemshopAuth();
   
   useEffect(() => {
+    // Verificar se há um código de autorização na URL
+    const authCode = detectAuthCode();
+    if (authCode) {
+      console.log("Código de autorização detectado no /editor:", authCode);
+      handleTestCode(authCode);
+      clearAuthCodeFromUrl();
+    }
+    
     // Garantir que temos templates disponíveis tanto no desenvolvimento quanto em produção
     const initializeTemplates = async () => {
       try {

@@ -52,7 +52,12 @@ export function useNuvemshopCodeExtractor({ setTestCode, handleTestCode }: UseNu
         console.log("Código detectado automaticamente:", authCode);
         setTestCode(authCode);
         if (authCode) {
-          setRedirectUrl(window.location.href);
+          // Inclui o caminho /editor na URL de redirecionamento
+          const currentUrl = window.location.href;
+          const editorUrl = currentUrl.includes('/editor') 
+            ? currentUrl 
+            : window.location.origin + '/editor' + window.location.search;
+          setRedirectUrl(editorUrl);
         }
       }
     };
