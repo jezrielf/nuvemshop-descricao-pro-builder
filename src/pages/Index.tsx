@@ -92,6 +92,19 @@ const Index = () => {
     });
   };
   
+  // Função para renderizar informações da loja conectada
+  const renderStoreInfo = () => {
+    let storeDisplayText = "Loja conectada";
+    
+    if (storeName) {
+      storeDisplayText = `Conectado com a ${storeName}`;
+    } else if (storeId) {
+      storeDisplayText = `Conectado com a loja ID: ${storeId}`;
+    }
+    
+    return storeDisplayText;
+  };
+  
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
@@ -105,9 +118,7 @@ const Index = () => {
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-green-100 text-green-800">
               <CheckCircle2 className="h-4 w-4 mr-1" />
-              {storeName 
-                ? `Conectado com a ${storeName}` 
-                : `Conectado com a loja ID: ${storeId}`}
+              {renderStoreInfo()}
             </Badge>
             <Button 
               variant="destructive" 
