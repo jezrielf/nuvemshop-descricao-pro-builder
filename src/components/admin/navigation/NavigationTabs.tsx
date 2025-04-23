@@ -6,10 +6,11 @@ import {
   LayoutDashboard, 
   FileText, 
   FileCode, 
-  CreditCard 
+  CreditCard,
+  Layout 
 } from 'lucide-react';
 
-export type AdminTab = 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings';
+export type AdminTab = 'dashboard' | 'users' | 'descriptions' | 'templates' | 'plans' | 'settings' | 'landing';
 
 export const navigationTabs = [
   { id: 'dashboard' as AdminTab, label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
@@ -17,6 +18,7 @@ export const navigationTabs = [
   { id: 'descriptions' as AdminTab, label: 'Descrições', icon: FileText, path: '/admin' },
   { id: 'templates' as AdminTab, label: 'Templates', icon: FileCode, path: '/admin-templates' },
   { id: 'plans' as AdminTab, label: 'Planos', icon: CreditCard, path: '/admin' },
+  { id: 'landing' as AdminTab, label: 'Landing Page', icon: Layout, path: '/admin' },
   { id: 'settings' as AdminTab, label: 'Configurações', icon: Settings, path: '/admin' }
 ];
 
