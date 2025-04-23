@@ -21,6 +21,11 @@ export const useDeletePlan = (
       const plan = window.selectedPlanToDelete;
       if (!plan) {
         console.error("No plan selected for deletion");
+        toast({
+          title: 'Erro ao excluir plano',
+          description: 'Nenhum plano selecionado para exclusão.',
+          variant: 'destructive',
+        });
         return;
       }
       

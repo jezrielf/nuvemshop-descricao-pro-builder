@@ -15,7 +15,7 @@ import { PlanBasicInfo } from './components/PlanBasicInfo';
 import { PlanStatusToggles } from './components/PlanStatusToggles';
 import { PlanFeaturesManager } from './components/PlanFeaturesManager';
 import { usePlanForm } from './hooks/usePlanForm';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface PlanFormDialogProps {
   open: boolean;
@@ -34,6 +34,8 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
   initialData,
   isSubmitting,
 }) => {
+  const { toast } = useToast();
+  
   const {
     form,
     newFeatureName,
@@ -61,7 +63,7 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
       // Reset form when opening for creating a new plan
       form.reset();
     }
-  }, [open, initialData, form]);
+  }, [open, initialData, form, toast]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

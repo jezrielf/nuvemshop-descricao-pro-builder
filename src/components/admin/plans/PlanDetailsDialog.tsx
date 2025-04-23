@@ -1,18 +1,14 @@
 
 import React from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogClose
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { Check, X } from 'lucide-react';
 import { Plan } from './types';
-import { Badge } from '@/components/ui/badge';
 
 interface PlanDetailsDialogProps {
   open: boolean;
@@ -20,74 +16,81 @@ interface PlanDetailsDialogProps {
   selectedPlan: Plan | null;
 }
 
-const PlanDetailsDialog: React.FC<PlanDetailsDialogProps> = ({ 
-  open, 
-  onOpenChange, 
-  selectedPlan 
+const PlanDetailsDialog: React.FC<PlanDetailsDialogProps> = ({
+  open,
+  onOpenChange,
+  selectedPlan
 }) => {
   if (!selectedPlan) return null;
 
-  // Format price to display as currency
-  const formattedPrice = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(selectedPlan.price);
+  const formatPrice = (price: number) => {
+    if (price === 0) return 'Grátis';
+    return `R$ ${price.toFixed(2)}`;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{selectedPlan.name}</DialogTitle>
-          <div className="flex items-center gap-2 mt-1">
-            <Badge variant={selectedPlan.isActive ? "default" : "outline"}>
-              {selectedPlan.isActive ? "Ativo" : "Inativo"}
-            </Badge>
-            {selectedPlan.isDefault && (
-              <Badge variant="secondary">Plano Padrão</Badge>
-            )}
-          </div>
+          <DialogTitle>{selectedPlan.name}</DialogTitle>
         </DialogHeader>
         
-        <div className="py-4">
+        <div className="space-y-4 py-4">
+          <div>
+            <h3 className="text-lg font-semibold">Detalhes do Plano</h3>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="font-medium">Preço:</div>
+              <div>{formatPrice(selectedPlan.price)}</div>
+              
+              <div className="font-medium">Status:</div>
+              <div>
+                {selectedPlan.isActive ? (
+                  <Badge variant="outline" className="bg-green-50 text-green-700">
+                    Ativo
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-red-50 text-red-700">
+                    Inativo
+                  </Badge>
+                )}
+              </div>
+              
+              <div className="font-medium">Plano Padrão:</div>
+              <div>
+                {selectedPlan.isDefault ? (
+                  <Check className="h-5 w-5 text-green-600" />
+                ) : (
+                  <X className="h-5 w-5 text-gray-400" />
+                )}
+              </div>
+            </div>
+          </div>
+          
           {selectedPlan.description && (
-            <div className="mb-4">
-              <h3 className="text-sm font-medium mb-1">Descrição</h3>
-              <p className="text-sm text-muted-foreground">{selectedPlan.description}</p>
+            <div>
+              <h3 className="text-lg font-semibold">Descrição</h3>
+              <p className="text-gray-600 mt-1">{selectedPlan.description}</p>
             </div>
           )}
           
-          <div className="mb-4">
-            <h3 className="text-sm font-medium mb-1">Preço Mensal</h3>
-            <p className="text-lg font-bold">{formattedPrice}</p>
-          </div>
-          
           <div>
-            <h3 className="text-sm font-medium mb-2">Recursos Incluídos</h3>
-            <ScrollArea className="h-[250px] rounded-md border p-2">
-              <div className="space-y-2">
-                {selectedPlan.features.map((feature) => (
-                  <div 
-                    key={feature.id}
-                    className="flex items-center justify-between p-2 border rounded-md"
-                  >
-                    <span className="text-sm font-medium">{feature.name}</span>
-                    {feature.included ? (
-                      <Check className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <X className="h-5 w-5 text-red-500" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+            <h3 className="text-lg font-semibold">Recursos</h3>
+            <ul className="mt-2 space-y-2">
+              {selectedPlan.features.map((feature, index) => (
+                <li key={index} className="flex items-start">
+                  {feature.included ? (
+                    <Check className="h-5 w-5 text-green-600 mr-2 shrink-0" />
+                  ) : (
+                    <X className="h-5 w-5 text-gray-400 mr-2 shrink-0" />
+                  )}
+                  <span className={feature.included ? 'text-gray-900' : 'text-gray-500'}>
+                    {feature.name}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-        
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button>Fechar</Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
