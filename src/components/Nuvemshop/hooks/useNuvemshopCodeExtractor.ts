@@ -1,39 +1,92 @@
 
-import { useEffect } from 'react';
-import { useUrlCodeExtractor } from './useUrlCodeExtractor';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
-export function useNuvemshopCodeExtractor(setTestCode: (code: string) => void) {
-  const {
-    redirectUrl,
-    setRedirectUrl,
-    extractCodeFromUrl,
-    extractCodeFromReferrer,
-    copyToClipboard
-  } = useUrlCodeExtractor();
+interface UseNuvemshopCodeExtractorProps {
+  setTestCode: (code: string) => void;
+  handleTestCode: () => void;
+}
 
-  // Effect to try extracting code from referrer on load
-  useEffect(() => {
-    // Attempt to extract on initial load
-    setTimeout(() => {
-      const code = extractCodeFromReferrer();
+export function useNuvemshopCodeExtractor({ setTestCode, handleTestCode }: UseNuvemshopCodeExtractorProps) {
+  const [redirectUrl, setRedirectUrl] = useState('');
+  const { toast } = useToast();
+
+  const extractAndTestCode = (url: string) => {
+    try {
+      if (!url) return null;
+      
+      const urlObj = new URL(url);
+      const code = urlObj.searchParams.get('code');
+      
       if (code) {
         setTestCode(code);
+        // Automatically test the code after extraction
+        setTimeout(() => handleTestCode(), 100);
+        return code;
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Código não encontrado',
+          description: 'Não foi possível encontrar um código de autorização na URL fornecida.',
+        });
+        return null;
       }
-    }, 1000);
-  }, [extractCodeFromReferrer, setTestCode]);
-
-  // Helper function to extract code from URL
-  const handleExtractCode = () => {
-    const code = extractCodeFromUrl(redirectUrl);
-    if (code) {
-      setTestCode(code);
+    } catch (error) {
+      console.error('Error parsing URL:', error);
+      toast({
+        variant: 'destructive',
+        title: 'URL inválida',
+        description: 'O formato da URL fornecida é inválido.',
+      });
+      return null;
     }
+  };
+
+  // Watch for changes in redirectUrl and automatically extract and test code
+  useEffect(() => {
+    if (redirectUrl) {
+      extractAndTestCode(redirectUrl);
+    }
+  }, [redirectUrl]);
+
+  // Extract from referrer on mount
+  useEffect(() => {
+    const referrer = document.referrer;
+    if (referrer && referrer.includes('descricaopro.com.br') && referrer.includes('code=')) {
+      setRedirectUrl(referrer);
+    }
+  }, []);
+
+  // Auto extract from current URL if code is present
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('code=')) {
+      extractAndTestCode(currentUrl);
+    }
+  }, []);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast({
+          title: 'Copiado!',
+          description: 'Texto copiado para a área de transferência.',
+        });
+      })
+      .catch((err) => {
+        console.error('Erro ao copiar:', err);
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao copiar',
+          description: 'Não foi possível copiar o texto.',
+        });
+      });
   };
 
   return {
     redirectUrl,
     setRedirectUrl,
-    handleExtractCode,
+    extractAndTestCode,
     copyToClipboard
   };
 }

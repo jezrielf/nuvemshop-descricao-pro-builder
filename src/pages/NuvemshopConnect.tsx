@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
@@ -44,9 +43,12 @@ const NuvemshopConnect: React.FC = () => {
   const {
     redirectUrl,
     setRedirectUrl,
-    handleExtractCode,
+    extractAndTestCode,
     copyToClipboard
-  } = useNuvemshopCodeExtractor(setTestCode);
+  } = useNuvemshopCodeExtractor({
+    setTestCode,
+    handleTestCode: handleTestCodeClick
+  });
 
   // Verificar se há código no URL e automaticamente processar
   useEffect(() => {
@@ -116,7 +118,7 @@ const NuvemshopConnect: React.FC = () => {
           setTestCode={setTestCode}
           redirectUrl={redirectUrl}
           setRedirectUrl={setRedirectUrl}
-          extractCodeFromUrl={handleExtractCode}
+          extractCodeFromUrl={extractAndTestCode}
           handleTestCode={handleTestCodeClick}
           copyToClipboard={copyToClipboard}
           handleClearCache={handleClearCache}

@@ -6,7 +6,7 @@ import { CodeTestSection } from './connect/authentication/CodeTestSection';
 interface AuthenticationPanelProps {
   redirectUrl: string;
   setRedirectUrl: (url: string) => void;
-  extractCodeFromUrl: () => void;
+  extractCodeFromUrl: (url: string) => void;
   testCode: string;
   setTestCode: (code: string) => void;
   handleTestCode: () => void;
@@ -20,7 +20,7 @@ export const AuthenticationPanel: React.FC<AuthenticationPanelProps> = (props) =
       <UrlInputSection 
         redirectUrl={props.redirectUrl}
         setRedirectUrl={props.setRedirectUrl}
-        extractCodeFromUrl={props.extractCodeFromUrl}
+        extractCodeFromUrl={() => props.extractCodeFromUrl(props.redirectUrl)}
       />
       
       <CodeTestSection 
