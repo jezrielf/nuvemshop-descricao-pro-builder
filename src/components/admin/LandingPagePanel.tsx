@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import LandingPageImageManager from './LandingPageImageManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

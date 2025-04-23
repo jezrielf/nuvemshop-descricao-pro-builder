@@ -84,6 +84,27 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_page_content: {
+        Row: {
+          content: Json
+          id: string
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          id?: string
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          id?: string
+          section?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_performance: {
         Row: {
           created_at: string | null
