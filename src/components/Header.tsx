@@ -26,7 +26,7 @@ const Header: React.FC = () => {
     subscriptionTier,
     profile
   } = auth;
-  const isMobile = useIsMobile';
+  const isMobile = useIsMobile(); // Corrected hook call
   
   // Log para debug dos papéis e status
   useEffect(() => {
