@@ -105,7 +105,9 @@ const Index = () => {
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-green-100 text-green-800">
               <CheckCircle2 className="h-4 w-4 mr-1" />
-              
+              {storeName 
+                ? `Conectado com a ${storeName}` 
+                : `Conectado com a loja ID: ${storeId}`}
             </Badge>
             <Button 
               variant="destructive" 
