@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, CircleX, Lock } from 'lucide-react';
+import { CheckIcon, X } from 'lucide-react';
 
 interface PlanFeature {
   name: string;
@@ -9,24 +9,33 @@ interface PlanFeature {
 
 interface PlanFeaturesListProps {
   features: PlanFeature[];
-  isPriceFree: boolean;
+  isPriceFree?: boolean;
 }
 
-const PlanFeaturesList: React.FC<PlanFeaturesListProps> = ({ features, isPriceFree }) => {
+const PlanFeaturesList: React.FC<PlanFeaturesListProps> = ({ 
+  features,
+  isPriceFree = false
+}) => {
+  // Ensure we have features
+  if (!features || features.length === 0) {
+    return (
+      <p className="text-muted-foreground text-sm italic">
+        {isPriceFree ? 'Plano com recursos básicos' : 'Nenhum recurso especificado'}
+      </p>
+    );
+  }
+
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-2">
       {features.map((feature, index) => (
         <li key={index} className="flex items-start">
           {feature.included ? (
-            <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+            <CheckIcon className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
           ) : (
-            <CircleX className="h-5 w-5 text-gray-300 mr-2 flex-shrink-0" />
+            <X className="h-5 w-5 text-gray-300 mr-2 shrink-0 mt-0.5" />
           )}
-          <span className={feature.included ? '' : 'text-muted-foreground'}>
+          <span className={feature.included ? "" : "text-muted-foreground"}>
             {feature.name}
-            {!feature.included && isPriceFree && (
-              <Lock className="h-3 w-3 inline ml-1 text-yellow-500" />
-            )}
           </span>
         </li>
       ))}

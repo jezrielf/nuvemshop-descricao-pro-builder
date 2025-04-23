@@ -1,46 +1,75 @@
 
+import { useState } from 'react';
 import { Plan } from '../types';
-import { useDialogState } from './useDialogState';
 import { useDeletePlan } from './useDeletePlan';
 import { useCreatePlan } from './useCreatePlan';
 import { useUpdatePlan } from './useUpdatePlan';
 
 export const usePlanActions = (
-  plans: Plan[], 
-  setPlans: React.Dispatch<React.SetStateAction<Plan[]>>, 
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   fetchPlans: () => Promise<void>
 ) => {
-  const dialogState = useDialogState();
-  
-  const { handleDeleteConfirm } = useDeletePlan(
-    plans, 
-    setPlans, 
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const { handleDeleteConfirm, isSubmitting: isDeleting } = useDeletePlan(
     setLoading, 
-    dialogState.setIsDeleteDialogOpen,
+    setIsDeleteDialogOpen, 
     fetchPlans
   );
 
-  const { handleCreatePlan } = useCreatePlan(
-    plans,
-    setPlans,
+  const { handleCreatePlan, isSubmitting: isCreating } = useCreatePlan(
     setLoading,
-    dialogState.setIsCreateDialogOpen,
+    setIsCreateDialogOpen,
     fetchPlans
   );
 
-  const { handleUpdatePlan } = useUpdatePlan(
-    plans,
-    setPlans,
+  const { handleUpdatePlan, isSubmitting: isUpdating } = useUpdatePlan(
     setLoading,
-    dialogState.setIsEditDialogOpen,
+    setIsEditDialogOpen,
     fetchPlans
   );
+
+  const handleViewPlan = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setIsViewOpen(true);
+  };
+
+  const handleEditClick = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setIsDeleteDialogOpen(true);
+  };
 
   return {
-    ...dialogState,
-    handleDeleteConfirm: () => handleDeleteConfirm(dialogState.selectedPlan),
+    // State
+    selectedPlan,
+    isViewOpen,
+    isDeleteDialogOpen,
+    isCreateDialogOpen,
+    isEditDialogOpen,
+    isSubmitting: isDeleting || isCreating || isUpdating,
+    
+    // Setters
+    setSelectedPlan,
+    setIsViewOpen,
+    setIsDeleteDialogOpen,
+    setIsCreateDialogOpen,
+    setIsEditDialogOpen,
+    
+    // Handlers
+    handleViewPlan,
+    handleEditClick,
+    handleDeleteClick,
+    handleDeleteConfirm,
     handleCreatePlan,
-    handleUpdatePlan
+    handleUpdatePlan,
   };
 };

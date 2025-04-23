@@ -1,21 +1,23 @@
 
+import { useState } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
 import { adminService } from '@/services/admin';
 
 export const useUpdatePlan = (
-  plans: Plan[],
-  setPlans: React.Dispatch<React.SetStateAction<Plan[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
   fetchPlans: () => Promise<void>
 ) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleUpdatePlan = async (planData: Plan) => {
     try {
+      setIsSubmitting(true);
       setLoading(true);
       
+      console.log("Atualizando plano:", planData.id, planData);
       const updatedPlan = await adminService.updatePlan(planData.id, planData);
       
       toast({
@@ -31,7 +33,7 @@ export const useUpdatePlan = (
       
       return updatedPlan;
     } catch (error: any) {
-      console.error('Error updating plan:', error);
+      console.error('Erro ao atualizar plano:', error);
       
       toast({
         title: 'Erro ao atualizar plano',
@@ -41,9 +43,10 @@ export const useUpdatePlan = (
       
       return null;
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
 
-  return { handleUpdatePlan };
+  return { handleUpdatePlan, isSubmitting };
 };

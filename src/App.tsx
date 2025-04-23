@@ -10,8 +10,8 @@ import AdminTemplates from './pages/AdminTemplates';
 import Plans from './pages/Plans';
 import NuvemshopConnect from './pages/NuvemshopConnect';
 import Success from './pages/Success';
+import Landing from './pages/Landing';
 import { AuthProvider } from './contexts/AuthContext';
-// Removido: import { NimbusProvider } from './contexts/NimbusProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Create a client
@@ -21,11 +21,11 @@ const App: React.FC = () => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        {/* NimbusProvider removido */}
         <AuthProvider>
           <Router>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/editor" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/description-analysis" element={<DescriptionAnalysis />} />
               <Route path="/admin" element={<Admin />} />
@@ -43,4 +43,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-

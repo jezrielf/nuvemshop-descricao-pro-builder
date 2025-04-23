@@ -27,9 +27,9 @@ export function generateFeaturesBlockHtml(block: FeaturesBlock): string {
   // Ensure columns value is between 1 and 4
   const columnCount = Math.min(Math.max(Number(columnsValue), 1), 4);
   
-  // Generate HTML for each feature with fixed width percentage
+  // Generate HTML for each feature with flex layout
   const featuresHtml = features.map(feature => `
-    <div class="feature-item mb-4" style="display: inline-block; vertical-align: top; width: ${100/columnCount}%; padding: 8px; box-sizing: border-box;">
+    <div class="feature-item" style="flex: 0 0 calc(${100/columnCount}% - 16px); margin: 8px; box-sizing: border-box;">
       <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; height: 100%; box-sizing: border-box;">
         ${feature.icon ? `<div style="${block.layout === 'vertical' ? 'text-align: center; margin-bottom: 8px;' : 'float: left; margin-right: 12px;'} font-size: 24px;">${feature.icon}</div>` : ''}
         <div style="${block.layout === 'vertical' ? 'text-align: center;' : ''}">
@@ -44,13 +44,16 @@ export function generateFeaturesBlockHtml(block: FeaturesBlock): string {
   return `
     <div class="features-block" id="block-${block.id}" style="${blockStyles}">
       <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; text-align: center;">${heading || 'Características'}</h2>
-      <div class="features-container" style="font-size: 0; margin: 0 -8px; text-align: left;">
+      <div class="features-container" style="display: flex; flex-wrap: wrap; margin: -8px; text-align: left;">
         ${featuresHtml}
       </div>
       <style>
         @media (max-width: 768px) {
+          #block-${block.id} .features-container {
+            flex-direction: column;
+          }
           #block-${block.id} .feature-item {
-            width: 100% !important;
+            flex: 0 0 calc(100% - 16px);
           }
         }
       </style>

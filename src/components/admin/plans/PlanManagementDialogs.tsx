@@ -1,9 +1,9 @@
 
 import React from 'react';
-import PlanDetailsDialog from './PlanDetailsDialog';
-import DeletePlanDialog from './DeletePlanDialog';
-import PlanFormDialog from './PlanFormDialog';
 import { Plan } from './types';
+import DeletePlanDialog from './DeletePlanDialog';
+import PlanDetailsDialog from './PlanDetailsDialog';
+import PlanFormDialog from './PlanFormDialog';
 
 interface PlanManagementDialogsProps {
   isViewOpen: boolean;
@@ -18,6 +18,7 @@ interface PlanManagementDialogsProps {
   onConfirmDelete: () => void;
   onCreateSubmit: (data: Omit<Plan, 'id'>) => void;
   onUpdateSubmit: (data: Plan) => void;
+  isSubmitting: boolean;
 }
 
 const PlanManagementDialogs: React.FC<PlanManagementDialogsProps> = ({
@@ -32,45 +33,45 @@ const PlanManagementDialogs: React.FC<PlanManagementDialogsProps> = ({
   onEditOpenChange,
   onConfirmDelete,
   onCreateSubmit,
-  onUpdateSubmit
+  onUpdateSubmit,
+  isSubmitting
 }) => {
   return (
     <>
-      {/* View Plan Dialog */}
+      {/* Visualização de detalhes do plano */}
       <PlanDetailsDialog
         open={isViewOpen}
         onOpenChange={onViewOpenChange}
-        selectedPlan={selectedPlan}
+        plan={selectedPlan}
       />
 
-      {/* Create Plan Dialog */}
-      <PlanFormDialog
-        open={isCreateDialogOpen}
-        onOpenChange={onCreateOpenChange}
-        onSubmit={onCreateSubmit}
-        title="Criar Novo Plano"
-      />
-
-      {/* Edit Plan Dialog */}
-      <PlanFormDialog
-        open={isEditDialogOpen}
-        onOpenChange={onEditOpenChange}
-        onSubmit={(data) => {
-          if (selectedPlan && 'id' in data) {
-            // Type checking to ensure data has the right structure
-            onUpdateSubmit(data as Plan);
-          }
-        }}
-        title="Editar Plano"
-        initialData={selectedPlan}
-      />
-
-      {/* Delete Confirmation Dialog */}
+      {/* Diálogo de confirmação para exclusão */}
       <DeletePlanDialog
         open={isDeleteDialogOpen}
         onOpenChange={onDeleteOpenChange}
         selectedPlan={selectedPlan}
         onConfirmDelete={onConfirmDelete}
+        isSubmitting={isSubmitting}
+      />
+
+      {/* Diálogo para criação de novo plano */}
+      <PlanFormDialog
+        open={isCreateDialogOpen}
+        onOpenChange={onCreateOpenChange}
+        onSubmit={onCreateSubmit}
+        title="Criar Novo Plano"
+        initialData={null}
+        isSubmitting={isSubmitting}
+      />
+
+      {/* Diálogo para edição de plano existente */}
+      <PlanFormDialog
+        open={isEditDialogOpen}
+        onOpenChange={onEditOpenChange}
+        onSubmit={onUpdateSubmit}
+        title="Editar Plano"
+        initialData={selectedPlan}
+        isSubmitting={isSubmitting}
       />
     </>
   );

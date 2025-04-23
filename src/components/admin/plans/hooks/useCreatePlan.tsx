@@ -1,21 +1,23 @@
 
+import { useState } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
 import { adminService } from '@/services/admin';
 
 export const useCreatePlan = (
-  plans: Plan[],
-  setPlans: React.Dispatch<React.SetStateAction<Plan[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setIsCreateDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
   fetchPlans: () => Promise<void>
 ) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleCreatePlan = async (planData: Omit<Plan, 'id'>) => {
     try {
+      setIsSubmitting(true);
       setLoading(true);
       
+      console.log("Criando plano:", planData);
       const newPlan = await adminService.createPlan(planData);
       
       toast({
@@ -31,7 +33,7 @@ export const useCreatePlan = (
       
       return newPlan;
     } catch (error: any) {
-      console.error('Error creating plan:', error);
+      console.error('Erro ao criar plano:', error);
       
       toast({
         title: 'Erro ao criar plano',
@@ -41,9 +43,10 @@ export const useCreatePlan = (
       
       return null;
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
 
-  return { handleCreatePlan };
+  return { handleCreatePlan, isSubmitting };
 };

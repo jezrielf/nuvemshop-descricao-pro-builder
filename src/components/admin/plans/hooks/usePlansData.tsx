@@ -15,24 +15,24 @@ export const usePlansData = () => {
   const fetchPlans = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("Fetching plans...");
+      console.log("Buscando planos...");
       
       const plansData = await adminService.getPlans();
       
       // If we have no products, fallback to mock data
       if (!plansData || plansData.length === 0) {
-        console.log("No plans found, using mock data");
+        console.log("Nenhum plano encontrado, usando dados mockados");
         setPlans(mockPlans);
         return;
       }
       
-      console.log("Plans fetched successfully:", plansData.length);
+      console.log("Planos buscados com sucesso:", plansData.length);
       setPlans(plansData);
     } catch (error: any) {
-      console.error("Error fetching plans:", error);
+      console.error("Erro ao buscar planos:", error);
       
       // Fallback to mock data
-      console.log("Using mock data as fallback");
+      console.log("Usando dados mockados como fallback");
       setPlans(mockPlans);
       
       toast({

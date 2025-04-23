@@ -14,8 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
-
-// Removido: import NimbusDemo from '@/components/NimbusDemo';
+import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -74,8 +73,6 @@ const Index = () => {
         .catch(err => console.error("Erro ao atualizar templates no background:", err));
     }, 5 * 60 * 1000); // 5 minutos
     
-    // Removida a pre-carga de imagens do tutorial do Nimbus
-    
     // Limpar o intervalo quando o componente for desmontado
     return () => {
       clearInterval(templateRefreshInterval);
@@ -98,11 +95,6 @@ const Index = () => {
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
-      
-      {/* Nimbus Demo removido */}
-      {/* <div className="bg-gray-100 p-4 border-b">
-        <NimbusDemo />
-      </div> */}
       
       <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
         <div className="flex-1">
@@ -172,9 +164,11 @@ const Index = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+      
+      {/* Tutorial de primeiro acesso */}
+      <FirstAccessTutorial />
     </div>
   );
 };
 
 export default Index;
-

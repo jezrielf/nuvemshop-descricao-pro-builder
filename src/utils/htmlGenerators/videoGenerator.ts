@@ -81,7 +81,7 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
     }
   }
   
-  // Construct the full HTML for the video block
+  // Construct the full HTML for the video block including title and description
   return `
     <div class="video-block my-6" style="${containerStyle}">
       ${title ? `<h3 class="text-xl font-semibold mb-3" style="color: ${block.style?.headingColor || 'inherit'}">${title}</h3>` : ''}

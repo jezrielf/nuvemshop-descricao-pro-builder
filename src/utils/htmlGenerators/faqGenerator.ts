@@ -13,9 +13,9 @@ export const generateFAQHtml = (block: FAQBlock): string => {
         const itemBottomStyle = isLastItem ? 'margin-bottom:0;' : 'margin-bottom:16px;';
         
         return `
-          <div class="faq-item" style="${itemBottomStyle}border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:16px;">
+          <div class="faq-item" style="${itemBottomStyle}border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;">
             <div class="faq-question" 
-                 onclick="toggleFAQ('faq-${block.id}-${index}')"
+                 onclick="document.getElementById('faq-${block.id}-${index}').classList.toggle('active');document.getElementById('faq-icon-${block.id}-${index}').style.transform = document.getElementById('faq-icon-${block.id}-${index}').style.transform === 'rotate(45deg)' ? 'rotate(0)' : 'rotate(45deg';"
                  style="padding:12px 16px;background-color:#f9fafb;font-weight:500;cursor:pointer;position:relative;display:block;">
               ${item.question}
               <span id="faq-icon-${block.id}-${index}" style="position:absolute;right:16px;top:12px;font-size:18px;transition:transform 0.3s ease;">+</span>
@@ -31,20 +31,25 @@ export const generateFAQHtml = (block: FAQBlock): string => {
   // JavaScript to handle the FAQ toggle behavior inline
   const faqScript = `
     <script>
-      function toggleFAQ(id) {
-        var answer = document.getElementById(id);
-        var icon = document.getElementById('faq-icon-' + id);
-        
-        if (answer.style.maxHeight === '0px' || !answer.style.maxHeight) {
-          answer.style.maxHeight = '1000px';
-          answer.style.padding = '0 16px';
-          if (icon) icon.style.transform = 'rotate(45deg)';
-        } else {
-          answer.style.maxHeight = '0px';
-          answer.style.padding = '0 16px';
-          if (icon) icon.style.transform = 'rotate(0)';
-        }
-      }
+      document.addEventListener('DOMContentLoaded', function() {
+        var faqItems = document.querySelectorAll('.faq-question');
+        faqItems.forEach(function(item) {
+          item.addEventListener('click', function() {
+            var answer = this.nextElementSibling;
+            var icon = this.querySelector('span');
+            
+            if (answer.style.maxHeight === '0px' || !answer.style.maxHeight) {
+              answer.style.maxHeight = '1000px';
+              answer.style.padding = '0 16px';
+              if (icon) icon.style.transform = 'rotate(45deg)';
+            } else {
+              answer.style.maxHeight = '0px';
+              answer.style.padding = '0 16px';
+              if (icon) icon.style.transform = 'rotate(0)';
+            }
+          });
+        });
+      });
     </script>
   `;
   

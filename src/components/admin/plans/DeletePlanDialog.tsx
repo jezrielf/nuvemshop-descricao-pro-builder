@@ -10,6 +10,7 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Plan } from './types';
 
 interface DeletePlanDialogProps {
@@ -17,13 +18,15 @@ interface DeletePlanDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedPlan: Plan | null;
   onConfirmDelete: () => void;
+  isSubmitting: boolean;
 }
 
 const DeletePlanDialog: React.FC<DeletePlanDialogProps> = ({ 
   open, 
   onOpenChange, 
   selectedPlan, 
-  onConfirmDelete 
+  onConfirmDelete,
+  isSubmitting
 }) => {
   if (!selectedPlan) return null;
 
@@ -39,13 +42,21 @@ const DeletePlanDialog: React.FC<DeletePlanDialogProps> = ({
         </DialogHeader>
         <DialogFooter className="mt-4">
           <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
+            <Button variant="outline" disabled={isSubmitting}>Cancelar</Button>
           </DialogClose>
           <Button 
             variant="destructive" 
             onClick={onConfirmDelete}
+            disabled={isSubmitting}
           >
-            Excluir
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Excluindo...
+              </>
+            ) : (
+              'Excluir'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

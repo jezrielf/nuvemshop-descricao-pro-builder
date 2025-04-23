@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import PlanManagementHeader from './plans/PlanManagementHeader';
 import PlanManagementContent from './plans/PlanManagementContent';
 import PlanManagementDialogs from './plans/PlanManagementDialogs';
@@ -7,7 +7,7 @@ import { usePlansData } from './plans/hooks/usePlansData';
 import { usePlanActions } from './plans/hooks/usePlanActions';
 
 const PlansPanel: React.FC = () => {
-  const { plans, setPlans, loading, setLoading, fetchPlans } = usePlansData();
+  const { plans, loading, setLoading, fetchPlans } = usePlansData();
   
   const { 
     selectedPlan,
@@ -15,6 +15,7 @@ const PlansPanel: React.FC = () => {
     isDeleteDialogOpen,
     isCreateDialogOpen,
     isEditDialogOpen,
+    isSubmitting,
     setIsViewOpen,
     setIsDeleteDialogOpen,
     setIsCreateDialogOpen,
@@ -25,14 +26,19 @@ const PlansPanel: React.FC = () => {
     handleDeleteConfirm,
     handleCreatePlan,
     handleUpdatePlan
-  } = usePlanActions(plans, setPlans, setLoading, fetchPlans);
+  } = usePlanActions(setLoading, fetchPlans);
+  
+  // Log plans when they change for debugging
+  useEffect(() => {
+    console.log("Planos atualizados:", plans.length);
+  }, [plans]);
 
   return (
     <div className="space-y-6">
       <PlanManagementHeader 
         onCreateClick={() => setIsCreateDialogOpen(true)}
         onRefreshClick={fetchPlans}
-        loading={loading}
+        loading={loading || isSubmitting}
       />
       
       <PlanManagementContent
@@ -56,6 +62,7 @@ const PlansPanel: React.FC = () => {
         onConfirmDelete={handleDeleteConfirm}
         onCreateSubmit={handleCreatePlan}
         onUpdateSubmit={handleUpdatePlan}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

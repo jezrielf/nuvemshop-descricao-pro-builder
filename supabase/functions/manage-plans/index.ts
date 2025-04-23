@@ -67,9 +67,9 @@ serve(async (req) => {
     // For the list-products action, we allow public access for displaying plans to users
     if (method === "GET" && action === "list-products") {
       try {
+        logStep("Listing products from Stripe");
         // List all products with their prices
         const products = await stripe.products.list({
-          active: true,
           expand: ['data.default_price'],
           limit: 100,
         });
@@ -77,6 +77,18 @@ serve(async (req) => {
         // Format the products into a more usable format
         const formattedProducts = products.data.map(product => {
           const defaultPrice = product.default_price as Stripe.Price;
+          
+          // Parse features if they exist
+          let features = [];
+          if (product.metadata.features) {
+            try {
+              features = JSON.parse(product.metadata.features);
+            } catch (e) {
+              console.error("Error parsing features:", e);
+              features = [];
+            }
+          }
+          
           return {
             id: product.id,
             name: product.name,
@@ -85,7 +97,7 @@ serve(async (req) => {
             priceId: defaultPrice ? defaultPrice.id : null,
             isActive: product.active,
             metadata: product.metadata,
-            features: product.metadata.features ? JSON.parse(product.metadata.features) : [],
+            features,
             isDefault: product.metadata.default === 'true',
           };
         });
@@ -187,6 +199,7 @@ serve(async (req) => {
       // Handle admin actions based on method and action
       if (method === "POST" && action === "create-product") {
         try {
+          logStep("Creating new product in Stripe");
           // Create a new product
           const product = await stripe.products.create({
             name: productData.name,
@@ -242,6 +255,7 @@ serve(async (req) => {
       
       if (method === "PUT" && action === "update-product") {
         try {
+          logStep("Updating product in Stripe", { productId });
           // Update the product
           const product = await stripe.products.update(productId, {
             name: productData.name,
@@ -259,6 +273,11 @@ serve(async (req) => {
               // We don't update existing prices in Stripe, instead create a new one if price changed
               const currentPrice = await stripe.prices.retrieve(productData.priceId);
               if (currentPrice.unit_amount !== Math.round(productData.price * 100)) {
+                logStep("Creating new price for product", { 
+                  oldPrice: currentPrice.unit_amount, 
+                  newPrice: Math.round(productData.price * 100)
+                });
+                
                 // Create a new price
                 const newPrice = await stripe.prices.create({
                   unit_amount: Math.round(productData.price * 100),
@@ -274,6 +293,8 @@ serve(async (req) => {
                 
                 // Mark old price as inactive (optional)
                 await stripe.prices.update(productData.priceId, { active: false });
+                
+                productData.priceId = newPrice.id;
               }
             } catch (priceError) {
               logStep(`WARNING: Price update failed - ${priceError instanceof Error ? priceError.message : String(priceError)}`);
@@ -312,6 +333,7 @@ serve(async (req) => {
       
       if (method === "DELETE" && action === "delete-product") {
         try {
+          logStep("Checking if product is default before deletion", { productId });
           // Check if product is set as default
           const product = await stripe.products.retrieve(productId);
           if (product.metadata.default === 'true') {
@@ -325,12 +347,13 @@ serve(async (req) => {
             });
           }
           
+          logStep("Archiving product (setting as inactive)", { productId });
           // Archive the product instead of deleting (Stripe recommended approach)
           await stripe.products.update(productId, {
             active: false,
           });
           
-          logStep("Product archived", { productId });
+          logStep("Product archived successfully", { productId });
           return new Response(JSON.stringify({ success: true }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 200,
