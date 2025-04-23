@@ -31,14 +31,12 @@ export const exchangeCodeForToken = async (authCode: string): Promise<NuvemshopA
  * Generate the authorization URL for Nuvemshop
  */
 export const getNuvemshopAuthUrl = () => {
-  // Use a configuração correta para produção com os parâmetros necessários
   const clientId = "17194";
-  // Usar o origin como base de redirecionamento para funcionar em qualquer rota
+  // Always use the root origin for redirect
   const redirectUrl = encodeURIComponent(window.location.origin);
-  const state = "csrf-code"; // Para proteção CSRF
+  const state = "csrf-code";
   
-  console.log("URL de redirecionamento para Nuvemshop:", window.location.origin);
+  console.log("Redirect URL for Nuvemshop:", window.location.origin);
   
-  // Construir a URL correta com parâmetros de redirecionamento
   return `https://www.nuvemshop.com.br/apps/${clientId}/authorize?state=${state}&redirect_uri=${redirectUrl}`;
 };

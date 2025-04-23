@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -50,6 +49,52 @@ export function useNuvemshopAuth() {
     
     handleAuthorizationCode();
   }, [location.search, authenticating, success]);
+
+  // Auto-connection handling
+  useEffect(() => {
+    const autoConnect = async () => {
+      try {
+        // Check for code in URL parameters first
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeParam = urlParams.get('code');
+        
+        if (codeParam && !authenticating && !success) {
+          console.log("Código detectado na URL, processando automaticamente:", codeParam);
+          setAuthenticating(true);
+          await processAuthCode(codeParam);
+          
+          // Clear the code from URL after processing
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return;
+        }
+        
+        // If no code in URL, check referrer
+        const referrer = document.referrer;
+        if (referrer && referrer.includes('code=')) {
+          const referrerUrl = new URL(referrer);
+          const referrerCode = referrerUrl.searchParams.get('code');
+          
+          if (referrerCode && !authenticating && !success) {
+            console.log("Código detectado no referrer, processando automaticamente:", referrerCode);
+            setAuthenticating(true);
+            await processAuthCode(referrerCode);
+          }
+        }
+      } catch (err: any) {
+        console.error('Erro na conexão automática:', err);
+        setError(err.message);
+        toast({
+          variant: 'destructive',
+          title: 'Erro na conexão',
+          description: err.message,
+        });
+      } finally {
+        setAuthenticating(false);
+      }
+    };
+
+    autoConnect();
+  }, []);
 
   const processAuthCode = async (authCode: string) => {
     try {

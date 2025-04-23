@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 const NuvemshopConnect: React.FC = () => {
   const { toast } = useToast();
   
-  // Custom hooks for functionality
   const {
     loading,
     authenticating,
@@ -41,9 +40,10 @@ const NuvemshopConnect: React.FC = () => {
     resetProducts
   } = useNuvemshopProducts(accessToken, userId);
 
-  // Define handleTestCodeClick before using it
   const handleTestCodeClick = () => {
-    handleTestCode(testCode);
+    if (testCode) {
+      handleTestCode(testCode);
+    }
   };
 
   const {
@@ -56,23 +56,6 @@ const NuvemshopConnect: React.FC = () => {
     handleTestCode: handleTestCodeClick
   });
 
-  // Verify if there's a code in the URL and automatically process it
-  useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const codeParam = query.get('code');
-    
-    if (codeParam && !success && !authenticating) {
-      console.log("Código detectado no URL durante carregamento:", codeParam);
-      setTestCode(codeParam);
-      handleTestCode(codeParam);
-      
-      toast({
-        title: 'Código encontrado',
-        description: 'Um código de autorização foi detectado na URL e está sendo processado automaticamente.',
-      });
-    }
-  }, []);
-
   // Handlers
   const handleDisconnectClick = () => {
     handleDisconnect();
@@ -84,14 +67,10 @@ const NuvemshopConnect: React.FC = () => {
   };
 
   const handleDirectConnect = (e?: React.MouseEvent) => {
-    // Prevent default event behavior if an event is passed
     if (e) {
       e.preventDefault();
     }
-    
-    // Clear cache before connecting
     clearAuthCache(false);
-    // Connect using the correct URL
     handleConnect();
   };
 
@@ -128,17 +107,19 @@ const NuvemshopConnect: React.FC = () => {
           handleClearCache={handleClearCache}
         />
         
-        <ProductsCard
-          products={products}
-          loadingProducts={loadingProducts}
-          updatingProduct={updatingProduct}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalProducts={totalProducts}
-          handlePrevPage={handlePrevPage}
-          handleNextPage={handleNextPage}
-          handleUpdateDescription={handleUpdateDescription}
-        />
+        {success && (
+          <ProductsCard
+            products={products}
+            loadingProducts={loadingProducts}
+            updatingProduct={updatingProduct}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalProducts={totalProducts}
+            handlePrevPage={handlePrevPage}
+            handleNextPage={handleNextPage}
+            handleUpdateDescription={handleUpdateDescription}
+          />
+        )}
       </div>
     </div>
   );
