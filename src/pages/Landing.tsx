@@ -349,19 +349,20 @@ const Landing: React.FC = () => {
                 otimizadas para SEO e que fazem seus produtos se destacarem da concorrência.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
+                
                 <Button 
                   size="lg" 
                   onClick={() => navigate('/auth?signup=true')}
-                  className="shadow-lg bg-white text-indigo-600 hover:bg-gray-100 font-semibold"
+                  className="shadow-lg bg-indigo-600 text-white hover:bg-indigo-700 font-semibold"
                 >
                   Começar Agora Gratuitamente
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                
+
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="border-2 border-white text-white hover:bg-white/10 font-semibold"
+                  className="border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold"
                 >
                   Ver Demonstração
                 </Button>
@@ -533,7 +534,8 @@ const Landing: React.FC = () => {
                   ))}
                 </ul>
                 <Button 
-                  className={`w-full ${plan.highlight ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}`}
+                  
+                  className={`w-full ${plan.name === 'Premium' ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                   onClick={() => navigate('/auth?signup=true')}
                 >
                   {plan.cta}
