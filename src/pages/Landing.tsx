@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -39,6 +39,7 @@ const Landing: React.FC = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeScreenshot, setActiveScreenshot] = useState(0);
   const [plans, setPlans] = useState<any[]>([]);
+  const [displayPlans, setDisplayPlans] = useState<any[]>([]);
 
   // If user is logged in, redirect to editor
   useEffect(() => {
@@ -75,15 +76,99 @@ const Landing: React.FC = () => {
     fetchContent();
   }, []);
 
-  // Fetch plans from database
+  // Fetch plans from database and prepare display plans
   useEffect(() => {
     const fetchPlans = async () => {
       try {
         const plansData = await adminService.getPlans();
         console.log("Fetched plans:", plansData);
         setPlans(plansData);
+        
+        // Default free plan that will always be shown
+        const freePlan = {
+          name: 'Free',
+          price: '0',
+          period: '/mês',
+          features: [
+            'Até 3 descrições por mês',
+            'Templates básicos',
+            'Análise SEO básica',
+            'Suporte por email'
+          ],
+          cta: 'Começar grátis',
+          highlight: false
+        };
+
+        // Find the active paid plan from database plans
+        const activePaidPlan = plansData.find((plan: any) => plan.isActive && plan.price > 0);
+        
+        if (!activePaidPlan) {
+          // Fallback paid plan if no active plan is found
+          const defaultPaidPlan = {
+            name: 'Premium',
+            price: '79.90',
+            period: '/mês',
+            features: [
+              'Descrições ilimitadas',
+              'Templates exclusivos',
+              'Análise e diagnóstico completo de SEO',
+              'Suporte prioritário 24/7',
+              'Integrações com e-commerce',
+              'Exportação em lote'
+            ],
+            cta: 'Assinar agora',
+            highlight: true
+          };
+          setDisplayPlans([freePlan, defaultPaidPlan]);
+        } else {
+          // Transform the active plan from database
+          const paidPlan = {
+            name: activePaidPlan.name,
+            price: String(activePaidPlan.price),
+            period: '/mês',
+            features: activePaidPlan.features.map((feature: any) => 
+              typeof feature === 'object' ? feature.name : feature.split(':')[0]
+            ),
+            cta: 'Assinar agora',
+            highlight: true
+          };
+          setDisplayPlans([freePlan, paidPlan]);
+        }
       } catch (error) {
         console.error("Error fetching plans:", error);
+        
+        // Set default plans if there's an error
+        const defaultPlans = [
+          {
+            name: 'Free',
+            price: '0',
+            period: '/mês',
+            features: [
+              'Até 3 descrições por mês',
+              'Templates básicos',
+              'Análise SEO básica',
+              'Suporte por email'
+            ],
+            cta: 'Começar grátis',
+            highlight: false
+          },
+          {
+            name: 'Premium',
+            price: '79.90',
+            period: '/mês',
+            features: [
+              'Descrições ilimitadas',
+              'Templates exclusivos',
+              'Análise e diagnóstico completo de SEO',
+              'Suporte prioritário 24/7',
+              'Integrações com e-commerce',
+              'Exportação em lote'
+            ],
+            cta: 'Assinar agora',
+            highlight: true
+          }
+        ];
+        setDisplayPlans(defaultPlans);
       }
     };
 
@@ -200,64 +285,6 @@ const Landing: React.FC = () => {
   const prevScreenshot = () => {
     setActiveScreenshot((prev) => (prev - 1 + screenshots.length) % screenshots.length);
   };
-
-  // Default free plan that will always be shown
-  const freePlan = {
-    name: 'Free',
-    price: '0',
-    period: '/mês',
-    features: [
-      'Até 3 descrições por mês',
-      'Templates básicos',
-      'Análise SEO básica',
-      'Suporte por email'
-    ],
-    cta: 'Começar grátis',
-    highlight: false
-  };
-
-  // Create the display plans array outside of the useMemo to avoid hook conditionals
-  const displayPlansData = (() => {
-    // Find the active paid plan from database plans
-    const activePaidPlan = plans.find(plan => plan.isActive && plan.price > 0);
-    
-    if (!activePaidPlan) {
-      // Fallback paid plan if no active plan is found
-      const defaultPaidPlan = {
-        name: 'Premium',
-        price: '79.90',
-        period: '/mês',
-        features: [
-          'Descrições ilimitadas',
-          'Templates exclusivos',
-          'Análise e diagnóstico completo de SEO',
-          'Suporte prioritário 24/7',
-          'Integrações com e-commerce',
-          'Exportação em lote'
-        ],
-        cta: 'Assinar agora',
-        highlight: true
-      };
-      return [freePlan, defaultPaidPlan];
-    }
-
-    // Transform the active plan from database
-    const paidPlan = {
-      name: activePaidPlan.name,
-      price: String(activePaidPlan.price),
-      period: '/mês',
-      features: activePaidPlan.features.map((feature: any) => 
-        typeof feature === 'object' ? feature.name : feature.split(':')[0]
-      ),
-      cta: 'Assinar agora',
-      highlight: true
-    };
-
-    return [freePlan, paidPlan];
-  })();
-  
-  // Now use useMemo with the pre-calculated data to avoid conditional hook calls
-  const displayPlans = useMemo(() => displayPlansData, [plans]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -498,7 +525,7 @@ const Landing: React.FC = () => {
                   <span className="text-gray-500 ml-1">{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, idx) => (
+                  {plan.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-center">
                       <Check className="h-5 w-5 text-green-500 mr-2" />
                       <span>{feature}</span>
