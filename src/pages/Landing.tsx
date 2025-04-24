@@ -150,8 +150,8 @@ const Landing: React.FC = () => {
       price: '0',
       period: '/mês',
       features: [
-        'Até 5 descrições por mês',
-        '3 templates básicos',
+        'Até 3 descrições por mês',
+        'Templates básicos',
         'Análise SEO básica',
         'Suporte por email'
       ],
@@ -163,8 +163,8 @@ const Landing: React.FC = () => {
       period: '/mês',
       features: [
         'Descrições ilimitadas',
-        'Todos os templates',
-        'Análise SEO avançada',
+        'Templates exclusivos',
+        'Análise e diagnóstico completo de SEO',
         'Suporte prioritário 24/7',
         'Integrações com e-commerce',
         'Exportação em lote'
