@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 import { basicTemplates } from './basic';
 import { supplementsTemplates } from './supplements';
@@ -8,9 +7,11 @@ import { healthTemplates } from './health';
 import { fashionTemplates } from './fashion';
 import { accessoriesTemplates } from './accessories';
 import { hauteCoutureTemplates } from './hauteCouture';
+import { waterFilterTemplate } from './products/water-filter';
 
 // Combining all templates
 export const advancedTemplates: Template[] = [
+  waterFilterTemplate,
   ...supplementsTemplates,
   ...shoesTemplates,
   ...electronicsTemplates,
