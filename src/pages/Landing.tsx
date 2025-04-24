@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,10 +7,12 @@ import {
   ArrowRight,
   Sparkles,
   BarChart2,
-  Search,
-  RefreshCw,
-  Zap,
-  ShieldCheck
+  Check,
+  Shield,
+  Clock,
+  Star,
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
@@ -19,10 +22,8 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
   const icons: Record<string, React.ReactNode> = {
     Sparkles: <Sparkles className={className} />,
     BarChart2: <BarChart2 className={className} />,
-    Search: <Search className={className} />,
-    RefreshCw: <RefreshCw className={className} />,
-    Zap: <Zap className={className} />,
-    ShieldCheck: <ShieldCheck className={className} />
+    Check: <Check className={className} />,
+    Shield: <Shield className={className} />
   };
 
   return <>{icons[name] || <Sparkles className={className} />}</>;
@@ -33,6 +34,8 @@ const Landing: React.FC = () => {
   const { user } = useAuth();
   const [content, setContent] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [activeScreenshot, setActiveScreenshot] = useState(0);
 
   // If user is logged in, redirect to editor
   useEffect(() => {
@@ -78,52 +81,117 @@ const Landing: React.FC = () => {
     );
   }
 
-  // Default values if content is not loaded
+  // Default values for the content
   const hero = content.hero || {
-    title: 'Descrições que vendem seu produto',
-    subtitle: 'Aumente suas vendas com descrições profissionais geradas por IA para seus produtos em minutos.',
+    title: 'Aplicativo de desktop para seu estilo de vida.',
+    subtitle: 'Suas descrições, o que você é!',
     cta_primary: 'Comece agora',
-    cta_secondary: 'Ver planos'
+    cta_secondary: 'Saiba mais'
   };
 
   const features = content.features || {
-    title: 'Como funciona a plataforma',
-    description: 'Uma interface intuitiva para criar descrições profissionais que convertem visitantes em clientes',
-    items: []
-  };
-
-  const exclusiveFeatures = content.exclusive_features || {
-    title: 'Recursos exclusivos',
-    items: []
+    title: 'Porque amamos o que fazemos!',
+    description: 'Otimizando as descrições de produtos para melhorar suas vendas e conversão.',
+    items: [
+      {
+        title: 'Simples como CTRL+C',
+        description: 'Copie e cole as descrições geradas em qualquer plataforma.',
+        icon: 'Check'
+      },
+      {
+        title: 'Trabalho Inteligente',
+        description: 'Nossa IA entende seu produto e gera descrições personalizadas.',
+        icon: 'Sparkles'
+      }
+    ]
   };
 
   const howItWorks = content.how_it_works || {
-    title: 'Como funciona',
-    description: 'Gerar descrições profissionais nunca foi tão fácil',
+    title: 'Questione, ouça, aprenda e inove.',
+    description: 'Plataforma intuitiva que ajusta seu estilo de escrita para melhor SEO.',
     steps: []
   };
 
-  const benefits = content.benefits || {
-    title: 'Por que usar DescriçãoPro?',
-    items: []
+  const screenshots = [
+    { image: '/lovable-uploads/05f724f5-3141-4fee-aa9e-d37e9faae0a4.png', title: 'Dashboard' },
+    { image: '/assets/landing/editor-interface.png', title: 'Editor' },
+    { image: '/assets/landing/ai-generator.png', title: 'Gerador de IA' },
+    { image: '/assets/landing/analytics.png', title: 'Analíticos' }
+  ];
+
+  const stats = [
+    { value: '3546+', label: 'Descrições' },
+    { value: '2052+', label: 'Usuários' },
+    { value: '2+', label: 'Anos de Trabalho' },
+    { value: '2955+', label: 'Produtos Cadastrados' }
+  ];
+
+  const plans = [
+    {
+      name: 'Grátis',
+      price: '0',
+      period: 'Free',
+      features: [
+        'Limite de 5 descrições',
+        'Acesso a 3 templates',
+        'Suporte básico',
+        'Válido por 7 dias'
+      ],
+      cta: 'Cadastrar-se'
+    },
+    {
+      name: 'Profissional',
+      price: '25',
+      period: '/mês',
+      features: [
+        'Descrições ilimitadas',
+        'Templates ilimitados',
+        'Gestão completa',
+        'Análise de SEO em tempo real'
+      ],
+      cta: 'Cadastrar-se',
+      highlight: true
+    }
+  ];
+
+  const testimonials = content.testimonials?.items || [
+    {
+      name: 'João Silva',
+      company: 'Loja Virtual ABC',
+      text: 'As descrições geradas aumentaram minhas vendas em 40% em apenas dois meses. Nunca foi tão fácil criar conteúdo de qualidade.',
+      image: 'https://randomuser.me/api/portraits/men/32.jpg',
+      rating: 5
+    },
+    {
+      name: 'Maria Costa',
+      company: 'MC Eletrônicos',
+      text: 'Uso diariamente para meus produtos e notei uma melhora significativa no tráfego orgânico. A função de SEO em tempo real é fantástica.',
+      image: 'https://randomuser.me/api/portraits/women/44.jpg',
+      rating: 5
+    },
+    {
+      name: 'Carlos Mendes',
+      company: 'Tech Shop',
+      text: 'Economizo horas todas as semanas com essa ferramenta. As descrições são profissionais e convertem muito melhor que as antigas.',
+      image: 'https://randomuser.me/api/portraits/men/67.jpg',
+      rating: 5
+    }
+  ];
+
+  const nextTestimonial = () => {
+    setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
   };
 
-  const testimonials = content.testimonials || {
-    title: 'O que nossos clientes dizem',
-    items: []
+  const prevTestimonial = () => {
+    setActiveTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  const cta = content.cta || {
-    title: 'Pronto para transformar suas descrições?',
-    description: 'Junte-se a centenas de lojistas que já aumentaram suas vendas com descrições profissionais.',
-    cta_primary: 'Comece grátis agora',
-    cta_secondary: 'Ver planos'
+  const nextScreenshot = () => {
+    setActiveScreenshot((prev) => (prev + 1) % screenshots.length);
   };
 
-  const footer = content.footer || {
-    main_text: 'Descrições profissionais para e-commerce geradas por IA.',
-    company_name: 'DescriçãoPro',
-    copyright: 'Todos os direitos reservados'
+  const prevScreenshot = () => {
+    setActiveScreenshot((prev) => (prev - 1 + screenshots.length) % screenshots.length);
   };
 
   return (
@@ -134,15 +202,23 @@ const Landing: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-primary">
-                {footer.company_name || "DescriçãoPRO"}
+                DescriçãoPRO
               </h1>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="#features" className="text-gray-600 hover:text-primary">Funcionalidades</a>
+              <a href="#plans" className="text-gray-600 hover:text-primary">Planos</a>
+              <a href="#testimonials" className="text-gray-600 hover:text-primary">Depoimentos</a>
+              <a href="#video" className="text-gray-600 hover:text-primary">Vídeo</a>
+              <a href="#about" className="text-gray-600 hover:text-primary">Sobre</a>
             </div>
             
             <div className="flex items-center space-x-2">
               {user ? (
                 <Button 
                   onClick={() => navigate('/editor')}
-                  className="px-4"
+                  className="px-4 bg-indigo-600 hover:bg-indigo-700"
                 >
                   Ir para Editor
                 </Button>
@@ -151,15 +227,15 @@ const Landing: React.FC = () => {
                   <Button 
                     variant="outline" 
                     onClick={() => navigate('/auth')}
-                    className="px-4"
+                    className="px-4 text-indigo-600 border-indigo-600 hover:bg-indigo-50"
                   >
                     Entrar
                   </Button>
                   <Button 
                     onClick={() => navigate('/auth?signup=true')}
-                    className="px-4"
+                    className="px-4 bg-indigo-600 hover:bg-indigo-700"
                   >
-                    Cadastrar
+                    Registrar
                   </Button>
                 </>
               )}
@@ -169,25 +245,22 @@ const Landing: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-16">
-        <div className="container mx-auto px-4">
+      <section className="bg-indigo-600 py-16 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-indigo-500 rounded-bl-full opacity-50"></div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0">
+            <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0 text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                {hero.title?.includes('vendem') ? (
-                  <>
-                    Descrições que <span className="text-primary">vendem</span> seu produto
-                  </>
-                ) : hero.title}
+                {hero.title}
               </h1>
-              <p className="text-xl mb-6 text-gray-600">
+              <p className="text-xl mb-6 text-indigo-100">
                 {hero.subtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
                   onClick={() => navigate('/auth?signup=true')}
-                  className="shadow-md"
+                  className="shadow-md bg-white text-indigo-600 hover:bg-gray-100"
                 >
                   {hero.cta_primary}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -197,6 +270,7 @@ const Landing: React.FC = () => {
                   variant="outline" 
                   size="lg"
                   onClick={() => navigate('/plans')}
+                  className="border-white text-white hover:bg-indigo-700"
                 >
                   {hero.cta_secondary}
                 </Button>
@@ -204,196 +278,36 @@ const Landing: React.FC = () => {
             </div>
             
             <div className="md:w-1/2">
-              <img 
-                src="/assets/landing/editor-showcase.png" 
-                alt="DescriçãoPro Editor" 
-                className="rounded-lg shadow-lg border"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://placehold.co/600x400?text=Editor+do+DescricaoPro";
-                }}
-              />
+              <div className="bg-white p-4 rounded-lg shadow-lg">
+                <img 
+                  src="/lovable-uploads/05f724f5-3141-4fee-aa9e-d37e9faae0a4.png" 
+                  alt="Dashboard do DescriçãoPro" 
+                  className="rounded-md w-full"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://placehold.co/600x400?text=Dashboard+DescricaoPro";
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Application Screenshots */}
-      <section className="py-16 bg-white">
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">{features.title}</h2>
-          <p className="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-12">
-            {features.description}
-          </p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">{features.title}</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">{features.description}</p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.items && features.items.length > 0 ? (
               features.items.map((item: any, index: number) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4 border">
-                  <img 
-                    src={item.image} 
-                    alt={item.title} 
-                    className="w-full h-auto rounded-md shadow-md border"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "https://placehold.co/600x400?text=" + encodeURIComponent(item.title || "Feature");
-                    }}
-                  />
-                  <h3 className="text-xl font-bold mt-4 mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
-                </div>
-              ))
-            ) : (
-              // Fallback feature items if none exist in database
-              <>
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <img 
-                    src="/assets/landing/editor-interface.png" 
-                    alt="Interface do editor" 
-                    className="w-full h-auto rounded-md shadow-md border"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "https://placehold.co/600x400?text=Interface+do+Editor";
-                    }}
-                  />
-                  <h3 className="text-xl font-bold mt-4 mb-2">Editor intuitivo</h3>
-                  <p className="text-gray-600">
-                    Interface simples e intuitiva para criar descrições ricas sem conhecimento técnico.
-                  </p>
-                </div>
-                
-                <div className="bg-gray-50 rounded-lg p-4 border">
-                  <img 
-                    src="/assets/landing/ai-generator.png" 
-                    alt="Gerador de IA" 
-                    className="w-full h-auto rounded-md shadow-md border"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "https://placehold.co/600x400?text=Gerador+de+IA";
-                    }}
-                  />
-                  <h3 className="text-xl font-bold mt-4 mb-2">Gerador por IA</h3>
-                  <p className="text-gray-600">
-                    Nossa IA cria descrições otimizadas para SEO adaptadas ao seu tipo de produto.
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{exclusiveFeatures.title}</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {exclusiveFeatures.items && exclusiveFeatures.items.length > 0 ? (
-              exclusiveFeatures.items.map((item: any, index: number) => (
-                <div key={index} className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-                  <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                    <DynamicIcon name={item.icon} className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
-                </div>
-              ))
-            ) : (
-              // Fallback features if none exist in database
-              <>
-                <div className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-                  <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                    <Sparkles className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Geração por IA</h3>
-                  <p className="text-gray-600">
-                    Descrições profissionais criadas por inteligência artificial especializada em copywriting.
-                  </p>
-                </div>
-                
-                <div className="bg-white p-6 rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-                  <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                    <BarChart2 className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Otimização SEO</h3>
-                  <p className="text-gray-600">
-                    Melhore seu ranking nos motores de busca com descrições otimizadas para SEO.
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">{howItWorks.title}</h2>
-          <p className="text-center text-xl mb-12 max-w-3xl mx-auto text-gray-600">
-            {howItWorks.description}
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {howItWorks.steps && howItWorks.steps.length > 0 ? (
-              // Sort steps by number
-              [...howItWorks.steps]
-                .sort((a, b) => a.number - b.number)
-                .map((step: any, index: number) => (
-                  <div key={index} className="text-center">
-                    <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-primary">{step.number}</span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                    <p className="text-gray-600">{step.description}</p>
-                    <img 
-                      src={step.image}
-                      alt={step.title} 
-                      className="mt-4 rounded-lg shadow-sm border mx-auto"
-                      height="150"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = `https://placehold.co/300x150?text=${encodeURIComponent(step.title || "Step")}`;
-                      }}
-                    />
-                  </div>
-                ))
-            ) : (
-              // Fallback steps if none exist in database
-              <>
-                <div className="text-center">
-                  <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-primary">1</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Cadastre seus produtos</h3>
-                  <p className="text-gray-600">Insira as informações básicas do seu produto</p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-primary">2</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Escolha o estilo</h3>
-                  <p className="text-gray-600">Selecione o tom e estilo da descrição</p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{benefits.title}</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {benefits.items && benefits.items.length > 0 ? (
-              benefits.items.map((item: any, index: number) => (
-                <div key={index} className="flex items-start">
-                  <div className="bg-primary/10 p-2 rounded-full mr-4">
-                    <DynamicIcon name={item.icon} className="h-5 w-5 text-primary" />
+                <div key={index} className="flex items-start p-6 bg-white rounded-lg shadow-sm">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
+                    <DynamicIcon name={item.icon} className="h-6 w-6 text-indigo-600" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-2">{item.title}</h3>
@@ -402,29 +316,44 @@ const Landing: React.FC = () => {
                 </div>
               ))
             ) : (
-              // Fallback benefits if none exist in database
               <>
-                <div className="flex items-start">
-                  <div className="bg-primary/10 p-2 rounded-full mr-4">
-                    <RefreshCw className="h-5 w-5 text-primary" />
+                <div className="flex items-start p-6 bg-white rounded-lg shadow-sm">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
+                    <Check className="h-6 w-6 text-indigo-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Economize tempo</h3>
-                    <p className="text-gray-600">
-                      Crie descrições em minutos, não em horas. Nosso sistema automatiza todo o processo.
-                    </p>
+                    <h3 className="text-xl font-bold mb-2">Descrições ilimitadas</h3>
+                    <p className="text-gray-600">Crie quantas descrições quiser para todos os seus produtos sem limites.</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start">
-                  <div className="bg-primary/10 p-2 rounded-full mr-4">
-                    <Zap className="h-5 w-5 text-primary" />
+                <div className="flex items-start p-6 bg-white rounded-lg shadow-sm">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
+                    <Sparkles className="h-6 w-6 text-indigo-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Aumente conversões</h3>
-                    <p className="text-gray-600">
-                      Descrições persuasivas que convertam visitantes em clientes.
-                    </p>
+                    <h3 className="text-xl font-bold mb-2">Templates ilimitados</h3>
+                    <p className="text-gray-600">Acesse todos os templates disponíveis e personalize-os como quiser.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start p-6 bg-white rounded-lg shadow-sm">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
+                    <BarChart2 className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Gestão completa</h3>
+                    <p className="text-gray-600">Gerencie todas as suas descrições em um só lugar com ferramentas poderosas.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start p-6 bg-white rounded-lg shadow-sm">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
+                    <Shield className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">Análise de SEO em tempo real</h3>
+                    <p className="text-gray-600">Receba análises e diagnósticos completos de SEO enquanto escreve.</p>
                   </div>
                 </div>
               </>
@@ -433,79 +362,294 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* Customer Testimonials */}
-      <section className="py-16 bg-white">
+      {/* How it works */}
+      <section id="about" className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">{testimonials.title}</h2>
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="md:w-1/2">
+              <div className="relative">
+                <div className="bg-indigo-100 absolute -top-5 -left-5 w-full h-full rounded-lg"></div>
+                <img 
+                  src="/assets/landing/analytics.png" 
+                  alt="Dashboard analítico" 
+                  className="rounded-lg shadow-md relative z-10"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://placehold.co/600x400?text=Analytics+Dashboard";
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div className="md:w-1/2">
+              <h2 className="text-3xl font-bold mb-6">{howItWorks.title}</h2>
+              <p className="text-lg text-gray-600 mb-8">{howItWorks.description}</p>
+              
+              <ul className="space-y-4">
+                <li className="flex items-start">
+                  <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                    <Clock className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">Economia de tempo</h3>
+                    <p className="text-gray-600">Crie descrições em minutos ao invés de horas. Nossa IA faz todo o trabalho pesado.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                    <BarChart2 className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">Aumento nas vendas</h3>
+                    <p className="text-gray-600">Descrições otimizadas que convertem visitantes em clientes satisfeitos.</p>
+                  </div>
+                </li>
+                
+                <li className="flex items-start">
+                  <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                    <Star className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">Qualidade profissional</h3>
+                    <p className="text-gray-600">Algoritmos treinados para produzir textos que se equiparam aos melhores copywriters.</p>
+                  </div>
+                </li>
+              </ul>
+              
+              <Button
+                className="mt-8 bg-indigo-600 hover:bg-indigo-700"
+                size="lg"
+                onClick={() => navigate('/plans')}
+              >
+                Explorar plataforma
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Screenshots Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Nossas Telas</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.items && testimonials.items.length > 0 ? (
-              testimonials.items.map((item: any, index: number) => (
-                <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-sm border">
-                  <div className="flex items-center mb-4">
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="w-12 h-12 rounded-full mr-4 object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = "https://placehold.co/100x100?text=Cliente";
-                      }}
-                    />
-                    <div>
-                      <h4 className="font-bold">{item.name}</h4>
-                      <p className="text-gray-500 text-sm">{item.company}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 italic">"{item.text}"</p>
+          <div className="relative">
+            <div className="flex justify-center">
+              <div className="w-full max-w-4xl relative">
+                <img 
+                  src={screenshots[activeScreenshot].image}
+                  alt={screenshots[activeScreenshot].title}
+                  className="w-full h-auto rounded-lg shadow-lg"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://placehold.co/800x450?text=Screenshot";
+                  }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg">
+                  <p className="text-white text-lg">{screenshots[activeScreenshot].title}</p>
                 </div>
-              ))
-            ) : (
-              // Fallback testimonials if none exist in database
-              <>
-                <div className="bg-gray-50 p-6 rounded-lg shadow-sm border">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 rounded-full mr-4 bg-gray-300"></div>
-                    <div>
-                      <h4 className="font-bold">Ana Silva</h4>
-                      <p className="text-gray-500 text-sm">Loja de Roupas</p>
-                    </div>
+              </div>
+            </div>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+              onClick={prevScreenshot}
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+              onClick={nextScreenshot}
+            >
+              <ChevronRight className="h-6 w-6" />
+            </Button>
+          </div>
+          
+          <div className="flex justify-center mt-6 gap-2">
+            {screenshots.map((_, index) => (
+              <Button
+                key={index}
+                variant="ghost"
+                size="sm"
+                className={`p-1 min-w-0 h-2 ${activeScreenshot === index ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                onClick={() => setActiveScreenshot(index)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-16 bg-gray-100 border-t border-b border-gray-200">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <p className="text-3xl md:text-4xl font-bold text-indigo-600">{stat.value}</p>
+                <p className="text-gray-500">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="plans" className="py-20 bg-indigo-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Nosso Planos de Preços</h2>
+            <p className="text-xl text-indigo-100 max-w-2xl mx-auto">
+              Escolha o plano perfeito para você com 100% de satisfação garantida.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row justify-center gap-8 max-w-4xl mx-auto">
+            {plans.map((plan, index) => (
+              <div 
+                key={index} 
+                className={`bg-white rounded-lg shadow-lg p-8 text-gray-800 flex-1 relative ${plan.highlight ? 'transform md:-translate-y-4' : ''}`}
+              >
+                {plan.highlight && (
+                  <div className="absolute top-0 right-0 bg-indigo-500 text-white px-3 py-1 rounded-tr-lg rounded-bl-lg text-sm font-medium">
+                    Mais Popular
                   </div>
-                  <p className="text-gray-600 italic">"Minhas vendas aumentaram 30% desde que comecei a usar o DescriçãoPro."</p>
+                )}
+                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <div className="flex items-baseline mb-6">
+                  <span className="text-4xl font-bold">R${plan.price}</span>
+                  <span className="text-gray-500 ml-1">{plan.period}</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center">
+                      <Check className="h-5 w-5 text-green-500 mr-2" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  className={`w-full ${plan.highlight ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}`}
+                  onClick={() => navigate('/auth?signup=true')}
+                >
+                  {plan.cta}
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section id="video" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Vídeo sobre nosso processo de trabalho
+          </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+            Entenda melhor como nossa IA cria descrições otimizadas para seus produtos e como isso pode aumentar suas vendas.
+          </p>
+          
+          <div className="max-w-4xl mx-auto aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="text-center p-8">
+              <p className="text-gray-500 mb-4">Vídeo em breve disponível</p>
+              <Button className="bg-indigo-600 hover:bg-indigo-700">
+                Receber notificação quando disponível
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Testemunhos</h2>
+          
+          <div className="max-w-4xl mx-auto relative">
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="md:w-1/4 flex flex-col items-center">
+                  <img 
+                    src={testimonials[activeTestimonial].image}
+                    alt={testimonials[activeTestimonial].name}
+                    className="w-20 h-20 rounded-full object-cover mb-4"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "https://placehold.co/200x200?text=User";
+                    }}
+                  />
+                  <div className="flex mb-2">
+                    {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+                  <h4 className="font-bold text-center">{testimonials[activeTestimonial].name}</h4>
+                  <p className="text-gray-500 text-sm text-center">{testimonials[activeTestimonial].company}</p>
                 </div>
                 
-                <div className="bg-gray-50 p-6 rounded-lg shadow-sm border">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 rounded-full mr-4 bg-gray-300"></div>
-                    <div>
-                      <h4 className="font-bold">Carlos Mendes</h4>
-                      <p className="text-gray-500 text-sm">Loja de Eletrônicos</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 italic">"Economizo horas por semana com o DescriçãoPro."</p>
+                <div className="md:w-3/4 flex items-center">
+                  <p className="italic text-gray-600">"{testimonials[activeTestimonial].text}"</p>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
+            
+            <div className="flex justify-center mt-6 gap-4">
+              <Button
+                variant="outline"
+                size="icon"
+                className="bg-white hover:bg-gray-50"
+                onClick={prevTestimonial}
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+              
+              <div className="flex justify-center gap-2 items-center">
+                {testimonials.map((_, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    size="sm"
+                    className={`p-1 min-w-0 h-2 ${activeTestimonial === index ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                    onClick={() => setActiveTestimonial(index)}
+                  />
+                ))}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                className="bg-white hover:bg-gray-50"
+                onClick={nextTestimonial}
+              >
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary py-16 text-white">
+      <section className="py-16 bg-indigo-600 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">{cta.title}</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            {cta.description}
+          <h2 className="text-3xl font-bold mb-6">Pronto para transformar suas descrições?</h2>
+          <p className="text-xl mb-8 max-w-3xl mx-auto text-indigo-100">
+            Junte-se a milhares de lojistas que já melhoraram suas vendas com descrições otimizadas geradas por IA.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              variant="secondary" 
               size="lg"
               onClick={() => navigate('/auth?signup=true')}
-              className="shadow-md"
+              className="shadow-md bg-white text-indigo-600 hover:bg-gray-100"
             >
-              {cta.cta_primary}
+              Começar agora
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             
@@ -513,9 +657,9 @@ const Landing: React.FC = () => {
               variant="outline" 
               size="lg"
               onClick={() => navigate('/plans')}
-              className="bg-white text-primary hover:bg-white/90"
+              className="border-white text-white hover:bg-indigo-700"
             >
-              {cta.cta_secondary}
+              Ver planos
             </Button>
           </div>
         </div>
@@ -526,9 +670,9 @@ const Landing: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold text-white mb-4">{footer.company_name}</h3>
+              <h3 className="text-xl font-bold text-white mb-4">DescriçãoPRO</h3>
               <p className="mb-4">
-                {footer.main_text}
+                Descrições profissionais para e-commerce geradas por IA.
               </p>
             </div>
             
@@ -536,8 +680,9 @@ const Landing: React.FC = () => {
               <h4 className="text-lg font-semibold text-white mb-4">Links</h4>
               <ul className="space-y-2">
                 <li><a href="/" className="hover:text-white">Início</a></li>
-                <li><a href="/plans" className="hover:text-white">Planos</a></li>
-                <li><a href="/auth" className="hover:text-white">Entrar</a></li>
+                <li><a href="#features" className="hover:text-white">Funcionalidades</a></li>
+                <li><a href="#plans" className="hover:text-white">Planos</a></li>
+                <li><a href="#testimonials" className="hover:text-white">Depoimentos</a></li>
               </ul>
             </div>
             
@@ -559,7 +704,7 @@ const Landing: React.FC = () => {
           </div>
           
           <div className="border-t border-gray-700 mt-8 pt-8 text-center">
-            <p>&copy; {new Date().getFullYear()} {footer.company_name}. {footer.copyright}</p>
+            <p>&copy; {new Date().getFullYear()} DescriçãoPRO. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>

@@ -36,12 +36,17 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
           onClick={onSave} 
           disabled={saving}
           size="sm"
+          className="bg-indigo-600 hover:bg-indigo-700"
         >
           <Save className="mr-2 h-4 w-4" />
           {saving ? 'Salvando...' : 'Salvar Alterações'}
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
+        <p className="text-sm text-gray-500 mb-4">
+          Personalize as informações do rodapé da sua página.
+        </p>
+        
         <SectionEditor
           label="Texto Principal"
           value={content.main_text}
