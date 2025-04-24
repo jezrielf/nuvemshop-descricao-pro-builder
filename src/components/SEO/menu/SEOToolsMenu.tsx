@@ -33,7 +33,7 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 p-3">
+      <PopoverContent align="end" className="w-64 p-3 bg-white">
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Otimização de SEO</h4>
           <div className="grid gap-1.5">

@@ -41,7 +41,7 @@ const SEOTools: React.FC<SEOToolsProps> = ({ description }) => {
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 bg-white">
         <DropdownMenuLabel>Otimização de SEO</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer">
