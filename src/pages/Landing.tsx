@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { adminService } from '@/services/admin';
 
 // Dynamic icon mapping
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -37,6 +38,7 @@ const Landing: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeScreenshot, setActiveScreenshot] = useState(0);
+  const [plans, setPlans] = useState<any[]>([]);
 
   // If user is logged in, redirect to editor
   useEffect(() => {
@@ -71,6 +73,21 @@ const Landing: React.FC = () => {
     };
 
     fetchContent();
+  }, []);
+
+  // Fetch plans from database
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const plansData = await adminService.getPlans();
+        console.log("Fetched plans:", plansData);
+        setPlans(plansData);
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      }
+    };
+
+    fetchPlans();
   }, []);
 
   if (loading) {
@@ -144,7 +161,7 @@ const Landing: React.FC = () => {
     { value: '200%', label: 'Aumento em Vendas' }
   ];
 
-  const plans = [
+  const plansData = [
     {
       name: 'Free',
       price: '0',
@@ -213,6 +230,16 @@ const Landing: React.FC = () => {
   const prevScreenshot = () => {
     setActiveScreenshot((prev) => (prev - 1 + screenshots.length) % screenshots.length);
   };
+
+  // Transform database plans into display format
+  const displayPlans = plans.length > 0 ? plans.map(plan => ({
+    name: plan.name,
+    price: String(plan.price),
+    period: '/mês',
+    features: plan.features.map((feature: any) => feature.name),
+    cta: plan.price === 0 ? 'Começar grátis' : 'Assinar agora',
+    highlight: !plan.price === 0
+  })) : plansData;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -437,7 +464,7 @@ const Landing: React.FC = () => {
           </div>
           
           <div className="flex flex-col md:flex-row justify-center gap-8 max-w-4xl mx-auto">
-            {plans.map((plan, index) => (
+            {displayPlans.map((plan, index) => (
               <div 
                 key={index} 
                 className={`bg-white rounded-lg shadow-lg p-8 border flex-1 relative ${plan.highlight ? 'border-indigo-500' : 'border-gray-200'}`}
