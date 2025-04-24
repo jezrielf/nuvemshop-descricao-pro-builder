@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -85,25 +84,30 @@ const Landing: React.FC = () => {
 
   // Default values for the content
   const hero = content.hero || {
-    title: 'Aplicativo de desktop para seu estilo de vida.',
-    subtitle: 'Suas descrições, o que você é!',
-    cta_primary: 'Comece agora',
-    cta_secondary: 'Saiba mais'
+    title: 'Descrições de Produtos que Vendem Mais',
+    subtitle: 'Crie descrições profissionais otimizadas para SEO em minutos usando IA',
+    cta_primary: 'Começar agora',
+    cta_secondary: 'Ver demonstração'
   };
 
   const features = content.features || {
-    title: 'Porque amamos o que fazemos!',
-    description: 'Otimizando as descrições de produtos para melhorar suas vendas e conversão.',
+    title: 'Potencialize suas Vendas',
+    description: 'Ferramentas poderosas para criar descrições que convertem',
     items: [
       {
-        title: 'Simples como CTRL+C',
-        description: 'Copie e cole as descrições geradas em qualquer plataforma.',
-        icon: 'Check'
+        title: 'Descrições Ilimitadas com IA',
+        description: 'Gere quantas descrições quiser com nossa IA treinada para e-commerce.',
+        icon: 'Sparkles'
       },
       {
-        title: 'Trabalho Inteligente',
-        description: 'Nossa IA entende seu produto e gera descrições personalizadas.',
-        icon: 'Sparkles'
+        title: 'Análise SEO em Tempo Real',
+        description: 'Otimize suas descrições com feedback instantâneo de SEO.',
+        icon: 'BarChart2'
+      },
+      {
+        title: 'Templates Personalizáveis',
+        description: 'Acesse templates profissionais ou crie os seus próprios.',
+        icon: 'Layout'
       }
     ]
   };
@@ -116,77 +120,79 @@ const Landing: React.FC = () => {
 
   const screenshots = [
     { 
-      image: '/lovable-uploads/0.png', 
-      title: 'Dashboard Analytics' 
+      image: '/lovable-uploads/0.png',
+      title: 'Editor Intuitivo' 
     },
     { 
-      image: '/lovable-uploads/1.png', 
-      title: 'Análise Detalhada' 
+      image: '/lovable-uploads/1.png',
+      title: 'Análise SEO' 
     },
     { 
-      image: '/lovable-uploads/2.png', 
-      title: 'Otimização SEO' 
+      image: '/lovable-uploads/2.png',
+      title: 'Templates Profissionais' 
     },
     { 
-      image: '/lovable-uploads/3.png', 
-      title: 'Dashboard SEO' 
+      image: '/lovable-uploads/3.png',
+      title: 'Dashboard Completo' 
     }
   ];
 
   const stats = [
-    { value: '3546+', label: 'Descrições' },
-    { value: '2052+', label: 'Usuários' },
-    { value: '2+', label: 'Anos de Trabalho' },
-    { value: '2955+', label: 'Produtos Cadastrados' }
+    { value: '50.000+', label: 'Descrições Geradas' },
+    { value: '5.000+', label: 'Usuários Ativos' },
+    { value: '98%', label: 'Satisfação' },
+    { value: '200%', label: 'Aumento em Vendas' }
   ];
 
   const plans = [
     {
-      name: 'Grátis',
+      name: 'Free',
       price: '0',
-      period: 'Free',
+      period: '/mês',
       features: [
-        'Limite de 5 descrições',
-        'Acesso a 3 templates',
-        'Suporte básico',
-        'Válido por 7 dias'
+        'Até 5 descrições por mês',
+        '3 templates básicos',
+        'Análise SEO básica',
+        'Suporte por email'
       ],
-      cta: 'Cadastrar-se'
+      cta: 'Começar grátis'
     },
     {
-      name: 'Profissional',
-      price: '25',
+      name: 'Pro',
+      price: '97',
       period: '/mês',
       features: [
         'Descrições ilimitadas',
-        'Templates ilimitados',
-        'Gestão completa',
-        'Análise de SEO em tempo real'
+        'Todos os templates',
+        'Análise SEO avançada',
+        'Suporte prioritário 24/7',
+        'Integrações com e-commerce',
+        'Exportação em lote'
       ],
-      cta: 'Cadastrar-se',
+      cta: 'Assinar agora',
       highlight: true
     }
   ];
 
-  const testimonials = content.testimonials?.items || [
+  const testimonials = [
     {
       name: 'Ana Silva',
-      company: 'Boutique Elegance',
-      text: 'As descrições geradas aumentaram minhas vendas em 40% em apenas dois meses. Nunca foi tão fácil criar conteúdo de qualidade.',
+      company: 'Loja Virtual Express',
+      text: 'Aumentei minhas vendas em 150% em apenas 3 meses usando as descrições otimizadas. A análise de SEO em tempo real é fantástica!',
       image: '/lovable-uploads/4.png',
       rating: 5
     },
     {
-      name: 'Maria Costa',
-      company: 'MC Fashion',
-      text: 'Uso diariamente para meus produtos e notei uma melhora significativa no tráfego orgânico. A função de SEO em tempo real é fantástica.',
+      name: 'Carlos Mendes',
+      company: 'Tech Store',
+      text: 'A ferramenta revolucionou nossa produtividade. O que levava horas agora é feito em minutos, com qualidade muito superior.',
       image: '/lovable-uploads/5.png',
       rating: 5
     },
     {
-      name: 'Carla Mendes',
-      company: 'Atelier CM',
-      text: 'Economizo horas todas as semanas com essa ferramenta. As descrições são profissionais e convertem muito melhor que as antigas.',
+      name: 'Marina Costa',
+      company: 'Fashion Store',
+      text: 'Os templates são excepcionais e a IA entende perfeitamente o tom da nossa marca. Recomendo para todas as lojas online!',
       image: '/lovable-uploads/6.png',
       rating: 5
     }
@@ -258,32 +264,31 @@ const Landing: React.FC = () => {
         </div>
       </header>
 
-      {/* Hero Section - Redesigned */}
-      <section className="bg-indigo-600 py-16">
+      {/* Hero Section - Updated */}
+      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0 text-white">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
                 {hero.title}
               </h1>
-              <p className="text-xl mb-6 text-indigo-100">
+              <p className="text-xl mb-8 text-indigo-100 leading-relaxed">
                 {hero.subtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
                   onClick={() => navigate('/auth?signup=true')}
-                  className="shadow-md bg-white text-indigo-600 hover:bg-gray-100"
+                  className="shadow-lg bg-white text-indigo-600 hover:bg-gray-100 font-semibold"
                 >
                   {hero.cta_primary}
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 
                 <Button 
                   variant="outline" 
                   size="lg"
-                  onClick={() => navigate('/plans')}
-                  className="border-white text-white hover:bg-indigo-700"
+                  className="border-2 border-white text-white hover:bg-white/10 font-semibold"
                 >
                   {hero.cta_secondary}
                 </Button>
@@ -291,15 +296,11 @@ const Landing: React.FC = () => {
             </div>
             
             <div className="md:w-1/2">
-              <div className="bg-white p-6 rounded-lg shadow-lg">
+              <div className="bg-white p-4 rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-300">
                 <img 
                   src="/lovable-uploads/7.png" 
-                  alt="Dashboard illustration" 
+                  alt="Dashboard Preview" 
                   className="rounded-md w-full"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://placehold.co/600x400?text=Dashboard+Illustration";
-                  }}
                 />
               </div>
             </div>
@@ -307,80 +308,24 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section - Redesigned */}
-      <section id="features" className="py-24 bg-white">
+      {/* Features Section - Updated */}
+      <section id="features" className="py-24 bg-gradient-to-b from-white to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">{features.title}</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{features.title}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">{features.description}</p>
           </div>
           
-          <div className="flex flex-col md:flex-row justify-between gap-8 mb-16">
-            <div className="md:w-1/2">
-              <img 
-                src="/lovable-uploads/1.png" 
-                alt="Analytics Feature" 
-                className="rounded-lg shadow-lg w-full"
-              />
-            </div>
-            
-            <div className="md:w-1/2 flex flex-col justify-center">
-              <div className="grid grid-cols-1 gap-8">
-                <div className="flex items-start">
-                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
-                    <Check className="h-6 w-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Descrições ilimitadas</h3>
-                    <p className="text-gray-600">Crie quantas descrições quiser para todos os seus produtos sem limites.</p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {features.items.map((feature, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+                <div className="bg-indigo-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                  <DynamicIcon name={feature.icon} className="h-6 w-6 text-indigo-600" />
                 </div>
-                
-                <div className="flex items-start">
-                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
-                    <Sparkles className="h-6 w-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Templates ilimitados</h3>
-                    <p className="text-gray-600">Acesse todos os templates disponíveis e personalize-os como quiser.</p>
-                  </div>
-                </div>
+                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
               </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col md:flex-row-reverse justify-between gap-8">
-            <div className="md:w-1/2">
-              <img 
-                src="/lovable-uploads/2.png" 
-                alt="SEO Feature" 
-                className="rounded-lg shadow-lg w-full"
-              />
-            </div>
-            
-            <div className="md:w-1/2 flex flex-col justify-center">
-              <div className="grid grid-cols-1 gap-8">
-                <div className="flex items-start">
-                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
-                    <BarChart2 className="h-6 w-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Gestão completa</h3>
-                    <p className="text-gray-600">Gerencie todas as suas descrições em um só lugar com ferramentas poderosas.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
-                    <Shield className="h-6 w-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Análise de SEO em tempo real</h3>
-                    <p className="text-gray-600">Receba análises e diagnósticos completos de SEO enquanto escreve.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
