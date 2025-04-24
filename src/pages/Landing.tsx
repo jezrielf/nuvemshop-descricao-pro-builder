@@ -231,14 +231,14 @@ const Landing: React.FC = () => {
     setActiveScreenshot((prev) => (prev - 1 + screenshots.length) % screenshots.length);
   };
 
-  // Transform database plans into display format
+  // Transform database plans into display format - FIXED HIGHLIGHT LOGIC
   const displayPlans = plans.length > 0 ? plans.map(plan => ({
     name: plan.name,
     price: String(plan.price),
     period: '/mês',
     features: plan.features.map((feature: any) => feature.name),
     cta: plan.price === 0 ? 'Começar grátis' : 'Assinar agora',
-    highlight: !plan.price === 0
+    highlight: plan.price !== 0 // Fixed: Now correctly setting highlight for non-free plans
   })) : plansData;
 
   return (
