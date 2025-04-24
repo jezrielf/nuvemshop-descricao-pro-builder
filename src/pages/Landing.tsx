@@ -602,12 +602,14 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section - Redesigned */}
+      {/* CTA Section - Redesigned with More Specific Messaging */}
       <section className="py-16 bg-indigo-600 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Pronto para transformar suas descrições?</h2>
+          <h2 className="text-3xl font-bold mb-6">Transforme Suas Descrições com IA Inteligente</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto text-indigo-100">
-            Junte-se a milhares de lojistas que já melhoraram suas vendas com descrições otimizadas geradas por IA.
+            Mais do que uma simples ferramenta de geração de texto: 
+            uma plataforma completa de otimização de descrições com análise SEO robusta, 
+            templates personalizados e insights para impulsionar suas vendas.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -616,7 +618,7 @@ const Landing: React.FC = () => {
               onClick={() => navigate('/auth?signup=true')}
               className="shadow-md bg-white text-indigo-600 hover:bg-gray-100"
             >
-              Começar agora
+              Crie Descrições Inteligentes
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             
@@ -626,7 +628,7 @@ const Landing: React.FC = () => {
               onClick={() => navigate('/plans')}
               className="border-white text-white hover:bg-indigo-700"
             >
-              Ver planos
+              Conheça Nossos Planos
             </Button>
           </div>
         </div>
