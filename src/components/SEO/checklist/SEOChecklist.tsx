@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ProductDescription } from '@/types/editor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,9 +15,9 @@ interface SEOChecklistProps {
 
 const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
   const [open, setOpen] = useState(false);
-  const { checklistData, runChecklist } = useSEOChecklist(description);
+  const { checklistItems, progress, checklistData, runChecklist } = useSEOChecklist(description);
   
-  React.useEffect(() => {
+  useEffect(() => {
     if (open && description) {
       runChecklist();
     }
@@ -67,12 +67,12 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
                   </div>
                   
                   <CategoryChecks 
-                    title="Conteúdo"
+                    title="content"
                     checks={checklistData.contentChecks}
                   />
                   
                   <CategoryChecks 
-                    title="Técnico"
+                    title="technical"
                     checks={checklistData.technicalChecks}
                   />
                 </TabsContent>

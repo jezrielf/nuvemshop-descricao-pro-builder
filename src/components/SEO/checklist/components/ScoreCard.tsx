@@ -2,13 +2,22 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
-import { SEOCheckItem } from '../types';
 
 interface ScoreCardProps {
-  check: SEOCheckItem;
+  title: string;
+  score: number;
+  maxScore: number;
 }
 
-export const ScoreCard: React.FC<ScoreCardProps> = ({ check }) => {
+export const ScoreCard: React.FC<ScoreCardProps> = ({ title, score, maxScore }) => {
+  const getStatus = () => {
+    if (score >= 80) return 'pass';
+    if (score >= 60) return 'warning';
+    return 'fail';
+  };
+  
+  const status = getStatus();
+  
   const getStatusIcon = (status: 'pass' | 'fail' | 'warning') => {
     switch (status) {
       case 'pass':
@@ -36,11 +45,11 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({ check }) => {
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium">{check.title}</h3>
-            <p className="text-sm text-gray-500">{check.description}</p>
+            <h3 className="text-lg font-medium">{title}</h3>
+            <p className="text-sm text-gray-500">{score}% do {maxScore}%</p>
           </div>
-          <div className={`px-3 py-2 rounded-full ${getStatusColor(check.status)}`}>
-            {getStatusIcon(check.status)}
+          <div className={`px-3 py-2 rounded-full ${getStatusColor(status)}`}>
+            {getStatusIcon(status)}
           </div>
         </div>
       </CardContent>

@@ -4,12 +4,12 @@ import { CheckItem } from './CheckItem';
 import { SEOCheckItem } from '../types';
 
 interface CategoryChecksProps {
-  category: string;
+  title: string;
   checks: SEOCheckItem[];
 }
 
 export const CategoryChecks: React.FC<CategoryChecksProps> = ({ 
-  category, 
+  title, 
   checks 
 }) => {
   const getCategoryName = (category: string) => {
@@ -25,7 +25,7 @@ export const CategoryChecks: React.FC<CategoryChecksProps> = ({
   return (
     <div className="space-y-2">
       <h3 className="text-md font-medium capitalize px-1">
-        {getCategoryName(category)}
+        {getCategoryName(title)}
       </h3>
       
       {checks.map(check => (
