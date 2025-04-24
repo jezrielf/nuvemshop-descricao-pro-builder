@@ -120,19 +120,19 @@ const Landing: React.FC = () => {
 
   const screenshots = [
     { 
-      image: '/lovable-uploads/inicio-da-pagina.jpg',
+      image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
       title: 'Editor Intuitivo' 
     },
     { 
-      image: '/lovable-uploads/image_seo.jpg',
+      image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
       title: 'Análise SEO' 
     },
     { 
-      image: '/lovable-uploads/templates.png',
+      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
       title: 'Templates Profissionais' 
     },
     { 
-      image: '/lovable-uploads/dashseo.png',
+      image: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334',
       title: 'Dashboard Completo' 
     }
   ];
@@ -179,21 +179,21 @@ const Landing: React.FC = () => {
       name: 'Ana Silva',
       company: 'Moda Online Store',
       text: 'As descrições geradas pela plataforma aumentaram nossas vendas em 150%. A otimização para SEO nos trouxe muito mais visitantes qualificados.',
-      image: '/lovable-uploads/inicio-da-pagina.jpg',
+      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
       rating: 5
     },
     {
       name: 'Carlos Mendes',
       company: 'Tech Store',
       text: 'Economizamos horas de trabalho com as descrições automáticas. A qualidade é excepcional e os resultados são impressionantes.',
-      image: '/lovable-uploads/image_seo.jpg',
+      image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
       rating: 5
     },
     {
       name: 'Marina Costa',
       company: 'Fashion Store',
       text: 'Os templates são perfeitos e a IA entende exatamente o tom da nossa marca. Recomendo para todas as lojas online!',
-      image: '/lovable-uploads/templates.png',
+      image: 'https://images.unsplash.com/photo-1500673922987-e212871fec22',
       rating: 5
     }
   ];
@@ -270,10 +270,11 @@ const Landing: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0 text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                {hero.title}
+                Transforme suas Descrições de Produtos em Máquinas de Vendas
               </h1>
               <p className="text-xl mb-8 text-indigo-100 leading-relaxed">
-                {hero.subtitle}
+                Use nossa IA especializada para criar descrições profissionais que convertem, 
+                otimizadas para SEO e que fazem seus produtos se destacarem da concorrência.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
@@ -281,7 +282,7 @@ const Landing: React.FC = () => {
                   onClick={() => navigate('/auth?signup=true')}
                   className="shadow-lg bg-white text-indigo-600 hover:bg-gray-100 font-semibold"
                 >
-                  {hero.cta_primary}
+                  Começar Agora Gratuitamente
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 
@@ -290,7 +291,7 @@ const Landing: React.FC = () => {
                   size="lg"
                   className="border-2 border-white text-white hover:bg-white/10 font-semibold"
                 >
-                  {hero.cta_secondary}
+                  Ver Demonstração
                 </Button>
               </div>
             </div>
@@ -561,9 +562,9 @@ const Landing: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-center mb-8">
             <img 
-              src="/lovable-uploads/7.png" 
-              alt="Logo" 
-              className="h-16 w-auto"
+              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+              alt="Logo"
+              className="h-16 w-auto object-contain"
             />
           </div>
           
