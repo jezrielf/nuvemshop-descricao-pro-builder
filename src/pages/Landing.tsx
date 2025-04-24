@@ -84,29 +84,29 @@ const Landing: React.FC = () => {
 
   // Default values for the content
   const hero = content.hero || {
-    title: 'Descrições de Produtos que Vendem Mais',
-    subtitle: 'Crie descrições profissionais otimizadas para SEO em minutos usando IA',
-    cta_primary: 'Começar agora',
-    cta_secondary: 'Ver demonstração'
+    title: 'Crie Descrições que Vendem',
+    subtitle: 'Use Inteligência Artificial para gerar descrições profissionais e otimizadas para SEO em minutos. Aumente suas vendas com textos persuasivos e envolventes.',
+    cta_primary: 'Começar Gratuitamente',
+    cta_secondary: 'Ver Demonstração'
   };
 
   const features = content.features || {
-    title: 'Potencialize suas Vendas',
-    description: 'Ferramentas poderosas para criar descrições que convertem',
+    title: 'Recursos Poderosos',
+    description: 'Tudo que você precisa para criar descrições que convertem',
     items: [
       {
-        title: 'Descrições Ilimitadas com IA',
-        description: 'Gere quantas descrições quiser com nossa IA treinada para e-commerce.',
+        title: 'IA Especializada em E-commerce',
+        description: 'Nossa IA foi treinada com milhares de descrições de sucesso para gerar textos que realmente vendem.',
         icon: 'Sparkles'
       },
       {
-        title: 'Análise SEO em Tempo Real',
-        description: 'Otimize suas descrições com feedback instantâneo de SEO.',
+        title: 'Otimização SEO em Tempo Real',
+        description: 'Análise instantânea de SEO para garantir que suas descrições apareçam no topo das buscas.',
         icon: 'BarChart2'
       },
       {
-        title: 'Templates Personalizáveis',
-        description: 'Acesse templates profissionais ou crie os seus próprios.',
+        title: 'Templates Profissionais',
+        description: 'Biblioteca completa de templates testados e aprovados para diferentes segmentos.',
         icon: 'Layout'
       }
     ]
@@ -120,19 +120,19 @@ const Landing: React.FC = () => {
 
   const screenshots = [
     { 
-      image: '/lovable-uploads/a9d1a842-27ea-41b9-9064-6c24edef2bdb.png',
+      image: '/lovable-uploads/inicio-da-pagina.jpg',
       title: 'Editor Intuitivo' 
     },
     { 
-      image: '/lovable-uploads/4153bf41-d7be-45ad-8487-fddf9b6c7795.png',
+      image: '/lovable-uploads/image_seo.jpg',
       title: 'Análise SEO' 
     },
     { 
-      image: '/lovable-uploads/6192d365-5d85-440f-87e4-710c5d6852d8.png',
+      image: '/lovable-uploads/templates.png',
       title: 'Templates Profissionais' 
     },
     { 
-      image: '/lovable-uploads/4c136dd7-f72a-45da-8482-6ef57fd062a9.png',
+      image: '/lovable-uploads/dashseo.png',
       title: 'Dashboard Completo' 
     }
   ];
@@ -177,23 +177,23 @@ const Landing: React.FC = () => {
   const testimonials = [
     {
       name: 'Ana Silva',
-      company: 'Loja Virtual Express',
-      text: 'Aumentei minhas vendas em 150% em apenas 3 meses usando as descrições otimizadas. A análise de SEO em tempo real é fantástica!',
-      image: '/lovable-uploads/4.png',
+      company: 'Moda Online Store',
+      text: 'As descrições geradas pela plataforma aumentaram nossas vendas em 150%. A otimização para SEO nos trouxe muito mais visitantes qualificados.',
+      image: '/lovable-uploads/inicio-da-pagina.jpg',
       rating: 5
     },
     {
       name: 'Carlos Mendes',
       company: 'Tech Store',
-      text: 'A ferramenta revolucionou nossa produtividade. O que levava horas agora é feito em minutos, com qualidade muito superior.',
-      image: '/lovable-uploads/5.png',
+      text: 'Economizamos horas de trabalho com as descrições automáticas. A qualidade é excepcional e os resultados são impressionantes.',
+      image: '/lovable-uploads/image_seo.jpg',
       rating: 5
     },
     {
       name: 'Marina Costa',
       company: 'Fashion Store',
-      text: 'Os templates são excepcionais e a IA entende perfeitamente o tom da nossa marca. Recomendo para todas as lojas online!',
-      image: '/lovable-uploads/6.png',
+      text: 'Os templates são perfeitos e a IA entende exatamente o tom da nossa marca. Recomendo para todas as lojas online!',
+      image: '/lovable-uploads/templates.png',
       rating: 5
     }
   ];
