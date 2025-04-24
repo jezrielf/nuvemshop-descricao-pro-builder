@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -162,37 +161,6 @@ const Landing: React.FC = () => {
     { value: '200%', label: 'Aumento em Vendas' }
   ];
 
-  const plansData = [
-    {
-      name: 'Free',
-      price: '0',
-      period: '/mês',
-      features: [
-        'Até 3 descrições por mês',
-        'Templates básicos',
-        'Análise SEO básica',
-        'Suporte por email'
-      ],
-      cta: 'Começar grátis',
-      highlight: false
-    },
-    {
-      name: 'Pro',
-      price: '97',
-      period: '/mês',
-      features: [
-        'Descrições ilimitadas',
-        'Templates exclusivos',
-        'Análise e diagnóstico completo de SEO',
-        'Suporte prioritário 24/7',
-        'Integrações com e-commerce',
-        'Exportação em lote'
-      ],
-      cta: 'Assinar agora',
-      highlight: true
-    }
-  ];
-
   const testimonials = [
     {
       name: 'Ana Silva',
@@ -245,11 +213,11 @@ const Landing: React.FC = () => {
       'Suporte por email'
     ],
     cta: 'Começar grátis',
-    highlight: false  // Add highlight property with false value
+    highlight: false
   };
 
-  // Transform database plans to display format
-  const displayPlans = useMemo(() => {
+  // Create the display plans array outside of the useMemo to avoid hook conditionals
+  const displayPlansData = (() => {
     // Find the active paid plan from database plans
     const activePaidPlan = plans.find(plan => plan.isActive && plan.price > 0);
     
@@ -286,7 +254,10 @@ const Landing: React.FC = () => {
     };
 
     return [freePlan, paidPlan];
-  }, [plans]);
+  })();
+  
+  // Now use useMemo with the pre-calculated data to avoid conditional hook calls
+  const displayPlans = useMemo(() => displayPlansData, [plans]);
 
   return (
     <div className="min-h-screen flex flex-col">
