@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -231,15 +231,59 @@ const Landing: React.FC = () => {
     setActiveScreenshot((prev) => (prev - 1 + screenshots.length) % screenshots.length);
   };
 
-  // Transform database plans into display format - FIXED HIGHLIGHT LOGIC
-  const displayPlans = plans.length > 0 ? plans.map(plan => ({
-    name: plan.name,
-    price: String(plan.price),
+  // Default free plan that will always be shown
+  const freePlan = {
+    name: 'Free',
+    price: '0',
     period: '/mês',
-    features: plan.features.map((feature: any) => feature.name),
-    cta: plan.price === 0 ? 'Começar grátis' : 'Assinar agora',
-    highlight: plan.price !== 0 // Fixed: Now correctly setting highlight for non-free plans
-  })) : plansData;
+    features: [
+      'Até 3 descrições por mês',
+      'Templates básicos',
+      'Análise SEO básica',
+      'Suporte por email'
+    ],
+    cta: 'Começar grátis'
+  };
+
+  // Transform database plans to display format
+  const displayPlans = useMemo(() => {
+    // Find the active paid plan from database plans
+    const activePaidPlan = plans.find(plan => plan.isActive && plan.price > 0);
+    
+    if (!activePaidPlan) {
+      // Fallback paid plan if no active plan is found
+      const defaultPaidPlan = {
+        name: 'Premium',
+        price: '79.90',
+        period: '/mês',
+        features: [
+          'Descrições ilimitadas',
+          'Templates exclusivos',
+          'Análise e diagnóstico completo de SEO',
+          'Suporte prioritário 24/7',
+          'Integrações com e-commerce',
+          'Exportação em lote'
+        ],
+        cta: 'Assinar agora',
+        highlight: true
+      };
+      return [freePlan, defaultPaidPlan];
+    }
+
+    // Transform the active plan from database
+    const paidPlan = {
+      name: activePaidPlan.name,
+      price: String(activePaidPlan.price),
+      period: '/mês',
+      features: activePaidPlan.features.map((feature: any) => 
+        typeof feature === 'object' ? feature.name : feature.split(':')[0]
+      ),
+      cta: 'Assinar agora',
+      highlight: true
+    };
+
+    return [freePlan, paidPlan];
+  }, [plans]);
 
   return (
     <div className="min-h-screen flex flex-col">
