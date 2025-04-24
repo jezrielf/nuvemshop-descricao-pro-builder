@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
@@ -9,7 +10,7 @@ import { AlertCircle, Sparkles, Lock } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import AIDescriptionGenerator from './AIGenerator/AIContentRecommender';
+import AIContentRecommender from './AIGenerator/AIContentRecommender';
 import { SEOToolsMenu } from './SEO/menu/SEOToolsMenu';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -110,9 +111,10 @@ const Editor: React.FC = () => {
           </div>
         </div>
         
-        <AIDescriptionGenerator 
+        <AIContentRecommender 
           isOpen={isAIGeneratorOpen} 
           onOpenChange={setIsAIGeneratorOpen} 
+          description={null}
         />
       </div>
     );

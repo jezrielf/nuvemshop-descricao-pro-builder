@@ -52,8 +52,9 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({
     
     setLoading(true);
     try {
-      // Get product type from description or default to empty string
-      const type = description.metadata?.industry || description.metadata?.category || '';
+      // Get product type from description
+      // Using name and category fields from the ProductDescription type
+      const type = description.category || '';
       setProductType(type);
       
       const recs = await getContentRecommendations(description, type);
@@ -70,8 +71,8 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({
     
     setContentLoading(true);
     try {
-      const type = productType || description.metadata?.industry || description.metadata?.category || '';
-      const name = description.title || 'Produto';
+      const type = productType || description.category || '';
+      const name = description.name || 'Produto';
       
       const content = await generateContentSuggestion(type, name);
       setContentSuggestion(content);
@@ -87,8 +88,8 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({
     
     setKeywordsLoading(true);
     try {
-      const type = productType || description.metadata?.industry || description.metadata?.category || '';
-      const name = description.title || 'Produto';
+      const type = productType || description.category || '';
+      const name = description.name || 'Produto';
       
       const suggestionKeywords = await getSuggestedKeywords(type, name);
       setKeywords(suggestionKeywords);
