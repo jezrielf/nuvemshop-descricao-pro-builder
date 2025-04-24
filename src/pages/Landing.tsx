@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -113,10 +112,22 @@ const Landing: React.FC = () => {
   };
 
   const screenshots = [
-    { image: '/lovable-uploads/05f724f5-3141-4fee-aa9e-d37e9faae0a4.png', title: 'Dashboard' },
-    { image: '/assets/landing/editor-interface.png', title: 'Editor' },
-    { image: '/assets/landing/ai-generator.png', title: 'Gerador de IA' },
-    { image: '/assets/landing/analytics.png', title: 'Analíticos' }
+    { 
+      image: '/lovable-uploads/67168fff-aa7f-43ba-b81b-b3c4024d8dac.png', 
+      title: 'Dashboard Analytics' 
+    },
+    { 
+      image: '/lovable-uploads/13390983-2056-4832-a317-0025039311bc.png', 
+      title: 'Análise Detalhada' 
+    },
+    { 
+      image: '/lovable-uploads/a0169f01-2e8b-4872-8825-53d66a99a682.png', 
+      title: 'Otimização SEO' 
+    },
+    { 
+      image: '/lovable-uploads/4b934484-b55b-48cd-9c4d-718bfd5c6162.png', 
+      title: 'Dashboard SEO' 
+    }
   ];
 
   const stats = [
@@ -156,24 +167,24 @@ const Landing: React.FC = () => {
 
   const testimonials = content.testimonials?.items || [
     {
-      name: 'João Silva',
-      company: 'Loja Virtual ABC',
+      name: 'Ana Silva',
+      company: 'Boutique Elegance',
       text: 'As descrições geradas aumentaram minhas vendas em 40% em apenas dois meses. Nunca foi tão fácil criar conteúdo de qualidade.',
-      image: 'https://randomuser.me/api/portraits/men/32.jpg',
+      image: '/lovable-uploads/b5ae54d3-2356-4242-a8d5-a65b14d4469d.png',
       rating: 5
     },
     {
       name: 'Maria Costa',
-      company: 'MC Eletrônicos',
+      company: 'MC Fashion',
       text: 'Uso diariamente para meus produtos e notei uma melhora significativa no tráfego orgânico. A função de SEO em tempo real é fantástica.',
-      image: 'https://randomuser.me/api/portraits/women/44.jpg',
+      image: '/lovable-uploads/eb80ba27-14ae-43dd-9f69-99e84d9fd8c3.png',
       rating: 5
     },
     {
-      name: 'Carlos Mendes',
-      company: 'Tech Shop',
+      name: 'Carla Mendes',
+      company: 'Atelier CM',
       text: 'Economizo horas todas as semanas com essa ferramenta. As descrições são profissionais e convertem muito melhor que as antigas.',
-      image: 'https://randomuser.me/api/portraits/men/67.jpg',
+      image: '/lovable-uploads/e18c5ee1-74ae-42f6-affd-c8c9e60ca356.png',
       rating: 5
     }
   ];
@@ -245,15 +256,15 @@ const Landing: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-indigo-600 py-16 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-indigo-500 rounded-bl-full opacity-50"></div>
+      <section className="bg-[#8B4513] py-16 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-opacity-50 bg-[#A0522D] rounded-bl-full"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0 text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 {hero.title}
               </h1>
-              <p className="text-xl mb-6 text-indigo-100">
+              <p className="text-xl mb-6 text-[#FFE4B5]">
                 {hero.subtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -280,12 +291,12 @@ const Landing: React.FC = () => {
             <div className="md:w-1/2">
               <div className="bg-white p-4 rounded-lg shadow-lg">
                 <img 
-                  src="/lovable-uploads/05f724f5-3141-4fee-aa9e-d37e9faae0a4.png" 
-                  alt="Dashboard do DescriçãoPro" 
+                  src="/lovable-uploads/e93193b7-175d-4c24-b5a9-e86626675f3b.png" 
+                  alt="E-commerce illustration" 
                   className="rounded-md w-full"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "https://placehold.co/600x400?text=Dashboard+DescricaoPro";
+                    target.src = "https://placehold.co/600x400?text=E-commerce+Illustration";
                   }}
                 />
               </div>
@@ -668,6 +679,14 @@ const Landing: React.FC = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12">
         <div className="container mx-auto px-4">
+          <div className="flex justify-center mb-8">
+            <img 
+              src="/lovable-uploads/e93193b7-175d-4c24-b5a9-e86626675f3b.png" 
+              alt="Logo" 
+              className="h-16 w-auto"
+            />
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-xl font-bold text-white mb-4">DescriçãoPRO</h3>
