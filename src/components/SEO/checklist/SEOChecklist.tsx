@@ -8,6 +8,7 @@ import { CategoryChecks } from './components/CategoryChecks';
 import { ResourcesList } from './components/ResourcesList';
 import { ScoreCard } from './components/ScoreCard';
 import { EmptyState } from './components/EmptyState';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SEOChecklistProps {
   description: ProductDescription | null;
@@ -28,8 +29,8 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
       <DialogTrigger asChild>
         <span className="w-full">Checklist SEO</span>
       </DialogTrigger>
-      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
-        <DialogHeader>
+      <DialogContent className="max-w-xl max-h-[90vh] flex flex-col overflow-hidden p-0">
+        <DialogHeader className="p-4 border-b">
           <DialogTitle>Checklist de SEO</DialogTitle>
           <DialogDescription>
             Verifique se sua descrição atende às melhores práticas de SEO.
@@ -37,18 +38,22 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
         </DialogHeader>
         
         {!description ? (
-          <EmptyState message="Crie uma descrição para utilizar o checklist de SEO" />
+          <div className="p-4">
+            <EmptyState message="Crie uma descrição para utilizar o checklist de SEO" />
+          </div>
         ) : (
-          <div className="flex-grow overflow-hidden mt-4">
-            <Tabs defaultValue="checklist" className="h-full flex flex-col">
-              <TabsList>
-                <TabsTrigger value="checklist">Checklist</TabsTrigger>
-                <TabsTrigger value="resources">Recursos</TabsTrigger>
-              </TabsList>
+          <div className="flex-grow flex flex-col h-full overflow-hidden">
+            <Tabs defaultValue="checklist" className="flex flex-col h-full">
+              <div className="px-4 pt-2">
+                <TabsList className="w-full">
+                  <TabsTrigger value="checklist" className="flex-1">Checklist</TabsTrigger>
+                  <TabsTrigger value="resources" className="flex-1">Recursos</TabsTrigger>
+                </TabsList>
+              </div>
               
-              <div className="flex-1 overflow-auto pt-4">
-                <TabsContent value="checklist" className="h-full">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <ScrollArea className="flex-1 p-4">
+                <TabsContent value="checklist" className="mt-0 m-0 h-full">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <ScoreCard 
                       title="Score Geral" 
                       score={checklistData.overallScore} 
@@ -66,21 +71,23 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
                     />
                   </div>
                   
-                  <CategoryChecks 
-                    title="content"
-                    checks={checklistData.contentChecks}
-                  />
-                  
-                  <CategoryChecks 
-                    title="technical"
-                    checks={checklistData.technicalChecks}
-                  />
+                  <div className="space-y-6">
+                    <CategoryChecks 
+                      title="content"
+                      checks={checklistData.contentChecks}
+                    />
+                    
+                    <CategoryChecks 
+                      title="technical"
+                      checks={checklistData.technicalChecks}
+                    />
+                  </div>
                 </TabsContent>
                 
-                <TabsContent value="resources">
+                <TabsContent value="resources" className="mt-0 m-0">
                   <ResourcesList />
                 </TabsContent>
-              </div>
+              </ScrollArea>
             </Tabs>
           </div>
         )}

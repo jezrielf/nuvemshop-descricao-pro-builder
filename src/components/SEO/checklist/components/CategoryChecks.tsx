@@ -23,20 +23,23 @@ export const CategoryChecks: React.FC<CategoryChecksProps> = ({
   };
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-md font-medium capitalize px-1">
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium capitalize">
         {getCategoryName(title)}
       </h3>
       
-      {checks.map(check => (
-        <CheckItem 
-          key={check.id}
-          id={check.id}
-          title={check.title}
-          description={check.description}
-          status={check.status}
-        />
-      ))}
+      <div className="space-y-3">
+        {checks.map(check => (
+          <CheckItem 
+            key={check.id}
+            id={check.id}
+            title={check.title}
+            description={check.description}
+            status={check.status}
+            suggestion={check.suggestion}
+          />
+        ))}
+      </div>
     </div>
   );
 };

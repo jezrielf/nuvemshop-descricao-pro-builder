@@ -14,6 +14,8 @@ import MetaTagValidator from '../metatags/MetaTagValidator';
 import ImageOptimizer from '../images/ImageOptimizer';
 import AIContentRecommender from '../../AIGenerator/AIContentRecommender';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import { updateBlockImage } from '../utils/imageUtils';
 
 interface SEOToolsMenuProps {
   description: ProductDescription | null;
@@ -41,23 +43,27 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-64 p-3 bg-white">
+      <PopoverContent 
+        align="end" 
+        className="w-72 p-3 bg-white max-h-[80vh] overflow-y-auto"
+        sideOffset={5}
+      >
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Otimização de SEO</h4>
           <div className="grid gap-1.5">
-            <SEOToolButton>
+            <SEOToolButton onClick={() => {}} label="Ferramentas SEO">
               <SEOAnalyzer description={description} />
             </SEOToolButton>
             
-            <SEOToolButton>
+            <SEOToolButton onClick={() => {}} label="Checklist SEO">
               <SEOChecklist description={description} />
             </SEOToolButton>
             
-            <SEOToolButton>
+            <SEOToolButton onClick={() => {}} label="Meta Tags">
               <MetaTagValidator description={description} />
             </SEOToolButton>
             
-            <SEOToolButton>
+            <SEOToolButton onClick={() => {}} label="Otimizar Imagens">
               <ImageOptimizer 
                 description={description} 
                 onUpdateImage={handleUpdateImage}
@@ -69,7 +75,7 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
           
           <h4 className="text-sm font-medium">Recursos de IA</h4>
           <div className="grid gap-1.5">
-            <SEOToolButton>
+            <SEOToolButton onClick={() => {}} label="Recomendações de IA">
               <AIContentRecommender description={description} />
             </SEOToolButton>
           </div>
@@ -79,11 +85,23 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
   );
 };
 
+interface SEOToolButtonProps {
+  children: React.ReactNode;
+  onClick: () => void;
+  label: string;
+}
+
 // Componente auxiliar para simplificar a estrutura
-const SEOToolButton: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const SEOToolButton: React.FC<SEOToolButtonProps> = ({ children, onClick, label }) => {
   return (
     <div className="w-full">
-      {children}
+      <Button
+        variant="ghost"
+        className="w-full justify-start text-left font-normal h-auto py-1.5 px-2 hover:bg-gray-100"
+        onClick={onClick}
+      >
+        {children}
+      </Button>
     </div>
   );
 };
