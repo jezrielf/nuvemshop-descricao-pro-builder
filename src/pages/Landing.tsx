@@ -344,7 +344,7 @@ const Landing: React.FC = () => {
             <div className="md:w-1/2">
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <img 
-                  src="/lovable-uploads/3.png" 
+                  src="/lovable-uploads/ea72f039-790b-455c-b2ea-0c2a7981d2d2.png" 
                   alt="Platform demo" 
                   className="w-full rounded-md"
                 />
