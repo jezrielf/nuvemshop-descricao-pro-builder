@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Popover,
@@ -17,15 +17,23 @@ import { Separator } from '@/components/ui/separator';
 
 interface SEOToolsMenuProps {
   description: ProductDescription | null;
-  onUpdateImage: (blockId: string, imageType: string, newImageUrl: string) => void;
+  onUpdateImage?: (blockId: string, imageType: string, newImageUrl: string) => void;
 }
 
 export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({ 
   description,
   onUpdateImage
 }) => {
+  const [open, setOpen] = useState(false);
+  
+  const handleUpdateImage = (blockId: string, imageType: string, newImageUrl: string) => {
+    if (onUpdateImage) {
+      onUpdateImage(blockId, imageType, newImageUrl);
+    }
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8">
           <Settings className="h-4 w-4 mr-1" />
@@ -52,7 +60,7 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
             <SEOToolButton>
               <ImageOptimizer 
                 description={description} 
-                onUpdateImage={onUpdateImage}
+                onUpdateImage={handleUpdateImage}
               />
             </SEOToolButton>
           </div>

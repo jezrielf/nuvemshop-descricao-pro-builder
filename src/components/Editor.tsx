@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
@@ -11,12 +10,12 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AIDescriptionGenerator from './AIGenerator/AIDescriptionGenerator';
-import SEOTools from './SEO/SEOTools';
+import { SEOToolsMenu } from './SEO/menu/SEOToolsMenu';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Editor: React.FC = () => {
-  const { description, reorderBlocks } = useEditorStore();
+  const { description, reorderBlocks, updateBlock } = useEditorStore();
   const { isPremium, isBusiness } = useAuth();
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const navigate = useNavigate();
@@ -47,10 +46,14 @@ const Editor: React.FC = () => {
     navigate('/plans');
   };
   
+  const handleUpdateImage = (blockId: string, imageType: string, newImageUrl: string) => {
+    updateBlockImage(blockId, imageType, newImageUrl, updateBlock, description);
+  };
+  
   // Memoize the SEO tools component to prevent unnecessary re-renders
   const seoToolsComponent = useMemo(() => {
     if (description && (isPremiumUser || isBusinessUser)) {
-      return <SEOTools description={description} />;
+      return <SEOToolsMenu description={description} onUpdateImage={handleUpdateImage} />;
     }
     return null;
   }, [description, isPremiumUser, isBusinessUser]);
@@ -158,6 +161,46 @@ const Editor: React.FC = () => {
       </ScrollArea>
     </div>
   );
+};
+
+// Make sure we have this imported correctly
+const updateBlockImage = (blockId: string, imageType: string, newImageUrl: string, updateBlock: any, description: any) => {
+  if (!description || !blockId) return;
+  
+  const block = description.blocks.find(b => b.id === blockId);
+  if (!block) return;
+  
+  if (block.type === 'image' && imageType === 'src') {
+    // Update image block
+    updateBlock(blockId, { 
+      ...block,
+      src: newImageUrl 
+    });
+  } else if ((block.type === 'imageText' || block.type === 'textImage') && imageType === 'imageSrc') {
+    // Update imageText or textImage block
+    updateBlock(blockId, { 
+      ...block,
+      imageSrc: newImageUrl 
+    });
+  } else if (block.type === 'hero' && imageType === 'backgroundImage') {
+    // Update hero block background
+    updateBlock(blockId, { 
+      ...block,
+      backgroundImage: newImageUrl 
+    });
+  } else if (block.type === 'gallery') {
+    // For gallery, we update the specific image in the images array
+    const imageIndex = parseInt(imageType);
+    if (!isNaN(imageIndex) && block.images && block.images[imageIndex]) {
+      const updatedImages = [...block.images];
+      updatedImages[imageIndex].src = newImageUrl;
+      
+      updateBlock(blockId, {
+        ...block,
+        images: updatedImages
+      });
+    }
+  }
 };
 
 export default Editor;

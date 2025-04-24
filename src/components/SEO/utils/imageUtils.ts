@@ -1,100 +1,50 @@
 
-import { Block, ProductDescription } from '@/types/editor';
+import { ProductDescription, Block } from '@/types/editor';
 
+/**
+ * Updates an image in a block
+ */
 export const updateBlockImage = (
   blockId: string, 
   imageType: string, 
   newImageUrl: string, 
-  updateBlock: (id: string, data: Partial<Block>) => void,
+  updateBlock: (id: string, updatedBlock: Block) => void,
   description: ProductDescription | null
 ) => {
-  if (!blockId || !description) return;
+  if (!description || !blockId) return;
   
   const block = description.blocks.find(b => b.id === blockId);
   if (!block) return;
   
-  // Handle different image types based on the block type
-  if (imageType === 'src' && block.type === 'image' && 'src' in block) {
-    updateBlock(blockId, { src: newImageUrl });
-  } 
-  else if (imageType === 'image' && 
-           (block.type === 'hero' || block.type === 'imageText' || block.type === 'textImage')) {
-    if (block.type === 'hero' && 'image' in block && block.image) {
-      updateBlock(blockId, { 
-        image: { ...block.image, src: newImageUrl }
-      });
-    } else if ((block.type === 'imageText' || block.type === 'textImage') && 
-               'image' in block && block.image) {
-      updateBlock(blockId, { 
-        image: { ...block.image, src: newImageUrl }
+  if (block.type === 'image' && imageType === 'src') {
+    // Update image block
+    updateBlock(blockId, { 
+      ...block,
+      src: newImageUrl 
+    });
+  } else if ((block.type === 'imageText' || block.type === 'textImage') && imageType === 'imageSrc') {
+    // Update imageText or textImage block
+    updateBlock(blockId, { 
+      ...block,
+      imageSrc: newImageUrl 
+    });
+  } else if (block.type === 'hero' && imageType === 'backgroundImage') {
+    // Update hero block background
+    updateBlock(blockId, { 
+      ...block,
+      backgroundImage: newImageUrl 
+    });
+  } else if (block.type === 'gallery') {
+    // For gallery, we update the specific image in the images array
+    const imageIndex = parseInt(imageType);
+    if (!isNaN(imageIndex) && block.images && block.images[imageIndex]) {
+      const updatedImages = [...block.images];
+      updatedImages[imageIndex].src = newImageUrl;
+      
+      updateBlock(blockId, {
+        ...block,
+        images: updatedImages
       });
     }
   }
-  else if (imageType.startsWith('gallery-') && block.type === 'gallery' && 'images' in block && block.images) {
-    const index = parseInt(imageType.split('-')[1]);
-    if (isNaN(index) || index < 0 || index >= block.images.length) return;
-    
-    const newImages = [...block.images];
-    newImages[index] = { ...newImages[index], src: newImageUrl };
-    
-    updateBlock(blockId, { images: newImages });
-  }
-};
-
-export const extractImagesFromDescription = (description: ProductDescription | null): {
-  blockId: string; 
-  type: string; 
-  url: string; 
-  alt: string; 
-  title: string
-}[] => {
-  if (!description) return [];
-  
-  const images: {blockId: string; type: string; url: string; alt: string; title: string}[] = [];
-  
-  description.blocks.forEach(block => {
-    if (block.type === 'image' && 'src' in block && block.src) {
-      images.push({
-        blockId: block.id,
-        type: 'src',
-        url: block.src,
-        alt: 'alt' in block ? block.alt || '' : '',
-        title: block.title || ''
-      });
-    } 
-    else if (block.type === 'hero' && 'image' in block && block.image?.src) {
-      images.push({
-        blockId: block.id,
-        type: 'image',
-        url: block.image.src,
-        alt: block.image.alt || '',
-        title: block.title || ''
-      });
-    }
-    else if ((block.type === 'imageText' || block.type === 'textImage') && 
-             'image' in block && block.image?.src) {
-      images.push({
-        blockId: block.id,
-        type: 'image',
-        url: block.image.src,
-        alt: block.image.alt || '',
-        title: block.title || ''
-      });
-    }
-    else if (block.type === 'gallery' && 'images' in block && block.images) {
-      block.images.forEach((img, index) => {
-        if (img.src) {
-          images.push({
-            blockId: block.id,
-            type: `gallery-${index}`,
-            url: img.src,
-            alt: img.alt || '',
-            title: `${block.title || ''} - Imagem ${index + 1}`
-          });
-        }
-      });
-    }
-  });
-  
-  return images;
 };
