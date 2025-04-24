@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -172,7 +173,8 @@ const Landing: React.FC = () => {
         'Análise SEO básica',
         'Suporte por email'
       ],
-      cta: 'Começar grátis'
+      cta: 'Começar grátis',
+      highlight: false
     },
     {
       name: 'Pro',
@@ -242,7 +244,8 @@ const Landing: React.FC = () => {
       'Análise SEO básica',
       'Suporte por email'
     ],
-    cta: 'Começar grátis'
+    cta: 'Começar grátis',
+    highlight: false  // Add highlight property with false value
   };
 
   // Transform database plans to display format
