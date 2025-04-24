@@ -113,19 +113,19 @@ const Landing: React.FC = () => {
 
   const screenshots = [
     { 
-      image: '/lovable-uploads/67168fff-aa7f-43ba-b81b-b3c4024d8dac.png', 
+      image: '/lovable-uploads/0.png', 
       title: 'Dashboard Analytics' 
     },
     { 
-      image: '/lovable-uploads/13390983-2056-4832-a317-0025039311bc.png', 
+      image: '/lovable-uploads/1.png', 
       title: 'Análise Detalhada' 
     },
     { 
-      image: '/lovable-uploads/a0169f01-2e8b-4872-8825-53d66a99a682.png', 
+      image: '/lovable-uploads/2.png', 
       title: 'Otimização SEO' 
     },
     { 
-      image: '/lovable-uploads/4b934484-b55b-48cd-9c4d-718bfd5c6162.png', 
+      image: '/lovable-uploads/3.png', 
       title: 'Dashboard SEO' 
     }
   ];
@@ -170,21 +170,21 @@ const Landing: React.FC = () => {
       name: 'Ana Silva',
       company: 'Boutique Elegance',
       text: 'As descrições geradas aumentaram minhas vendas em 40% em apenas dois meses. Nunca foi tão fácil criar conteúdo de qualidade.',
-      image: '/lovable-uploads/b5ae54d3-2356-4242-a8d5-a65b14d4469d.png',
+      image: '/lovable-uploads/4.png',
       rating: 5
     },
     {
       name: 'Maria Costa',
       company: 'MC Fashion',
       text: 'Uso diariamente para meus produtos e notei uma melhora significativa no tráfego orgânico. A função de SEO em tempo real é fantástica.',
-      image: '/lovable-uploads/eb80ba27-14ae-43dd-9f69-99e84d9fd8c3.png',
+      image: '/lovable-uploads/5.png',
       rating: 5
     },
     {
       name: 'Carla Mendes',
       company: 'Atelier CM',
       text: 'Economizo horas todas as semanas com essa ferramenta. As descrições são profissionais e convertem muito melhor que as antigas.',
-      image: '/lovable-uploads/e18c5ee1-74ae-42f6-affd-c8c9e60ca356.png',
+      image: '/lovable-uploads/6.png',
       rating: 5
     }
   ];
@@ -291,7 +291,7 @@ const Landing: React.FC = () => {
             <div className="md:w-1/2">
               <div className="bg-white p-4 rounded-lg shadow-lg">
                 <img 
-                  src="/lovable-uploads/e93193b7-175d-4c24-b5a9-e86626675f3b.png" 
+                  src="/lovable-uploads/7.png" 
                   alt="E-commerce illustration" 
                   className="rounded-md w-full"
                   onError={(e) => {
@@ -681,7 +681,7 @@ const Landing: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-center mb-8">
             <img 
-              src="/lovable-uploads/e93193b7-175d-4c24-b5a9-e86626675f3b.png" 
+              src="/lovable-uploads/7.png" 
               alt="Logo" 
               className="h-16 w-auto"
             />
@@ -695,7 +695,7 @@ const Landing: React.FC = () => {
               </p>
             </div>
             
-            <div>
+            <div className="md:w-1/4">
               <h4 className="text-lg font-semibold text-white mb-4">Links</h4>
               <ul className="space-y-2">
                 <li><a href="/" className="hover:text-white">Início</a></li>
@@ -705,7 +705,7 @@ const Landing: React.FC = () => {
               </ul>
             </div>
             
-            <div>
+            <div className="md:w-1/4">
               <h4 className="text-lg font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="hover:text-white">Termos de Serviço</a></li>
@@ -713,7 +713,7 @@ const Landing: React.FC = () => {
               </ul>
             </div>
             
-            <div>
+            <div className="md:w-1/4">
               <h4 className="text-lg font-semibold text-white mb-4">Contato</h4>
               <ul className="space-y-2">
                 <li>contato@descricaopro.com</li>
