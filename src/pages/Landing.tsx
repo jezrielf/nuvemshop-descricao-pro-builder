@@ -120,19 +120,19 @@ const Landing: React.FC = () => {
 
   const screenshots = [
     { 
-      image: '/lovable-uploads/0.png',
+      image: '/lovable-uploads/a9d1a842-27ea-41b9-9064-6c24edef2bdb.png',
       title: 'Editor Intuitivo' 
     },
     { 
-      image: '/lovable-uploads/1.png',
+      image: '/lovable-uploads/4153bf41-d7be-45ad-8487-fddf9b6c7795.png',
       title: 'Análise SEO' 
     },
     { 
-      image: '/lovable-uploads/2.png',
+      image: '/lovable-uploads/6192d365-5d85-440f-87e4-710c5d6852d8.png',
       title: 'Templates Profissionais' 
     },
     { 
-      image: '/lovable-uploads/3.png',
+      image: '/lovable-uploads/4c136dd7-f72a-45da-8482-6ef57fd062a9.png',
       title: 'Dashboard Completo' 
     }
   ];
