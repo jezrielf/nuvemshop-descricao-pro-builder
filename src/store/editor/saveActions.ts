@@ -10,6 +10,13 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
   // Function to set the auth context from components
   const setAuthContext = (context: ReturnType<typeof useAuth>) => {
     authContext = context;
+    
+    // Update user information in the store
+    if (context && context.user) {
+      set({ user: { id: context.user.id } });
+    } else {
+      set({ user: null });
+    }
   };
 
   return {

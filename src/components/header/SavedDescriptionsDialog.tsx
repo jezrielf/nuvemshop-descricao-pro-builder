@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -31,9 +32,9 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
-      const key = localStorage.getItem('nuvemshop_access_token') 
-        ? `savedDescriptions_${selectedDescription.id}`
-        : 'savedDescriptions_anonymous';
+      // Obter a chave correta do localStorage baseada no usuário atual
+      const { user } = useEditorStore.getState();
+      const key = user ? `savedDescriptions_${user.id}` : 'savedDescriptions_anonymous';
       
       // Get current descriptions
       const saved = localStorage.getItem(key);

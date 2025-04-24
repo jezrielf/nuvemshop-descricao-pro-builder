@@ -13,6 +13,7 @@ export interface EditorState {
   selectedBlockId: string | null;
   availableTemplates: Template[];
   savedDescriptions: ProductDescription[];
+  user: { id: string } | null;
   
   // Actions
   createNewDescription: (name: string) => void;

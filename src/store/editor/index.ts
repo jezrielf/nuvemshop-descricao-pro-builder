@@ -12,6 +12,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   selectedBlockId: null,
   availableTemplates: [],
   savedDescriptions: [],
+  user: null,
 
   // Combine actions from different modules
   ...createDescriptionActions(get, set),
