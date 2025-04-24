@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Settings, ChevronDown, List, Lightbulb, Image, FileCode } from 'lucide-react';
+import { Settings, ChevronDown, List, Lightbulb, Image, FileText } from 'lucide-react';
 import SEOAnalyzer from './analyzers/SEOAnalyzer';
 import SEOChecklist from './checklist/SEOChecklist';
 import MetaTagValidator from './metatags/MetaTagValidator';
@@ -53,7 +53,7 @@ const SEOTools: React.FC<SEOToolsProps> = ({ description }) => {
             <SEOChecklist description={description} />
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <FileCode className="h-4 w-4 mr-2" />
+            <FileText className="h-4 w-4 mr-2" />
             <MetaTagValidator description={description} />
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
