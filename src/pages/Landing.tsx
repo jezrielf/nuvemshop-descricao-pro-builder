@@ -298,8 +298,8 @@ const Landing: React.FC = () => {
             <div className="md:w-1/2">
               <div className="bg-white p-4 rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-300">
                 <img 
-                  src="/lovable-uploads/7.png" 
-                  alt="Dashboard Preview" 
+                  src="/lovable-uploads/871ee81c-828a-4474-9a93-77f13d2d9601.png" 
+                  alt="E-commerce Dashboard Illustration" 
                   className="rounded-md w-full"
                 />
               </div>
