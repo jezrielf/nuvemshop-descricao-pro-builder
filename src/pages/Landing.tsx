@@ -267,8 +267,8 @@ const Landing: React.FC = () => {
       {/* Hero Section - Updated */}
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-20">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0 text-white">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="md:w-1/2 md:pr-12 mb-8 md:mb-0 text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
                 Transforme suas Descrições de Produtos em Máquinas de Vendas
               </h1>
@@ -296,12 +296,12 @@ const Landing: React.FC = () => {
               </div>
             </div>
             
-            <div className="md:w-1/2">
-              <div className="bg-white p-4 rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <div className="md:w-1/2 md:pl-8">
+              <div className="bg-white/5 backdrop-blur-sm p-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
                 <img 
-                  src="/lovable-uploads/871ee81c-828a-4474-9a93-77f13d2d9601.png" 
-                  alt="E-commerce Dashboard Illustration" 
-                  className="rounded-md w-full"
+                  src="https://img.freepik.com/vetores-gratis/freelancer-feliz-com-o-computador-em-casa-jovem-sentado-na-poltrona-e-usando-o-laptop-conversando-online-e-sorrindo-ilustracao-vetorial-para-trabalho-a-distancia-aprendizagem-online-freelance_74855-8401.jpg" 
+                  alt="Pessoa utilizando o sistema"
+                  className="rounded-xl w-full h-auto"
                 />
               </div>
             </div>
@@ -309,6 +309,7 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
+      {/* Rest of the sections */}
       {/* Features Section - Updated */}
       <section id="features" className="py-24 bg-gradient-to-b from-white to-indigo-50">
         <div className="container mx-auto px-4">
