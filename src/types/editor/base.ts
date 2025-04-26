@@ -26,6 +26,9 @@ export interface BlockStyle {
   padding?: string;
   margin?: string;
   imageFit?: 'cover' | 'contain' | 'fill' | 'none';
+  hasBorder?: boolean;
+  hasShadow?: boolean;
+  blockSpacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export interface ProductDescription {
@@ -38,7 +41,7 @@ export interface ProductDescription {
   userId?: string;
   storeId?: string;
   isPublished?: boolean;
-  category?: string;
+  category?: ProductCategory;
   seo?: {
     title?: string;
     description?: string;
@@ -58,6 +61,14 @@ export interface Template {
 }
 
 export type ProductCategory = 
+  | 'supplements'
+  | 'clothing' 
+  | 'accessories' 
+  | 'shoes' 
+  | 'electronics' 
+  | 'energy' 
+  | 'Casa e decoração' 
+  | 'other'
   | 'Alimentos'
   | 'Bebidas' 
   | 'Beleza' 
@@ -66,8 +77,7 @@ export type ProductCategory =
   | 'Eletrônicos' 
   | 'Esporte' 
   | 'Moda' 
-  | 'Saúde' 
-  | 'Outro';
+  | 'Saúde';
 
 export type ColumnLayout = 'full' | '2col' | '3col' | '4col';
 

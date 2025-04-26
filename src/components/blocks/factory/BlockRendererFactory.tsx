@@ -1,6 +1,7 @@
 
+// Only updating the problem areas
 import React from 'react';
-import { Block, BlockType } from '@/types/editor';
+import { Block, BlockType, TextBlock } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
 import TextBlockComponent from '../TextBlock';
 import FeaturesBlock from '../FeaturesBlock';
@@ -140,10 +141,10 @@ export class BlockRendererFactory {
     // Para blocos de texto, verifica se tem heading e content
     if (fixedBlock.type === 'text') {
       if (!fixedBlock.heading) {
-        fixedBlock.heading = 'Título do Texto';
+        (fixedBlock as TextBlock).heading = 'Título do Texto';
       }
       if (!fixedBlock.content) {
-        fixedBlock.content = '<p>Insira o conteúdo aqui.</p>';
+        (fixedBlock as TextBlock).content = '<p>Insira o conteúdo aqui.</p>';
       }
     }
     

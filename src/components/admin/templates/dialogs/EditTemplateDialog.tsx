@@ -27,7 +27,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   template,
 }) => {
   const [editedName, setEditedName] = useState('');
-  const [editedCategory, setEditedCategory] = useState<ProductCategory>('other');
+  const [editedCategory, setEditedCategory] = useState<ProductCategory>('other' as ProductCategory);
   const [editedBlocks, setEditedBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -138,7 +138,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
 
   const resetForm = () => {
     setEditedName('');
-    setEditedCategory('other');
+    setEditedCategory('other' as ProductCategory);
     setEditedBlocks([]);
     setActiveTab('basic');
     setPreviewBlockId(null);

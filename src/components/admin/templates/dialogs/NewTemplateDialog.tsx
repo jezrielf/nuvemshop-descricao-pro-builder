@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Template, Block, BlockType } from '@/types/editor';
+import { Template, Block, BlockType, ProductCategory } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
 import { useTemplateStore } from '@/store/templates';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,7 +14,6 @@ import { Plus, Trash2, ArrowUp, ArrowDown, Eye } from 'lucide-react';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
-import { ProductCategory } from '@/types/editor';
 import ImportHtmlSection from './components/ImportHtmlSection';
 
 interface NewTemplateDialogProps {
@@ -26,7 +26,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
   onClose,
 }) => {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<ProductCategory>('other');
+  const [category, setCategory] = useState<ProductCategory>('other' as ProductCategory);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
@@ -101,7 +101,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
       name: name,
       category: category,
       blocks: blocks,
-      thumbnail: '/placeholder.svg' // Added default thumbnail
+      thumbnailUrl: '/placeholder.svg' // Changed from thumbnail to thumbnailUrl
     };
 
     try {
@@ -123,7 +123,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({
 
   const resetForm = () => {
     setName('');
-    setCategory('other');
+    setCategory('other' as ProductCategory);
     setBlocks([]);
     setActiveTab('basic');
     setPreviewBlockId(null);

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileImage, AlertCircle, CheckCircle, Download, Upload } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import ImageUpload from '@/components/ImageUpload'; // Fixed import statement
+import ImageUpload from '@/components/ImageUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ImageOptimizerProps {
@@ -226,8 +226,9 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                       ) : (
                         images.map((image, index) => {
                           const status = getOptimizationStatus(image);
-                          const statusColor = typeof status !== 'string' ? status.color : 'bg-gray-100';
-                          const statusLabel = typeof status !== 'string' ? status.label : 'Status desconhecido';
+                          const statusColorClass = status === "Desconhecido" ? "bg-gray-100" : status.color;
+                          const statusLabelText = status === "Desconhecido" ? "Status desconhecido" : status.label;
+                          
                           return (
                             <div key={index} className="flex items-center space-x-4 border-b pb-4 last:border-0 last:pb-0">
                               <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
@@ -240,8 +241,8 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                                 <p className="text-xs text-gray-500 mt-1">
                                   Tamanho: {getFileSize(image.fileSize)}
                                 </p>
-                                <Badge className={statusColor + " mt-2"}>
-                                  {statusLabel}
+                                <Badge className={`${statusColorClass} mt-2`}>
+                                  {statusLabelText}
                                 </Badge>
                               </div>
                               <Button 

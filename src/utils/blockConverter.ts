@@ -74,4 +74,14 @@ export const convertBlock = (
   return ensureBlockType(baseBlock);
 };
 
-export default { convertBlock };
+// Convert an array of blocks, ensuring they all have proper structure
+export const convertBlocks = (blocks: any[]): Block[] => {
+  if (!Array.isArray(blocks)) {
+    console.warn('convertBlocks: Not an array', blocks);
+    return [];
+  }
+  
+  return blocks.map(block => ensureBlockType(block));
+};
+
+export default { convertBlock, convertBlocks };
