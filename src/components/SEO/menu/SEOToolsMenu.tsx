@@ -11,11 +11,9 @@ import { ProductDescription } from '@/types/editor';
 import SEOAnalyzer from '../analyzers/SEOAnalyzer';
 import SEOChecklist from '../checklist/SEOChecklist';
 import MetaTagValidator from '../metatags/MetaTagValidator';
-import ImageOptimizer from '../images/ImageOptimizer';
+import ImageOptimizer from '../ImageOptimizer';
 import AIContentRecommender from '../../AIGenerator/AIContentRecommender';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { updateBlockImage } from '../utils/imageUtils';
 
 interface SEOToolsMenuProps {
   description: ProductDescription | null;

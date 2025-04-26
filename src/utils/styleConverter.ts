@@ -1,157 +1,143 @@
 
-import { BlockStyle } from '@/types/editor';
+import { BlockStyle, BlockSpacing } from '@/types/editor';
 
-// Convert BlockStyle to CSS inline style object
-export const blockStyleToCssObject = (style?: BlockStyle): React.CSSProperties => {
-  if (!style) return {};
-  
-  const cssStyle: React.CSSProperties = {};
-  
-  // Background properties
-  if (style.backgroundColor) {
-    cssStyle.backgroundColor = style.backgroundColor;
+// Convert block style object to CSS string
+export const getStylesFromBlock = (block: any): string | null => {
+  if (!block || !block.style) return null;
+
+  const style = block.style as BlockStyle;
+  let styles = '';
+
+  // Background styles
+  if (style.backgroundColor) styles += `background-color:${style.backgroundColor};`;
+  if (style.backgroundImage) styles += `background-image:url(${style.backgroundImage});`;
+  if (style.backgroundPosition) styles += `background-position:${style.backgroundPosition};`;
+  if (style.backgroundSize) styles += `background-size:${style.backgroundSize};`;
+
+  // Text styles
+  if (style.textColor) styles += `color:${style.textColor};`;
+  if (style.fontFamily) styles += `font-family:${style.fontFamily};`;
+  if (style.fontSize) styles += `font-size:${style.fontSize};`;
+  if (style.fontWeight) styles += `font-weight:${style.fontWeight};`;
+  if (style.fontStyle) styles += `font-style:${style.fontStyle};`;
+  if (style.textDecoration) styles += `text-decoration:${style.textDecoration};`;
+  if (style.textAlign) styles += `text-align:${style.textAlign};`;
+
+  // Border styles
+  if (style.hasBorder) {
+    styles += `border-style:solid;`;
+    if (style.borderWidth) styles += `border-width:${style.borderWidth};`;
+    if (style.borderColor) styles += `border-color:${style.borderColor};`;
   }
-  
-  if (style.backgroundImage) {
-    cssStyle.backgroundImage = `url(${style.backgroundImage})`;
-  }
-  
-  if (style.backgroundPosition) {
-    cssStyle.backgroundPosition = style.backgroundPosition;
-  }
-  
-  if (style.backgroundSize) {
-    cssStyle.backgroundSize = style.backgroundSize;
-  }
-  
-  // Text properties
-  if (style.textColor) {
-    cssStyle.color = style.textColor;
-  }
-  
-  if (style.fontFamily) {
-    cssStyle.fontFamily = style.fontFamily;
-  }
-  
-  if (style.fontSize) {
-    cssStyle.fontSize = style.fontSize;
-  }
-  
-  if (style.fontWeight) {
-    cssStyle.fontWeight = style.fontWeight;
-  }
-  
-  if (style.fontStyle) {
-    cssStyle.fontStyle = style.fontStyle;
-  }
-  
-  if (style.textDecoration) {
-    cssStyle.textDecoration = style.textDecoration;
-  }
-  
-  if (style.textAlign) {
-    cssStyle.textAlign = style.textAlign;
-  }
-  
-  if (style.lineHeight) {
-    cssStyle.lineHeight = style.lineHeight;
-  }
-  
-  // Border properties
-  if (style.borderRadius) {
-    cssStyle.borderRadius = style.borderRadius;
-  }
-  
-  if (style.borderWidth && style.hasBorder) {
-    cssStyle.borderWidth = style.borderWidth;
-  }
-  
-  if (style.borderColor && style.hasBorder) {
-    cssStyle.borderColor = style.borderColor;
-  }
-  
+  if (style.borderRadius) styles += `border-radius:${style.borderRadius};`;
+
   // Shadow
-  if (style.boxShadow && style.hasShadow) {
-    cssStyle.boxShadow = style.boxShadow;
+  if (style.hasShadow) {
+    styles += `box-shadow:${style.boxShadow || '0 4px 8px rgba(0,0,0,0.1)'};`;
   }
-  
+
   // Spacing
-  if (style.padding) {
-    cssStyle.padding = style.padding;
-  }
-  
-  if (style.margin) {
-    cssStyle.margin = style.margin;
-  }
-  
-  return cssStyle;
+  if (style.padding) styles += `padding:${style.padding};`;
+  if (style.margin) styles += `margin:${style.margin};`;
+  if (style.lineHeight) styles += `line-height:${style.lineHeight};`;
+
+  return styles || null;
 };
 
-// Convert spacing value to Tailwind classes
-export const getSpacingClasses = (style?: BlockStyle): string => {
-  if (!style || !style.blockSpacing) return '';
-  
-  let paddingClasses = '';
-  
-  // Map the blockSpacing values to Tailwind classes
-  switch (style.blockSpacing) {
-    case 'none':
-      paddingClasses = 'py-0';
-      break;
-      
-    case 'xs':
-      paddingClasses = 'py-2';
-      break;
-      
-    case 'sm':
-      paddingClasses = 'py-4';
-      break;
-      
-    case 'md':
-      paddingClasses = 'py-8';
-      break;
-      
-    case 'lg':
-      paddingClasses = 'py-12';
-      break;
-      
-    case 'xl':
-      paddingClasses = 'py-16';
-      break;
-      
-    default:
-      paddingClasses = 'py-4';
+// Convert a block style object to class names (for Tailwind)
+export const generateStyleClasses = (block: any): string => {
+  if (!block || !block.style) return '';
+
+  const style = block.style as BlockStyle;
+  const classes: string[] = [];
+
+  // Background styles
+  if (style.backgroundColor) {
+    if (style.backgroundColor.startsWith('#')) {
+      classes.push('bg-custom'); // Custom color to be handled with inline style
+    } else {
+      classes.push(`bg-${style.backgroundColor}`);
+    }
   }
-  
-  return paddingClasses;
+
+  // Text styles
+  if (style.textColor) {
+    if (style.textColor.startsWith('#')) {
+      classes.push('text-custom'); // Custom color to be handled with inline style
+    } else {
+      classes.push(`text-${style.textColor}`);
+    }
+  }
+
+  if (style.fontFamily) classes.push(`font-${style.fontFamily}`);
+  if (style.fontSize) classes.push(`text-${style.fontSize}`);
+  if (style.fontWeight) classes.push(`font-${style.fontWeight}`);
+  if (style.fontStyle === 'italic') classes.push('italic');
+  if (style.textDecoration === 'underline') classes.push('underline');
+  if (style.textAlign) classes.push(`text-${style.textAlign}`);
+
+  // Border styles
+  if (style.hasBorder) {
+    classes.push('border');
+    if (style.borderColor && !style.borderColor.startsWith('#')) {
+      classes.push(`border-${style.borderColor}`);
+    }
+    if (style.borderWidth) {
+      const width = style.borderWidth.replace('px', '');
+      classes.push(`border-${width}`);
+    }
+  }
+  if (style.borderRadius) classes.push(`rounded-${style.borderRadius}`);
+
+  // Shadow
+  if (style.hasShadow) classes.push('shadow');
+
+  // Spacing based on block spacing or individual padding/margin
+  addSpacingClasses(classes, style);
+
+  return classes.join(' ');
 };
 
-// Get responsive container class based on columns value
-export const getContainerClass = (columns: string | number): string => {
-  switch (columns) {
-    case 'full':
-    case 1:
-      return 'w-full';
-    case '2col':
-    case 2:
-      return 'max-w-screen-md mx-auto';
-    case '3col':
-    case 3:
-      return 'max-w-screen-lg mx-auto';
-    case '4col':
-    case 4:
-      return 'max-w-screen-xl mx-auto';
-    case '1/2':
-      return 'w-1/2';
-    case '1/3':
-      return 'w-1/3';
-    case '2/3':
-      return 'w-2/3';
-    case '1/4':
-      return 'w-1/4';
-    case '3/4':
-      return 'w-3/4';
-    default:
-      return 'w-full';
+// Helper function to add appropriate spacing classes
+const addSpacingClasses = (classes: string[], style: BlockStyle): void => {
+  if (style.blockSpacing) {
+    switch (style.blockSpacing) {
+      case 'xs':
+        classes.push('p-1 my-1');
+        break;
+      case 'sm':
+        classes.push('p-2 my-2');
+        break;
+      case 'md':
+        classes.push('p-4 my-4');
+        break;
+      case 'lg':
+        classes.push('p-6 my-6');
+        break;
+      case 'xl':
+        classes.push('p-8 my-8');
+        break;
+      default:
+        break;
+    }
+  } else {
+    // Handle individual padding and margin
+    if (style.padding) {
+      const paddingValue = parseInt(style.padding);
+      if (paddingValue <= 4) classes.push('p-1');
+      else if (paddingValue <= 8) classes.push('p-2');
+      else if (paddingValue <= 16) classes.push('p-4');
+      else if (paddingValue <= 24) classes.push('p-6');
+      else classes.push('p-8');
+    }
+    
+    if (style.margin) {
+      const marginValue = parseInt(style.margin);
+      if (marginValue <= 4) classes.push('m-1');
+      else if (marginValue <= 8) classes.push('m-2');
+      else if (marginValue <= 16) classes.push('m-4');
+      else if (marginValue <= 24) classes.push('m-6');
+      else classes.push('m-8');
+    }
   }
 };

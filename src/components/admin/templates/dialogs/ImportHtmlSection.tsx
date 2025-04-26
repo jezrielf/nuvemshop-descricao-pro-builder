@@ -1,100 +1,68 @@
 
 import React, { useState } from 'react';
-import { Template, ProductCategory, Block, BlockType } from '@/types/editor';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { analyzeHtmlToTemplate, customizeBlockTypes } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
-import { HtmlInputTab } from './import/HtmlInputTab';
-import { ReviewBlocksTab } from './import/ReviewBlocksTab';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
+import { analyzeHtmlToTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
+import { Template, BlockType } from '@/types/editor';
 
 interface ImportHtmlSectionProps {
   onTemplateGenerated: (template: Template) => void;
-  selectedCategory: ProductCategory;
 }
 
-export const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({
-  onTemplateGenerated,
-  selectedCategory,
-}) => {
+const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({ onTemplateGenerated }) => {
   const [htmlInput, setHtmlInput] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedTemplate, setGeneratedTemplate] = useState<Template | null>(null);
-  const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
-  const [blockTypeMap, setBlockTypeMap] = useState<Record<string, BlockType>>({});
-  const [activeTab, setActiveTab] = useState<string>('input');
-
-  const handleGenerateFromHtml = () => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  const handleImport = async () => {
     if (!htmlInput.trim()) return;
-
-    setIsGenerating(true);
+    
     try {
-      const template = analyzeHtmlToTemplate(htmlInput, selectedCategory);
-      setGeneratedTemplate(template);
-      setActiveTab('review');
-      setBlockTypeMap({});
+      setIsProcessing(true);
+      
+      // Use the HTML analyzer to create a template
+      const template = await analyzeHtmlToTemplate(htmlInput);
+      
+      if (template) {
+        onTemplateGenerated(template);
+      }
     } catch (error) {
-      console.error('Error generating template from HTML:', error);
+      console.error('Error processing HTML:', error);
     } finally {
-      setIsGenerating(false);
+      setIsProcessing(false);
     }
   };
-
-  const handleApplyTemplate = () => {
-    if (!generatedTemplate) return;
-    
-    const finalTemplate = Object.keys(blockTypeMap).length > 0 
-      ? customizeBlockTypes(generatedTemplate, blockTypeMap)
-      : generatedTemplate;
-    
-    onTemplateGenerated(finalTemplate);
-    
-    // Reset state
-    setHtmlInput('');
-    setGeneratedTemplate(null);
-    setBlockTypeMap({});
-    setEditingBlockId(null);
-    setActiveTab('input');
-  };
-
+  
   return (
     <div className="space-y-4">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 mb-4">
-          <TabsTrigger value="input">Entrada HTML</TabsTrigger>
-          <TabsTrigger value="review" disabled={!generatedTemplate}>
-            Revisar Blocos
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="input">
-          <HtmlInputTab
-            htmlInput={htmlInput}
-            isGenerating={isGenerating}
-            onHtmlChange={setHtmlInput}
-            onGenerate={handleGenerateFromHtml}
-          />
-        </TabsContent>
-        
-        <TabsContent value="review">
-          <ReviewBlocksTab
-            template={generatedTemplate}
-            editingBlockId={editingBlockId}
-            blockTypeMap={blockTypeMap}
-            onEditBlock={setEditingBlockId}
-            onChangeBlockType={(id, type) => setBlockTypeMap(prev => ({ ...prev, [id]: type }))}
-            onSaveBlockType={() => setEditingBlockId(null)}
-            onCancelBlockEdit={(id) => {
-              if (blockTypeMap[id]) {
-                const newMap = { ...blockTypeMap };
-                delete newMap[id];
-                setBlockTypeMap(newMap);
-              }
-              setEditingBlockId(null);
-            }}
-            onBack={() => setActiveTab('input')}
-            onApply={handleApplyTemplate}
-          />
-        </TabsContent>
-      </Tabs>
+      <div>
+        <h3 className="text-sm font-medium mb-2">Importe um HTML existente</h3>
+        <p className="text-sm text-muted-foreground mb-3">
+          Cole o HTML de uma descrição de produto já existente para converter automaticamente em um template.
+        </p>
+      </div>
+      
+      <Textarea
+        placeholder="Cole o código HTML aqui..."
+        rows={12}
+        value={htmlInput}
+        onChange={(e) => setHtmlInput(e.target.value)}
+        className="font-mono text-xs"
+      />
+      
+      <Button 
+        onClick={handleImport}
+        disabled={!htmlInput.trim() || isProcessing}
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Processando...
+          </>
+        ) : (
+          'Importar HTML'
+        )}
+      </Button>
     </div>
   );
 };

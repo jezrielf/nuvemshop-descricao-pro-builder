@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon } from 'lucide-react';
-import { BlockBase, BlockTypes, HeroBlock, ImageBlock, GalleryBlock, TextImageBlock, ImageTextBlock } from '@/types/editor';
+import { BlockBase, BlockType, HeroBlock, ImageBlock, GalleryBlock, ImageTextBlock, TextImageBlock } from '@/types/editor';
 
 interface ImageOptimizerProps {
   block: BlockBase;
@@ -21,14 +21,15 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage })
   const hasImages = (): boolean => {
     switch (block.type) {
       case 'hero':
-        return !!(block as HeroBlock).backgroundImage;
+        return !!(block as HeroBlock).image?.src;
       case 'image':
         return !!(block as ImageBlock).src;
       case 'gallery':
         return (block as GalleryBlock).images && (block as GalleryBlock).images.length > 0;
-      case 'image-text':
-      case 'text-image':
-        return !!(block as ImageTextBlock).src || !!(block as TextImageBlock).src;
+      case 'imageText':
+        return !!(block as ImageTextBlock).image?.src;
+      case 'textImage':
+        return !!(block as TextImageBlock).image?.src;
       default:
         return false;
     }
@@ -42,13 +43,13 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage })
     switch (block.type) {
       case 'hero': {
         const heroBlock = block as HeroBlock;
-        if (!heroBlock.backgroundImage) return null;
+        if (!heroBlock.image || !heroBlock.image.src) return null;
 
         return (
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleOptimizeImage(heroBlock.backgroundImage, 'backgroundImage')}
+            onClick={() => handleOptimizeImage(heroBlock.image.src, 'image.src')}
           >
             <ImageIcon className="h-4 w-4 mr-2" />
             Otimizar Imagem de Fundo
@@ -91,16 +92,16 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage })
           </Button>
         );
       }
-      case 'image-text':
-      case 'text-image': {
-        const imageTextBlock = block as ImageTextBlock | TextImageBlock;
-        if (!imageTextBlock.src) return null;
+      case 'imageText':
+      case 'textImage': {
+        const withImageBlock = block as ImageTextBlock | TextImageBlock;
+        if (!withImageBlock.image || !withImageBlock.image.src) return null;
         
         return (
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleOptimizeImage(imageTextBlock.src, 'src')}
+            onClick={() => handleOptimizeImage(withImageBlock.image.src, 'image.src')}
           >
             <ImageIcon className="h-4 w-4 mr-2" />
             Otimizar Imagem

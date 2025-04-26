@@ -2,75 +2,67 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Template, ProductCategory } from '@/types/editor';
-import { analyzeHtmlForTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
-import { v4 as uuidv4 } from 'uuid';
+import { Loader2 } from 'lucide-react';
+import { analyzeHtmlToTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
+import { Template } from '@/types/editor';
 
 interface ImportHtmlSectionProps {
   onTemplateGenerated: (template: Template) => void;
-  selectedCategory: ProductCategory;
 }
 
-const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({ 
-  onTemplateGenerated, 
-  selectedCategory 
-}) => {
-  const [htmlContent, setHtmlContent] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleConvert = async () => {
-    if (!htmlContent.trim()) {
-      setError('Por favor, insira o conteúdo HTML');
-      return;
-    }
-
+const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({ onTemplateGenerated }) => {
+  const [htmlInput, setHtmlInput] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  const handleImport = async () => {
+    if (!htmlInput.trim()) return;
+    
     try {
-      setIsAnalyzing(true);
-      setError(null);
+      setIsProcessing(true);
       
-      // Analyze HTML and convert to blocks
-      const template = analyzeHtmlForTemplate(htmlContent, selectedCategory);
+      // Use the HTML analyzer to create a template
+      const template = await analyzeHtmlToTemplate(htmlInput);
       
-      // Send the template back to the parent component
-      onTemplateGenerated(template);
-      
-    } catch (err) {
-      console.error('Error analyzing HTML:', err);
-      setError('Erro ao analisar o HTML. Verifique o formato e tente novamente.');
+      if (template) {
+        onTemplateGenerated(template);
+      }
+    } catch (error) {
+      console.error('Error processing HTML:', error);
     } finally {
-      setIsAnalyzing(false);
+      setIsProcessing(false);
     }
   };
-
+  
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-sm font-medium mb-2">Importar HTML</h3>
-        <p className="text-sm text-gray-500 mb-4">
-          Cole o código HTML da descrição de produto para criar um template automaticamente
+        <h3 className="text-sm font-medium mb-2">Importe um HTML existente</h3>
+        <p className="text-sm text-muted-foreground mb-3">
+          Cole o HTML de uma descrição de produto já existente para converter automaticamente em um template.
         </p>
-        
-        <Textarea
-          placeholder="Cole o código HTML aqui..."
-          value={htmlContent}
-          onChange={(e) => setHtmlContent(e.target.value)}
-          className="min-h-[200px]"
-        />
-        
-        {error && (
-          <p className="text-sm text-red-500 mt-2">{error}</p>
-        )}
       </div>
       
-      <div className="flex justify-end">
-        <Button 
-          onClick={handleConvert} 
-          disabled={isAnalyzing || !htmlContent.trim()}
-        >
-          {isAnalyzing ? 'Analisando...' : 'Converter HTML para Template'}
-        </Button>
-      </div>
+      <Textarea
+        placeholder="Cole o código HTML aqui..."
+        rows={12}
+        value={htmlInput}
+        onChange={(e) => setHtmlInput(e.target.value)}
+        className="font-mono text-xs"
+      />
+      
+      <Button 
+        onClick={handleImport}
+        disabled={!htmlInput.trim() || isProcessing}
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Processando...
+          </>
+        ) : (
+          'Importar HTML'
+        )}
+      </Button>
     </div>
   );
 };

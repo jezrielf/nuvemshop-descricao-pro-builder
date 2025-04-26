@@ -1,125 +1,127 @@
 
-import { v4 as uuidv4 } from 'uuid';
-
-// Types for users
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  createdAt: string;
-  lastLogin?: string;
-  isActive: boolean;
-}
+import { Profile } from '@/types/auth';
+import { supabase } from '@/integrations/supabase/client';
 
 // Get all users
-const getUsers = async (): Promise<User[]> => {
+const getUsers = async (): Promise<Profile[]> => {
   try {
-    // In a real app, this would be fetched from an API or database
-    // Return mock data for now
-    return [
-      {
-        id: uuidv4(),
-        email: "demo@example.com",
-        name: "Demo User",
-        role: "user",
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        isActive: true,
-      },
-      {
-        id: uuidv4(),
-        email: "admin@example.com",
-        name: "Admin User",
-        role: "admin",
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        isActive: true,
-      }
-    ];
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) throw error;
+    
+    return data as Profile[];
   } catch (error) {
     console.error('Error fetching users:', error);
     return [];
   }
 };
 
-// Create a new user
-const createUser = async (userData: Omit<User, 'id' | 'createdAt'>): Promise<User> => {
+// Get a user by ID
+const getUserById = async (id: string): Promise<Profile | null> => {
   try {
-    const newUser = {
-      ...userData,
-      id: uuidv4(),
-      createdAt: new Date().toISOString()
-    };
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
     
-    // In a real app, save to database
-    console.log('Creating user:', newUser);
-    return newUser;
+    return data as Profile;
+  } catch (error) {
+    console.error(`Error fetching user ${id}:`, error);
+    return null;
+  }
+};
+
+// Create a new user
+const createUser = async (user: Omit<Profile, 'id'>): Promise<Profile | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert([user])
+      .select();
+      
+    if (error) throw error;
+    
+    return data[0] as Profile;
   } catch (error) {
     console.error('Error creating user:', error);
-    throw error;
+    return null;
   }
 };
 
 // Update a user's profile
-const updateUserProfile = async (id: string, userData: Partial<User>): Promise<User> => {
+const updateUserProfile = async (id: string, profile: Partial<Profile>): Promise<Profile | null> => {
   try {
-    // In a real app, update in database
-    console.log('Updating user profile:', id, userData);
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(profile)
+      .eq('id', id)
+      .select();
+      
+    if (error) throw error;
     
-    // Mock response for now
-    return {
-      id,
-      email: userData.email || "user@example.com",
-      name: userData.name || "Updated User",
-      role: userData.role || "user",
-      createdAt: new Date().toISOString(),
-      lastLogin: userData.lastLogin,
-      isActive: userData.isActive !== undefined ? userData.isActive : true
-    };
+    return data[0] as Profile;
   } catch (error) {
-    console.error('Error updating user profile:', error);
-    throw error;
+    console.error(`Error updating user ${id}:`, error);
+    return null;
   }
 };
 
 // Update a user's role
-const updateUserRole = async (id: string, role: string): Promise<User> => {
+const updateUserRole = async (id: string, role: string): Promise<boolean> => {
   try {
-    // In a real app, update in database
-    console.log('Updating user role:', id, role);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role })
+      .eq('id', id);
+      
+    if (error) throw error;
     
-    // Mock response for now
-    return {
-      id,
-      email: "user@example.com",
-      name: "User",
-      role,
-      createdAt: new Date().toISOString(),
-      isActive: true
-    };
+    return true;
   } catch (error) {
-    console.error('Error updating user role:', error);
-    throw error;
+    console.error(`Error updating role for user ${id}:`, error);
+    return false;
   }
 };
 
 // Delete a user
 const deleteUser = async (id: string): Promise<boolean> => {
   try {
-    // In a real app, delete from database
-    console.log('Deleting user:', id);
+    // First delete from Supabase Auth (will cascade to profile due to RLS)
+    const { error: authError } = await supabase.auth.admin.deleteUser(id);
+    if (authError) throw authError;
+    
     return true;
   } catch (error) {
-    console.error('Error deleting user:', error);
-    throw error;
+    console.error(`Error deleting user ${id}:`, error);
+    
+    // Try direct profile deletion as fallback
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      return true;
+    } catch (fallbackError) {
+      console.error(`Fallback deletion failed for user ${id}:`, fallbackError);
+      return false;
+    }
   }
 };
 
 export const userService = {
   getUsers,
+  getUserById,
   createUser,
   updateUserProfile,
   updateUserRole,
-  deleteUser,
+  deleteUser
 };

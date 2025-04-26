@@ -1,102 +1,84 @@
 
 import { StateCreator } from 'zustand';
-import { TemplateState } from './state';
+import { TemplateState } from './types';
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import templateService from '@/services/admin/templateService';
+import { useEditorStore } from '@/store/editor';
 
 export interface TemplateCRUDSlice {
-  createTemplate: (template: Omit<Template, 'id'>) => Promise<Template>;
-  updateTemplate: (id: string, template: Partial<Template>) => Promise<Template | null>;
-  deleteTemplate: (id: string) => Promise<boolean>;
+  addTemplate: (template: Template) => void;
+  updateTemplate: (id: string, template: Partial<Template>) => void;
+  deleteTemplate: (id: string) => void;
   applyTemplate: (template: Template) => void;
 }
 
 export const createTemplateCRUDSlice: StateCreator<
-  TemplateState & TemplateCRUDSlice,
-  [],
-  [],
-  TemplateCRUDSlice
+  TemplateState & TemplateCRUDSlice
 > = (set, get) => ({
-  createTemplate: async (templateData) => {
+  addTemplate: (template: Template) => {
+    const newTemplate = { ...template, id: template.id || uuidv4() };
+    set((state) => ({
+      templates: [...state.templates, newTemplate],
+    }));
+
+    // Save to backend if available
     try {
-      const newTemplate = await templateService.createTemplate(templateData);
-      
-      set((state) => ({
-        templates: [...state.templates, newTemplate]
-      }));
-      
-      return newTemplate;
+      templateService.createTemplate(newTemplate);
     } catch (error) {
-      console.error('Error creating template:', error);
-      
-      // Fallback to local creation if API fails
-      const fallbackTemplate: Template = {
+      console.error('Error saving template:', error);
+    }
+  },
+
+  updateTemplate: (id: string, templateUpdate: Partial<Template>) => {
+    set((state) => ({
+      templates: state.templates.map((template) =>
+        template.id === id ? { ...template, ...templateUpdate } : template
+      ),
+    }));
+
+    // Update in backend if available
+    try {
+      templateService.updateTemplate(id, templateUpdate);
+    } catch (error) {
+      console.error('Error updating template:', error);
+    }
+  },
+
+  deleteTemplate: (id: string) => {
+    set((state) => ({
+      templates: state.templates.filter((template) => template.id !== id),
+    }));
+
+    // Delete from backend if available
+    try {
+      templateService.deleteTemplate(id);
+    } catch (error) {
+      console.error('Error deleting template:', error);
+    }
+  },
+
+  applyTemplate: (template: Template) => {
+    // Get the loadDescription function from editor store
+    const { loadDescription, createNewDescription } = useEditorStore.getState();
+    
+    if (template && template.blocks) {
+      // Create a new description based on the template
+      const templateDescription = {
         id: uuidv4(),
-        ...templateData,
+        name: `Descrição baseada em "${template.name}"`,
+        blocks: template.blocks ? [...template.blocks] : [],
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        category: template.category
       };
       
-      set((state) => ({
-        templates: [...state.templates, fallbackTemplate]
-      }));
-      
-      return fallbackTemplate;
+      // Load the new description into the editor
+      if (loadDescription) {
+        loadDescription(templateDescription);
+      } else if (createNewDescription) {
+        createNewDescription(templateDescription.name);
+      }
     }
-  },
-  
-  updateTemplate: async (id, templateData) => {
-    try {
-      const updatedTemplate = await templateService.updateTemplate(id, templateData);
-      
-      set((state) => ({
-        templates: state.templates.map((template) =>
-          template.id === id ? { ...template, ...updatedTemplate } : template
-        )
-      }));
-      
-      return updatedTemplate;
-    } catch (error) {
-      console.error(`Error updating template ${id}:`, error);
-      
-      // Fallback to local update if API fails
-      set((state) => ({
-        templates: state.templates.map((template) =>
-          template.id === id
-            ? { ...template, ...templateData, updatedAt: new Date().toISOString() }
-            : template
-        )
-      }));
-      
-      return { ...get().templates.find((t) => t.id === id)!, ...templateData };
-    }
-  },
-  
-  deleteTemplate: async (id) => {
-    try {
-      await templateService.deleteTemplate(id);
-      
-      set((state) => ({
-        templates: state.templates.filter((template) => template.id !== id)
-      }));
-      
-      return true;
-    } catch (error) {
-      console.error(`Error deleting template ${id}:`, error);
-      
-      // Fallback to local deletion if API fails
-      set((state) => ({
-        templates: state.templates.filter((template) => template.id !== id)
-      }));
-      
-      return true;
-    }
-  },
-  
-  applyTemplate: (template) => {
-    templateService.applyTemplate(template);
   }
 });
-
-export { createTemplateCRUDSlice as createCRUDSlice };
