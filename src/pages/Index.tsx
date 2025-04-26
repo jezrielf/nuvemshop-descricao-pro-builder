@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, memo } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -95,7 +94,7 @@ const Index = () => {
       clearAuthCodeFromUrl();
     }
     
-    // Load templates with error handling
+    // Load templates with error handling - modificado para evitar loop infinito
     const initializeTemplates = async () => {
       try {
         setIsLoadingTemplates(true);
@@ -127,14 +126,9 @@ const Index = () => {
     
     initializeTemplates();
     
-    // Template refresh interval
-    const templateRefreshInterval = setInterval(() => {
-      loadTemplates().catch(err => console.error("Erro ao atualizar templates no background:", err));
-    }, 10 * 60 * 1000); // 10 minutes
+    // Removido o intervalo de atualização para evitar possíveis loops
+    // Template refresh interval será reintroduzido de uma forma melhor depois
     
-    return () => {
-      clearInterval(templateRefreshInterval);
-    };
   }, [loadTemplates, toast, handleTestCode]);
 
   const handleNuvemshopDisconnect = () => {

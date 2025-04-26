@@ -6,6 +6,7 @@ import { RecommendationsList } from './RecommendationsList';
 import { KeywordsList } from './KeywordsList';
 import { EmptyState } from './EmptyState';
 import { SEOResult } from '../types';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface AnalyzerDialogContentProps {
   keyword: string;
@@ -35,11 +36,13 @@ export const AnalyzerDialogContent: React.FC<AnalyzerDialogContentProps> = ({
       />
       
       {results ? (
-        <div className="space-y-2 overflow-y-auto flex-grow mt-2">
-          <ScoreDisplay score={results.score} />
-          <RecommendationsList recommendations={results.recommendations} />
-          <KeywordsList keywords={results.keywords} />
-        </div>
+        <ScrollArea className="h-[calc(100%-80px)] flex-grow mt-2">
+          <div className="space-y-2">
+            <ScoreDisplay score={results.score} />
+            <RecommendationsList recommendations={results.recommendations} />
+            <KeywordsList keywords={results.keywords} />
+          </div>
+        </ScrollArea>
       ) : (
         <EmptyState analyzing={analyzing} />
       )}

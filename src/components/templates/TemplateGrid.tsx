@@ -3,6 +3,7 @@ import React from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Template } from '@/types/editor';
 import TemplateCard from './TemplateCard';
+import { Button } from '@/components/ui/button';
 
 interface TemplateGridProps {
   templates: Template[];
@@ -11,6 +12,7 @@ interface TemplateGridProps {
   onSelectTemplate: (template: Template) => void;
   getThumbnail: (template: Template) => string;
   isAdvancedTemplate: (id: string) => boolean;
+  onRefresh?: () => Promise<void>; // Adicionamos uma prop para recarregar
 }
 
 const TemplateGrid: React.FC<TemplateGridProps> = ({
@@ -20,6 +22,7 @@ const TemplateGrid: React.FC<TemplateGridProps> = ({
   onSelectTemplate,
   getThumbnail,
   isAdvancedTemplate,
+  onRefresh
 }) => {
   if (isLoading) {
     return (
@@ -32,8 +35,14 @@ const TemplateGrid: React.FC<TemplateGridProps> = ({
 
   if (templates.length === 0) {
     return (
-      <div className="col-span-2 text-center py-8">
-        <p className="text-muted-foreground">Nenhum template encontrado.</p>
+      <div className="col-span-2 flex flex-col items-center text-center py-8">
+        <p className="text-muted-foreground mb-4">Nenhum template encontrado.</p>
+        {onRefresh && (
+          <Button onClick={onRefresh} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar novamente
+          </Button>
+        )}
       </div>
     );
   }

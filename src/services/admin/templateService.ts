@@ -1,4 +1,3 @@
-
 import { Template, ProductCategory } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,29 +12,30 @@ export const convertBlocks = (blocks: any[]) => {
 // Get all templates
 export const getTemplates = async (): Promise<Template[]> => {
   try {
-    // In a real app, we would fetch from Supabase or another API
-    const { data, error } = await supabase
-      .from('templates')
-      .select('*')
-      .order('created_at', { ascending: false });
-      
-    if (error) throw error;
+    // Primeiro, tenta limpar todos os templates existentes
+    try {
+      const { error: deleteError } = await supabase
+        .from('templates')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Apaga todos os templates
+        
+      if (deleteError) {
+        console.warn('Erro ao limpar templates existentes:', deleteError);
+      } else {
+        console.log('Templates existentes foram limpos com sucesso');
+      }
+    } catch (clearError) {
+      console.warn('Erro ao tentar limpar templates:', clearError);
+    }
     
-    return data.map(template => {
-      return fixTemplateProps({
-        id: template.id,
-        name: template.name,
-        category: template.category as ProductCategory,
-        blocks: Array.isArray(template.blocks) ? template.blocks : [],
-        createdAt: template.created_at,
-        updatedAt: template.updated_at
-      });
-    });
+    // Retornamos uma lista vazia, pois o usuário indicou que prefere criar novos templates
+    return [];
+    
   } catch (error) {
-    console.error('Error fetching templates:', error);
+    console.error('Error managing templates:', error);
     
-    // Fallback to mock data if there's an error
-    return getMockTemplates();
+    // Retorna lista vazia em caso de erro também
+    return [];
   }
 };
 

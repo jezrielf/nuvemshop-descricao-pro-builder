@@ -6,12 +6,17 @@ import templateService from '@/services/admin/templateService';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice
-> = (set) => ({
+> = (set, get) => ({
   templates: [],
   isLoading: false,
   error: null,
   
   loadTemplates: async () => {
+    // Evitar múltiplas chamadas quando já está carregando
+    if (get().isLoading) {
+      return get().templates;
+    }
+    
     set({ isLoading: true, error: null });
     
     try {
@@ -20,7 +25,7 @@ export const createLoadingSlice: StateCreator<
       return templates;
     } catch (error) {
       console.error("Error loading templates:", error);
-      set({ error, isLoading: false });
+      set({ error, isLoading: false, templates: [] }); // Reset templates em caso de erro
       return [];
     }
   }

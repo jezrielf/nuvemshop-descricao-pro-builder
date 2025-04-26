@@ -157,7 +157,8 @@ export class BlockRendererFactory {
   private static isValidBlockType(type: string): boolean {
     const validTypes = [
       'hero', 'text', 'features', 'benefits', 'specifications', 
-      'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta', 'video'
+      'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta', 'video',
+      'videoText', 'textVideo' // Adicionados os dois tipos que estavam faltando
     ];
     
     return validTypes.includes(type);
