@@ -5,31 +5,24 @@ interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  className?: string;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   onChange,
-  placeholder = 'Digite seu texto aqui...',
-  className = ''
+  placeholder = 'Digite aqui...'
 }) => {
-  // A simple contentEditable component for now
-  // In a real implementation, this would use a proper rich text editor like TipTap, CKEditor, etc.
-  
-  const handleChange = (e: React.FormEvent<HTMLDivElement>) => {
-    const newValue = e.currentTarget.innerHTML;
-    onChange(newValue);
-  };
-  
+  // Simple textarea-based editor for now
+  // This could be replaced with a more sophisticated rich text editor like TipTap or Quill
   return (
-    <div 
-      className={`p-3 border rounded-md min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-      contentEditable
-      dangerouslySetInnerHTML={{ __html: value }}
-      onInput={handleChange}
-      data-placeholder={placeholder}
-    />
+    <div className="rich-text-editor w-full">
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full min-h-[120px] p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
   );
 };
 

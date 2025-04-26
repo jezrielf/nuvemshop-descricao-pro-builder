@@ -1,54 +1,56 @@
 
-import { Block, ProductCategory } from '@/types/editor';
-import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
+import { Template, ProductCategory } from '@/types/editor';
 
-interface SupabaseTemplate {
-  id: string;
-  name: string;
-  category: string;
-  blocks: any;
-  thumbnail?: string;
-  created_at?: string;
-  updated_at?: string;
-  user_id?: string;
-}
-
-export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Template | null => {
-  try {
-    let blocks = [];
-    
-    if (Array.isArray(supaTemplate.blocks)) {
-      blocks = supaTemplate.blocks;
-    } else if (typeof supaTemplate.blocks === 'object' && supaTemplate.blocks !== null) {
-      blocks = Object.values(supaTemplate.blocks);
-    }
-    
-    // Convert category to a valid ProductCategory
-    let category: ProductCategory = 'other';
-    
-    // Check if it's a valid ProductCategory
-    const validCategories: ProductCategory[] = [
-      'supplements', 'clothing', 'accessories', 'shoes', 
-      'electronics', 'energy', 'Casa e decoração', 'other'
-    ];
-    
-    if (supaTemplate.category && validCategories.includes(supaTemplate.category as ProductCategory)) {
-      category = supaTemplate.category as ProductCategory;
-    }
-    
-    return {
-      id: supaTemplate.id,
-      name: supaTemplate.name,
-      category: category,
-      blocks: blocks,
-      thumbnail: supaTemplate.thumbnail || '/placeholder.svg' // Default placeholder if no thumbnail
-    };
-  } catch (error) {
-    console.error('Error converting template:', error, supaTemplate);
-    return null;
-  }
+// Create a default template for a given category
+export const createDefaultTemplate = (category: ProductCategory): Template => {
+  return {
+    id: uuidv4(),
+    name: `Novo Template - ${getCategoryName(category)}`,
+    description: 'Template personalizado criado pelo usuário',
+    category,
+    blocks: [],
+    thumbnailUrl: getDefaultThumbnailForCategory(category),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
 };
 
-export const serializeBlocks = (blocks: Block[]): any => {
-  return JSON.parse(JSON.stringify(blocks));
+// Helper function to get category name
+export const getCategoryName = (category: ProductCategory): string => {
+  const categoryMap: Partial<Record<ProductCategory, string>> = {
+    'supplements': 'Suplementos',
+    'clothing': 'Roupas',
+    'accessories': 'Acessórios',
+    'shoes': 'Calçados',
+    'electronics': 'Eletrônicos',
+    'energy': 'Energia',
+    'Casa e decoração': 'Casa e Decoração',
+    'other': 'Outros',
+    'Alimentos': 'Alimentos',
+    'Bebidas': 'Bebidas',
+    'Beleza': 'Beleza e Cuidados Pessoais',
+    'Casa': 'Casa',
+    'Decoração': 'Decoração',
+    'Eletrônicos': 'Eletrônicos',
+    'Esporte': 'Esporte e Fitness',
+    'Moda': 'Moda',
+    'Saúde': 'Saúde e Bem-estar',
+  };
+
+  return categoryMap[category] || 'Categoria Desconhecida';
+};
+
+// Helper function to get default thumbnail for a category
+export const getDefaultThumbnailForCategory = (category: ProductCategory): string => {
+  const categoryThumbnails: Partial<Record<ProductCategory, string>> = {
+    'supplements': '/templates/supplements.jpg',
+    'clothing': '/templates/clothing.jpg',
+    'electronics': '/templates/electronics.jpg',
+    'Casa e decoração': '/templates/home.jpg',
+    'Eletrônicos': '/templates/electronics.jpg',
+    'Moda': '/templates/fashion.jpg'
+  };
+
+  return categoryThumbnails[category] || '/templates/default.jpg';
 };

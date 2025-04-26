@@ -79,7 +79,7 @@ export type ProductCategory =
   | 'Moda' 
   | 'Saúde';
 
-export type ColumnLayout = 'full' | '2col' | '3col' | '4col';
+export type ColumnLayout = 'full' | '2col' | '3col' | '4col' | 1 | 2 | 3 | 4 | '1/2' | '1/3' | '2/3' | '1/4' | '3/4';
 
 export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
 

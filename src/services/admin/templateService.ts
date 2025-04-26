@@ -1,199 +1,161 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Template } from '@/types/editor';
-import { ProductCategory } from '@/types/editor/products';
-import { convertBlocks } from '@/utils/blockConverter';
-import { getAllTemplates } from '@/utils/templates';
+import { Template, BlockType } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
+import { convertBlock } from '@/utils/blockConverter';
 
-export const templateService = {
-  getTemplates: async (): Promise<Template[]> => {
-    try {
-      console.log('Iniciando carregamento de templates do banco de dados');
-      // Primeiro tentamos obter templates do banco de dados
-      const { data, error } = await supabase
-        .from('templates')
-        .select('*')
-        .order('updated_at', { ascending: false });
-      
-      if (error) {
-        console.warn('Erro ao carregar templates do banco de dados:', error);
-        // Se houve erro, retornamos templates locais
-        const localTemplates = getAllTemplates();
-        console.log(`Fallback para ${localTemplates.length} templates locais devido a erro no banco`);
-        return localTemplates;
-      }
-      
-      // Se não há dados ou o array está vazio, retornamos templates locais
-      if (!data || data.length === 0) {
-        console.log('Nenhum template encontrado no banco de dados, usando templates locais');
-        const localTemplates = getAllTemplates();
-        console.log(`Carregados ${localTemplates.length} templates locais como fallback`);
-        return localTemplates;
-      }
-      
-      // Convert the database response to Template format with proper type handling
-      const templates: Template[] = (data || []).map((template) => {
-        // Convert string category to ProductCategory
-        let category: ProductCategory = 'other';
-        
-        // Try to match the string category with a valid ProductCategory
-        if (template.category && typeof template.category === 'string') {
-          // Check if it's a valid ProductCategory
-          const validCategories: ProductCategory[] = [
-            'supplements', 'clothing', 'accessories', 'shoes', 
-            'electronics', 'energy', 'Casa e decoração', 'other'
-          ];
-          
-          if (validCategories.includes(template.category as ProductCategory)) {
-            category = template.category as ProductCategory;
-          }
-        }
-        
-        // Ensure blocks is always an array
-        let blockData: any[] = [];
-        
-        if (Array.isArray(template.blocks)) {
-          blockData = template.blocks;
-        } else if (typeof template.blocks === 'object' && template.blocks !== null) {
-          blockData = Object.values(template.blocks);
-        }
-        
-        return {
-          id: template.id,
-          name: template.name,
-          category: category,
-          blocks: blockData,
-          thumbnail: '/placeholder.svg' // Default thumbnail as it's not in the database
-        };
-      });
-      
-      // Se ainda não retornamos, significa que temos templates do banco de dados
-      console.log(`Carregados ${templates.length} templates do banco de dados com sucesso`);
-      
-      // Se tivermos templates do banco, mas são poucos, combinamos com os locais
-      if (templates.length < 10) {
-        const localTemplates = getAllTemplates();
-        // Filtramos para não ter IDs duplicados
-        const localWithoutDuplicates = localTemplates.filter(
-          local => !templates.some(db => db.id === local.id)
-        );
-        const combined = [...templates, ...localWithoutDuplicates];
-        console.log(`Combinando ${templates.length} templates do banco com ${localWithoutDuplicates.length} templates locais`);
-        return combined;
-      }
-      
-      return templates;
-    } catch (error) {
-      console.error('Error in getTemplates:', error);
-      // Em caso de qualquer erro, retornamos os templates locais como fallback
-      const localTemplates = getAllTemplates();
-      console.log(`Usando ${localTemplates.length} templates locais como fallback devido a erro geral`);
-      return localTemplates;
-    }
+// Mock database of templates
+let templates: Template[] = [
+  {
+    id: '1',
+    name: 'Template Básico',
+    description: 'Template simples com estrutura básica',
+    category: 'supplements',
+    blocks: [],
+    thumbnailUrl: '/templates/basic.jpg',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
-  
-  createTemplate: async (templateData: Omit<Template, 'id'>): Promise<Template> => {
-    try {
-      // Generate UUID for new template
-      const id = crypto.randomUUID();
-      
-      // Ensure blocks is serialized properly for storage
-      const blockData = templateData.blocks || [];
-      
-      const { data, error } = await supabase
-        .from('templates')
-        .insert({
-          id,
-          name: templateData.name,
-          category: templateData.category,
-          blocks: blockData
-        })
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      // Ensure blocks is always an array
-      let blocks: any[] = [];
-      
-      if (Array.isArray(data.blocks)) {
-        blocks = data.blocks;
-      } else if (typeof data.blocks === 'object' && data.blocks !== null) {
-        blocks = Object.values(data.blocks);
-      }
-      
-      // Convert returned data to Template format
-      const template: Template = {
-        id: data.id,
-        name: data.name,
-        category: data.category as ProductCategory,
-        blocks,
-        thumbnail: '/placeholder.svg' // Default thumbnail
-      };
-      
-      return template;
-    } catch (error) {
-      console.error('Error in createTemplate:', error);
-      throw error;
-    }
+  {
+    id: '2',
+    name: 'Vitaminas e Minerais',
+    description: 'Para produtos de suplementação diária',
+    category: 'supplements',
+    blocks: [],
+    thumbnailUrl: '/templates/vitamins.jpg',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
-  
-  updateTemplate: async (templateId: string, templateData: Partial<Template>): Promise<Template> => {
-    try {
-      // Prepare update data
-      const updateData: any = {};
-      
-      if (templateData.name) updateData.name = templateData.name;
-      if (templateData.category) updateData.category = templateData.category;
-      if (templateData.blocks) updateData.blocks = templateData.blocks;
-      
-      updateData.updated_at = new Date().toISOString();
-      
-      const { data, error } = await supabase
-        .from('templates')
-        .update(updateData)
-        .eq('id', templateId)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      // Ensure blocks is always an array
-      let blocks: any[] = [];
-      
-      if (Array.isArray(data.blocks)) {
-        blocks = data.blocks;
-      } else if (typeof data.blocks === 'object' && data.blocks !== null) {
-        blocks = Object.values(data.blocks);
-      }
-      
-      // Convert returned data to Template format
-      const template: Template = {
-        id: data.id,
-        name: data.name,
-        category: data.category as ProductCategory,
-        blocks,
-        thumbnail: '/placeholder.svg' // Default thumbnail
-      };
-      
-      return template;
-    } catch (error) {
-      console.error('Error in updateTemplate:', error);
-      throw error;
-    }
+  {
+    id: '3',
+    name: 'Roupas Esportivas',
+    description: 'Para produtos de vestuário esportivo',
+    category: 'clothing',
+    blocks: [],
+    thumbnailUrl: '/templates/sportswear.jpg',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
-  
-  deleteTemplate: async (templateId: string): Promise<void> => {
-    try {
-      const { error } = await supabase
-        .from('templates')
-        .delete()
-        .eq('id', templateId);
-      
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error in deleteTemplate:', error);
-      throw error;
-    }
+];
+
+export const fetchTemplates = async (): Promise<Template[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Return the templates
+  return templates;
+};
+
+export const fetchTemplatesByCategory = async (category: string): Promise<Template[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Filter templates by category
+  return templates.filter(template => template.category === category);
+};
+
+export const fetchTemplateById = async (id: string): Promise<Template | null> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Find template by ID
+  const template = templates.find(t => t.id === id);
+  return template || null;
+};
+
+export const createTemplate = async (template: Omit<Template, 'id'>): Promise<Template> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Create a new template with a unique ID
+  const newTemplate: Template = {
+    ...template,
+    id: uuidv4(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  // Add to the templates array
+  templates = [...templates, newTemplate];
+
+  return newTemplate;
+};
+
+export const updateTemplate = async (id: string, update: Partial<Template>): Promise<Template | null> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Find the index of the template to update
+  const index = templates.findIndex(t => t.id === id);
+  if (index === -1) {
+    return null;
   }
+
+  // Update the template
+  const updatedTemplate: Template = {
+    ...templates[index],
+    ...update,
+    updatedAt: new Date().toISOString()
+  };
+  templates[index] = updatedTemplate;
+
+  return updatedTemplate;
+};
+
+export const deleteTemplate = async (id: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Filter out the template to delete
+  const initialLength = templates.length;
+  templates = templates.filter(t => t.id !== id);
+  return templates.length < initialLength;
+};
+
+export const convertLegacyTemplates = async (legacyTemplates: any[]): Promise<Template[]> => {
+  return legacyTemplates.map(item => {
+    const template: Template = {
+      id: item.id || uuidv4(),
+      name: item.name || 'Template sem título',
+      description: item.description || '',
+      category: item.category as any || 'other',
+      blocks: Array.isArray(item.blocks) ? item.blocks : [],
+      thumbnailUrl: item.thumbnailUrl || '',
+      createdAt: item.createdAt || new Date().toISOString(),
+      updatedAt: item.updatedAt || new Date().toISOString(),
+    };
+    return template;
+  });
+};
+
+export const cloneTemplate = async (id: string): Promise<Template | null> => {
+  // Find the template to clone
+  const template = templates.find(t => t.id === id);
+  if (!template) {
+    return null;
+  }
+
+  // Create a clone with a new ID
+  const clone: Template = {
+    ...template,
+    id: uuidv4(),
+    name: `${template.name} (Cópia)`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  // Add to the templates array
+  templates = [...templates, clone];
+
+  return clone;
+};
+
+export default {
+  fetchTemplates,
+  fetchTemplatesByCategory,
+  fetchTemplateById,
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+  convertLegacyTemplates,
+  cloneTemplate,
 };

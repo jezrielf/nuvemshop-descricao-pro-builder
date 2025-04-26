@@ -41,9 +41,9 @@ export const convertBlock = (
     // These blocks have the same structure, just swapping positions
     return {
       ...baseBlock,
-      image: block.image,
-      heading: block.heading,
-      content: block.content,
+      imageSrc: (block as any).imageSrc,
+      heading: (block as any).heading,
+      content: (block as any).content,
     } as Block;
   }
 
@@ -55,16 +55,16 @@ export const convertBlock = (
     // These blocks share video properties
     const converted: any = {
       ...baseBlock,
-      videoUrl: block.videoUrl || '',
-      aspectRatio: block.aspectRatio || '16:9',
-      autoplay: block.autoplay !== undefined ? block.autoplay : false,
-      muteAudio: block.muteAudio !== undefined ? block.muteAudio : true,
+      videoUrl: (block as any).videoUrl || '',
+      aspectRatio: (block as any).aspectRatio || '16:9',
+      autoplay: (block as any).autoplay !== undefined ? (block as any).autoplay : false,
+      muteAudio: (block as any).muteAudio !== undefined ? (block as any).muteAudio : true,
     };
 
     // Add text properties if target is videoText or textVideo
     if (targetType === 'videoText' || targetType === 'textVideo') {
-      converted.heading = block.heading || 'Título da Seção';
-      converted.content = block.content || '<p>Adicione o texto aqui para descrever seu vídeo ou produto.</p>';
+      converted.heading = (block as any).heading || 'Título da Seção';
+      converted.content = (block as any).content || '<p>Adicione o texto aqui para descrever seu vídeo ou produto.</p>';
     }
 
     return converted as Block;

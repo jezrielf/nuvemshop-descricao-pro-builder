@@ -56,7 +56,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUploaded }) => {
               disabled={isUploading}
             />
             <Button
-              as="span"
               disabled={isUploading}
               className="relative cursor-pointer"
             >

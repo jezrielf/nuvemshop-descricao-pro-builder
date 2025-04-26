@@ -63,6 +63,16 @@ export const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactN
     name: 'Vídeo',
     icon: <Play className="h-5 w-5" />,
     description: 'Vídeo do YouTube com autoplay'
+  },
+  videoText: {
+    name: 'Vídeo + Texto',
+    icon: <Play className="h-5 w-5" />,
+    description: 'Vídeo à esquerda com texto à direita'
+  },
+  textVideo: {
+    name: 'Texto + Vídeo',
+    icon: <Play className="h-5 w-5" />,
+    description: 'Texto à esquerda com vídeo à direita'
   }
 };
 
