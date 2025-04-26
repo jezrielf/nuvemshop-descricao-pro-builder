@@ -23,7 +23,7 @@ export { type VideoTextBlock } from './blocks/videoText';
 export { type CarouselBlock } from './blocks/carousel';
 export { type SpecificationsBlock } from './blocks/specifications';
 
-// Export base types explicitly by name to ensure they're available
+// Explicitly export base types to ensure they're available
 export { 
   type Template, 
   type ProductDescription, 

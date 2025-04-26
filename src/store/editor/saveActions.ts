@@ -19,6 +19,16 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     }
   };
 
+  // Helper method to handle incrementing description count
+  const incrementDescriptionCount = () => {
+    // If authContext exists and has the method, call it
+    if (authContext && typeof authContext.incrementDescriptionCount === 'function') {
+      authContext.incrementDescriptionCount();
+    } else {
+      console.warn('incrementDescriptionCount is not available in authContext');
+    }
+  };
+
   return {
     // Add the setter function for auth context
     setAuthContext,
@@ -39,9 +49,9 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           return false;
         }
         
-        // Increment description count for free users
+        // Increment description count for free users (using our helper method)
         if (!authContext.isPremium()) {
-          authContext.incrementDescriptionCount();
+          incrementDescriptionCount();
         }
         
         // Update the timestamp
