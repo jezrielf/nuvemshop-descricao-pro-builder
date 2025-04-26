@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
@@ -6,7 +5,7 @@ import AddBlock from './AddBlock';
 import TemplateSelector from './TemplateSelector';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Sparkles, Lock } from 'lucide-react';
+import { AlertCircle, Plus } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,9 +14,10 @@ import { SEOToolsMenu } from './SEO/menu/SEOToolsMenu';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { updateBlockImage } from './SEO/utils/imageUtils';
+import { v4 as uuidv4 } from 'uuid';
 
 const Editor: React.FC = () => {
-  const { description, reorderBlocks, updateBlock } = useEditorStore();
+  const { description, reorderBlocks, updateBlock, createNewDescription } = useEditorStore();
   const { isPremium, isBusiness } = useAuth();
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const navigate = useNavigate();
@@ -44,8 +44,8 @@ const Editor: React.FC = () => {
     reorderBlocks(fromIndex, toIndex);
   };
   
-  const handleUpgradePlan = () => {
-    navigate('/plans');
+  const handleStartDescription = () => {
+    createNewDescription("Nova descrição");
   };
   
   const handleUpdateImage = (blockId: string, imageType: string, newImageUrl: string) => {
@@ -86,36 +86,20 @@ const Editor: React.FC = () => {
           
           <div className="w-full bg-white border rounded-lg overflow-hidden">
             <div className="p-4 border-b">
-              <h3 className="font-medium">Ou crie uma descrição com IA</h3>
-              <p className="text-sm text-gray-500">Deixe nossa IA criar uma descrição completa para você</p>
+              <h3 className="font-medium">Ou crie uma descrição vazia</h3>
+              <p className="text-sm text-gray-500">Comece do zero e adicione os blocos que desejar</p>
             </div>
             <div className="p-4 flex justify-center">
-              {isPremiumUser || isBusinessUser ? (
-                <Button 
-                  onClick={() => setIsAIGeneratorOpen(true)}
-                  className="border-yellow-400 bg-gradient-to-r from-yellow-50 to-white"
-                >
-                  <Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
-                  Gerar Descrição com IA
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleUpgradePlan}
-                  variant="outline"
-                >
-                  <Lock className="h-4 w-4 mr-2" />
-                  Recurso do Plano Premium ou Empresarial
-                </Button>
-              )}
+              <Button 
+                onClick={handleStartDescription}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Iniciar Descrição
+              </Button>
             </div>
           </div>
         </div>
-        
-        <AIContentRecommender 
-          isOpen={isAIGeneratorOpen} 
-          onOpenChange={setIsAIGeneratorOpen} 
-          description={null}
-        />
       </div>
     );
   }

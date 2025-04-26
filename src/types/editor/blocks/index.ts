@@ -11,6 +11,8 @@ import { ImageTextBlock } from './imageText';
 import { TextImageBlock } from './textImage';
 import { FAQBlock } from './faq';
 import { CTABlock } from './cta';
+import { VideoTextBlock } from './videoText';
+import { TextVideoBlock } from './textVideo';
 
 export type Block = 
   | VideoBlock
@@ -24,7 +26,9 @@ export type Block =
   | ImageTextBlock
   | TextImageBlock
   | FAQBlock
-  | CTABlock;
+  | CTABlock
+  | VideoTextBlock
+  | TextVideoBlock;
 
 export * from './hero';
 export * from './text';
@@ -38,3 +42,5 @@ export * from './textImage';
 export * from './faq';
 export * from './cta';
 export * from './video';
+export * from './videoText';
+export * from './textVideo';

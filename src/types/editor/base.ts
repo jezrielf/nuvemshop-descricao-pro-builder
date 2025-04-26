@@ -1,72 +1,88 @@
 
-import { ProductCategory } from './products';
-
-export type BlockType = 
-  | 'hero'
-  | 'text'
-  | 'features'
-  | 'benefits'
-  | 'specifications'
-  | 'image'
-  | 'gallery'
-  | 'imageText'
-  | 'textImage'
-  | 'faq'
-  | 'cta'
-  | 'video';
-
-export type ColumnLayout = 'full' | '1/2' | '1/3' | '2/3' | '1/4' | '3/4' | 1 | 2 | 3 | 4;
-
-export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
-
-export interface BlockStyle {
-  backgroundColor?: string;
-  backgroundImage?: string;
-  textColor?: string;
-  padding?: string;
-  margin?: string;
-  borderRadius?: string;
-  borderWidth?: string;
-  borderColor?: string;
-  borderStyle?: string;
-  boxShadow?: string;
-  fontFamily?: string;
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
-  fontSize?: string;
-  fontWeight?: string;
-  lineHeight?: string;
-  imageFit?: 'cover' | 'contain' | 'fill' | 'none';
-  imagePosition?: string;
-  headingColor?: string; // Added for video block
-  [key: string]: any;
-}
-
 export interface BlockBase {
   id: string;
   type: BlockType;
   title: string;
-  visible: boolean;
   columns: ColumnLayout;
-  style: BlockStyle;
+  visible: boolean;
+  style?: BlockStyle;
 }
 
-export interface Template {
-  id: string;
-  name: string;
-  category: ProductCategory;
-  thumbnail?: string;
-  blocks: any[];
+export interface BlockStyle {
+  backgroundColor?: string;
+  textColor?: string;
+  headingColor?: string;
+  fontFamily?: string;
+  fontSize?: string;
+  fontWeight?: string;
+  fontStyle?: string;
+  textDecoration?: string;
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
+  headingWeight?: string;
+  borderRadius?: string;
+  borderWidth?: string;
+  borderColor?: string;
+  boxShadow?: string;
+  padding?: string;
+  margin?: string;
 }
 
 export interface ProductDescription {
   id: string;
   name: string;
+  blocks: any[];
   createdAt: string;
   updatedAt: string;
-  productName?: string;
-  category?: ProductCategory;
-  blocks: any[];
+  productId?: string;
+  userId?: string;
+  storeId?: string;
+  isPublished?: boolean;
+  seo?: {
+    title?: string;
+    description?: string;
+    keywords?: string[];
+  };
 }
 
-// Export ProductCategory using export type for TypeScript's isolatedModules
-export type { ProductCategory };
+export interface Template {
+  id: string;
+  name: string;
+  description?: string;
+  category: ProductCategory;
+  blocks: any[];
+  thumbnailUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type ProductCategory = 
+  | 'Alimentos'
+  | 'Bebidas' 
+  | 'Beleza' 
+  | 'Casa' 
+  | 'Decoração' 
+  | 'Eletrônicos' 
+  | 'Esporte' 
+  | 'Moda' 
+  | 'Saúde' 
+  | 'Outro';
+
+export type ColumnLayout = 'full' | '2col' | '3col' | '4col';
+
+export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
+
+export type BlockType = 
+  | 'hero' 
+  | 'text' 
+  | 'features' 
+  | 'benefits' 
+  | 'specifications' 
+  | 'image' 
+  | 'gallery' 
+  | 'imageText' 
+  | 'textImage' 
+  | 'faq' 
+  | 'cta' 
+  | 'video'
+  | 'videoText'
+  | 'textVideo';

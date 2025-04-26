@@ -13,6 +13,8 @@ import TextImageBlock from '../TextImageBlock';
 import FAQBlock from '../FAQBlock';
 import CTABlock from '../CTABlock';
 import VideoBlock from '../VideoBlock';
+import VideoTextBlock from '../VideoTextBlock';
+import TextVideoBlock from '../TextVideoBlock';
 import { validateBaseBlock, validateBlockByType } from '@/utils/blockCreators/validation';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 
@@ -74,6 +76,10 @@ export class BlockRendererFactory {
         return <CTABlock block={block} isPreview={isPreview} />;
       case 'video':
         return <VideoBlock block={block} isPreview={isPreview} />;
+      case 'videoText':
+        return <VideoTextBlock block={block} isPreview={isPreview} />;
+      case 'textVideo':
+        return <TextVideoBlock block={block} isPreview={isPreview} />;
       default:
         return (
           <div className="p-4 border rounded-md bg-gray-100">

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -105,15 +104,13 @@ const Index = () => {
   
   // Função para renderizar informações da loja conectada
   const renderStoreInfo = () => {
-    let storeDisplayText = "Loja conectada";
-    
     if (storeName) {
-      storeDisplayText = `Conectado com a ${storeName}`;
+      return `Conectado: ${storeName}`;
     } else if (storeId) {
-      storeDisplayText = `Conectado com a loja ID: ${storeId}`;
+      return `Conectado: ID ${storeId}`;
     }
     
-    return storeDisplayText;
+    return "Loja conectada";
   };
   
   return (

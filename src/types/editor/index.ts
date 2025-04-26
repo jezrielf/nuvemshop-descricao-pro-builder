@@ -27,4 +27,6 @@ export type Block =
   | import('./blocks').TextImageBlock
   | import('./blocks').FAQBlock
   | import('./blocks').CTABlock
-  | import('./blocks').VideoBlock;
+  | import('./blocks').VideoBlock
+  | import('./blocks').VideoTextBlock
+  | import('./blocks').TextVideoBlock;

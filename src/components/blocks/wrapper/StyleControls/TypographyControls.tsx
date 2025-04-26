@@ -11,7 +11,43 @@ interface TypographyControlsProps {
   updateStyle: (updates: Partial<BlockStyle>) => void;
 }
 
+// List of popular Google fonts
+const googleFonts = [
+  { name: 'Sans-serif (padrão)', value: 'sans' },
+  { name: 'Serif', value: 'serif' },
+  { name: 'Monospace', value: 'mono' },
+  { name: 'Roboto', value: 'Roboto' },
+  { name: 'Open Sans', value: 'Open Sans' },
+  { name: 'Lato', value: 'Lato' },
+  { name: 'Montserrat', value: 'Montserrat' },
+  { name: 'Raleway', value: 'Raleway' },
+  { name: 'Poppins', value: 'Poppins' },
+  { name: 'Oswald', value: 'Oswald' },
+  { name: 'Source Sans Pro', value: 'Source Sans Pro' },
+  { name: 'Playfair Display', value: 'Playfair Display' },
+  { name: 'Ubuntu', value: 'Ubuntu' },
+  { name: 'Merriweather', value: 'Merriweather' },
+];
+
 const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateStyle }) => {
+  // Add font to document head if it's a Google Font
+  React.useEffect(() => {
+    if (block.style?.fontFamily && block.style.fontFamily !== 'sans' && 
+        block.style.fontFamily !== 'serif' && block.style.fontFamily !== 'mono') {
+      
+      const fontName = block.style.fontFamily;
+      const fontLink = document.createElement('link');
+      fontLink.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(' ', '+')}:wght@400;700&display=swap`;
+      fontLink.rel = 'stylesheet';
+      
+      // Check if this font is already loaded
+      const existingLink = document.querySelector(`link[href="${fontLink.href}"]`);
+      if (!existingLink) {
+        document.head.appendChild(fontLink);
+      }
+    }
+  }, [block.style?.fontFamily]);
+
   const handleFontFamilyChange = (value: string) => {
     console.log('Changing font family to:', value);
     updateStyle({ fontFamily: value });
@@ -63,9 +99,16 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
               <SelectValue placeholder="Família da fonte" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="sans">Sans-serif</SelectItem>
-              <SelectItem value="serif">Serif</SelectItem>
-              <SelectItem value="mono">Monospace</SelectItem>
+              {googleFonts.map((font) => (
+                <SelectItem 
+                  key={font.value} 
+                  value={font.value}
+                  style={font.value !== 'sans' && font.value !== 'serif' && font.value !== 'mono' ? 
+                    { fontFamily: font.value } : undefined}
+                >
+                  {font.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
