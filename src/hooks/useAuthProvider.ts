@@ -18,12 +18,25 @@ export const convertToProfile = (userData: any): Profile => {
       nome: userData.nome,
       criado_em: userData.criado_em,
       atualizado_em: userData.atualizado_em,
-      avatar_url: userData.avatar_url
+      avatar_url: userData.avatar_url,
+      // Add User properties if they exist
+      app_metadata: userData.app_metadata,
+      user_metadata: userData.user_metadata,
+      aud: userData.aud,
+      created_at: userData.created_at
     };
   }
   
   // Handle the standard format
-  return userData as Profile;
+  const profile: Profile = {
+    ...userData,
+    // Ensure name is always set
+    name: userData.name || userData.nome || '',
+    // Ensure avatarUrl is set if avatar_url exists
+    avatarUrl: userData.avatarUrl || userData.avatar_url || null,
+  };
+  
+  return profile;
 };
 
 export const useAuthProvider = () => {

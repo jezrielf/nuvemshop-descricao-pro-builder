@@ -38,3 +38,13 @@ export const hasRole = (role: string | string[], requiredRole: string): boolean 
   }
   return role === requiredRole;
 };
+
+/**
+ * Returns roles as an array for consistent handling
+ */
+export const getRoles = (role: string | string[]): string[] => {
+  if (Array.isArray(role)) {
+    return role;
+  }
+  return [role];
+};

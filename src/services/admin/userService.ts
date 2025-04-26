@@ -1,3 +1,4 @@
+
 import { Profile } from '@/types/auth';
 import { convertToProfile } from '@/hooks/useAuthProvider';
 
