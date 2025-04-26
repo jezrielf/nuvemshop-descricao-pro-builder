@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, List, ListOrdered, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
+import TextAlign from '@tiptap/extension-text-align';
 
 interface RichTextEditorProps {
   value: string;
@@ -17,6 +18,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange 
       StarterKit,
       Placeholder.configure({
         placeholder: 'Digite seu conteúdo aqui...',
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right'],
       }),
     ],
     content: value,

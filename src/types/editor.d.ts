@@ -17,7 +17,7 @@ export interface BlockStyle {
   fontSize?: string;
   fontWeight?: string;
   textAlign?: 'left' | 'center' | 'right' | 'justify';
-  imageFit?: 'cover' | 'contain';
+  imageFit?: 'cover' | 'contain' | 'fill' | 'none';
 }
 
 // Add this to ensure name is allowed in Block updates
