@@ -19,26 +19,24 @@ const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/editor" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/description-analysis" element={<DescriptionAnalysis />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/admin-auth" element={<AdminAuth />} />
-              <Route path="/admin-templates" element={<AdminTemplates />} />
-              <Route path="/plans" element={<Plans />} />
-              <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-              <Route path="/success" element={<Success />} />
-            </Routes>
-          </Router>
-        </AuthProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/editor" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/description-analysis" element={<DescriptionAnalysis />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin-auth" element={<AdminAuth />} />
+            <Route path="/admin-templates" element={<AdminTemplates />} />
+            <Route path="/plans" element={<Plans />} />
+            <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+            <Route path="/success" element={<Success />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 

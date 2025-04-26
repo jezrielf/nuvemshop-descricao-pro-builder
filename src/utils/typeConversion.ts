@@ -1,45 +1,26 @@
 
-import { Block, BlockType } from '@/types/editor';
-import { createBlock } from '@/utils/blockCreators/createBlock';
+import { Profile } from '@/types/auth';
 
-export function ensureBlockType(block: any): Block {
-  if (!block || typeof block !== 'object') {
-    console.warn('Invalid block provided:', block);
-    return createBlock('text');
-  }
-  
-  if (!block.type || !block.id) {
-    console.warn('Block missing required properties:', block);
-    return createBlock('text');
-  }
-  
-  // Ensure the block has all required base properties
-  const blockWithDefaults = {
-    visible: true,
-    columns: 'full',
-    title: block.title || getDefaultTitle(block.type as BlockType),
-    style: block.style || {},
-    ...block
-  };
-  
-  return blockWithDefaults as Block;
-}
+/**
+ * Converts a Profile's role field to a string array for consistent handling
+ */
+export const getRoleAsString = (role: string | string[] | null): string[] => {
+  if (!role) return [];
+  if (Array.isArray(role)) return role;
+  return role.split(',').map(r => r.trim());
+};
 
-function getDefaultTitle(type: BlockType): string {
-  const titles: Record<BlockType, string> = {
-    hero: 'Banner Principal',
-    text: 'Texto',
-    features: 'Recursos',
-    benefits: 'Benefícios',
-    specifications: 'Especificações',
-    image: 'Imagem',
-    gallery: 'Galeria',
-    imageText: 'Imagem e Texto',
-    textImage: 'Texto e Imagem',
-    faq: 'Perguntas Frequentes',
-    cta: 'Chamada para Ação',
-    video: 'Vídeo'
+/**
+ * Converts database data to a Profile object
+ */
+export const convertToProfile = (data: any): Profile => {
+  return {
+    id: data.id || '',
+    nome: data.nome || null,
+    avatar_url: data.avatar_url || null,
+    criado_em: data.criado_em || new Date().toISOString(),
+    atualizado_em: data.atualizado_em || new Date().toISOString(),
+    role: data.role || null,
+    email: data.email || null
   };
-  
-  return titles[type] || 'Bloco';
-}
+};
