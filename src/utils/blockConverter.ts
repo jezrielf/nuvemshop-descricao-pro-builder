@@ -1,100 +1,85 @@
 
-import { BlockBase, Block } from '@/types/editor';
-import { v4 as uuidv4 } from 'uuid';
+import { Block, BlockType, ColumnLayout, BlockStyle } from "@/types/editor";
 
-// Helper to check if a block has a specific property
-const hasProperty = <T extends BlockBase, K extends keyof any>(
-  block: T,
-  property: K
-): block is T & Record<K, unknown> => {
-  return property in block;
-};
-
-// Convert between different block structures or formats
+// Helper function to convert potentially invalid blocks to valid ones
 export const convertBlock = (block: any): Block => {
-  // If the block already has an id and type, it might be valid
-  if (!block.id) {
-    block.id = uuidv4();
+  // If it's already a valid block, return as-is
+  if (isValidBlock(block)) {
+    return block;
   }
-  
-  if (!block.type) {
-    block.type = 'text'; // Default to text block
-  }
-  
-  // Ensure block has required base properties
-  const baseBlock: BlockBase = {
-    id: block.id,
-    type: block.type,
-    title: block.title || 'Block',
-    columns: block.columns || 'full',
+
+  // Create a new valid block with the same data
+  const validBlock: Block = {
+    id: block.id || generateId(),
+    type: sanitizeBlockType(block.type),
+    title: block.title || '',
+    columns: block.columns || 'single',
     visible: block.visible !== undefined ? block.visible : true,
-    style: block.style || {}
+    style: block.style || undefined
   };
-  
-  switch (block.type) {
+
+  // Add other fields based on block type
+  switch (validBlock.type) {
     case 'hero':
       return {
-        ...baseBlock,
-        heading: block.heading || 'Hero Title',
-        subheading: block.subheading || 'Subheading Text',
-        backgroundImage: block.backgroundImage || '',
+        ...validBlock,
+        heading: block.heading || '',
+        subheading: block.subheading || '',
         buttonText: block.buttonText || '',
         buttonUrl: block.buttonUrl || '',
-        ...(hasProperty(block, 'image') && {
-          image: {
-            src: block.image?.src || '',
-            alt: block.image?.alt || ''
-          }
-        })
+        backgroundImage: block.backgroundImage || null,
+        // Add safe image property
+        image: {
+          src: block.image?.src || '',
+          alt: block.image?.alt || ''
+        }
       };
-      
-    case 'text':
-      return {
-        ...baseBlock,
-        content: block.content || ''
-      };
-      
-    case 'video':
-      return {
-        ...baseBlock,
-        videoUrl: block.videoUrl || '',
-        aspectRatio: block.aspectRatio || '16:9',
-        autoplay: block.autoplay || false,
-        muteAudio: block.muteAudio || false,
-        description: block.description || '',
-        caption: block.caption || '',
-        heading: block.heading || ''
-      };
-      
-    case 'videoText':
-      return {
-        ...baseBlock,
-        videoUrl: block.videoUrl || '',
-        aspectRatio: block.aspectRatio || '16:9',
-        autoplay: block.autoplay || false,
-        muteAudio: block.muteAudio || false,
-        heading: block.heading || '',
-        content: block.content || ''
-      };
-      
-    case 'textVideo':
-      return {
-        ...baseBlock,
-        videoUrl: block.videoUrl || '',
-        aspectRatio: block.aspectRatio || '16:9',
-        autoplay: block.autoplay || false,
-        muteAudio: block.muteAudio || false,
-        heading: block.heading || '',
-        content: block.content || ''
-      };
-      
-    // Add other block type conversions here
+    // Handle other block types...
     default:
-      return block as Block;
+      return validBlock;
   }
 };
 
-// Convert multiple blocks at once
-export const convertBlocks = (blocks: any[]): Block[] => {
-  return blocks.map(block => convertBlock(block));
+// Helper to generate a random ID
+const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 15);
+};
+
+// Check if a block is valid
+const isValidBlock = (block: any): boolean => {
+  return (
+    block &&
+    typeof block === 'object' &&
+    typeof block.id === 'string' &&
+    typeof block.type === 'string'
+  );
+};
+
+// Ensure the block type is valid
+const sanitizeBlockType = (type: string): BlockType => {
+  const validTypes: BlockType[] = [
+    'heading',
+    'paragraph',
+    'image',
+    'list',
+    'hero',
+    'feature',
+    'gallery',
+    'table',
+    'video',
+    'cta',
+    'faq',
+    'testimonial',
+    'pricing',
+    'stat',
+    'section',
+    'custom'
+  ];
+  
+  if (validTypes.includes(type as BlockType)) {
+    return type as BlockType;
+  }
+  
+  // Default to paragraph if type is invalid
+  return 'paragraph';
 };

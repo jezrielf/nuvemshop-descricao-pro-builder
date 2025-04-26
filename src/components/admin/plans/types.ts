@@ -14,8 +14,8 @@ export interface Plan {
   isActive: boolean;
   isDefault: boolean;
   priceId?: string;
-  interval?: string;
-  currency?: string;
+  interval: string;  // Changed from optional to required
+  currency: string;  // Changed from optional to required
 }
 
 export const defaultFeaturesTemplate = [

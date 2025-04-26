@@ -1,10 +1,15 @@
 
 import React from 'react';
 import { Profile } from '@/types/auth';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import UserTable from '../UserTable';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/components/ui/alert';
 
 interface UserPanelContentProps {
   loading: boolean;
@@ -21,46 +26,31 @@ const UserPanelContent: React.FC<UserPanelContentProps> = ({
 }) => {
   if (error) {
     return (
-      <Alert variant="destructive" className="mb-4">
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
         <AlertTitle>Erro ao carregar usuários</AlertTitle>
         <AlertDescription>
-          <p>{error}</p>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={onRefresh}
-            className="mt-2"
-          >
-            Tentar novamente
-          </Button>
+          {error}
+          <div className="mt-4">
+            <Button variant="outline" size="sm" onClick={onRefresh}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Tentar novamente
+            </Button>
+          </div>
         </AlertDescription>
       </Alert>
     );
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      {loading ? (
-        <div className="p-6 space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <UserTable 
-          profiles={profiles} 
-          loading={loading}
-          error={error}
-          onRefresh={onRefresh}
-        />
-      )}
-    </div>
+    <Card className="p-6">
+      <UserTable
+        profiles={profiles}
+        loading={loading}
+        error={error}
+        onRefresh={onRefresh}
+      />
+    </Card>
   );
 };
 

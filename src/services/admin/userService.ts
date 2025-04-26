@@ -1,6 +1,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// Define valid roles for typing
+type UserRole = 'user' | 'premium' | 'admin';
+
 // Get all users
 const getUsers = async () => {
   try {
@@ -53,8 +56,8 @@ const createUser = async (email: string, password: string, userData: any) => {
     
     // Update the user role if specified
     if (userData.role && userData.role !== 'user') {
-      // Get the user's role enum value
-      const role = userData.role;
+      // Make sure role is a valid role type
+      const role = validateRole(userData.role);
       
       const { error: roleError } = await supabase
         .from('user_roles')
@@ -94,6 +97,14 @@ const updateUserProfile = async (userId: string, profileData: any) => {
   }
 };
 
+// Helper to validate role string to enum type
+const validateRole = (role: string): UserRole => {
+  if (role === 'user' || role === 'premium' || role === 'admin') {
+    return role as UserRole;
+  }
+  return 'user'; // Default to user if invalid role
+};
+
 // Update user role
 const updateUserRole = async (userId: string, role: string | string[]) => {
   try {
@@ -107,16 +118,17 @@ const updateUserRole = async (userId: string, role: string | string[]) => {
     
     // Add new roles
     const roles = Array.isArray(role) ? role : [role];
-    const roleData = roles.map(r => ({
-      user_id: userId,
-      role: r
-    }));
     
     // Insert role data one by one to avoid array insertion issues
-    for (const rd of roleData) {
+    for (const r of roles) {
+      const validRole = validateRole(r);
+      
       const { error } = await supabase
         .from('user_roles')
-        .insert(rd);
+        .insert({
+          user_id: userId,
+          role: validRole
+        });
         
       if (error) throw error;
     }

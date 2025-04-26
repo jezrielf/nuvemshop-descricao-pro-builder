@@ -7,6 +7,8 @@ import templateService from '@/services/admin/templateService';
 export const createCRUDSlice: StateCreator<
   TemplateState & TemplateCRUDSlice
 > = (set, get) => ({
+  templates: [],
+  
   addTemplate: (template: Template) => {
     set(state => ({
       templates: [...state.templates, template]

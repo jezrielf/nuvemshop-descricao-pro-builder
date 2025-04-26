@@ -7,6 +7,7 @@ import templateService from '@/services/admin/templateService';
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice
 > = (set, get) => ({
+  templates: [],
   isLoading: false,
   error: null,
   

@@ -51,6 +51,8 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
           isActive: initialData.isActive,
           isDefault: initialData.isDefault,
           features: initialData.features,
+          interval: initialData.interval || 'month',  // Ensure interval is set
+          currency: initialData.currency || 'BRL',    // Ensure currency is set
         });
       } else {
         // Reset form when opening for creating a new plan
@@ -61,6 +63,8 @@ const PlanFormDialog: React.FC<PlanFormDialogProps> = ({
           isActive: true,
           isDefault: false,
           features: [],
+          interval: 'month',  // Set default interval
+          currency: 'BRL',    // Set default currency
         });
       }
     }
