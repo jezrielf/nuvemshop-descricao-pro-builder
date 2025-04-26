@@ -3,13 +3,12 @@ import { StateCreator } from 'zustand';
 import { TemplateState } from './state';
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
-import { useEditorStore } from '@/store/editor';
 import templateService from '@/services/admin/templateService';
 
 export interface TemplateCRUDSlice {
-  createTemplate: (template: Omit<Template, 'id'>) => void;
-  updateTemplate: (id: string, template: Partial<Template>) => void;
-  deleteTemplate: (id: string) => void;
+  createTemplate: (template: Omit<Template, 'id'>) => Promise<Template>;
+  updateTemplate: (id: string, template: Partial<Template>) => Promise<Template | null>;
+  deleteTemplate: (id: string) => Promise<boolean>;
   applyTemplate: (template: Template) => void;
 }
 
@@ -96,9 +95,14 @@ export const createTemplateCRUDSlice: StateCreator<
   },
   
   applyTemplate: (template) => {
-    // Apply the template to the current editor state
-    // This is where we would load the template blocks into the editor
+    // Import dynamically to avoid circular dependency
+    const { useEditorStore } = require('@/store/editor');
     const { loadDescription } = useEditorStore.getState();
+    
+    if (!loadDescription) {
+      console.error("Failed to apply template: Editor store not available");
+      return;
+    }
     
     const templateDescription = {
       id: uuidv4(),

@@ -1,425 +1,382 @@
-
-import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogTrigger, DialogDescription 
-} from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Search, Image, Upload, ArrowRight } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Image, Upload, Download, RefreshCw, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { ProductDescription, Block } from '@/types/editor';
-import ImageUpload from '@/components/ImageUpload';
-
-interface ImageOptimizationResult {
-  status: 'low' | 'medium' | 'high' | 'unknown';
-  message: string;
-  suggestions?: string[];
-}
-
-type ImageIssue = { 
-  status: string;
-  label: string;
-  color: string;
-} | "Desconhecido";
-
-interface ImageInfo {
-  blockId: string;
-  blockType: string;
-  imageUrl: string | undefined;
-  imageType: string;
-  issues: ImageIssue[];
-  alt?: string;
-}
 
 interface ImageOptimizerProps {
   description: ProductDescription | null;
-  onUpdateImage: (blockId: string, imageType: string, newImageUrl: string) => void;
+  onUpdateImage?: (blockId: string, imageType: string, newImageData: string) => void;
 }
 
-const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateImage }) => {
+const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ 
+  description,
+  onUpdateImage 
+}) => {
   const [open, setOpen] = useState(false);
-  const [images, setImages] = useState<ImageInfo[]>([]);
-  const [selectedImage, setSelectedImage] = useState<ImageInfo | null>(null);
+  const [selectedTab, setSelectedTab] = useState('optimize');
+  const [selectedImage, setSelectedImage] = useState<{
+    blockId: string;
+    type: string; // 'src', 'image', or item index in gallery
+    url: string;
+    originalSize: number;
+    optimizedSize?: number;
+    optimizedUrl?: string;
+    isOptimizing: boolean;
+    alt?: string;
+    title?: string;
+  } | null>(null);
+  const [quality, setQuality] = useState(80);
+  const { toast } = useToast();
   
-  useEffect(() => {
-    if (description && open) {
-      scanDescriptionImages(description);
-    }
-  }, [description, open]);
-  
-  const scanDescriptionImages = (description: ProductDescription) => {
-    const imagesList: ImageInfo[] = [];
+  // Extract all images from description
+  const extractImages = (): {blockId: string; type: string; url: string; alt: string; title: string}[] => {
+    if (!description) return [];
     
-    description.blocks.forEach((block: Block) => {
-      // Check for hero block with background image
-      if (block.type === 'hero' && 'backgroundImage' in block && block.backgroundImage) {
-        imagesList.push({
-          blockId: block.id,
-          blockType: 'Hero',
-          imageUrl: block.backgroundImage,
-          imageType: 'backgroundImage',
-          issues: analyzeImage(block.backgroundImage),
-          alt: block.title || 'Hero Image'
-        });
-      }
-      
-      // Check for image block
-      if (block.type === 'image' && 'src' in block && block.src) {
-        imagesList.push({
-          blockId: block.id,
-          blockType: 'Image',
-          imageUrl: block.src,
-          imageType: 'src',
-          issues: analyzeImage(block.src),
-          alt: ('alt' in block ? block.alt : block.title) || ''
-        });
-      }
-      
-      // Check for imageText and textImage blocks
-      if ((block.type === 'imageText' || block.type === 'textImage') && 'imageSrc' in block && block.imageSrc) {
-        imagesList.push({
-          blockId: block.id,
-          blockType: block.type === 'imageText' ? 'Image + Text' : 'Text + Image',
-          imageUrl: block.imageSrc,
-          imageType: 'imageSrc',
-          issues: analyzeImage(block.imageSrc),
-          alt: ('alt' in block ? block.alt : block.title) || ''
-        });
-      }
-      
-      // Check for gallery block
-      if (block.type === 'gallery' && 'images' in block && block.images && block.images.length > 0) {
-        block.images.forEach((image, index) => {
-          if (image.src) {
-            imagesList.push({
+    const images: {blockId: string; type: string; url: string; alt: string; title: string}[] = [];
+    
+    description.blocks.forEach(block => {
+      switch (block.type) {
+        case 'image':
+          if (block.src) {
+            images.push({
               blockId: block.id,
-              blockType: 'Gallery',
-              imageUrl: image.src,
-              imageType: index.toString(), // Use index as the image identifier
-              issues: analyzeImage(image.src),
-              alt: image.alt || `Gallery Image ${index + 1}`
+              type: 'src',
+              url: block.src,
+              alt: block.alt || '',
+              title: block.title
             });
           }
-        });
+          break;
+          
+        case 'hero':
+          if (block.image?.src) {
+            images.push({
+              blockId: block.id,
+              type: 'image',
+              url: block.image.src,
+              alt: block.image.alt || '',
+              title: block.title
+            });
+          }
+          break;
+          
+        case 'imageText':
+        case 'textImage':
+          if (block.image?.src) {
+            images.push({
+              blockId: block.id,
+              type: 'image',
+              url: block.image.src,
+              alt: block.image.alt || '',
+              title: block.title
+            });
+          }
+          break;
+          
+        case 'gallery':
+          if (block.images) {
+            block.images.forEach((img, index) => {
+              if (img.src) {
+                images.push({
+                  blockId: block.id,
+                  type: `gallery-${index}`,
+                  url: img.src,
+                  alt: img.alt || '',
+                  title: `${block.title} - Imagem ${index + 1}`
+                });
+              }
+            });
+          }
+          break;
       }
     });
     
-    setImages(imagesList);
+    return images;
   };
   
-  const analyzeImage = (imageUrl: string): ImageIssue[] => {
-    const issues: ImageIssue[] = [];
+  // Simulate image optimization
+  const optimizeImage = async (imageUrl: string) => {
+    if (!selectedImage) return;
     
-    // Check if it's a placeholder
-    if (imageUrl.includes('placeholder') || imageUrl.includes('dummy')) {
-      issues.push({
-        status: 'error',
-        label: 'Placeholder detectado',
-        color: 'destructive'
-      });
-    }
-    
-    // Check file format (assuming we can extract it from URL)
-    const extension = imageUrl.split('.').pop()?.toLowerCase();
-    if (extension === 'jpg' || extension === 'jpeg') {
-      issues.push({
-        status: 'warning',
-        label: 'Formato JPG',
-        color: 'warning'
-      });
-    } else if (extension === 'png') {
-      issues.push({
-        status: 'warning',
-        label: 'Formato PNG',
-        color: 'warning'
-      });
-    } else if (extension === 'webp') {
-      issues.push({
-        status: 'success',
-        label: 'Formato WebP',
-        color: 'success'
-      });
-    } else {
-      issues.push({
-        status: 'info',
-        label: 'Formato desconhecido',
-        color: 'muted'
-      });
-    }
-    
-    return issues;
-  };
-  
-  const handleImageUpdated = (imageUrl: string) => {
-    if (selectedImage) {
-      onUpdateImage(selectedImage.blockId, selectedImage.imageType, imageUrl);
-      
-      // Update our local state with the new image
-      setImages(prevImages => 
-        prevImages.map(img => 
-          img.blockId === selectedImage.blockId && img.imageType === selectedImage.imageType
-            ? { ...img, imageUrl, issues: analyzeImage(imageUrl) }
-            : img
-        )
-      );
-      
-      setSelectedImage(null);
-    }
-  };
-  
-  const getIssueStatusCounts = () => {
-    const counts = {
-      error: 0,
-      warning: 0,
-      success: 0,
-      info: 0,
-      total: images.length
-    };
-    
-    images.forEach(image => {
-      image.issues.forEach(issue => {
-        if (typeof issue !== 'string' && issue.status in counts) {
-          counts[issue.status as keyof typeof counts]++;
-        }
-      });
+    setSelectedImage({
+      ...selectedImage,
+      isOptimizing: true
     });
     
-    return counts;
+    // Simulate optimization process
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    try {
+      // In a real implementation, this would call an API to optimize the image
+      // For now, we're simulating the result
+      
+      // Calculate simulated new file size (between 40-70% of original)
+      const reductionFactor = 0.3 + ((100 - quality) / 100);
+      const newSize = Math.round(selectedImage.originalSize * (1 - reductionFactor));
+      
+      setSelectedImage({
+        ...selectedImage,
+        optimizedSize: newSize,
+        optimizedUrl: imageUrl, // In real implementation, this would be the new URL
+        isOptimizing: false
+      });
+      
+      toast({
+        title: "Imagem otimizada com sucesso",
+        description: `Tamanho reduzido de ${formatFileSize(selectedImage.originalSize)} para ${formatFileSize(newSize)}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao otimizar imagem",
+        description: "Ocorreu um erro durante o processo de otimização.",
+        variant: "destructive"
+      });
+      
+      setSelectedImage({
+        ...selectedImage,
+        isOptimizing: false
+      });
+    }
   };
   
-  const statusCounts = getIssueStatusCounts();
+  // Format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+  
+  // Get file size from URL
+  const getImageFileSize = async (url: string): Promise<number> => {
+    // For demo purposes, generate a random file size
+    // In real implementation, you would fetch the actual file size
+    return Math.floor(Math.random() * 3000000) + 500000; // Random between 500KB and 3.5MB
+  };
+  
+  // Select image to optimize
+  const handleSelectImage = async (blockId: string, type: string, url: string, alt: string, title: string) => {
+    const originalSize = await getImageFileSize(url);
+    
+    setSelectedImage({
+      blockId,
+      type,
+      url,
+      originalSize,
+      isOptimizing: false,
+      alt,
+      title
+    });
+    
+    setSelectedTab('optimize');
+  };
+  
+  // Apply optimized image
+  const handleApplyOptimized = () => {
+    if (!selectedImage || !selectedImage.optimizedUrl || !onUpdateImage) return;
+    
+    onUpdateImage(
+      selectedImage.blockId,
+      selectedImage.type,
+      selectedImage.optimizedUrl
+    );
+    
+    toast({
+      title: "Imagem atualizada",
+      description: "A imagem otimizada foi aplicada com sucesso.",
+    });
+    
+    // Reset selection
+    setSelectedImage(null);
+  };
+  
+  const images = extractImages();
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <span className="w-full">Otimização de Imagens</span>
+        <Button variant="outline" size="sm" className="flex items-center">
+          <Image className="h-4 w-4 mr-1" />
+          Otimizar Imagens
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden">
+      
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Otimização de Imagens</DialogTitle>
+          <DialogTitle>Otimizador de Imagens</DialogTitle>
           <DialogDescription>
-            Analise e otimize as imagens do seu produto para melhorar o SEO e o tempo de carregamento.
+            Otimize as imagens da sua descrição para melhorar a velocidade de carregamento e SEO.
           </DialogDescription>
         </DialogHeader>
         
-        {selectedImage ? (
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Atualizar Imagem</h3>
-              <Button variant="outline" onClick={() => setSelectedImage(null)}>
-                Voltar para lista
-              </Button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(70vh-2rem)]">
+          <div className="md:col-span-1 border rounded-md overflow-hidden flex flex-col">
+            <div className="p-3 bg-gray-50 border-b font-medium">
+              Imagens na Descrição
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Imagem Atual:</p>
-                <div className="border rounded-md p-2">
-                  <img 
-                    src={selectedImage.imageUrl} 
-                    alt={selectedImage.alt || "Imagem do produto"} 
-                    className="max-h-[200px] mx-auto object-contain"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {selectedImage.issues.map((issue, i) => (
-                    <Badge key={i} variant={typeof issue !== 'string' ? issue.color as any : 'default'}>
-                      {typeof issue !== 'string' ? issue.label : issue}
-                    </Badge>
-                  ))}
-                </div>
+            <ScrollArea className="flex-grow">
+              <div className="p-3 space-y-3">
+                {images.length === 0 ? (
+                  <div className="text-center py-10 text-gray-500">
+                    <Image className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                    <p>Nenhuma imagem encontrada na descrição atual</p>
+                  </div>
+                ) : (
+                  images.map((img, index) => (
+                    <div 
+                      key={`${img.blockId}-${img.type}`}
+                      className={`border rounded-md overflow-hidden cursor-pointer transition-shadow hover:shadow-md ${
+                        selectedImage && selectedImage.blockId === img.blockId && selectedImage.type === img.type 
+                          ? 'ring-2 ring-primary' 
+                          : ''
+                      }`}
+                      onClick={() => handleSelectImage(img.blockId, img.type, img.url, img.alt, img.title)}
+                    >
+                      <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                        <img 
+                          src={img.url} 
+                          alt={img.alt}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="p-2">
+                        <p className="text-xs font-medium truncate">{img.title}</p>
+                        <p className="text-xs text-gray-500 truncate">{img.alt || 'Sem texto alternativo'}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-              
-              <div>
-                <p className="text-sm font-medium mb-2">Enviar Nova Imagem:</p>
-                <ImageUpload onImageUploaded={handleImageUpdated} />
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Recomendações para otimização:</h4>
-              <ul className="text-sm space-y-1 list-disc pl-5">
-                <li>Use o formato WebP para melhor compressão e qualidade</li>
-                <li>Mantenha o tamanho do arquivo abaixo de 200KB</li>
-                <li>Dimensione suas imagens adequadamente (800-1200px de largura para imagens maiores)</li>
-                <li>Sempre inclua texto alternativo descritivo</li>
-                <li>Evite imagens com texto - use HTML para texto sobre as imagens</li>
-              </ul>
-            </div>
+            </ScrollArea>
           </div>
-        ) : (
-          <Tabs defaultValue="all">
-            <TabsList>
-              <TabsTrigger value="all">Todas ({statusCounts.total})</TabsTrigger>
-              <TabsTrigger value="issues">Problemas ({statusCounts.error + statusCounts.warning})</TabsTrigger>
-              <TabsTrigger value="optimized">Otimizadas ({statusCounts.success})</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all" className="h-[500px]">
-              <ScrollArea className="h-full pr-4">
-                {images.length > 0 ? (
-                  <div className="space-y-3">
-                    {images.map((image, index) => (
-                      <Card key={`${image.blockId}-${index}`}>
-                        <div className="flex">
-                          <div className="w-24 h-24 p-2 flex items-center justify-center">
-                            {image.imageUrl ? (
-                              <img 
-                                src={image.imageUrl} 
-                                alt={image.alt || "Image"} 
-                                className="max-h-full max-w-full object-contain"
-                              />
-                            ) : (
-                              <Image className="w-12 h-12 text-gray-300" />
-                            )}
-                          </div>
-                          <div className="flex-1 p-4">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-medium">{image.blockType}</h3>
-                                <p className="text-sm text-gray-500">
-                                  {image.alt || "Sem texto alternativo"}
-                                </p>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {image.issues.map((issue, i) => (
-                                    <Badge key={i} variant={(typeof issue !== 'string' && issue.color) as any || 'default'} className="text-xs">
-                                      {typeof issue !== 'string' ? issue.label : issue}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              </div>
-                              <Button size="sm" onClick={() => setSelectedImage(image)}>
-                                Otimizar
-                              </Button>
-                            </div>
-                          </div>
+          
+          <div className="md:col-span-2 flex flex-col">
+            {!selectedImage ? (
+              <div className="flex-grow flex flex-col items-center justify-center p-10 text-center text-gray-500 border rounded-md">
+                <Image className="h-16 w-16 mb-4 opacity-20" />
+                <p className="mb-2">Selecione uma imagem para otimizar</p>
+                <p className="text-sm">A otimização de imagens melhora o tempo de carregamento da página e a experiência do usuário.</p>
+              </div>
+            ) : (
+              <div className="flex-grow flex flex-col border rounded-md overflow-hidden">
+                <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-grow flex flex-col">
+                  <div className="border-b">
+                    <TabsList className="p-0 h-auto w-full rounded-none border-b bg-gray-50">
+                      <TabsTrigger 
+                        value="preview" 
+                        className="flex-1 rounded-none data-[state=active]:bg-background"
+                      >
+                        Pré-visualização
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="optimize" 
+                        className="flex-1 rounded-none data-[state=active]:bg-background"
+                      >
+                        Otimizar
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+                  
+                  <TabsContent value="preview" className="flex-grow flex flex-col mt-0">
+                    <div className="p-4 bg-gray-50 border-b">
+                      <h3 className="font-medium">Detalhes da Imagem</h3>
+                    </div>
+                    <div className="p-4 flex-grow overflow-auto">
+                      <div className="mb-4 border rounded-md overflow-hidden">
+                        <img 
+                          src={selectedImage.url} 
+                          alt="Preview" 
+                          className="w-full object-contain"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-sm font-medium">Tamanho Original</Label>
+                          <p className="text-sm">{formatFileSize(selectedImage.originalSize)}</p>
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
-                    <Search className="h-10 w-10 mb-4 opacity-20" />
-                    <h3 className="text-lg font-medium">Nenhuma imagem encontrada</h3>
-                    <p className="max-w-md">Sua descrição de produto não contém imagens. Adicione imagens para melhorar o engajamento e a visibilidade do produto.</p>
-                  </div>
-                )}
-              </ScrollArea>
-            </TabsContent>
-
-            <TabsContent value="issues" className="h-[500px]">
-              <ScrollArea className="h-full pr-4">
-                {images.filter(img => img.issues.some(issue => typeof issue !== 'string' && (issue.status === 'error' || issue.status === 'warning'))).length > 0 ? (
-                  <div className="space-y-3">
-                    {images
-                      .filter(img => img.issues.some(issue => typeof issue !== 'string' && (issue.status === 'error' || issue.status === 'warning')))
-                      .map((image, index) => (
-                        <Card key={`issues-${image.blockId}-${index}`}>
-                          <div className="flex">
-                            <div className="w-24 h-24 p-2 flex items-center justify-center">
-                              {image.imageUrl ? (
-                                <img 
-                                  src={image.imageUrl} 
-                                  alt={image.alt || "Image"} 
-                                  className="max-h-full max-w-full object-contain"
-                                />
-                              ) : (
-                                <Image className="w-12 h-12 text-gray-300" />
-                              )}
-                            </div>
-                            <div className="flex-1 p-4">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h3 className="font-medium">{image.blockType}</h3>
-                                  <p className="text-sm text-gray-500">
-                                    {image.alt || "Sem texto alternativo"}
-                                  </p>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {image.issues.map((issue, i) => (
-                                      <Badge key={i} variant={(typeof issue !== 'string' && issue.color) as any || 'default'} className="text-xs">
-                                        {typeof issue !== 'string' ? issue.label : issue}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                                <Button size="sm" onClick={() => setSelectedImage(image)}>
-                                  Otimizar
-                                </Button>
-                              </div>
-                            </div>
+                        {selectedImage.optimizedSize && (
+                          <div>
+                            <Label className="text-sm font-medium">Tamanho Otimizado</Label>
+                            <p className="text-sm">{formatFileSize(selectedImage.optimizedSize)} <span className="text-green-600">({Math.round((1 - selectedImage.optimizedSize / selectedImage.originalSize) * 100)}% menor)</span></p>
                           </div>
-                        </Card>
-                      ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
-                    <Search className="h-10 w-10 mb-4 opacity-20" />
-                    <h3 className="text-lg font-medium">Nenhum problema encontrado</h3>
-                    <p className="max-w-md">Não foram encontrados problemas nas imagens da sua descrição de produto.</p>
-                  </div>
-                )}
-              </ScrollArea>
-            </TabsContent>
-            
-            <TabsContent value="optimized" className="h-[500px]">
-              <ScrollArea className="h-full pr-4">
-                {images.filter(img => img.issues.some(issue => typeof issue !== 'string' && issue.status === 'success')).length > 0 ? (
-                  <div className="space-y-3">
-                    {images
-                      .filter(img => img.issues.some(issue => typeof issue !== 'string' && issue.status === 'success'))
-                      .map((image, index) => (
-                        <Card key={`optimized-${image.blockId}-${index}`}>
-                          <div className="flex">
-                            <div className="w-24 h-24 p-2 flex items-center justify-center">
-                              {image.imageUrl ? (
-                                <img 
-                                  src={image.imageUrl} 
-                                  alt={image.alt || "Image"} 
-                                  className="max-h-full max-w-full object-contain"
-                                />
-                              ) : (
-                                <Image className="w-12 h-12 text-gray-300" />
-                              )}
-                            </div>
-                            <div className="flex-1 p-4">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h3 className="font-medium">{image.blockType}</h3>
-                                  <p className="text-sm text-gray-500">
-                                    {image.alt || "Sem texto alternativo"}
-                                  </p>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {image.issues.map((issue, i) => (
-                                      <Badge key={i} variant={(typeof issue !== 'string' && issue.color) as any || 'default'} className="text-xs">
-                                        {typeof issue !== 'string' ? issue.label : issue}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                                <Button size="sm" onClick={() => setSelectedImage(image)}>
-                                  Revisar
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
-                    <Search className="h-10 w-10 mb-4 opacity-20" />
-                    <h3 className="text-lg font-medium">Nenhuma imagem otimizada</h3>
-                    <p className="max-w-md">Você ainda não tem imagens completamente otimizadas. Comece a otimizar suas imagens na guia "Todas".</p>
-                  </div>
-                )}
-              </ScrollArea>
-            </TabsContent>
-          </Tabs>
-        )}
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="optimize" className="flex-grow flex flex-col mt-0">
+                    <div className="p-4 bg-gray-50 border-b">
+                      <h3 className="font-medium">Configurações de Otimização</h3>
+                    </div>
+                    <div className="p-4 space-y-6 flex-grow">
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <Label>Qualidade da Imagem: {quality}%</Label>
+                        </div>
+                        <Slider 
+                          value={[quality]} 
+                          min={40}
+                          max={95}
+                          step={5}
+                          onValueChange={(values) => setQuality(values[0])}
+                        />
+                        <p className="text-xs text-gray-500">
+                          Valores menores resultam em arquivos menores, mas podem reduzir a qualidade visual.
+                        </p>
+                      </div>
+                      
+                      <div className="border rounded-md p-4 bg-gray-50">
+                        <p className="text-sm">
+                          Imagens otimizadas carregam mais rápido, melhoram a performance da página e a experiência do usuário. Isso também afeta positivamente seu SEO.
+                        </p>
+                      </div>
+                      
+                      <div className="flex space-x-3">
+                        <Button
+                          className="flex-1"
+                          onClick={() => optimizeImage(selectedImage.url)}
+                          disabled={selectedImage.isOptimizing}
+                        >
+                          {selectedImage.isOptimizing ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Otimizando...
+                            </>
+                          ) : selectedImage.optimizedUrl ? (
+                            <>
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Reotimizar
+                            </>
+                          ) : (
+                            <>
+                              <Image className="h-4 w-4 mr-2" />
+                              Otimizar Imagem
+                            </>
+                          )}
+                        </Button>
+                        
+                        {selectedImage.optimizedUrl && (
+                          <Button
+                            variant="outline"
+                            onClick={handleApplyOptimized}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Aplicar
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

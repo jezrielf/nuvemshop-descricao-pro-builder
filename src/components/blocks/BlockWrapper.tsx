@@ -8,12 +8,14 @@ import { cn } from '@/lib/utils';
 interface BlockWrapperProps {
   block: BlockBase;
   isPreview?: boolean;
+  isEditing?: boolean;
   children: React.ReactNode;
 }
 
 const BlockWrapper: React.FC<BlockWrapperProps> = ({ 
   block, 
-  isPreview = false, 
+  isPreview = false,
+  isEditing = false,
   children 
 }) => {
   const blockClasses = generateStyleClasses(block);

@@ -6,8 +6,10 @@ import analyticsService from './analyticsService';
 
 // Export all admin services under one object
 export const adminService = {
-  ...planService,
-  ...userService,
-  ...templateService,
-  ...analyticsService
+  plans: planService,
+  users: userService,
+  templates: templateService,
+  analytics: analyticsService
 };
+
+export { planService, userService, templateService, analyticsService };

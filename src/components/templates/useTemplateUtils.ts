@@ -29,7 +29,7 @@ export const useTemplateUtils = () => {
   }, []);
 
   // Function to get display name for a category
-  const getCategoryName = (category: ProductCategory): string => {
+  const getCategoryName = (category: string): string => {
     return categoryNames[category] || category;
   };
 

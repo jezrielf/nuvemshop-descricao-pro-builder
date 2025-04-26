@@ -3,6 +3,7 @@ import React from 'react';
 import { useTemplateStore } from '@/store/templates';
 import TemplatePreview from './TemplatePreview';
 import { Template } from '@/types/editor';
+import { useTemplateUtils } from '../templates/useTemplateUtils';
 
 interface TemplateSelectionProps {
   onSelectTemplate: (template: Template) => void;
@@ -10,6 +11,7 @@ interface TemplateSelectionProps {
 
 const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate }) => {
   const { templates, categories, selectedCategory, setSelectedCategory } = useTemplateStore();
+  const { getCategoryName } = useTemplateUtils();
 
   // Filter templates by selected category
   const filteredTemplates = selectedCategory === 'all'
@@ -21,15 +23,15 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate 
       <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
           <button
-            key={category.value}
-            onClick={() => setSelectedCategory(category.value as any)}
+            key={category}
+            onClick={() => setSelectedCategory(category as any)}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
-              selectedCategory === category.value
+              selectedCategory === category
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted hover:bg-muted/80'
             }`}
           >
-            {category.label}
+            {getCategoryName(category as any)}
           </button>
         ))}
       </div>

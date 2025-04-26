@@ -1,73 +1,92 @@
 
-import { Template } from '@/types/editor';
+import { Template, ProductCategory, Block, BlockType } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
-// Function to sanitize HTML input
-const sanitizeHTML = (html: string): string => {
-  // Implement sanitization as needed
-  return html;
-};
-
-// Function to extract main content from HTML
-const extractContent = (html: string): string => {
-  const sanitizedHtml = sanitizeHTML(html);
+// Function to convert HTML to a template
+export const analyzeHtmlToTemplate = (html: string, category: ProductCategory): Template => {
+  // Create a parser to extract content from the HTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
   
-  // In a real implementation, we would use a proper HTML parser
-  // For now, use a simple extraction approach
-  const bodyContent = sanitizedHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] || sanitizedHtml;
+  // Extract blocks from the HTML content
+  const blocks: Block[] = [];
   
-  return bodyContent;
-};
-
-// Generate template blocks from HTML content
-const generateBlocks = (htmlContent: string) => {
-  // Here we would parse the HTML and convert it into blocks
-  // For now, return a simple structure
+  // Example logic - extract paragraphs into text blocks
+  const paragraphs = doc.querySelectorAll('p');
+  paragraphs.forEach((p) => {
+    if (p.textContent?.trim()) {
+      blocks.push({
+        id: uuidv4(),
+        type: 'text',
+        title: 'Texto',
+        content: p.innerHTML,
+        style: {
+          textAlign: 'left',
+          fontSize: 'base',
+          fontWeight: 'normal',
+          textColor: '',
+          backgroundColor: ''
+        }
+      });
+    }
+  });
   
-  return [
-    {
+  // Extract images
+  const images = doc.querySelectorAll('img');
+  images.forEach((img) => {
+    blocks.push({
       id: uuidv4(),
-      type: 'text',
-      title: 'HTML Content',
-      content: htmlContent,
-      columns: 'full',
-      visible: true,
-    },
-  ];
-};
-
-// Main function to analyze HTML and convert to template
-export const analyzeHtmlToTemplate = (html: string, name: string = 'Imported HTML Template'): Template => {
-  const content = extractContent(html);
-  const blocks = generateBlocks(content);
+      type: 'image',
+      title: 'Imagem',
+      src: img.src,
+      alt: img.alt || '',
+      style: {
+        textAlign: 'center',
+        fontSize: 'base',
+        fontWeight: 'normal',
+        textColor: '',
+        backgroundColor: ''
+      }
+    });
+  });
   
   return {
     id: uuidv4(),
-    name,
-    description: 'Template importado de HTML',
-    category: 'other',
+    name: 'Template importado de HTML',
+    description: 'Template automaticamente gerado a partir do código HTML',
+    category,
     blocks,
     thumbnailUrl: '/templates/imported.jpg',
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 };
 
-// Function to analyze product page and extract template
-export const analyzeProductPageToTemplate = (html: string, productName: string): Template => {
-  const content = extractContent(html);
+// Alias for backward compatibility
+export const analyzeHtmlForTemplate = analyzeHtmlToTemplate;
+
+// Function to customize block types in a template
+export const customizeBlockTypes = (
+  template: Template, 
+  blockTypeMap: Record<string, BlockType>
+): Template => {
+  const updatedTemplate = { ...template };
   
-  // You would implement more sophisticated extraction for product pages
-  const blocks = generateBlocks(content);
+  updatedTemplate.blocks = template.blocks.map(block => {
+    if (blockTypeMap[block.id]) {
+      // Change the block type while preserving common properties
+      return {
+        ...block,
+        type: blockTypeMap[block.id]
+      };
+    }
+    return block;
+  });
   
   return {
-    id: uuidv4(),
-    name: `Template de ${productName}`,
-    description: `Template gerado a partir da página do produto ${productName}`,
-    category: 'other',
-    blocks,
-    thumbnailUrl: '/templates/product.jpg',
-    createdAt: new Date().toISOString(),
+    ...template,
+    blocks: updatedTemplate.blocks,
+    thumbnailUrl: template.thumbnailUrl,
     updatedAt: new Date().toISOString()
   };
 };

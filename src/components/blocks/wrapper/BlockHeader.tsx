@@ -10,7 +10,15 @@ interface BlockHeaderProps {
 }
 
 const BlockHeader: React.FC<BlockHeaderProps> = ({ block }) => {
-  const { moveBlockUp, moveBlockDown, deleteBlock } = useEditorStore();
+  const { moveBlockUp, moveBlockDown, removeBlock } = useEditorStore();
+
+  const handleDeleteBlock = () => {
+    if (removeBlock) {
+      removeBlock(block.id);
+    } else {
+      console.error('removeBlock function not available in EditorStore');
+    }
+  };
 
   return (
     <div className="absolute -top-3 left-0 right-0 flex justify-center">
@@ -41,7 +49,7 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({ block }) => {
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-destructive hover:text-destructive"
-          onClick={() => deleteBlock(block.id)}
+          onClick={handleDeleteBlock}
         >
           <Trash className="h-3 w-3" />
         </Button>

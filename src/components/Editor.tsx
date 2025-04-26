@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
@@ -15,13 +16,17 @@ import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { updateBlockImage } from './SEO/utils/imageUtils';
 import { v4 as uuidv4 } from 'uuid';
+import { Template } from '@/types/editor';
+import { useTemplateStore } from '@/store/templates';
 
 const Editor: React.FC = () => {
   const { description, reorderBlocks, updateBlock, createNewDescription } = useEditorStore();
   const { isPremium, isBusiness } = useAuth();
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [isTemplateSelectorOpen, setIsTemplateSelectorOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { applyTemplate } = useTemplateStore();
   
   // Calculate these values once per render
   const isPremiumUser = isPremium();
@@ -54,6 +59,10 @@ const Editor: React.FC = () => {
     }
   };
   
+  const handleSelectTemplate = (template: Template) => {
+    applyTemplate(template);
+  };
+  
   // Memoize the SEO tools component to prevent unnecessary re-renders
   const seoToolsComponent = useMemo(() => {
     if (description && (isPremiumUser || isBusinessUser)) {
@@ -80,7 +89,17 @@ const Editor: React.FC = () => {
               <p className="text-sm text-gray-500">Escolha um de nossos templates prontos</p>
             </div>
             <div className="p-4">
-              <TemplateSelector />
+              <Button 
+                onClick={() => setIsTemplateSelectorOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+              >
+                Selecionar Template
+              </Button>
+              <TemplateSelector 
+                isOpen={isTemplateSelectorOpen} 
+                onClose={() => setIsTemplateSelectorOpen(false)} 
+                onSelectTemplate={handleSelectTemplate} 
+              />
             </div>
           </div>
           
@@ -100,6 +119,12 @@ const Editor: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        <TemplateSelector 
+          isOpen={isTemplateSelectorOpen} 
+          onClose={() => setIsTemplateSelectorOpen(false)} 
+          onSelectTemplate={handleSelectTemplate} 
+        />
       </div>
     );
   }
@@ -107,7 +132,18 @@ const Editor: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="p-3 sm:p-4 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-2">
-        <TemplateSelector />
+        <Button 
+          onClick={() => setIsTemplateSelectorOpen(true)}
+          variant="outline" 
+          size="sm"
+        >
+          Selecionar Template
+        </Button>
+        <TemplateSelector 
+          isOpen={isTemplateSelectorOpen} 
+          onClose={() => setIsTemplateSelectorOpen(false)} 
+          onSelectTemplate={handleSelectTemplate} 
+        />
         {seoToolsComponent}
       </div>
       

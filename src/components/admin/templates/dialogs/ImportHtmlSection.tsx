@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Template, ProductCategory, Block, BlockType } from '@/types/editor';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { analyzeHtmlForTemplate, customizeBlockTypes } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
+import { analyzeHtmlToTemplate, customizeBlockTypes } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
 import { HtmlInputTab } from './import/HtmlInputTab';
 import { ReviewBlocksTab } from './import/ReviewBlocksTab';
 
@@ -27,7 +27,7 @@ export const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({
 
     setIsGenerating(true);
     try {
-      const template = analyzeHtmlForTemplate(htmlInput, selectedCategory);
+      const template = analyzeHtmlToTemplate(htmlInput, selectedCategory);
       setGeneratedTemplate(template);
       setActiveTab('review');
       setBlockTypeMap({});
@@ -98,3 +98,5 @@ export const ImportHtmlSection: React.FC<ImportHtmlSectionProps> = ({
     </div>
   );
 };
+
+export default ImportHtmlSection;
