@@ -2,10 +2,14 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
 import { v4 as uuidv4 } from 'uuid';
+import { rolesToString } from '@/utils/roleUtils';
 
-const validateRole = (role: string): "user" | "premium" | "admin" => {
+// Define allowed roles to match database constraints
+type AllowedRole = 'user' | 'premium' | 'admin';
+
+const validateRole = (role: string): AllowedRole => {
   if (role === "user" || role === "premium" || role === "admin") {
-    return role;
+    return role as AllowedRole;
   }
   return "user"; // Default to user if invalid role
 };
@@ -88,7 +92,7 @@ export const userService = {
       
       // If role is specified and not 'user', set it in the user_roles table
       if (userData.role && userData.role !== 'user') {
-        const validatedRole = validateRole(userData.role);
+        const validatedRole = validateRole(typeof userData.role === 'string' ? userData.role : 'user');
         
         const { error: roleError } = await supabase
           .from('user_roles')
@@ -113,12 +117,19 @@ export const userService = {
   // Update user
   updateUser: async (userId: string, userData: Partial<Profile>): Promise<Profile | null> => {
     try {
+      const updateData: any = {
+        ...userData,
+        atualizado_em: new Date().toISOString()
+      };
+      
+      // Ensure role is string if passed
+      if (userData.role && typeof userData.role !== 'string') {
+        updateData.role = rolesToString(userData.role);
+      }
+      
       const { data, error } = await supabase
         .from('profiles')
-        .update({
-          ...userData,
-          atualizado_em: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', userId)
         .select()
         .single();
@@ -127,7 +138,9 @@ export const userService = {
       
       // If role is being updated, update the user_roles table
       if (userData.role) {
-        const validatedRole = validateRole(userData.role);
+        const validatedRole = validateRole(
+          typeof userData.role === 'string' ? userData.role : 'user'
+        );
         
         // Check if there's an existing role
         const { data: existingRole, error: fetchError } = await supabase
@@ -179,4 +192,14 @@ export const userService = {
       return false;
     }
   },
+
+  // New method: Update user profile (wrapper for updateUser)
+  updateUserProfile: async (userId: string, data: { nome: string }): Promise<Profile | null> => {
+    return userService.updateUser(userId, data);
+  },
+  
+  // New method: Update user role
+  updateUserRole: async (userId: string, role: string | string[]): Promise<Profile | null> => {
+    return userService.updateUser(userId, { role });
+  }
 };

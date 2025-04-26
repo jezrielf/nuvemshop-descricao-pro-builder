@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import {
@@ -42,7 +43,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, error, onRefre
   const handleUpdateUser = async (userId: string, data: { nome: string }) => {
     try {
       setUpdating(true);
-      await userService.updateUserProfile(userId, data);
+      await userService.updateUser(userId, data);
       onRefresh();
       toast({
         title: 'Usuário atualizado',
@@ -63,7 +64,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, error, onRefre
   const handleUpdateRole = async (userId: string, role: string) => {
     try {
       setUpdating(true);
-      await userService.updateUserRole(userId, role);
+      await userService.updateUser(userId, { role });
       onRefresh();
       toast({
         title: 'Perfil atualizado',
@@ -84,7 +85,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, error, onRefre
   const handlePromoteToRole = async (userId: string, role: string) => {
     try {
       setUpdating(true);
-      await userService.updateUserRole(userId, role);
+      await userService.updateUser(userId, { role });
       onRefresh();
       toast({
         title: 'Usuário promovido',

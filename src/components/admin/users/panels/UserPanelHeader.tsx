@@ -1,84 +1,56 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { UserPlus, RefreshCw } from 'lucide-react';
-import {
-  Dialog,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import CreateUserForm, { CreateUserFormProps } from '../CreateUserForm';
-import UserSearchBar from './UserSearchBar';
-import { useToast } from '@/hooks/use-toast';
+import { Plus, RefreshCw } from 'lucide-react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { CreateUserForm } from '../CreateUserForm';
+import { UserSearchBar } from './UserSearchBar';
 
-interface UserPanelHeaderProps {
+export interface UserPanelHeaderProps {
   filterUsers: (query: string) => void;
   onRefresh: () => void;
   loading: boolean;
-  onUserCreated?: () => Promise<void>;
-  searchTerm?: string;
-  onSearchChange?: (value: string) => void;
-  isCreateUserSheetOpen?: boolean;
-  setIsCreateUserSheetOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  handleCreateUser?: () => Promise<void>;
+  onUserCreated: () => Promise<void>;
 }
 
 const UserPanelHeader: React.FC<UserPanelHeaderProps> = ({
+  filterUsers,
   onRefresh,
   loading,
-  filterUsers,
-  onUserCreated,
-  searchTerm = '',
-  onSearchChange = (value: string) => filterUsers(value),
-  isCreateUserSheetOpen = false,
-  setIsCreateUserSheetOpen = () => {},
-  handleCreateUser = async () => {}
+  onUserCreated
 }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const { toast } = useToast();
-
-  const handleSearchChange = (value: string) => {
-    if (onSearchChange) {
-      onSearchChange(value);
-    } else {
-      filterUsers(value);
-    }
-  };
-
   return (
-    <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <UserSearchBar 
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-      />
-      <div className="flex gap-2 w-full sm:w-auto">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Novo Usuário
-            </Button>
-          </DialogTrigger>
-          
-          {onUserCreated && (
-            <CreateUserForm 
-              onUserCreated={async () => {
-                await onUserCreated();
-                setDialogOpen(false);
-                toast({
-                  title: 'Usuário criado',
-                  description: 'O usuário foi criado com sucesso.',
-                });
-              }}
-            />
-          )}
-        </Dialog>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <UserSearchBar onChange={filterUsers} />
+      
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
+          size="sm"
           onClick={onRefresh}
           disabled={loading}
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Atualizar
         </Button>
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Usuário
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="sm:max-w-md">
+            <SheetHeader>
+              <SheetTitle>Criar Novo Usuário</SheetTitle>
+              <SheetDescription>
+                Crie um novo usuário com acesso ao sistema.
+              </SheetDescription>
+            </SheetHeader>
+            <CreateUserForm onUserCreated={onUserCreated} />
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import PlanManagementContent from './plans/PlanManagementContent';
 import PlanManagementDialogs from './plans/PlanManagementDialogs';
 import { usePlansData } from './plans/hooks/usePlansData';
 import { usePlanActions } from './plans/hooks/usePlanActions';
+import { Plan as PlanType } from './plans/types';
 
 const PlansPanel: React.FC = () => {
   const { plans, loading, setLoading, fetchPlans } = usePlansData();
@@ -42,7 +43,7 @@ const PlansPanel: React.FC = () => {
       />
       
       <PlanManagementContent
-        plans={plans}
+        plans={plans as PlanType[]}
         loading={loading}
         onViewPlan={handleViewPlan}
         onEditClick={handleEditClick}
@@ -54,7 +55,7 @@ const PlansPanel: React.FC = () => {
         isDeleteDialogOpen={isDeleteDialogOpen}
         isCreateDialogOpen={isCreateDialogOpen}
         isEditDialogOpen={isEditDialogOpen}
-        selectedPlan={selectedPlan}
+        selectedPlan={selectedPlan as PlanType}
         onViewOpenChange={setIsViewOpen}
         onDeleteOpenChange={setIsDeleteDialogOpen}
         onCreateOpenChange={setIsCreateDialogOpen}
