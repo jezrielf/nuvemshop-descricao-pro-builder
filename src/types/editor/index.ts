@@ -23,5 +23,8 @@ export { type VideoTextBlock } from './blocks/videoText';
 export { type CarouselBlock } from './blocks/carousel';
 export { type SpecificationsBlock } from './blocks/specifications';
 
+// Export base types explicitly by name to ensure they're available
+export { type Template, type ProductDescription, type BlockType, type ColumnLayout, type BlockStyle, type BlockBase, type BlockSpacing } from './base';
+
 // Also export any utility types from other editor-related type files
 export * from './products';

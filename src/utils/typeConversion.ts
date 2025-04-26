@@ -24,6 +24,8 @@ export function ensureBlockType(block: any): Block {
  * This is useful when dealing with Profile objects that need to be used as User objects
  */
 export function convertProfileToUser(profile: Profile): any {
+  if (!profile) return null;
+  
   return {
     ...profile,
     // Ensure required User properties exist
@@ -39,7 +41,7 @@ export function convertProfileToUser(profile: Profile): any {
 /**
  * Gets role as string from a user/profile object that might have role as string or string[]
  */
-export function getRoleAsString(user: { role: string | string[] }): string {
+export function getRoleAsString(user: Profile | null | { role: string | string[] }): string {
   if (!user?.role) return '';
   return Array.isArray(user.role) ? (user.role[0] || '') : user.role;
 }

@@ -10,6 +10,7 @@ interface AuthState {
   isLoading: boolean;
   isPremium: () => boolean;
   isBusiness: () => boolean;
+  isAdmin: () => boolean; // Add the isAdmin method explicitly
   isSubscribed: () => boolean;
   isSubscriptionLoading: boolean;
   error: string | null;
@@ -27,6 +28,7 @@ export const useAuthProvider = (): AuthState => {
   const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
   const [isBusinessUser, setIsBusinessUser] = useState<boolean>(false);
   const [isSubscribedUser, setIsSubscribedUser] = useState<boolean>(false);
+  const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
 
   useEffect(() => {
     const loadSession = async () => {
@@ -79,6 +81,11 @@ export const useAuthProvider = (): AuthState => {
           setIsBusinessUser(false);
           setIsSubscribedUser(false);
         }
+
+        // Check if user has admin role
+        const userRole = getRoleAsString(user);
+        setIsAdminUser(userRole === 'admin');
+        
       } catch (err: any) {
         console.error('Error processing subscription:', err);
         setIsPremiumUser(false);
@@ -95,6 +102,7 @@ export const useAuthProvider = (): AuthState => {
   const isPremium = useCallback(() => isPremiumUser, [isPremiumUser]);
   const isBusiness = useCallback(() => isBusinessUser, [isBusinessUser]);
   const isSubscribed = useCallback(() => isSubscribedUser, [isSubscribedUser]);
+  const isAdmin = useCallback(() => isAdminUser, [isAdminUser]);
 
   // Create a complete profile with all required properties
   const createEmptyProfile = (userId: string, email: string): Profile => {
@@ -119,7 +127,6 @@ export const useAuthProvider = (): AuthState => {
       if (error) throw error;
       
       // This is a placeholder since we can't actually return the profile immediately after OTP request
-      // In a real implementation, we'd handle this differently
       const tempProfile = createEmptyProfile('pending-auth', credentials.email);
       return tempProfile;
     } catch (err: any) {
@@ -186,6 +193,7 @@ export const useAuthProvider = (): AuthState => {
     isLoading,
     isPremium,
     isBusiness,
+    isAdmin,
     isSubscribed,
     isSubscriptionLoading,
     error,

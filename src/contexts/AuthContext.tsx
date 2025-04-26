@@ -40,25 +40,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading: auth.isLoading,
     error: auth.error,
     isAuthenticated: !!auth.user,
-    login: auth.signIn || (async () => { throw new Error('Not implemented'); }),
-    signIn: auth.signIn || (async () => { throw new Error('Not implemented'); }),
+    login: auth.signIn,
+    signIn: auth.signIn,
     signUp: async (userData: any) => {
       console.warn('signUp not implemented, using signIn instead');
       if (auth.signIn) return auth.signIn({ email: userData.email, password: userData.password });
       throw new Error('Not implemented');
     },
-    logout: auth.signOut || (() => {}),
-    signOut: auth.signOut || (() => {}),
+    logout: auth.signOut,
+    signOut: auth.signOut,
     refreshProfile: auth.refreshProfile || (async () => undefined),
-    isPremium: auth.isPremium || (() => false),
-    isBusiness: auth.isBusiness || (() => false),
-    isAdmin: auth.isAdmin || (() => false),
+    isPremium: auth.isPremium,
+    isBusiness: auth.isBusiness,
+    isAdmin: auth.isAdmin,
     hasRole: (role: string) => !!auth.user?.role && (
       typeof auth.user.role === 'string' 
         ? auth.user.role === role
         : auth.user.role.includes(role)
     ),
-    isSubscribed: auth.isSubscribed || (() => false),
+    isSubscribed: auth.isSubscribed,
     subscriptionTier: 'free', // Default value
     descriptionCount: 0, // Default value
     canCreateMoreDescriptions: () => true, // Default implementation
