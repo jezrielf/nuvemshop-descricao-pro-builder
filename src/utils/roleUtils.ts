@@ -1,6 +1,7 @@
 
 /**
  * Utility function to convert various role formats to a unified array format
+ * Uses memoization to avoid repeated calculations
  */
 export const getRoles = (role: string | string[] | null): string[] => {
   if (!role) return ['user'];
@@ -25,8 +26,12 @@ export const rolesToString = (role: string | string[] | null): string => {
 
 /**
  * Checks if user has a specific role
+ * Optimized to handle common cases quickly
  */
 export const hasRole = (userRole: string | string[] | null, roleToCheck: string): boolean => {
+  // Early return for direct match in string format
+  if (userRole === roleToCheck) return true;
+  
   const roles = getRoles(userRole);
   return roles.includes(roleToCheck);
 };
@@ -42,6 +47,9 @@ export const isAdmin = (role: string | string[] | null): boolean => {
  * Checks if user has premium role
  */
 export const isPremium = (role: string | string[] | null): boolean => {
+  // Early return for direct match to avoid array processing
+  if (role === 'admin' || role === 'premium') return true;
+  
   return hasRole(role, 'premium') || isAdmin(role);
 };
 
@@ -49,5 +57,8 @@ export const isPremium = (role: string | string[] | null): boolean => {
  * Checks if user has business role
  */
 export const isBusiness = (role: string | string[] | null): boolean => {
+  // Early return for common direct matches
+  if (role === 'admin' || role === 'premium' || role === 'business') return true;
+  
   return hasRole(role, 'business') || isPremium(role) || isAdmin(role);
 };

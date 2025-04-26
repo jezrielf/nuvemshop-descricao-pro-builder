@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { BlockBase } from '@/types/editor';
 import { generateStyleClasses } from './StyleClassGenerator';
 import BlockHeader from './BlockHeader';
@@ -11,17 +11,19 @@ interface BlockWrapperProps {
   children: React.ReactNode;
 }
 
-const BlockWrapper: React.FC<BlockWrapperProps> = ({ 
+// Using memo to prevent unnecessary re-renders
+const BlockWrapper: React.FC<BlockWrapperProps> = memo(({ 
   block, 
   isPreview = false, 
   children 
 }) => {
+  // Only regenerate style classes if block or its style props change
   const blockClasses = generateStyleClasses(block);
   
   return (
     <div className={cn(
       "block-container relative w-full",
-      !isPreview && "p-4 border rounded-lg hover:border-blue-300",
+      !isPreview && "p-3 border rounded-lg hover:border-blue-300",
       isPreview && "preview-mode"
     )}>
       {!isPreview && <BlockHeader block={block} />}
@@ -34,6 +36,9 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({
       </div>
     </div>
   );
-};
+});
+
+// Add display name for easier debugging
+BlockWrapper.displayName = 'BlockWrapper';
 
 export default BlockWrapper;
