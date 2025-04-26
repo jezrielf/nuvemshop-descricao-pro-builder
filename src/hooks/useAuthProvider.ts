@@ -1,7 +1,8 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
-import { convertProfileToUser } from '@/utils/typeConversion';
+import { convertProfileToUser, getRoleAsString } from '@/utils/typeConversion';
 
 interface AuthState {
   user: Profile | null;

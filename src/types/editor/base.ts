@@ -74,5 +74,5 @@ export interface ProductDescription {
   blocks: any[];
 }
 
-// Export ProductCategory using export type for TypeScript's isolatedModules
-export type { ProductCategory };
+// Export ProductCategory
+export { type ProductCategory };
