@@ -105,15 +105,16 @@ const Index = () => {
   
   // Função para renderizar informações da loja conectada
   const renderStoreInfo = () => {
-    let storeDisplayText = "Loja conectada";
+    // Verificar se o storeName é uma string válida
+    const isValidStoreName = typeof storeName === 'string' && storeName.trim() !== '';
     
-    if (storeName) {
-      storeDisplayText = `Conectado com a ${storeName}`;
+    if (isValidStoreName) {
+      return `Conectado com ${storeName}`;
     } else if (storeId) {
-      storeDisplayText = `Conectado com a loja ID: ${storeId}`;
+      return `Conectado (ID: ${storeId})`;
+    } else {
+      return 'Conectado';
     }
-    
-    return storeDisplayText;
   };
   
   return (

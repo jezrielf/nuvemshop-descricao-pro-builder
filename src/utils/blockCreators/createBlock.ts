@@ -12,7 +12,10 @@ import {
   createTextImageBlock,
   createFAQBlock,
   createCTABlock,
-  createVideoBlock
+  createVideoBlock,
+  createVideoTextBlock,
+  createTextVideoBlock,
+  createCarouselBlock
 } from './blocks';
 import { ensureValidBlock } from './validation';
 
@@ -69,6 +72,18 @@ export const createBlock = (type: BlockType, columns: ColumnLayout = 'full'): Bl
         
       case 'video':
         block = createVideoBlock(columns);
+        break;
+        
+      case 'videoText':
+        block = createVideoTextBlock(columns);
+        break;
+        
+      case 'textVideo':
+        block = createTextVideoBlock(columns);
+        break;
+        
+      case 'carousel':
+        block = createCarouselBlock(columns);
         break;
         
       default:
