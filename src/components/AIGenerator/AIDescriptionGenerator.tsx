@@ -19,13 +19,13 @@ import { Separator } from '@/components/ui/separator';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sparkles, Loader2, Upload, Image, LucideProps } from 'lucide-react';
+import { Sparkles, Loader2, Upload, Image } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import AIGeneratorResult from './AIGeneratorResult';
-import { ProductCategory, ProductDescription, Block, BlockType } from '@/types/editor';
+import { ProductDescription, Block, BlockType } from '@/types/editor';
 import { isPremium } from '@/utils/roleUtils';
 
 // Import generateDescription directly
@@ -81,7 +81,7 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
   });
 
   // If not premium, redirect to plans page
-  if (!isPremium(profile?.role) && !isBusiness()) {
+  if (profile?.role && !isPremium(Array.isArray(profile.role) ? profile.role[0] : profile.role) && !isBusiness()) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[500px]">

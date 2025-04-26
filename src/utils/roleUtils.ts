@@ -1,17 +1,23 @@
 
-export const isPremium = (role?: string): boolean => {
+export const isPremium = (role?: string | string[]): boolean => {
   if (!role) return false;
-  return role === 'premium' || role === 'business' || role === 'admin';
+  
+  const roles = getRoles(role);
+  return roles.includes('premium') || roles.includes('business') || roles.includes('admin');
 };
 
-export const isBusiness = (role?: string): boolean => {
+export const isBusiness = (role?: string | string[]): boolean => {
   if (!role) return false;
-  return role === 'business' || role === 'admin';
+  
+  const roles = getRoles(role);
+  return roles.includes('business') || roles.includes('admin');
 };
 
-export const isAdmin = (role?: string): boolean => {
+export const isAdmin = (role?: string | string[]): boolean => {
   if (!role) return false;
-  return role === 'admin';
+  
+  const roles = getRoles(role);
+  return roles.includes('admin');
 };
 
 // Add the getRoles function to extract roles from a role string

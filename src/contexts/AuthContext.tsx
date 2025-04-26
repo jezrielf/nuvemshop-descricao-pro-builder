@@ -1,3 +1,4 @@
+
 import React, { 
   createContext, 
   useState, 
@@ -23,6 +24,15 @@ interface AuthContextProps {
   isBusiness: () => boolean;
   isAdmin: () => boolean;
   hasRole: (role: string) => boolean;
+  // Add these properties to match what's used in the components
+  user: any;
+  signOut: () => void;
+  isSubscribed: () => boolean;
+  subscriptionTier: string;
+  descriptionCount: number;
+  canCreateMoreDescriptions: () => boolean;
+  openCustomerPortal: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -39,6 +49,15 @@ const AuthContext = createContext<AuthContextProps>({
   isBusiness: () => false,
   isAdmin: () => false,
   hasRole: () => false,
+  // Add these properties to match what's used in the components
+  user: null,
+  signOut: () => {},
+  isSubscribed: () => false,
+  subscriptionTier: '',
+  descriptionCount: 0,
+  canCreateMoreDescriptions: () => false,
+  openCustomerPortal: async () => {},
+  refreshProfile: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -53,6 +72,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Add these properties to match what's used in the components
+  const [descriptionCount, setDescriptionCount] = useState(0);
+  const [subscriptionTier, setSubscriptionTier] = useState('');
 
   useEffect(() => {
     const storedProfile = localStorage.getItem('userProfile');
@@ -89,20 +111,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
   
   const checkIsPremium = useCallback(() => {
-    return isPremium(profile?.role);
+    if (!profile?.role) return false;
+    return isPremium(Array.isArray(profile.role) ? profile.role[0] : profile.role);
   }, [profile]);
   
   const checkIsBusiness = useCallback(() => {
-    return isBusiness(profile?.role);
+    if (!profile?.role) return false;
+    return isBusiness(Array.isArray(profile.role) ? profile.role[0] : profile.role);
   }, [profile]);
   
   const checkIsAdmin = useCallback(() => {
-    return isAdmin(profile?.role);
+    if (!profile?.role) return false;
+    return isAdmin(Array.isArray(profile.role) ? profile.role[0] : profile.role);
   }, [profile]);
   
   const checkHasRole = useCallback((requiredRole: string) => {
-    return hasRole(profile?.role, requiredRole);
+    if (!profile?.role) return false;
+    return hasRole(profile.role, requiredRole);
   }, [profile]);
+
+  // Add these methods to match what's used in the components
+  const checkIsSubscribed = useCallback(() => {
+    return checkIsPremium() || checkIsBusiness();
+  }, [checkIsPremium, checkIsBusiness]);
+
+  const canCreateMoreDescriptions = useCallback(() => {
+    return checkIsSubscribed() || descriptionCount < 3;
+  }, [checkIsSubscribed, descriptionCount]);
+
+  const refreshProfile = async () => {
+    // Mock implementation
+    return Promise.resolve();
+  };
+
+  const openCustomerPortal = async () => {
+    // Mock implementation
+    return Promise.resolve();
+  };
 
   const contextValue = {
     profile,
@@ -114,6 +159,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isBusiness: checkIsBusiness,
     isAdmin: checkIsAdmin,
     hasRole: checkHasRole,
+    // Add these properties to match what's used in the components
+    user: profile,
+    signOut: logout,
+    isSubscribed: checkIsSubscribed,
+    subscriptionTier: 'free',
+    descriptionCount: descriptionCount,
+    canCreateMoreDescriptions,
+    openCustomerPortal,
+    refreshProfile,
   };
 
   return (
