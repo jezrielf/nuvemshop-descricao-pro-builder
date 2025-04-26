@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 
 interface SavedDescriptionsDialogProps {
-  isPremium: () => boolean;
+  isPremium: boolean; // Changed from function to boolean
   descriptionCount: number;
   savedDescriptions: ProductDescription[];
 }
@@ -70,7 +70,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
             <DialogTitle>Suas Descrições Salvas</DialogTitle>
             <DialogDescription>
               Selecione uma descrição para continuar editando.
-              {!isPremium() && (
+              {!isPremium && ( // Changed from function call to direct boolean check
                 <div className="mt-2 text-yellow-600 text-sm flex items-center">
                   <BadgeAlert className="mr-1 h-4 w-4" />
                   Você usou {descriptionCount}/3 descrições gratuitas.
