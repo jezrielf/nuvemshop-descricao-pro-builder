@@ -30,7 +30,10 @@ export const useImageUpload = (props?: UseImageUploadProps) => {
         user_metadata: auth.user.user_metadata || {},
         aud: auth.user.aud || '',
         created_at: auth.user.created_at || '',
-        role: typeof auth.user.role === 'object' ? auth.user.role[0] : auth.user.role || ''
+        // Convert role to string if it's an array
+        role: typeof auth.user.role === 'object' && Array.isArray(auth.user.role) 
+          ? auth.user.role[0] || '' 
+          : auth.user.role || ''
       } : null;
 
       const result = await storageService.uploadFile({

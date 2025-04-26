@@ -31,3 +31,6 @@ export { type TextVideoBlock } from './blocks/textVideo';
 export { type VideoTextBlock } from './blocks/videoText';
 export { type CarouselBlock } from './blocks/carousel';
 export { type SpecificationsBlock } from './blocks/specifications';
+
+// Also export any utility types from other editor-related type files
+export * from './products';

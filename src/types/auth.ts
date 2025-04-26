@@ -12,7 +12,7 @@ export interface Profile {
   atualizado_em?: string; // Updated at date
   avatar_url?: string; // Alias for avatarUrl
   
-  // Add User properties that might be needed for compatibility
+  // Add User properties that might be needed for compatibility with storage services
   app_metadata: any;
   user_metadata: any;
   aud: string;
