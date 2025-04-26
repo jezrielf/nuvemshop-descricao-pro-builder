@@ -83,8 +83,10 @@ export const useAuthProvider = (): AuthState => {
         }
 
         // Check if user has admin role
-        const userRole = getRoleAsString(user);
-        setIsAdminUser(userRole === 'admin');
+        if (user) {
+          const userRole = getRoleAsString(user);
+          setIsAdminUser(userRole === 'admin');
+        }
         
       } catch (err: any) {
         console.error('Error processing subscription:', err);
@@ -97,7 +99,7 @@ export const useAuthProvider = (): AuthState => {
     };
 
     fetchSubscriptionStatus();
-  }, [user?.id]);
+  }, [user?.id, user]);
 
   const isPremium = useCallback(() => isPremiumUser, [isPremiumUser]);
   const isBusiness = useCallback(() => isBusinessUser, [isBusinessUser]);
