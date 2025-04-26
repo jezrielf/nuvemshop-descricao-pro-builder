@@ -13,10 +13,7 @@ export type BlockType =
   | 'textImage'
   | 'faq'
   | 'cta'
-  | 'video'
-  | 'videoText'
-  | 'textVideo'
-  | 'carousel';
+  | 'video';
 
 export type ColumnLayout = 'full' | '1/2' | '1/3' | '2/3' | '1/4' | '3/4' | 1 | 2 | 3 | 4;
 
@@ -25,7 +22,6 @@ export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
 export interface BlockStyle {
   backgroundColor?: string;
   backgroundImage?: string;
-  backgroundGradient?: string;
   textColor?: string;
   padding?: string;
   margin?: string;
@@ -41,9 +37,7 @@ export interface BlockStyle {
   lineHeight?: string;
   imageFit?: 'cover' | 'contain' | 'fill' | 'none';
   imagePosition?: string;
-  headingColor?: string;
-  headingWeight?: string;
-  blockSpacing?: BlockSpacing;
+  headingColor?: string; // Added for video block
   [key: string]: any;
 }
 
@@ -74,5 +68,5 @@ export interface ProductDescription {
   blocks: any[];
 }
 
-// Export type ProductCategory
-export { type ProductCategory };
+// Export ProductCategory using export type for TypeScript's isolatedModules
+export type { ProductCategory };

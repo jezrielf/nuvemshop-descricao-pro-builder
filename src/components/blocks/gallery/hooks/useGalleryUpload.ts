@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { convertProfileToUser } from '@/utils/typeConversion';
 
 export const useGalleryUpload = () => {
   const [uploading, setUploading] = useState<{ [key: string]: boolean }>({});
@@ -60,7 +59,7 @@ export const useGalleryUpload = () => {
       });
       return null;
     }
-
+    
     // Validações
     if (!file.type.startsWith('image/')) {
       toast({
@@ -90,10 +89,7 @@ export const useGalleryUpload = () => {
         throw new Error('Não foi possível preparar o armazenamento');
       }
       
-      // Ensure user has required properties for compatibility
-      const userWithRequiredProps = convertProfileToUser(auth.user);
-      
-      const userId = userWithRequiredProps.id;
+      const userId = auth.user.id;
       if (!userId) {
         throw new Error('ID de usuário não disponível');
       }

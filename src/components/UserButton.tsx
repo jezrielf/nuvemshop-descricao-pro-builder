@@ -60,7 +60,7 @@ export const UserButton: React.FC = () => {
     );
   }
 
-  const userInitial = profile?.name ? profile.name[0].toUpperCase() : user.email?.[0].toUpperCase() || 'U';
+  const userInitial = profile?.nome ? profile.nome[0].toUpperCase() : user.email?.[0].toUpperCase() || 'U';
   const isSubscribed = isPremium() || isBusiness();
   
   // Display the appropriate roles as badges
@@ -74,7 +74,7 @@ export const UserButton: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={profile?.avatarUrl || undefined} alt={profile?.name || user.email || ''} />
+            <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.nome || user.email || ''} />
             <AvatarFallback>{userInitial}</AvatarFallback>
           </Avatar>
         </Button>
@@ -83,7 +83,7 @@ export const UserButton: React.FC = () => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium leading-none">{profile?.name || 'Usuário'}</p>
+              <p className="text-sm font-medium leading-none">{profile?.nome || 'Usuário'}</p>
               <Badge variant={mainRole === 'admin' ? 'default' : 'secondary'} className="ml-2">
                 {mainRole}
               </Badge>

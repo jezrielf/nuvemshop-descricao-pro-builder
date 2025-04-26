@@ -1,208 +1,113 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { Profile } from '@/types/auth';
-import { getRoleAsString } from '@/utils/typeConversion';
 
-interface AuthState {
-  user: Profile | null;
-  session: any | null;
-  isLoading: boolean;
-  isPremium: () => boolean;
-  isBusiness: () => boolean;
-  isAdmin: () => boolean;
-  isSubscribed: () => boolean;
-  isSubscriptionLoading: boolean;
-  error: string | null;
-  signIn: (credentials: { email: string; password?: string }) => Promise<Profile>;
-  signOut: () => Promise<void>;
-  refreshProfile?: () => Promise<Profile | undefined>;
-}
-
-export const useAuthProvider = (): AuthState => {
-  const [user, setUser] = useState<Profile | null>(null);
-  const [session, setSession] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isSubscriptionLoading, setIsSubscriptionLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
-  const [isBusinessUser, setIsBusinessUser] = useState<boolean>(false);
-  const [isSubscribedUser, setIsSubscribedUser] = useState<boolean>(false);
-  const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
+export const useAuthProvider = () => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [descriptionCount, setDescriptionCount] = useState(0);
+  const [subscriptionTier, setSubscriptionTier] = useState<string>('free');
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadSession = async () => {
-      setIsLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
         setSession(session);
-        setUser(session?.user as Profile || null);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          setTimeout(() => fetchProfile(session.user.id), 0);
+          // Load description count from localStorage for this user
+          const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
+          if (storedCount) {
+            setDescriptionCount(parseInt(storedCount, 10));
+          }
+        } else {
+          setProfile(null);
+          // For anonymous users, use a generic key
+          const storedCount = localStorage.getItem('descriptionCount_anonymous');
+          if (storedCount) {
+            setDescriptionCount(parseInt(storedCount, 10));
+          }
+        }
       }
-    };
+    );
 
-    loadSession();
-
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(session?.user as Profile || null);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        // Load description count for logged in user
+        const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
+        if (storedCount) {
+          setDescriptionCount(parseInt(storedCount, 10));
+        }
+      } else {
+        // Load description count for anonymous user
+        const storedCount = localStorage.getItem('descriptionCount_anonymous');
+        if (storedCount) {
+          setDescriptionCount(parseInt(storedCount, 10));
+        }
+      }
+      
+      setLoading(false);
     });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchSubscriptionStatus = async () => {
-      if (!user?.id) {
-        setIsSubscriptionLoading(false);
-        return;
-      }
-
-      setIsSubscriptionLoading(true);
-      try {
-        // Fix for the subscription table query - check if the table exists first
-        // Use 'subscribers' table instead of 'subscriptions' 
-        const { data, error } = await supabase
-          .from('subscribers')
-          .select('subscription_tier')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error) {
-          console.error('Error fetching subscription:', error);
-          setIsPremiumUser(false);
-          setIsBusinessUser(false);
-          setIsSubscribedUser(false);
-        } else if (data) {
-          setIsSubscribedUser(data.subscription_tier !== 'free');
-          setIsPremiumUser(data.subscription_tier === 'premium');
-          setIsBusinessUser(data.subscription_tier === 'business');
-        } else {
-          setIsPremiumUser(false);
-          setIsBusinessUser(false);
-          setIsSubscribedUser(false);
-        }
-
-        // Check if user has admin role
-        if (user) {
-          const userRole = getRoleAsString(user);
-          setIsAdminUser(userRole === 'admin');
-        }
-        
-      } catch (err: any) {
-        console.error('Error processing subscription:', err);
-        setIsPremiumUser(false);
-        setIsBusinessUser(false);
-        setIsSubscribedUser(false);
-      } finally {
-        setIsSubscriptionLoading(false);
-      }
-    };
-
-    fetchSubscriptionStatus();
-  }, [user?.id, user]);
-
-  const isPremium = useCallback(() => isPremiumUser, [isPremiumUser]);
-  const isBusiness = useCallback(() => isBusinessUser, [isBusinessUser]);
-  const isSubscribed = useCallback(() => isSubscribedUser, [isSubscribedUser]);
-  const isAdmin = useCallback(() => isAdminUser, [isAdminUser]);
-
-  // Create a complete profile with all required properties
-  const createEmptyProfile = (userId: string, email: string): Profile => {
-    return {
-      id: userId,
-      email,
-      name: email.split('@')[0],
-      role: 'user',
-      avatarUrl: null,
-      app_metadata: {},
-      user_metadata: {},
-      aud: '',
-      created_at: new Date().toISOString()
-    };
-  };
-
-  const signIn = async (credentials: { email: string; password?: string }): Promise<Profile> => {
-    setIsLoading(true);
-    setError(null);
+  const fetchProfile = async (userId: string) => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email: credentials.email });
-      if (error) throw error;
-      
-      // This is a placeholder since we can't actually return the profile immediately after OTP request
-      const tempProfile = createEmptyProfile('pending-auth', credentials.email);
-      return tempProfile;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signOut = async (): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refreshProfile = async (): Promise<Profile | undefined> => {
-    if (!user?.id) return undefined;
-    
-    try {
+      console.log('Fetching profile for user ID:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
-      
+
       if (error) {
-        console.error('Error fetching profile:', error);
-        return undefined;
+        console.error('Erro ao buscar perfil:', error);
+        return;
       }
-      
-      if (data) {
-        // Merge with existing user data
-        const updatedUser: Profile = {
-          ...user,
-          ...data,
-          app_metadata: user.app_metadata,
-          user_metadata: user.user_metadata,
-          aud: user.aud,
-          created_at: user.created_at
-        };
-        setUser(updatedUser);
-        return updatedUser;
-      }
-      
-      return user;
-    } catch (err) {
-      console.error('Error refreshing profile:', err);
-      return undefined;
+
+      console.log('Profile data received:', data);
+      setProfile(data as Profile);
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
     }
+  };
+  
+  const refreshProfile = async () => {
+    if (user) {
+      return fetchProfile(user.id);
+    }
+    return Promise.resolve();
   };
 
   return {
-    user,
     session,
-    isLoading,
-    isPremium,
-    isBusiness,
-    isAdmin,
-    isSubscribed,
-    isSubscriptionLoading,
-    error,
-    signIn,
-    signOut,
-    refreshProfile
+    user,
+    profile,
+    loading,
+    descriptionCount,
+    subscriptionTier,
+    subscriptionEnd,
+    setLoading,
+    setDescriptionCount,
+    setSubscriptionTier,
+    setSubscriptionEnd,
+    fetchProfile,
+    refreshProfile,
+    toast,
+    navigate
   };
 };

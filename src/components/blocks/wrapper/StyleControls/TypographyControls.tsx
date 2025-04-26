@@ -1,207 +1,164 @@
 
 import React from 'react';
-import { BlockBase } from '@/types/editor';
+import { BlockBase, BlockStyle } from '@/types/editor';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Bold, Italic, Underline } from 'lucide-react';
 
 interface TypographyControlsProps {
   block: BlockBase;
-  updateStyle: (styleUpdates: any) => void;
+  updateStyle: (updates: Partial<BlockStyle>) => void;
 }
 
-// Google Fonts populares organizadas por categoria
-const fontFamilies = [
-  { value: 'inherit', label: 'Padrão do site' },
-  { value: 'Arial, sans-serif', label: 'Arial' },
-  { value: 'Verdana, sans-serif', label: 'Verdana' },
-  { value: 'Helvetica, sans-serif', label: 'Helvetica' },
-  { value: 'Tahoma, sans-serif', label: 'Tahoma' },
-  { value: 'Trebuchet MS, sans-serif', label: 'Trebuchet MS' },
-  { value: 'Georgia, serif', label: 'Georgia' },
-  { value: 'Garamond, serif', label: 'Garamond' },
-  { value: 'Courier New, monospace', label: 'Courier New' },
-  { value: 'Brush Script MT, cursive', label: 'Brush Script MT' },
-  // Google Fonts - Sans Serif
-  { value: '\'Roboto\', sans-serif', label: 'Roboto' },
-  { value: '\'Open Sans\', sans-serif', label: 'Open Sans' },
-  { value: '\'Lato\', sans-serif', label: 'Lato' },
-  { value: '\'Montserrat\', sans-serif', label: 'Montserrat' },
-  { value: '\'Raleway\', sans-serif', label: 'Raleway' },
-  { value: '\'Poppins\', sans-serif', label: 'Poppins' },
-  { value: '\'Source Sans Pro\', sans-serif', label: 'Source Sans Pro' },
-  { value: '\'Noto Sans\', sans-serif', label: 'Noto Sans' },
-  // Google Fonts - Serif
-  { value: '\'Merriweather\', serif', label: 'Merriweather' },
-  { value: '\'Playfair Display\', serif', label: 'Playfair Display' },
-  { value: '\'Lora\', serif', label: 'Lora' },
-  { value: '\'Noto Serif\', serif', label: 'Noto Serif' },
-  { value: '\'Crimson Text\', serif', label: 'Crimson Text' },
-  // Google Fonts - Display
-  { value: '\'Lobster\', cursive', label: 'Lobster' },
-  { value: '\'Pacifico\', cursive', label: 'Pacifico' },
-  { value: '\'Abril Fatface\', cursive', label: 'Abril Fatface' },
-  { value: '\'Bebas Neue\', sans-serif', label: 'Bebas Neue' },
-  { value: '\'Dancing Script\', cursive', label: 'Dancing Script' },
-];
-
-const fontWeights = [
-  { value: 'normal', label: 'Normal (400)' },
-  { value: 'medium', label: 'Médio (500)' },
-  { value: 'semibold', label: 'Semi-negrito (600)' },
-  { value: 'bold', label: 'Negrito (700)' },
-];
-
-const fontSizes = [
-  { value: '12px', label: 'Muito pequeno' },
-  { value: '14px', label: 'Pequeno' },
-  { value: '16px', label: 'Normal' },
-  { value: '18px', label: 'Médio' },
-  { value: '20px', label: 'Grande' },
-  { value: '24px', label: 'Muito grande' },
-  { value: '30px', label: 'Enorme' },
-  { value: '36px', label: 'Gigante' },
-  { value: '48px', label: 'Mega' }
-];
-
-const headingFontWeights = [
-  { value: 'normal', label: 'Normal (400)' },
-  { value: 'medium', label: 'Médio (500)' },
-  { value: 'semibold', label: 'Semi-negrito (600)' },
-  { value: 'bold', label: 'Negrito (700)' },
-];
-
-const textAlignOptions = [
-  { value: 'left', label: 'Esquerda' },
-  { value: 'center', label: 'Centro' },
-  { value: 'right', label: 'Direita' },
-  { value: 'justify', label: 'Justificado' },
-];
-
-const fontSizePx = {
-  min: 12,
-  max: 48,
-  default: 16
-};
-
 const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateStyle }) => {
-  const [fontSize, setFontSize] = React.useState<number>(
-    block.style?.fontSize 
-      ? parseInt(block.style.fontSize) 
-      : fontSizePx.default
-  );
-
-  const handleFontSizeChange = (values: number[]) => {
-    const newSize = values[0];
-    setFontSize(newSize);
-    updateStyle({ fontSize: `${newSize}px` });
+  const handleFontFamilyChange = (value: string) => {
+    console.log('Changing font family to:', value);
+    updateStyle({ fontFamily: value });
   };
-
+  
+  const handleFontSizeChange = (value: string) => {
+    console.log('Changing font size to:', value);
+    updateStyle({ fontSize: value });
+  };
+  
+  const handleTextAlignChange = (value: string) => {
+    console.log('Changing text align to:', value);
+    // Ensure the value is one of the allowed types for textAlign
+    const textAlign = value as 'left' | 'center' | 'right' | 'justify';
+    updateStyle({ textAlign });
+  };
+  
+  const handleFontWeightChange = (value: string) => {
+    console.log('Changing font weight to:', value);
+    updateStyle({ fontWeight: value });
+  };
+  
+  const handleFontStyleChange = (value: string) => {
+    console.log('Changing font style to:', value);
+    updateStyle({ fontStyle: value });
+  };
+  
+  const handleTextDecorationChange = (value: string) => {
+    console.log('Changing text decoration to:', value);
+    updateStyle({ textDecoration: value });
+  };
+  
+  const handleHeadingWeightChange = (value: string) => {
+    console.log('Changing heading weight to:', value);
+    updateStyle({ headingWeight: value });
+  };
+  
   return (
-    <div className="space-y-4 pb-4 border-b">
-      <h4 className="font-medium text-sm">Tipografia</h4>
-      
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="fontFamily">Fonte</Label>
+    <div className="space-y-2">
+      <h5 className="text-sm font-medium">Tipografia</h5>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label htmlFor="fontFamily">Família da fonte</Label>
           <Select 
-            value={block.style?.fontFamily || 'inherit'} 
-            onValueChange={(value) => updateStyle({ fontFamily: value })}
+            value={block.style?.fontFamily || 'sans'} 
+            onValueChange={handleFontFamilyChange}
           >
             <SelectTrigger id="fontFamily">
-              <SelectValue placeholder="Selecione uma fonte" />
+              <SelectValue placeholder="Família da fonte" />
             </SelectTrigger>
             <SelectContent>
-              {fontFamilies.map((font) => (
-                <SelectItem 
-                  key={font.value} 
-                  value={font.value}
-                  style={{ fontFamily: font.value }}
-                >
-                  {font.label}
-                </SelectItem>
-              ))}
+              <SelectItem value="sans">Sans-serif</SelectItem>
+              <SelectItem value="serif">Serif</SelectItem>
+              <SelectItem value="mono">Monospace</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="fontSize">Tamanho da Fonte</Label>
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <Slider
-                value={[fontSize]}
-                min={fontSizePx.min}
-                max={fontSizePx.max}
-                step={1}
-                onValueChange={handleFontSizeChange}
-              />
-            </div>
-            <div className="w-12 text-right">{fontSize}px</div>
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="fontWeight">Peso da Fonte</Label>
+        <div>
+          <Label htmlFor="fontSize">Tamanho da fonte</Label>
           <Select 
-            value={block.style?.fontWeight || 'normal'} 
-            onValueChange={(value) => updateStyle({ fontWeight: value })}
+            value={block.style?.fontSize || 'base'} 
+            onValueChange={handleFontSizeChange}
           >
-            <SelectTrigger id="fontWeight">
-              <SelectValue placeholder="Peso normal" />
+            <SelectTrigger id="fontSize">
+              <SelectValue placeholder="Tamanho da fonte" />
             </SelectTrigger>
             <SelectContent>
-              {fontWeights.map((weight) => (
-                <SelectItem key={weight.value} value={weight.value}>{weight.label}</SelectItem>
-              ))}
+              <SelectItem value="xs">Muito pequeno</SelectItem>
+              <SelectItem value="sm">Pequeno</SelectItem>
+              <SelectItem value="base">Normal</SelectItem>
+              <SelectItem value="lg">Grande</SelectItem>
+              <SelectItem value="xl">Muito grande</SelectItem>
+              <SelectItem value="2xl">Extra grande</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="textAlign">Alinhamento</Label>
-          <Select 
-            value={block.style?.textAlign || 'left'} 
-            onValueChange={(value) => updateStyle({ textAlign: value })}
-          >
-            <SelectTrigger id="textAlign">
-              <SelectValue placeholder="Alinhado à esquerda" />
-            </SelectTrigger>
-            <SelectContent>
-              {textAlignOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      </div>
+      
+      <div>
+        <Label htmlFor="textAlign">Alinhamento</Label>
+        <Select 
+          value={block.style?.textAlign || 'left'} 
+          onValueChange={handleTextAlignChange}
+        >
+          <SelectTrigger id="textAlign">
+            <SelectValue placeholder="Alinhamento" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="left">Esquerda</SelectItem>
+            <SelectItem value="center">Centro</SelectItem>
+            <SelectItem value="right">Direita</SelectItem>
+            <SelectItem value="justify">Justificado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="fontWeight">Estilo do texto</Label>
+        <div className="flex space-x-2 mt-1">
+          <ToggleGroup type="single" value={block.style?.fontWeight || 'normal'} onValueChange={handleFontWeightChange}>
+            <ToggleGroupItem value="normal" aria-label="Normal">Normal</ToggleGroupItem>
+            <ToggleGroupItem value="medium" aria-label="Médio">Médio</ToggleGroupItem>
+            <ToggleGroupItem value="semibold" aria-label="Semi-negrito">Semi</ToggleGroupItem>
+            <ToggleGroupItem value="bold" aria-label="Negrito">Negrito</ToggleGroupItem>
+          </ToggleGroup>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="headingColor">Cor dos Títulos</Label>
-          <input 
-            type="color"
-            id="headingColor"
-            value={block.style?.headingColor || '#000000'}
-            onChange={(e) => updateStyle({ headingColor: e.target.value })}
-            className="h-8 w-full cursor-pointer"
-          />
+      </div>
+
+      <div>
+        <Label>Formatação</Label>
+        <div className="flex items-center space-x-2 mt-1">
+          <ToggleGroup type="single" value={block.style?.fontStyle || 'normal'} onValueChange={handleFontStyleChange}>
+            <ToggleGroupItem value="normal" aria-label="Normal">
+              <span className="mr-2">Aa</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="Itálico">
+              <Italic className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+          
+          <ToggleGroup type="single" value={block.style?.textDecoration || 'none'} onValueChange={handleTextDecorationChange}>
+            <ToggleGroupItem value="none" aria-label="Sem decoração">
+              <span className="mr-2">Aa</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="Sublinhado">
+              <Underline className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="headingWeight">Peso dos Títulos</Label>
-          <Select 
-            value={block.style?.headingWeight || 'bold'} 
-            onValueChange={(value) => updateStyle({ headingWeight: value })}
-          >
-            <SelectTrigger id="headingWeight">
-              <SelectValue placeholder="Peso negrito" />
-            </SelectTrigger>
-            <SelectContent>
-              {headingFontWeights.map((weight) => (
-                <SelectItem key={weight.value} value={weight.value}>{weight.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="headingWeight">Estilo dos títulos</Label>
+        <Select 
+          value={block.style?.headingWeight || 'bold'} 
+          onValueChange={handleHeadingWeightChange}
+        >
+          <SelectTrigger id="headingWeight">
+            <SelectValue placeholder="Estilo dos títulos" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="normal">Normal</SelectItem>
+            <SelectItem value="medium">Médio</SelectItem>
+            <SelectItem value="semibold">Semi-negrito</SelectItem>
+            <SelectItem value="bold">Negrito</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

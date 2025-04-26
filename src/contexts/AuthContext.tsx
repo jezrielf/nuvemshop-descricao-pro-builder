@@ -1,85 +1,131 @@
 
-import { createContext, useContext, ReactNode } from 'react';
-import { Profile } from '@/types/auth';
-import { useAuthProvider } from '@/hooks/useAuthProvider';
+import React, { createContext, useContext } from 'react';
+import { AuthContextProps } from '@/types/authContext';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useDescriptionCount } from '@/hooks/useDescriptionCount';
+import { getRoles, hasRole, isAdmin, isPremium, isBusiness } from '@/utils/roleUtils';
 
-export interface AuthContextProps {
-  profile: Profile | null;
-  user: Profile | null; // Alias for profile
-  loading: boolean;
-  error: string | null;
-  isAuthenticated: boolean;
-  login: (credentials?: { email: string; password: string }) => Promise<Profile>;
-  signIn: (credentials?: { email: string; password: string }) => Promise<Profile>; // Alias for login
-  signUp: (userData: any) => Promise<any>;
-  logout: () => void;
-  signOut: () => void; // Alias for logout
-  refreshProfile: () => Promise<Profile | undefined>;
-  isPremium: () => boolean;
-  isBusiness: () => boolean;
-  isAdmin: () => boolean;
-  hasRole: (requiredRole: string) => boolean;
-  isSubscribed: () => boolean;
-  subscriptionTier: string;
-  descriptionCount: number;
-  canCreateMoreDescriptions: () => boolean;
-  openCustomerPortal: () => Promise<void>;
-  refreshSubscription: () => Promise<void>;
-  session: any;
+interface AuthProviderProps {
+  children: React.ReactNode;
 }
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+export const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const auth = useAuthProvider();
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const {
+    session,
+    user,
+    profile,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    fetchProfile,
+    refreshProfile
+  } = useAuthSession();
+
+  const {
+    subscriptionTier,
+    subscriptionEnd,
+    refreshSubscription,
+    openCustomerPortal
+  } = useSubscription();
+
+  const {
+    descriptionCount,
+    incrementDescriptionCount
+  } = useDescriptionCount(user?.id);
   
-  // Create a compatible context value
-  const contextValue: AuthContextProps = {
-    profile: auth.user,
-    user: auth.user,
-    loading: auth.isLoading,
-    error: auth.error,
-    isAuthenticated: !!auth.user,
-    login: auth.signIn,
-    signIn: auth.signIn,
-    signUp: async (userData: any) => {
-      console.warn('signUp not implemented, using signIn instead');
-      if (auth.signIn) return auth.signIn({ email: userData.email, password: userData.password });
-      throw new Error('Not implemented');
-    },
-    logout: auth.signOut,
-    signOut: auth.signOut,
-    refreshProfile: auth.refreshProfile || (async () => undefined),
-    isPremium: auth.isPremium,
-    isBusiness: auth.isBusiness,
-    isAdmin: auth.isAdmin,
-    hasRole: (role: string) => !!auth.user?.role && (
-      typeof auth.user.role === 'string' 
-        ? auth.user.role === role
-        : auth.user.role.includes(role)
-    ),
-    isSubscribed: auth.isSubscribed,
-    subscriptionTier: 'free', // Default value
-    descriptionCount: 0, // Default value
-    canCreateMoreDescriptions: () => true, // Default implementation
-    openCustomerPortal: async () => { console.warn('openCustomerPortal not implemented'); },
-    refreshSubscription: async () => {
-      if (auth.refreshProfile) await auth.refreshProfile();
-      console.log('Subscription refreshed');
-    },
-    session: auth.session || { user: auth.user }
+  // Effect to refresh profile and subscription regularly
+  React.useEffect(() => {
+    // Refresh profile and subscription every 5 minutes when user is logged in
+    if (user) {
+      const refreshInterval = setInterval(() => {
+        refreshProfile();
+        refreshSubscription();
+      }, 5 * 60 * 1000); // 5 minutes
+      
+      return () => clearInterval(refreshInterval);
+    }
+  }, [user, refreshProfile, refreshSubscription]);
+
+  // Corrigido: Verificação correta de papéis do usuário
+  const isAdminUser = React.useMemo(() => {
+    if (!profile?.role) return false;
+    return isAdmin(profile.role);
+  }, [profile?.role]);
+
+  const isPremiumUser = React.useMemo(() => {
+    // Verificar tanto o papel do usuário quanto o plano de assinatura
+    if (!profile?.role) return subscriptionTier === 'premium' || subscriptionTier === 'admin';
+    
+    // Se tiver o papel premium ou admin nos perfis, é premium
+    if (isPremium(profile.role) || isAdminUser) return true;
+    
+    // Se tiver uma assinatura premium, é premium
+    return subscriptionTier === 'premium' || subscriptionTier === 'admin';
+  }, [profile?.role, isAdminUser, subscriptionTier]);
+
+  const isBusinessUser = React.useMemo(() => {
+    // Verificar tanto o papel do usuário quanto o plano de assinatura
+    if (!profile?.role) return subscriptionTier === 'business';
+    
+    // Se tiver o papel business, premium ou admin, é business
+    if (isBusiness(profile.role) || isPremiumUser) return true;
+    
+    // Se tiver uma assinatura business, é business
+    return subscriptionTier === 'business';
+  }, [profile?.role, isPremiumUser, subscriptionTier]);
+
+  const isSubscribedUser = React.useMemo(() => {
+    // Se tiver qualquer papel premium ou superior, é assinante
+    if (isPremiumUser || isBusinessUser) return true;
+    
+    // Ou se tiver um plano de assinatura diferente de 'free'
+    return Boolean(subscriptionTier && subscriptionTier.toLowerCase() !== 'free');
+  }, [isPremiumUser, isBusinessUser, subscriptionTier]);
+
+  const canCreateMoreDescriptionsValue = isSubscribedUser || descriptionCount < 3;
+
+  const hasRoleCallback = (role: string) => {
+    if (!profile?.role) return false;
+    return hasRole(profile.role, role);
   };
-  
+
+  const value = {
+    session,
+    user,
+    profile,
+    signIn,
+    signUp,
+    signOut,
+    loading,
+    hasRole: hasRoleCallback,
+    isAdmin: () => isAdminUser,
+    isPremium: () => isPremiumUser,
+    isBusiness: () => isBusinessUser,
+    isSubscribed: () => isSubscribedUser,
+    subscriptionTier,
+    subscriptionEnd,
+    refreshSubscription,
+    openCustomerPortal,
+    descriptionCount,
+    incrementDescriptionCount,
+    canCreateMoreDescriptions: () => canCreateMoreDescriptionsValue,
+    refreshProfile
+  };
+
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

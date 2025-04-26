@@ -1,30 +1,24 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/services/storage';
-import { convertProfileToUser } from '@/utils/typeConversion';
 
 export const useImageUpload = () => {
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const auth = useAuth();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return null;
+  const uploadImage = async (file: File) => {
+    if (!file) return;
     
-    setIsUploading(true);
+    setUploading(true);
     setUploadProgress(0);
     
     try {
-      // Convert the user to the format expected by storageService
-      const user = auth.user ? convertProfileToUser(auth.user) : null;
-
       const result = await storageService.uploadFile({
-        user,
+        user: auth.user,
         file,
         onProgress: setUploadProgress
       });
@@ -33,7 +27,6 @@ export const useImageUpload = () => {
         throw new Error(result.error);
       }
       
-      // Set the image URL for display
       setImageUrl(result.url);
       
       toast({
@@ -53,16 +46,22 @@ export const useImageUpload = () => {
       
       return null;
     } finally {
-      setIsUploading(false);
-      if (e.target) e.target.value = '';
+      setUploading(false);
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    return uploadImage(file);
+  };
+
   return {
-    uploading: isUploading, // For backwards compatibility with components using 'uploading'
-    isUploading, 
+    uploading,
     uploadProgress,
     imageUrl,
+    uploadImage,
     handleFileChange
   };
 };

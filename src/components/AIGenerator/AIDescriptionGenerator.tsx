@@ -19,17 +19,15 @@ import { Separator } from '@/components/ui/separator';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sparkles, Loader2, Upload, Image } from 'lucide-react';
+import { Sparkles, Loader2, Upload, Image, LucideProps } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import AIGeneratorResult from './AIGeneratorResult';
-import { ProductDescription, Block, BlockType } from '@/types/editor';
+import { ProductCategory, ProductDescription, Block, BlockType } from '@/types/editor';
+import { generateAIDescription } from '@/utils/aiGenerators/descriptionGenerator';
 import { isPremium } from '@/utils/roleUtils';
-
-// Import generateDescription directly
-import { generateDescription } from '@/utils/aiGenerators/descriptionGenerator';
 
 // Form schema for AI description generation
 const formSchema = z.object({
@@ -43,9 +41,6 @@ const formSchema = z.object({
   tone: z.enum(['formal', 'casual', 'professional', 'enthusiastic']).default('professional'),
   imageUrl: z.string().optional(),
 });
-
-// Fix the type for tone to match what's expected
-type ToneType = 'formal' | 'casual' | 'professional' | 'enthusiastic';
 
 interface AIDescriptionGeneratorProps {
   isOpen: boolean;
@@ -81,7 +76,7 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
   });
 
   // If not premium, redirect to plans page
-  if (profile?.role && !isPremium(Array.isArray(profile.role) ? profile.role[0] : profile.role) && !isBusiness()) {
+  if (!isPremium(profile?.role) && !isBusiness()) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[500px]">
@@ -125,20 +120,17 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
     setIsGenerating(true);
     
     try {
-      // Fix: Convert tone value to the correct type explicitly 
-      const toneValue = values.tone as ToneType;
-
-      // Use function with correct parameters
-      const description = await generateDescription({
-        productName: values.productName,                 
-        productCategory: values.productCategory,         
-        productPrice: values.productPrice,               
-        companyInfo: values.companyInfo,                 
-        targetAudience: values.targetAudience,           
-        mainFeatures: values.mainFeatures,               
-        additionalInfo: values.additionalInfo,           
-        tone: toneValue,                               
-        imageUrl: uploadedImageUrl || undefined,         
+      // Fix: Make sure all required properties are provided to generateAIDescription
+      const description = await generateAIDescription({
+        productName: values.productName,                 // Required
+        productCategory: values.productCategory,         // Required
+        productPrice: values.productPrice,               // Optional
+        companyInfo: values.companyInfo,                 // Required
+        targetAudience: values.targetAudience,           // Required
+        mainFeatures: values.mainFeatures,               // Required
+        additionalInfo: values.additionalInfo,           // Optional
+        tone: values.tone,                               // Required
+        imageUrl: uploadedImageUrl || undefined,         // Optional
       });
       
       setGeneratedDescription(description);

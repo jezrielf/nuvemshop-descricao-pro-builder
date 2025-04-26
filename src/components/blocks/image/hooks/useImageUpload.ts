@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/services/storage';
-import { convertProfileToUser } from '@/utils/typeConversion';
 
 interface UseImageUploadProps {
   onSuccess?: (url: string, alt: string) => void;
@@ -23,11 +22,8 @@ export const useImageUpload = (props?: UseImageUploadProps) => {
     setUploadProgress(0);
     
     try {
-      // Convert the user to the format expected by storageService
-      const user = auth.user ? convertProfileToUser(auth.user) : null;
-
       const result = await storageService.uploadFile({
-        user,
+        user: auth.user,
         file,
         onProgress: setUploadProgress
       });

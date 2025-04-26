@@ -1,7 +1,5 @@
 
 import { VideoBlock } from './video';
-import { VideoTextBlock } from './videoText';
-import { TextVideoBlock } from './textVideo';
 import { HeroBlock } from './hero';
 import { TextBlock } from './text';
 import { FeaturesBlock } from './features';
@@ -13,12 +11,9 @@ import { ImageTextBlock } from './imageText';
 import { TextImageBlock } from './textImage';
 import { FAQBlock } from './faq';
 import { CTABlock } from './cta';
-import { CarouselBlock } from './carousel';
 
 export type Block = 
   | VideoBlock
-  | VideoTextBlock
-  | TextVideoBlock
   | HeroBlock
   | TextBlock
   | FeaturesBlock
@@ -29,8 +24,7 @@ export type Block =
   | ImageTextBlock
   | TextImageBlock
   | FAQBlock
-  | CTABlock
-  | CarouselBlock;
+  | CTABlock;
 
 export * from './hero';
 export * from './text';
@@ -44,6 +38,3 @@ export * from './textImage';
 export * from './faq';
 export * from './cta';
 export * from './video';
-export * from './videoText';
-export * from './textVideo';
-export * from './carousel';

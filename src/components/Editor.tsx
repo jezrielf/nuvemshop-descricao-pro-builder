@@ -6,25 +6,32 @@ import AddBlock from './AddBlock';
 import TemplateSelector from './TemplateSelector';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Sparkles, Lock } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import AIContentRecommender from './AIGenerator/AIContentRecommender';
 import { SEOToolsMenu } from './SEO/menu/SEOToolsMenu';
+import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { updateBlockImage } from './SEO/utils/imageUtils';
-import { v4 as uuidv4 } from 'uuid';
-import { ProductDescription } from '@/types/editor';
 
 const Editor: React.FC = () => {
-  const { description, reorderBlocks, updateBlock, loadSavedDescriptions } = useEditorStore();
+  const { description, reorderBlocks, updateBlock } = useEditorStore();
   const { isPremium, isBusiness } = useAuth();
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [nameInput, setNameInput] = useState('');
   
   // Calculate these values once per render
   const isPremiumUser = isPremium();
   const isBusinessUser = isBusiness();
+  
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Editor component - isPremium:", isPremiumUser);
+    console.log("Editor component - isBusiness:", isBusinessUser);
+  }
   
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -37,27 +44,14 @@ const Editor: React.FC = () => {
     reorderBlocks(fromIndex, toIndex);
   };
   
+  const handleUpgradePlan = () => {
+    navigate('/plans');
+  };
+  
   const handleUpdateImage = (blockId: string, imageType: string, newImageUrl: string) => {
     if (description) {
       updateBlockImage(blockId, imageType, newImageUrl, updateBlock, description);
     }
-  };
-
-  const handleCreateEmptyDescription = () => {
-    // Criar uma nova descrição temporária sem nome
-    const newDescription: ProductDescription = {
-      id: uuidv4(),
-      name: 'Nova descrição',
-      blocks: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // Usar a action loadDescription para carregar esta descrição temporária
-    useEditorStore.getState().loadDescription(newDescription);
-    
-    // Recarregar as descrições salvas para garantir que tudo esteja atualizado
-    loadSavedDescriptions();
   };
   
   // Memoize the SEO tools component to prevent unnecessary re-renders
@@ -92,19 +86,36 @@ const Editor: React.FC = () => {
           
           <div className="w-full bg-white border rounded-lg overflow-hidden">
             <div className="p-4 border-b">
-              <h3 className="font-medium">Ou inicie uma descrição em branco</h3>
-              <p className="text-sm text-gray-500">Crie e personalize sua descrição do zero</p>
+              <h3 className="font-medium">Ou crie uma descrição com IA</h3>
+              <p className="text-sm text-gray-500">Deixe nossa IA criar uma descrição completa para você</p>
             </div>
             <div className="p-4 flex justify-center">
-              <Button 
-                onClick={handleCreateEmptyDescription}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Iniciar Descrição
-              </Button>
+              {isPremiumUser || isBusinessUser ? (
+                <Button 
+                  onClick={() => setIsAIGeneratorOpen(true)}
+                  className="border-yellow-400 bg-gradient-to-r from-yellow-50 to-white"
+                >
+                  <Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
+                  Gerar Descrição com IA
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleUpgradePlan}
+                  variant="outline"
+                >
+                  <Lock className="h-4 w-4 mr-2" />
+                  Recurso do Plano Premium ou Empresarial
+                </Button>
+              )}
             </div>
           </div>
         </div>
+        
+        <AIContentRecommender 
+          isOpen={isAIGeneratorOpen} 
+          onOpenChange={setIsAIGeneratorOpen} 
+          description={null}
+        />
       </div>
     );
   }

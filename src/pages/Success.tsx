@@ -1,82 +1,84 @@
 
 import React, { useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-
-interface SubscriptionInfo {
-  status: string;
-  plan: string;
-}
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, ArrowRight, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SubscriptionInfo } from '@/services/subscriptionService';
 
 const Success: React.FC = () => {
-  const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { refreshSubscription } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  
   useEffect(() => {
-    const fetchSubscriptionInfo = async () => {
+    const updateSubscription = async () => {
       try {
-        // Mock subscription info for now
-        const mockSubscription = {
-          status: 'active',
-          plan: 'premium'
-        };
-        
-        setSubscriptionInfo(mockSubscription);
-      } catch (error) {
-        console.error('Error fetching subscription info:', error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível verificar sua assinatura.',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
+        setLoading(true);
+        setError(null);
+        // Refresh subscription information
+        const subscriptionInfo: SubscriptionInfo = await refreshSubscription();
+        console.log('Updated subscription info:', subscriptionInfo);
+        setLoading(false);
+      } catch (error: any) {
+        console.error('Error updating subscription status:', error);
+        setError(error.message || 'Erro ao atualizar informações da assinatura');
+        setLoading(false);
       }
     };
-
-    fetchSubscriptionInfo();
-  }, [toast]);
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>;
-  }
-
-  if (!subscriptionInfo) {
-    return <Navigate to="/" />;
-  }
-
+    
+    if (sessionId) {
+      updateSubscription();
+    } else {
+      setLoading(false);
+    }
+  }, [sessionId, refreshSubscription]);
+  
+  const handleContinue = () => {
+    navigate('/editor');
+  };
+  
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <Card className="w-full max-w-lg shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <Card className="w-full max-w-md text-center">
         <CardHeader>
-          <div className="flex items-center justify-center mb-4">
-            <div className="rounded-full bg-green-100 p-3">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
+          <div className="flex justify-center mb-4">
+            <CheckCircle className="h-16 w-16 text-green-500" />
           </div>
-          <CardTitle className="text-center text-2xl font-bold">Assinatura confirmada!</CardTitle>
+          <CardTitle className="text-2xl">Assinatura Confirmada!</CardTitle>
+          <CardDescription>
+            Sua assinatura foi processada com sucesso.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center space-y-4">
-            <p className="text-gray-500">
-              Parabéns! Sua assinatura {subscriptionInfo.plan} está {subscriptionInfo.status === 'active' ? 'ativa' : 'pendente'}.
+          {error ? (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {error}. Os recursos Premium ainda podem estar disponíveis.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <p className="mb-4">
+              Obrigado por assinar o Descrição Pro. Você agora tem acesso a todos os recursos do plano.
             </p>
-            <p className="text-gray-500">
-              Agora você pode aproveitar todos os recursos premium da plataforma.
-            </p>
-          </div>
+          )}
+          
+          {loading ? (
+            <p className="text-muted-foreground">Atualizando informações da sua conta...</p>
+          ) : (
+            <p className="text-muted-foreground">Suas informações de assinatura foram atualizadas.</p>
+          )}
         </CardContent>
-        <CardFooter className="flex justify-center gap-4">
-          <Button onClick={() => navigate('/editor')}>
-            Ir para o Editor
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/account')}>
-            Ver minha conta
+        <CardFooter className="flex justify-center">
+          <Button onClick={handleContinue} disabled={loading}>
+            Continuar para o Editor
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
       </Card>
