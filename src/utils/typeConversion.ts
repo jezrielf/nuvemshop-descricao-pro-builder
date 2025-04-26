@@ -1,4 +1,5 @@
 
+
 import { Block, BlockType } from '@/types/editor';
 
 /**
@@ -49,5 +50,33 @@ export function convertProfileToUser(profile: any): any {
     role: profile.user_metadata?.role || 'user',
     plan: profile.user_metadata?.plan || 'free',
     savedDescriptionsCount: profile.user_metadata?.savedDescriptionsCount || 0
+  };
+}
+
+/**
+ * Gets user role as string
+ */
+export function getRoleAsString(role: string | string[] | undefined): string {
+  if (!role) return 'user';
+  
+  if (Array.isArray(role)) {
+    return role.length > 0 ? role[0] : 'user';
+  }
+  
+  return role;
+}
+
+/**
+ * Converts profile data to formatted profile
+ */
+export function convertToProfile(data: any): any {
+  if (!data) return null;
+  
+  return {
+    id: data.id,
+    email: data.email,
+    name: data.name || data.user_metadata?.name || '',
+    role: data.role || data.user_metadata?.role || 'user',
+    plan: data.plan || data.user_metadata?.plan || 'free'
   };
 }
