@@ -23,7 +23,8 @@ export const useTemplateUtils = () => {
       'electronics': 'Eletrônicos',
       'energy': 'Energia',
       'Casa e decoração': 'Casa e Decoração',
-      'other': 'Outros'
+      'other': 'Outros',
+      'all': 'Todos'
     };
     return names;
   }, []);
@@ -35,3 +36,4 @@ export const useTemplateUtils = () => {
 
   return { getCategoryName, categoryNames };
 };
+

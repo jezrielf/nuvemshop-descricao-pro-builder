@@ -61,6 +61,7 @@ const Editor: React.FC = () => {
   
   const handleSelectTemplate = (template: Template) => {
     applyTemplate(template);
+    setIsTemplateSelectorOpen(false);
   };
   
   // Memoize the SEO tools component to prevent unnecessary re-renders
@@ -95,11 +96,6 @@ const Editor: React.FC = () => {
               >
                 Selecionar Template
               </Button>
-              <TemplateSelector 
-                isOpen={isTemplateSelectorOpen} 
-                onClose={() => setIsTemplateSelectorOpen(false)} 
-                onSelectTemplate={handleSelectTemplate} 
-              />
             </div>
           </div>
           

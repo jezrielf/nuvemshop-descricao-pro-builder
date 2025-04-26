@@ -24,14 +24,14 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate 
         {categories.map((category) => (
           <button
             key={category}
-            onClick={() => setSelectedCategory(category as any)}
+            onClick={() => setSelectedCategory(category)}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
               selectedCategory === category
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted hover:bg-muted/80'
             }`}
           >
-            {getCategoryName(category as any)}
+            {getCategoryName(category)}
           </button>
         ))}
       </div>

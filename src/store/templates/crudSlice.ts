@@ -95,24 +95,8 @@ export const createTemplateCRUDSlice: StateCreator<
   },
   
   applyTemplate: (template) => {
-    // Import dynamically to avoid circular dependency
-    const { useEditorStore } = require('@/store/editor');
-    const { loadDescription } = useEditorStore.getState();
-    
-    if (!loadDescription) {
-      console.error("Failed to apply template: Editor store not available");
-      return;
-    }
-    
-    const templateDescription = {
-      id: uuidv4(),
-      name: `Descrição baseada em "${template.name}"`,
-      blocks: template.blocks ? [...template.blocks] : [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      category: template.category
-    };
-    
-    loadDescription(templateDescription);
+    templateService.applyTemplate(template);
   }
 });
+
+export { createTemplateCRUDSlice as createCRUDSlice };

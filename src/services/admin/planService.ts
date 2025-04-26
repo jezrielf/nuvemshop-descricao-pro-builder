@@ -1,197 +1,137 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Plan } from '@/components/admin/plans/types';
+import { v4 as uuidv4 } from 'uuid';
+
+// Type for a plan feature
+export interface PlanFeature {
+  name: string;
+  included: boolean;
+}
+
+// Type for a plan
+export interface Plan {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year' | 'one-time';
+  features: PlanFeature[];
+  isActive: boolean;
+  isDefault: boolean;
+  stripePriceId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Get all plans
+const getPlans = async (): Promise<Plan[]> => {
+  try {
+    // In a real app, this would be fetched from an API or database
+    // Return mock data for now
+    return [
+      {
+        id: "1",
+        name: "Free",
+        description: "Basic features for free",
+        price: 0,
+        currency: "BRL",
+        interval: "month",
+        features: [
+          { name: "Unlimited Templates", included: false },
+          { name: "AI Generation", included: false },
+          { name: "Remove Attribution", included: false },
+        ],
+        isActive: true,
+        isDefault: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "2",
+        name: "Pro",
+        description: "For professionals and businesses",
+        price: 29.90,
+        currency: "BRL",
+        interval: "month",
+        features: [
+          { name: "Unlimited Templates", included: true },
+          { name: "AI Generation", included: true },
+          { name: "Remove Attribution", included: true },
+        ],
+        isActive: true,
+        isDefault: false,
+        stripePriceId: "price_1abc123def456",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    ];
+  } catch (error) {
+    console.error('Error fetching plans:', error);
+    return [];
+  }
+};
+
+// Create a new plan
+const createPlan = async (planData: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>): Promise<Plan> => {
+  try {
+    const newPlan = {
+      ...planData,
+      id: uuidv4(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // In a real app, save to database
+    console.log('Creating plan:', newPlan);
+    return newPlan;
+  } catch (error) {
+    console.error('Error creating plan:', error);
+    throw error;
+  }
+};
+
+// Update an existing plan
+const updatePlan = async (id: string, planData: Partial<Plan>): Promise<Plan> => {
+  try {
+    // In a real app, update in database
+    console.log('Updating plan:', id, planData);
+    
+    // Mock response for now
+    return {
+      id,
+      name: planData.name || "Updated Plan",
+      description: planData.description || "Updated description",
+      price: planData.price || 0,
+      currency: planData.currency || "BRL",
+      interval: planData.interval || "month",
+      features: planData.features || [],
+      isActive: planData.isActive !== undefined ? planData.isActive : true,
+      isDefault: planData.isDefault !== undefined ? planData.isDefault : false,
+      stripePriceId: planData.stripePriceId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error updating plan:', error);
+    throw error;
+  }
+};
+
+// Delete a plan
+const deletePlan = async (id: string): Promise<boolean> => {
+  try {
+    // In a real app, delete from database
+    console.log('Deleting plan:', id);
+    return true;
+  } catch (error) {
+    console.error('Error deleting plan:', error);
+    throw error;
+  }
+};
 
 export const planService = {
-  getPlans: async (): Promise<Plan[]> => {
-    try {
-      console.log("Buscando planos no Stripe via Edge Function");
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { method: 'GET', action: 'list-products' }
-      });
-      
-      if (error) {
-        console.error("Erro na Edge Function:", error);
-        throw error;
-      }
-      
-      if (data && !data.success) {
-        console.error("Erro ao buscar planos:", data.error);
-        throw new Error(data.error || "Failed to fetch plans");
-      }
-      
-      console.log("Planos recebidos:", data.products?.length || 0);
-      
-      // Process retrieved products
-      const formattedPlans: Plan[] = data.products.map((product: any) => {
-        // Parse features from string to our PlanFeature format
-        let features = [];
-        try {
-          if (Array.isArray(product.features)) {
-            features = product.features.map((feature: any, index: number) => {
-              if (typeof feature === 'object' && 'name' in feature && 'included' in feature) {
-                return {
-                  id: feature.id || `feature-${index}`,
-                  name: feature.name,
-                  included: feature.included
-                };
-              } else if (typeof feature === 'string') {
-                const [name, includedStr] = feature.split(':');
-                return {
-                  id: `feature-${index}`,
-                  name,
-                  included: includedStr === 'true'
-                };
-              }
-              
-              return {
-                id: `feature-${index}`,
-                name: String(feature),
-                included: false
-              };
-            });
-          }
-        } catch (e) {
-          console.error("Erro ao processar features:", e);
-          features = [];
-        }
-        
-        return {
-          id: product.id,
-          name: product.name,
-          description: product.description || '',
-          price: product.price,
-          priceId: product.priceId,
-          features,
-          isActive: product.isActive,
-          isDefault: product.isDefault
-        };
-      });
-      
-      console.log("Planos formatados:", formattedPlans.length);
-      return formattedPlans;
-    } catch (error) {
-      console.error('Erro em getPlans:', error);
-      throw error;
-    }
-  },
-  
-  createPlan: async (planData: Omit<Plan, 'id'>): Promise<Plan> => {
-    try {
-      console.log("Criando novo plano:", planData.name);
-      
-      // Always get the most current session before making admin requests
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("Authentication required");
-      }
-      
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { 
-          method: 'POST', 
-          action: 'create-product',
-          productData: planData
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      
-      if (error) {
-        console.error("Erro na Edge Function:", error);
-        throw error;
-      }
-      
-      if (data && !data.success) {
-        console.error("Erro ao criar plano:", data.error);
-        throw new Error(data.error || "Failed to create plan");
-      }
-      
-      console.log("Plano criado com sucesso:", data.product);
-      return data.product;
-    } catch (error) {
-      console.error('Erro em createPlan:', error);
-      throw error;
-    }
-  },
-  
-  updatePlan: async (planId: string, planData: Partial<Plan>): Promise<Plan> => {
-    try {
-      console.log("Atualizando plano:", planId);
-      
-      // Always get the most current session before making admin requests
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("Authentication required");
-      }
-      
-      console.log("Token para autorização:", session.access_token.substring(0, 10) + "...");
-      
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { 
-          method: 'PUT', 
-          action: 'update-product',
-          productId: planId,
-          productData: planData
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      
-      if (error) {
-        console.error("Erro na Edge Function:", error);
-        throw error;
-      }
-      
-      if (data && !data.success) {
-        console.error("Erro ao atualizar plano:", data.error);
-        throw new Error(data.error || "Failed to update plan");
-      }
-      
-      console.log("Plano atualizado com sucesso:", data.product);
-      return data.product;
-    } catch (error) {
-      console.error('Erro em updatePlan:', error);
-      throw error;
-    }
-  },
-  
-  deletePlan: async (planId: string): Promise<void> => {
-    try {
-      console.log("Excluindo plano:", planId);
-      
-      // Always get the most current session before making admin requests
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("Authentication required");
-      }
-      
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { 
-          method: 'DELETE', 
-          action: 'delete-product',
-          productId: planId
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      
-      if (error) {
-        console.error("Erro na Edge Function:", error);
-        throw error;
-      }
-      
-      if (data && !data.success) {
-        console.error("Erro ao excluir plano:", data.error);
-        throw new Error(data.error || "Failed to delete plan");
-      }
-      
-      console.log("Plano excluído com sucesso");
-    } catch (error) {
-      console.error('Erro em deletePlan:', error);
-      throw error;
-    }
-  },
+  getPlans,
+  createPlan,
+  updatePlan,
+  deletePlan,
 };

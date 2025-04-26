@@ -25,7 +25,7 @@ export const getTemplates = async (): Promise<Template[]> => {
       name: template.name,
       description: template.description,
       category: template.category as ProductCategory,
-      blocks: template.blocks || [],
+      blocks: Array.isArray(template.blocks) ? template.blocks : [],
       thumbnailUrl: template.thumbnailUrl || '/templates/default.jpg',
       createdAt: template.created_at,
       updatedAt: template.updated_at
@@ -55,7 +55,7 @@ export const getTemplateById = async (id: string): Promise<Template | null> => {
       name: data.name,
       description: data.description,
       category: data.category as ProductCategory,
-      blocks: data.blocks || [],
+      blocks: Array.isArray(data.blocks) ? data.blocks : [],
       thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',
       createdAt: data.created_at,
       updatedAt: data.updated_at
@@ -128,7 +128,7 @@ export const updateTemplate = async (id: string, template: Partial<Template>): P
       name: data.name,
       description: data.description,
       category: data.category as ProductCategory,
-      blocks: data.blocks || [],
+      blocks: Array.isArray(data.blocks) ? data.blocks : [],
       thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',
       createdAt: data.created_at,
       updatedAt: data.updated_at
@@ -188,6 +188,29 @@ const getMockTemplates = (): Template[] => {
   ];
 };
 
+// Function to apply a template
+const applyTemplate = (template: Template) => {
+  // Import dynamically to avoid circular dependency
+  const { useEditorStore } = require('@/store/editor');
+  const { loadDescription } = useEditorStore.getState();
+  
+  if (!loadDescription) {
+    console.error("Failed to apply template: Editor store not available");
+    return;
+  }
+  
+  const templateDescription = {
+    id: uuidv4(),
+    name: `Descrição baseada em "${template.name}"`,
+    blocks: template.blocks ? [...template.blocks] : [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    category: template.category
+  };
+  
+  loadDescription(templateDescription);
+};
+
 // Export as a default object for compatibility
 const templateService = {
   getTemplates,
@@ -195,7 +218,8 @@ const templateService = {
   createTemplate,
   updateTemplate,
   deleteTemplate,
-  convertBlocks
+  convertBlocks,
+  applyTemplate
 };
 
 export default templateService;
