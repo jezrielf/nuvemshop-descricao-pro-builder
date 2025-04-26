@@ -8,7 +8,7 @@ import { createSaveActions } from './saveActions';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 // Create the central store that combines all action creators with selector middleware for performance
-export const useEditorStore = create<EditorState>(
+export const useEditorStore = create<EditorState>()(
   subscribeWithSelector((set, get) => ({
     description: null,
     selectedBlockId: null,
@@ -44,5 +44,6 @@ export const {
   duplicateBlock,
   getHtmlOutput,
   saveCurrentDescription,
-  loadSavedDescriptions
+  loadSavedDescriptions,
+  setAuthContext
 } = useEditorStore.getState();
