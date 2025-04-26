@@ -1,35 +1,28 @@
 
 import { StateCreator } from 'zustand';
-import { TemplateState } from './state';
+import { TemplateState, TemplateLoadingSlice } from './types';
+import { Template } from '@/types/editor';
 import templateService from '@/services/admin/templateService';
 
-export interface TemplateLoadingSlice {
-  isLoading: boolean;
-  error: string | null;
-  fetchTemplates: () => Promise<void>;
-}
-
-export const createTemplateLoadingSlice: StateCreator<
-  TemplateState & TemplateLoadingSlice,
-  [],
-  [],
-  TemplateLoadingSlice
+export const createLoadingSlice: StateCreator<
+  TemplateState & TemplateLoadingSlice
 > = (set, get) => ({
   isLoading: false,
   error: null,
   
-  fetchTemplates: async () => {
-    set({ isLoading: true, error: null });
-    
+  loadTemplates: async () => {
     try {
+      set({ isLoading: true, error: null });
       const templates = await templateService.getTemplates();
       set({ templates, isLoading: false });
+      return templates;
     } catch (error) {
-      console.error('Error fetching templates:', error);
+      console.error('Error loading templates:', error);
       set({ 
         isLoading: false, 
-        error: error instanceof Error ? error.message : 'Failed to fetch templates' 
+        error: error instanceof Error ? error.message : 'Failed to load templates' 
       });
+      return [];
     }
   }
 });

@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Plan } from '../types';
+import { Plan } from '@/types/subscription';
 import { useToast } from '@/hooks/use-toast';
-import { adminService } from '@/services/admin';
+import { planService } from '@/services/admin/planService';
 
 // Import mockData for fallback
 import { mockPlans } from '../mockData';
@@ -17,7 +17,7 @@ export const usePlansData = () => {
       setLoading(true);
       console.log("Buscando planos...");
       
-      const plansData = await adminService.getPlans();
+      const plansData = await planService.getPlans();
       
       // If we have no products, fallback to mock data
       if (!plansData || plansData.length === 0) {

@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { Plan } from '../types';
+import { Plan } from '@/types/subscription';
 import { useToast } from '@/hooks/use-toast';
-import { adminService } from '@/services/admin';
+import { planService } from '@/services/admin/planService';
 
 export const useDeletePlan = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -29,7 +29,7 @@ export const useDeletePlan = (
       }
       
       console.log("Excluindo plano:", planToDelete.id);
-      await adminService.deletePlan(planToDelete.id);
+      await planService.deletePlan(planToDelete.id);
       
       toast({
         title: 'Plano excluído',

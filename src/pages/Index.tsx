@@ -48,9 +48,9 @@ const Index = () => {
         setIsLoadingTemplates(true);
         console.log("Iniciando carregamento de templates na página inicial");
         const loadedTemplates = await loadTemplates();
-        console.log("Templates carregados na inicialização:", loadedTemplates.length);
-        
-        if (loadedTemplates.length > 0) {
+        console.log("Templates carregados na inicialização:", loadedTemplates?.length || 0);
+      
+        if (loadedTemplates && loadedTemplates.length > 0) {
           toast({
             title: "Templates carregados",
             description: `${loadedTemplates.length} templates disponíveis`,
@@ -79,7 +79,7 @@ const Index = () => {
     // Configura um intervalo para verificar atualizações de templates a cada 5 minutos
     const templateRefreshInterval = setInterval(() => {
       loadTemplates()
-        .then(templates => console.log("Templates atualizados no background:", templates.length))
+        .then(templates => console.log("Templates atualizados no background:", templates?.length || 0))
         .catch(err => console.error("Erro ao atualizar templates no background:", err));
     }, 5 * 60 * 1000); // 5 minutos
     

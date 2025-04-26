@@ -12,4 +12,5 @@ export const adminService = {
   analytics: analyticsService
 };
 
+// Export individual services for direct imports
 export { planService, userService, templateService, analyticsService };

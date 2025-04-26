@@ -1,145 +1,165 @@
-
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Template, ProductCategory } from '@/types/editor';
-import { useTemplateStore } from '@/store/templates';
-import { v4 as uuidv4 } from 'uuid';
-import { convertBlock, convertBlocks } from '@/utils/blockConverter';
+import { useToast } from '@/hooks/use-toast';
+import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
 
 interface NewTemplateDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onClose }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<ProductCategory>('other' as ProductCategory);
-  
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: 'O nome deve ter pelo menos 2 caracteres.',
+  }),
+  description: z.string().optional(),
+  category: z.enum(['basic', 'supplements', 'shoes', 'electronics', 'health', 'fashion', 'accessories', 'hauteCouture', 'other']),
+  thumbnailUrl: z.string().url('URL inválida').optional(),
+});
+
+export function NewTemplateDialog({ open, onClose }: NewTemplateDialogProps) {
   const { createTemplate } = useTemplateStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name.trim()) {
-      toast({
-        title: "Nome obrigatório",
-        description: "Por favor, informe um nome para o template.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    const newTemplate: Omit<Template, "id"> = {
-      name,
-      description,
-      category,
-      blocks: [],
-      thumbnailUrl: `/templates/default.jpg`, // Default image
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    createTemplate(newTemplate);
-    
-    toast({
-      title: "Template criado",
-      description: `O template "${name}" foi criado com sucesso.`
-    });
-    
-    onClose();
-  };
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      category: 'other',
+      thumbnailUrl: ''
+    },
+  });
   
-  const categoryOptions = [
-    { value: 'supplements', label: 'Suplementos' },
-    { value: 'clothing', label: 'Roupas' },
-    { value: 'accessories', label: 'Acessórios' },
-    { value: 'shoes', label: 'Calçados' },
-    { value: 'Eletrônicos', label: 'Eletrônicos' },
-    { value: 'energy', label: 'Energia' },
-    { value: 'Casa e decoração', label: 'Casa e Decoração' },
-    { value: 'Alimentos', label: 'Alimentos' },
-    { value: 'Bebidas', label: 'Bebidas' },
-    { value: 'Beleza', label: 'Beleza' },
-    { value: 'Casa', label: 'Casa' },
-    { value: 'Decoração', label: 'Decoração' },
-    { value: 'Esporte', label: 'Esporte' },
-    { value: 'Moda', label: 'Moda' },
-    { value: 'Saúde', label: 'Saúde' },
-    { value: 'other', label: 'Outros' }
-  ];
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setIsSubmitting(true);
+      
+      await createTemplate({
+        name: values.name,
+        description: values.description,
+        category: values.category as ProductCategory,
+        blocks: [],
+        thumbnailUrl: values.thumbnailUrl || undefined,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      
+      toast({
+        title: 'Template criado',
+        description: 'O template foi criado com sucesso.',
+      });
+      
+      form.reset();
+      onClose();
+    } catch (error) {
+      console.error('Error creating template:', error);
+      toast({
+        title: 'Erro ao criar template',
+        description: 'Não foi possível criar o template. Tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Criar Novo Template</DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nome do Template</Label>
-              <Input 
-                id="name" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Template para Suplementos"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="description">Descrição</Label>
-              <Textarea 
-                id="description" 
-                value={description} 
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descreva o template e seu uso recomendado"
-                className="h-20"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="category">Categoria</Label>
-              <Select 
-                value={category} 
-                onValueChange={(value: string) => setCategory(value as ProductCategory)}
-              >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Selecione uma categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit">Criar Template</Button>
-          </DialogFooter>
-        </form>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Novo Template</DialogTitle>
+          <DialogDescription>
+            Crie um novo template para usar nas suas descrições de produtos.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome do template" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Descrição do template" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="basic">Básico</SelectItem>
+                      <SelectItem value="supplements">Suplementos</SelectItem>
+                      <SelectItem value="shoes">Calçados</SelectItem>
+                      <SelectItem value="electronics">Eletrônicos</SelectItem>
+                      <SelectItem value="health">Saúde</SelectItem>
+                      <SelectItem value="fashion">Moda</SelectItem>
+                      <SelectItem value="accessories">Acessórios</SelectItem>
+                      <SelectItem value="hauteCouture">Alta Costura</SelectItem>
+                      <SelectItem value="other">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="thumbnailUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL da Thumbnail</FormLabel>
+                  <FormControl>
+                    <Input placeholder="URL da imagem de visualização" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Criando...' : 'Criar'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
-};
+}

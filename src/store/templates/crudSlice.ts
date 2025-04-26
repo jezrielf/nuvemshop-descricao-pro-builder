@@ -5,7 +5,7 @@ import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import templateService from '@/services/admin/templateService';
 
-export const createTemplateCRUDSlice: StateCreator<
+export const createCRUDSlice: StateCreator<
   TemplateState & TemplateCRUDSlice
 > = (set, get) => ({
   addTemplate: (template: Template) => {
@@ -76,5 +76,34 @@ export const createTemplateCRUDSlice: StateCreator<
         createNewDescription(templateDescription.name);
       }
     }
+  },
+
+  createTemplate: async (template: Omit<Template, "id">) => {
+    try {
+      const newTemplate = await templateService.createTemplate(template);
+      
+      set((state) => ({
+        templates: [...state.templates, newTemplate]
+      }));
+      
+      return newTemplate;
+    } catch (error) {
+      console.error('Error creating template:', error);
+      throw error;
+    }
+  },
+
+  searchTemplates: (query = '', category = null) => {
+    const { templates } = get();
+    
+    return templates.filter((template) => {
+      const matchesQuery = !query || 
+        template.name.toLowerCase().includes(query.toLowerCase()) || 
+        (template.description && template.description.toLowerCase().includes(query.toLowerCase()));
+        
+      const matchesCategory = !category || template.category === category;
+      
+      return matchesQuery && matchesCategory;
+    });
   }
 });

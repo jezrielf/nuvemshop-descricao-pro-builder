@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon } from 'lucide-react';
-import { BlockBase, BlockType, HeroBlock, ImageBlock, GalleryBlock } from '@/types/editor';
+import { BlockBase, BlockType, HeroBlock, ImageBlock, GalleryBlock, ImageTextBlock, TextImageBlock } from '@/types/editor';
 
 interface ImageOptimizerProps {
   block: BlockBase;
@@ -16,15 +16,15 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage })
 
     switch (block.type) {
       case 'hero':
-        return !!(block as HeroBlock).imageUrl;
+        return !!(block as HeroBlock).image?.src;
       case 'image':
         return !!(block as ImageBlock).src;
       case 'gallery':
         return (block as GalleryBlock).images && (block as GalleryBlock).images.length > 0;
-      case 'image-text':
-        return !!(block as any).imageUrl;
-      case 'text-image':
-        return !!(block as any).imageUrl;
+      case 'imageText':
+        return !!(block as ImageTextBlock).image?.src;
+      case 'textImage':
+        return !!(block as TextImageBlock).image?.src;
       default:
         return false;
     }
@@ -36,15 +36,15 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage })
 
     switch (block.type) {
       case 'hero':
-        return (block as HeroBlock).imageUrl || '';
+        return (block as HeroBlock).image?.src || '';
       case 'image':
         return (block as ImageBlock).src || '';
       case 'gallery':
         return (block as GalleryBlock).images?.[0]?.src || '';
-      case 'image-text':
-        return (block as any).imageUrl || '';
-      case 'text-image':
-        return (block as any).imageUrl || '';
+      case 'imageText':
+        return (block as ImageTextBlock).image?.src || '';
+      case 'textImage':
+        return (block as TextImageBlock).image?.src || '';
       default:
         return '';
     }
@@ -56,14 +56,15 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage })
 
     switch (block.type) {
       case 'hero':
-        return 'imageUrl';
+        return 'image.src';
       case 'image':
         return 'src';
       case 'gallery':
         return 'images[0].src';
-      case 'image-text':
-      case 'text-image':
-        return 'imageUrl';
+      case 'imageText':
+        return 'image.src';
+      case 'textImage':
+        return 'image.src';
       default:
         return '';
     }

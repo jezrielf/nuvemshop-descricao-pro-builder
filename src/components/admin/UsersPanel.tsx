@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 import UserPanelHeader from './users/panels/UserPanelHeader';
 import UserPanelContent from './users/panels/UserPanelContent';
-import { adminService } from '@/services/admin';
+import { userService } from '@/services/admin/userService';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -43,7 +44,7 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const users = await adminService.getUsers();
+      const users = await userService.getUsers();
       setProfiles(users);
       setFilteredProfiles(users);
     } catch (error: any) {
@@ -87,10 +88,6 @@ const UsersPanel: React.FC = () => {
         profiles={filteredProfiles}
         onRefresh={fetchProfiles}
       />
-      
-      <div className="mt-4 text-sm text-gray-500">
-        Total de usuários: {profiles.length}
-      </div>
     </div>
   );
 };

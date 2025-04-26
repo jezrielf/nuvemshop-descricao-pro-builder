@@ -1,114 +1,151 @@
-
 import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
-import { CreateUserFormValues } from './types';
-import CreateUserRoleSelector from './CreateUserRoleSelector';
-import { adminService } from '@/services/admin';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { userService } from '@/services/admin/userService';
+
+const formSchema = z.object({
+  nome: z.string().min(2, {
+    message: 'Nome deve ter pelo menos 2 caracteres.',
+  }),
+  email: z.string().email({
+    message: 'Email inválido.',
+  }),
+  password: z.string().min(6, {
+    message: 'Senha deve ter pelo menos 6 caracteres.',
+  }),
+  role: z.enum(['user', 'premium', 'admin']).default('user'),
+});
 
 interface CreateUserFormProps {
-  onUserCreated: () => void;
+  onSuccess: () => void;
 }
 
-const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
-  const [loading, setLoading] = useState(false);
+const CreateUserForm: React.FC<CreateUserFormProps> = ({ onSuccess }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const form = useForm<CreateUserFormValues>({
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      nome: '',
       email: '',
       password: '',
-      nome: '',
-      role: 'user'
-    }
+      role: 'user',
+    },
   });
 
-  const handleSubmit = async (values: CreateUserFormValues) => {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setLoading(true);
-      console.log('Creating user with values:', values);
+      setIsSubmitting(true);
       
-      // Prepare user data
       const userData = {
         nome: values.nome,
         role: values.role
       };
       
-      // Create the user using the admin service
-      const data = await adminService.createUser(values.email, values.password, userData);
-      
-      console.log('User created successfully:', data);
+      await userService.createUser(values.email, values.password, userData);
       
       toast({
         title: 'Usuário criado com sucesso',
-        description: `Usuário ${values.nome} foi criado com email ${values.email}`,
+        description: `O usuário ${values.email} foi criado com sucesso.`
       });
       
-      onUserCreated();
       form.reset();
+      onSuccess();
     } catch (error: any) {
-      console.error('Error creating user:', error);
+      console.error('Erro ao criar usuário:', error);
       toast({
         title: 'Erro ao criar usuário',
-        description: error.message || 'Ocorreu um erro ao criar o usuário',
+        description: error.message || 'Ocorreu um erro ao criar o usuário.',
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 mt-6">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="email@example.com"
-          {...form.register('email', { required: true })}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="nome"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome</FormLabel>
+              <FormControl>
+                <Input placeholder="Nome do usuário" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="nome">Nome</Label>
-        <Input
-          id="nome"
-          placeholder="Nome do usuário"
-          {...form.register('nome', { required: true })}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="exemplo@email.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="********"
-          {...form.register('password', { required: true })}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Senha</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium">Tipo de Usuário</h3>
-        <CreateUserRoleSelector 
-          watch={form.watch} 
-          setValue={form.setValue} 
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Perfil</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um perfil" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="user">Usuário</SelectItem>
+                  <SelectItem value="premium">Premium</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full mt-6" 
-        disabled={loading}
-      >
-        {loading ? <Spinner className="mr-2" /> : null}
-        Criar Usuário
-      </Button>
-    </form>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Criando...' : 'Criar Usuário'}
+        </Button>
+      </form>
+    </Form>
   );
 };
 
