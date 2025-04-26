@@ -43,3 +43,33 @@ export const isAdmin = (user?: User | null): boolean => {
   const userRole = user.role?.toLowerCase();
   return userRole === 'admin' || userRole === 'administrator';
 };
+
+/**
+ * Get user roles as an array
+ */
+export const getRoles = (user?: User | null): string[] => {
+  if (!user || !user.role) return ['user'];
+  
+  // If role is already an array, return it
+  if (Array.isArray(user.role)) {
+    return user.role;
+  }
+  
+  // If role is a string, convert to array
+  return [user.role];
+};
+
+/**
+ * Check if user has a business role/plan
+ */
+export const isBusiness = (user?: User | null): boolean => {
+  if (!user) return false;
+  
+  const userRole = user.role?.toLowerCase();
+  const userPlan = user.plan?.toLowerCase();
+  
+  return (
+    userRole === 'business' || 
+    userPlan === 'business'
+  );
+};
