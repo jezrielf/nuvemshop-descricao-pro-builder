@@ -2,6 +2,25 @@
 import { templateService } from './templateService';
 import { userService } from './userService';
 
+// Define the return type for the dashboard stats
+interface DashboardStats {
+  userStats: {
+    total: number;
+    premium: number;
+    admin: number;
+    newToday: number;
+  };
+  descriptions: {
+    total: number;
+    recent: number;
+  };
+  plans: {
+    total: number;
+    active: number;
+  };
+  templates: number;
+}
+
 // Create a centralized adminService object that exports all admin services
 export const adminService = {
   // Plan-related methods
@@ -50,14 +69,25 @@ export const adminService = {
   },
 
   // Dashboard-related methods
-  getDashboardStats: async () => {
+  getDashboardStats: async (): Promise<DashboardStats> => {
     console.info('Fetching dashboard stats');
-    // Mock implementation
+    // Mock implementation with the correct structure
     return {
-      users: 25,
-      descriptions: 42,
-      templates: 15,
-      plans: 3
+      userStats: {
+        total: 25,
+        premium: 8,
+        admin: 2,
+        newToday: 3
+      },
+      descriptions: {
+        total: 42,
+        recent: 5
+      },
+      plans: {
+        total: 3,
+        active: 2
+      },
+      templates: 15
     };
   },
 

@@ -1,3 +1,4 @@
+
 /**
  * Convert role property (string or string[]) to array of strings
  */
@@ -25,4 +26,25 @@ export const getRoles = (role: string | string[] | null): string[] => {
 export const hasRole = (userRole: string | string[] | null, roleToCheck: string): boolean => {
   const roles = getRoles(userRole);
   return roles.includes(roleToCheck);
+};
+
+/**
+ * Check if a user has a premium role
+ */
+export const isPremium = (userRole: string | string[] | null): boolean => {
+  return hasRole(userRole, 'premium') || hasRole(userRole, 'business');
+};
+
+/**
+ * Check if a user has a business role
+ */
+export const isBusiness = (userRole: string | string[] | null): boolean => {
+  return hasRole(userRole, 'business');
+};
+
+/**
+ * Check if a user has an admin role
+ */
+export const isAdmin = (userRole: string | string[] | null): boolean => {
+  return hasRole(userRole, 'admin');
 };
