@@ -84,9 +84,15 @@ export const userService = {
         atualizado_em: new Date().toISOString(),
       };
       
+      // Ensure role is a string when inserting into the database
+      const profileToInsert = {
+        ...newProfile,
+        role: typeof newProfile.role === 'string' ? newProfile.role : rolesToString(newProfile.role),
+      };
+      
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert([newProfile]);
+        .insert([profileToInsert]);
         
       if (profileError) throw profileError;
       
@@ -123,8 +129,8 @@ export const userService = {
       };
       
       // Ensure role is string if passed
-      if (userData.role && typeof userData.role !== 'string') {
-        updateData.role = rolesToString(userData.role);
+      if (userData.role) {
+        updateData.role = typeof userData.role === 'string' ? userData.role : rolesToString(userData.role);
       }
       
       const { data, error } = await supabase

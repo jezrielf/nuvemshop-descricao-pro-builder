@@ -30,3 +30,24 @@ export const hasRole = (userRole: string | string[] | null, roleToCheck: string)
   const roles = getRoles(userRole);
   return roles.includes(roleToCheck);
 };
+
+/**
+ * Checks if user has admin role
+ */
+export const isAdmin = (role: string | string[] | null): boolean => {
+  return hasRole(role, 'admin');
+};
+
+/**
+ * Checks if user has premium role
+ */
+export const isPremium = (role: string | string[] | null): boolean => {
+  return hasRole(role, 'premium') || isAdmin(role);
+};
+
+/**
+ * Checks if user has business role
+ */
+export const isBusiness = (role: string | string[] | null): boolean => {
+  return hasRole(role, 'business') || isPremium(role) || isAdmin(role);
+};

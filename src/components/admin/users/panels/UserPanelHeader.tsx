@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { CreateUserForm } from '../CreateUserForm';
+import CreateUserForm from '../CreateUserForm';
 import { UserSearchBar } from './UserSearchBar';
 
 export interface UserPanelHeaderProps {
