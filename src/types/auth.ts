@@ -9,4 +9,6 @@ export interface Profile {
   // Add these properties for backward compatibility
   nome?: string;       // Alias for name
   criado_em?: string;  // Created at date
+  atualizado_em?: string; // Updated at date
+  avatar_url?: string; // Alias for avatarUrl
 }

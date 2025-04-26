@@ -1,113 +1,182 @@
-
-import { useState, useEffect } from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { Profile } from '@/types/auth';
+import { isPremium, isBusiness, isAdmin, hasRole } from '@/utils/roleUtils';
+
+// Add profile conversion utility
+export const convertToProfile = (userData: any): Profile => {
+  if (!userData) return null;
+  
+  // Handle the case where we get a profile in the legacy format
+  if (userData.nome && !userData.name) {
+    return {
+      id: userData.id,
+      email: userData.email || '',
+      name: userData.nome, // Use nome as name
+      role: userData.role,
+      avatarUrl: userData.avatar_url || null,
+      // Keep original properties for backward compatibility
+      nome: userData.nome,
+      criado_em: userData.criado_em,
+      atualizado_em: userData.atualizado_em,
+      avatar_url: userData.avatar_url
+    };
+  }
+  
+  // Handle the standard format
+  return userData as Profile;
+};
 
 export const useAuthProvider = () => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [subscriptionTier, setSubscriptionTier] = useState('free');
   const [descriptionCount, setDescriptionCount] = useState(0);
-  const [subscriptionTier, setSubscriptionTier] = useState<string>('free');
-  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 0);
-          // Load description count from localStorage for this user
-          const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
-          if (storedCount) {
-            setDescriptionCount(parseInt(storedCount, 10));
-          }
-        } else {
-          setProfile(null);
-          // For anonymous users, use a generic key
-          const storedCount = localStorage.getItem('descriptionCount_anonymous');
-          if (storedCount) {
-            setDescriptionCount(parseInt(storedCount, 10));
-          }
-        }
+    // Check for stored profile on mount
+    const storedProfile = localStorage.getItem('userProfile');
+    if (storedProfile) {
+      try {
+        const parsedProfile = JSON.parse(storedProfile);
+        setProfile(convertToProfile(parsedProfile));
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.error('Error parsing stored profile:', err);
+        localStorage.removeItem('userProfile');
       }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        // Load description count for logged in user
-        const storedCount = localStorage.getItem(`descriptionCount_${session.user.id}`);
-        if (storedCount) {
-          setDescriptionCount(parseInt(storedCount, 10));
-        }
-      } else {
-        // Load description count for anonymous user
-        const storedCount = localStorage.getItem('descriptionCount_anonymous');
-        if (storedCount) {
-          setDescriptionCount(parseInt(storedCount, 10));
-        }
-      }
-      
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    }
+    setLoading(false);
   }, []);
-
-  const fetchProfile = async (userId: string) => {
-    try {
-      console.log('Fetching profile for user ID:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Erro ao buscar perfil:', error);
-        return;
-      }
-
-      console.log('Profile data received:', data);
-      setProfile(data as Profile);
-    } catch (error) {
-      console.error('Erro ao buscar perfil:', error);
-    }
-  };
   
-  const refreshProfile = async () => {
-    if (user) {
-      return fetchProfile(user.id);
+  // Update profile setter to use conversion utility
+  const setUserProfile = useCallback((userData: any) => {
+    if (!userData) {
+      setProfile(null);
+      return;
     }
+    
+    const convertedProfile = convertToProfile(userData);
+    setProfile(convertedProfile);
+  }, []);
+  
+  const login = useCallback(async (credentials?: { email: string; password: string }) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate API call for login
+      const response = await new Promise<Profile>((resolve) => {
+        setTimeout(() => {
+          resolve({
+            id: 'user-123',
+            email: credentials?.email || 'user@example.com',
+            name: 'Test User',
+            role: 'premium',
+            avatarUrl: 'https://i.pravatar.cc/150?img=3'
+          });
+        }, 1000);
+      });
+      
+      setUserProfile(response);
+      setIsAuthenticated(true);
+      localStorage.setItem('userProfile', JSON.stringify(response));
+      
+      return response;
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [setUserProfile]);
+  
+  const logout = useCallback(() => {
+    setProfile(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('userProfile');
+  }, []);
+  
+  const refreshProfile = useCallback(async () => {
+    if (!profile?.id) return;
+    
+    setLoading(true);
+    try {
+      // Simulate API call to refresh profile
+      const response = await new Promise<Profile>((resolve) => {
+        setTimeout(() => {
+          resolve({
+            ...profile,
+            // Add any updated fields here
+          });
+        }, 500);
+      });
+      
+      setUserProfile(response);
+      localStorage.setItem('userProfile', JSON.stringify(response));
+      return response;
+    } catch (err: any) {
+      console.error('Error refreshing profile:', err);
+      setError(err.message || 'Failed to refresh profile');
+    } finally {
+      setLoading(false);
+    }
+  }, [profile, setUserProfile]);
+  
+  const checkIsPremium = useCallback(() => {
+    if (!profile?.role) return false;
+    return isPremium(profile.role);
+  }, [profile]);
+  
+  const checkIsBusiness = useCallback(() => {
+    if (!profile?.role) return false;
+    return isBusiness(profile.role);
+  }, [profile]);
+  
+  const checkIsAdmin = useCallback(() => {
+    if (!profile?.role) return false;
+    return isAdmin(profile.role);
+  }, [profile]);
+  
+  const checkHasRole = useCallback((requiredRole: string) => {
+    if (!profile?.role) return false;
+    return hasRole(profile.role, requiredRole);
+  }, [profile]);
+  
+  const checkIsSubscribed = useCallback(() => {
+    return checkIsPremium() || checkIsBusiness();
+  }, [checkIsPremium, checkIsBusiness]);
+  
+  const canCreateMoreDescriptions = useCallback(() => {
+    return checkIsSubscribed() || descriptionCount < 3;
+  }, [checkIsSubscribed, descriptionCount]);
+  
+  const openCustomerPortal = useCallback(async () => {
+    // Simulate opening customer portal
+    window.open('https://example.com/customer-portal', '_blank');
     return Promise.resolve();
-  };
-
+  }, []);
+  
   return {
-    session,
-    user,
     profile,
     loading,
-    descriptionCount,
-    subscriptionTier,
-    subscriptionEnd,
-    setLoading,
-    setDescriptionCount,
-    setSubscriptionTier,
-    setSubscriptionEnd,
-    fetchProfile,
+    error,
+    isAuthenticated,
+    login,
+    logout,
     refreshProfile,
-    toast,
-    navigate
+    isPremium: checkIsPremium,
+    isBusiness: checkIsBusiness,
+    isAdmin: checkIsAdmin,
+    hasRole: checkHasRole,
+    isSubscribed: checkIsSubscribed,
+    subscriptionTier,
+    descriptionCount,
+    canCreateMoreDescriptions,
+    openCustomerPortal,
+    // Aliases for backward compatibility
+    user: profile,
+    signOut: logout,
   };
 };
