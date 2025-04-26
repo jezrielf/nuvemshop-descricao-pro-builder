@@ -100,7 +100,7 @@ export const blockTypeInfo: Record<BlockType, BlockTypeInfo> = {
     name: 'Carrossel',
     description: 'Imagens em formato de carrossel',
     icon: <Images size={24} />
-  },
+  }
 };
 
 // Add backward compatibility functions
