@@ -1,3 +1,4 @@
+
 import { Template } from '@/types/editor';
 import { basicTemplates } from './basic';
 import { supplementsTemplates } from './supplements';
@@ -8,21 +9,23 @@ import { fashionTemplates } from './fashion';
 import { accessoriesTemplates } from './accessories';
 import { hauteCoutureTemplates } from './hauteCouture';
 import { waterFilterTemplate } from './products/water-filter';
+import { fixTemplateArray, fixTemplateProps } from './fixTemplateProps';
 
-// Combining all templates
-export const advancedTemplates: Template[] = [
-  waterFilterTemplate,
-  ...supplementsTemplates,
-  ...shoesTemplates,
-  ...electronicsTemplates,
-  ...healthTemplates,
-  ...fashionTemplates,
-  ...accessoriesTemplates,
-  ...hauteCoutureTemplates
+// Combining all templates and fixing properties
+const fixedWaterFilterTemplate = fixTemplateProps(waterFilterTemplate);
+const advancedTemplates: Template[] = [
+  fixedWaterFilterTemplate,
+  ...fixTemplateArray(supplementsTemplates),
+  ...fixTemplateArray(shoesTemplates),
+  ...fixTemplateArray(electronicsTemplates),
+  ...fixTemplateArray(healthTemplates),
+  ...fixTemplateArray(fashionTemplates),
+  ...fixTemplateArray(accessoriesTemplates),
+  ...fixTemplateArray(hauteCoutureTemplates)
 ];
 
 export const getAllTemplates = (): Template[] => {
-  return [...basicTemplates, ...advancedTemplates];
+  return [...fixTemplateArray(basicTemplates), ...advancedTemplates];
 };
 
 export * from './basic';

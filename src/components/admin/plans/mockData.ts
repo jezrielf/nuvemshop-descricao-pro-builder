@@ -9,6 +9,8 @@ export const mockPlans: Plan[] = [
     price: 0,
     isActive: true,
     isDefault: false,
+    interval: 'month',
+    currency: 'BRL',
     features: [
       { id: 'free-1', name: 'Até 3 descrições de produto', included: true },
       { id: 'free-2', name: 'Editor básico', included: true },
@@ -24,6 +26,8 @@ export const mockPlans: Plan[] = [
     price: 4990,
     isActive: true,
     isDefault: true,
+    interval: 'month',
+    currency: 'BRL',
     features: [
       { id: 'premium-1', name: 'Descrições ilimitadas', included: true },
       { id: 'premium-2', name: 'Todos os recursos do editor', included: true },
@@ -39,6 +43,8 @@ export const mockPlans: Plan[] = [
     price: 9990,
     isActive: true,
     isDefault: false,
+    interval: 'month',
+    currency: 'BRL',
     features: [
       { id: 'business-1', name: 'Descrições ilimitadas', included: true },
       { id: 'business-2', name: 'Todos os recursos do editor', included: true },

@@ -9,7 +9,7 @@ export const convertBlock = (block: any): Block => {
   }
 
   // Create a new valid block with the same data
-  const validBlock: Block = {
+  const validBlock: any = {
     id: block.id || generateId(),
     type: sanitizeBlockType(block.type),
     title: block.title || '',
@@ -33,10 +33,10 @@ export const convertBlock = (block: any): Block => {
           src: block.image?.src || '',
           alt: block.image?.alt || ''
         }
-      };
+      } as Block;
     // Handle other block types...
     default:
-      return validBlock;
+      return validBlock as Block;
   }
 };
 
@@ -58,28 +58,26 @@ const isValidBlock = (block: any): boolean => {
 // Ensure the block type is valid
 const sanitizeBlockType = (type: string): BlockType => {
   const validTypes: BlockType[] = [
-    'heading',
-    'paragraph',
+    'text',
     'image',
-    'list',
     'hero',
-    'feature',
+    'features',
+    'benefits',
+    'specifications',
     'gallery',
-    'table',
-    'video',
-    'cta',
+    'imageText',
+    'textImage',
     'faq',
-    'testimonial',
-    'pricing',
-    'stat',
-    'section',
-    'custom'
+    'cta',
+    'video',
+    'videoText',
+    'textVideo'
   ];
   
   if (validTypes.includes(type as BlockType)) {
     return type as BlockType;
   }
   
-  // Default to paragraph if type is invalid
-  return 'paragraph';
+  // Default to text if type is invalid
+  return 'text';
 };
