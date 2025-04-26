@@ -1,11 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
-import { VideoTextBlock as VideoTextBlockType } from '@/types/editor';
-import BlockWrapper from './BlockWrapper';
-import { useEditorStore } from '@/store/editor';
+import React, { useState } from 'react';
+import { VideoTextBlock as VideoTextBlockType } from '@/types/editor/blocks';
+import { Card } from '@/components/ui/card';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEditorStore } from '@/store/editor';
 import { Switch } from '@/components/ui/switch';
 import RichTextEditor from './editors/RichTextEditor';
 
@@ -15,158 +17,207 @@ interface VideoTextBlockProps {
 }
 
 const VideoTextBlock: React.FC<VideoTextBlockProps> = ({ block, isPreview = false }) => {
-  const { updateBlock } = useEditorStore();
-  const [embedUrl, setEmbedUrl] = useState<string>('');
+  const { updateBlock, selectedBlockId } = useEditorStore();
+  const isSelected = selectedBlockId === block.id;
   
-  const updateField = (field: string, value: any) => {
-    updateBlock(block.id, { [field]: value });
+  const [activeTab, setActiveTab] = useState('content');
+  
+  // Extract YouTube video ID and create embed URL
+  const getYouTubeEmbedUrl = (url: string) => {
+    const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&?/]+)/;
+    const match = url.match(regExp);
+    
+    if (match && match[1]) {
+      const videoId = match[1];
+      return `https://www.youtube.com/embed/${videoId}?autoplay=${block.autoplay ? '1' : '0'}&mute=${block.muteAudio ? '1' : '0'}&rel=0`;
+    }
+    
+    return '';
   };
   
-  useEffect(() => {
-    // Extrair ID do vídeo da URL do YouTube
-    const getYouTubeEmbedUrl = (url: string) => {
-      // Lidar com diferentes formatos de URLs do YouTube
-      const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&?/]+)/;
-      const match = url.match(regExp);
-      
-      if (match && match[1]) {
-        // Formar URL de incorporação com parâmetros de autoplay e mudo
-        const videoId = match[1];
-        return `https://www.youtube.com/embed/${videoId}?autoplay=${block.autoplay ? '1' : '0'}&mute=${block.muteAudio ? '1' : '0'}&rel=0`;
-      }
-      
-      return '';
-    };
-    
-    setEmbedUrl(getYouTubeEmbedUrl(block.videoUrl));
-  }, [block.videoUrl, block.autoplay, block.muteAudio]);
-
+  const embedUrl = getYouTubeEmbedUrl(block.videoUrl);
+  
+  // Calculate aspect ratio for the video
+  const getAspectRatioValue = () => {
+    switch (block.aspectRatio) {
+      case '16:9': return 16 / 9;
+      case '4:3': return 4 / 3;
+      case '1:1': return 1;
+      default: return 16 / 9;
+    }
+  };
+  
+  // Handlers for editing
+  const handleVideoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateBlock(block.id, { ...block, videoUrl: e.target.value });
+  };
+  
+  const handleHeadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateBlock(block.id, { ...block, heading: e.target.value });
+  };
+  
+  const handleContentChange = (value: string) => {
+    updateBlock(block.id, { ...block, content: value });
+  };
+  
+  const handleAutoplayChange = (checked: boolean) => {
+    updateBlock(block.id, { ...block, autoplay: checked });
+  };
+  
+  const handleMuteChange = (checked: boolean) => {
+    updateBlock(block.id, { ...block, muteAudio: checked });
+  };
+  
+  const handleAspectRatioChange = (value: string) => {
+    updateBlock(block.id, { ...block, aspectRatio: value });
+  };
+  
   if (isPreview) {
+    // Simple preview rendering
     return (
-      <BlockWrapper block={block} isEditing={false}>
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-1/2 flex-shrink-0">
-            <div className="aspect-w-16 aspect-h-9">
-              {embedUrl ? (
-                <iframe
-                  src={embedUrl}
-                  title={block.heading || "Vídeo"}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full rounded"
-                />
-              ) : (
-                <div className="bg-gray-100 p-4 rounded text-center h-full flex items-center justify-center">
-                  <p>URL de vídeo inválida</p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="md:w-1/2">
-            {block.heading && (
-              <h3 className="text-xl font-semibold mb-3" style={{ color: block.style?.headingColor || 'inherit' }}>
-                {block.heading}
-              </h3>
+      <div className="flex flex-col md:flex-row gap-6 p-4">
+        <div className="md:w-1/2">
+          <AspectRatio ratio={getAspectRatioValue()}>
+            {embedUrl ? (
+              <iframe 
+                src={embedUrl}
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full rounded"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500 rounded">
+                URL de vídeo inválida
+              </div>
             )}
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: block.content }} />
-          </div>
+          </AspectRatio>
         </div>
-      </BlockWrapper>
+        <div className="md:w-1/2">
+          {block.heading && <h3 className="text-xl font-semibold mb-3">{block.heading}</h3>}
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: block.content }} />
+        </div>
+      </div>
     );
   }
   
+  // Full editor rendering
   return (
-    <BlockWrapper block={block} isEditing={!isPreview}>
-      <div className="space-y-6">
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor={`heading-${block.id}`}>Título da Seção</Label>
-            <Input
-              id={`heading-${block.id}`}
-              value={block.heading || ''}
-              onChange={(e) => updateField('heading', e.target.value)}
-              placeholder="Título da seção"
-            />
-          </div>
+    <Card className={`p-4 ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+      <div className="mb-4">
+        <h3 className="text-lg font-medium mb-2">{block.title}</h3>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="content">Conteúdo</TabsTrigger>
+            <TabsTrigger value="video">Vídeo</TabsTrigger>
+          </TabsList>
           
-          <div>
-            <Label htmlFor={`videoUrl-${block.id}`}>URL do Vídeo</Label>
-            <Input
-              id={`videoUrl-${block.id}`}
-              value={block.videoUrl}
-              onChange={(e) => updateField('videoUrl', e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
-            <p className="text-xs text-gray-500 mt-1">Cole a URL do vídeo do YouTube aqui.</p>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-row items-center space-x-2">
-              <Switch
-                id={`autoplay-${block.id}`}
-                checked={block.autoplay || false}
-                onCheckedChange={(checked) => updateField('autoplay', checked)}
+          <TabsContent value="content" className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor={`${block.id}-heading`}>Título da Seção</Label>
+              <Input
+                id={`${block.id}-heading`}
+                value={block.heading || ''}
+                onChange={handleHeadingChange}
+                placeholder="Título da seção (opcional)"
               />
-              <Label htmlFor={`autoplay-${block.id}`}>Reprodução Automática</Label>
             </div>
             
-            <div className="flex flex-row items-center space-x-2">
-              <Switch
-                id={`mute-${block.id}`}
-                checked={block.muteAudio || false}
-                onCheckedChange={(checked) => updateField('muteAudio', checked)}
-              />
-              <Label htmlFor={`mute-${block.id}`}>Silenciar Áudio</Label>
-            </div>
-          </div>
-          
-          <div>
-            <Label>Conteúdo de Texto</Label>
-            <div className="mt-2">
+            <div>
+              <Label htmlFor={`${block.id}-content`}>Conteúdo</Label>
               <RichTextEditor
                 value={block.content}
-                onChange={(value) => updateField('content', value)}
+                onChange={handleContentChange}
+                placeholder="Adicione seu texto aqui..."
+                className="min-h-[150px]"
               />
             </div>
-          </div>
-        </div>
-        
-        {!embedUrl && block.videoUrl && (
-          <div className="bg-red-50 p-4 rounded text-red-600 text-sm">
-            URL de vídeo inválida. Por favor, use uma URL válida do YouTube.
-          </div>
-        )}
-        
-        {embedUrl && (
-          <div className="mt-4 border rounded-md p-4">
-            <h4 className="text-sm font-medium mb-2">Pré-visualização do Layout</h4>
-            <div className="flex flex-col md:flex-row gap-6 p-4 border rounded">
-              <div className="md:w-1/2 flex-shrink-0">
-                <div className="aspect-w-16 aspect-h-9">
-                  <iframe
-                    src={embedUrl}
-                    title="Pré-visualização do vídeo"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full rounded"
+          </TabsContent>
+          
+          <TabsContent value="video" className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor={`${block.id}-video-url`}>URL do Vídeo (YouTube)</Label>
+              <Input
+                id={`${block.id}-video-url`}
+                value={block.videoUrl}
+                onChange={handleVideoUrlChange}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id={`${block.id}-autoplay`}
+                    checked={block.autoplay}
+                    onCheckedChange={handleAutoplayChange}
                   />
+                  <Label htmlFor={`${block.id}-autoplay`}>Reprodução automática</Label>
                 </div>
-              </div>
-              <div className="md:w-1/2">
-                <div className="prose prose-sm border p-3 rounded bg-gray-50 h-full">
-                  <h3 className="text-gray-500">{block.heading || "Título da Seção"}</h3>
-                  <div className="text-gray-400 text-sm">
-                    O texto será exibido aqui, formatado conforme o editor.
-                  </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id={`${block.id}-mute`}
+                    checked={block.muteAudio}
+                    onCheckedChange={handleMuteChange}
+                  />
+                  <Label htmlFor={`${block.id}-mute`}>Silenciar áudio</Label>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+            
+            <div>
+              <Label htmlFor={`${block.id}-aspect-ratio`}>Proporção</Label>
+              <div className="flex space-x-2 mt-1">
+                <Button
+                  type="button"
+                  variant={block.aspectRatio === '16:9' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleAspectRatioChange('16:9')}
+                >
+                  16:9
+                </Button>
+                <Button
+                  type="button"
+                  variant={block.aspectRatio === '4:3' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleAspectRatioChange('4:3')}
+                >
+                  4:3
+                </Button>
+                <Button
+                  type="button"
+                  variant={block.aspectRatio === '1:1' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleAspectRatioChange('1:1')}
+                >
+                  1:1
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <Label>Preview</Label>
+              <AspectRatio ratio={getAspectRatioValue()} className="mt-2 bg-gray-100 rounded overflow-hidden">
+                {embedUrl ? (
+                  <iframe
+                    src={embedUrl}
+                    frameBorder="0"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
+                    URL de vídeo inválida ou não inserida
+                  </div>
+                )}
+              </AspectRatio>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-    </BlockWrapper>
+    </Card>
   );
 };
 

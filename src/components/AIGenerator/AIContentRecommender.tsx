@@ -53,7 +53,7 @@ const AIContentRecommender: React.FC<AIContentRecommenderProps> = ({
     setLoading(true);
     try {
       // Get product type from description
-      // Using name and category fields from the ProductDescription type
+      // Using product type or category if available, otherwise empty string
       const type = description.category || '';
       setProductType(type);
       

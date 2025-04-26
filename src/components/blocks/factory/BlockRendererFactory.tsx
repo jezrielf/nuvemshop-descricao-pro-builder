@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Block, BlockType, TextBlock } from '@/types/editor';
+import { Block, BlockType } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
 import TextBlockComponent from '../TextBlock';
 import FeaturesBlock from '../FeaturesBlock';
@@ -17,6 +17,12 @@ import VideoTextBlock from '../VideoTextBlock';
 import TextVideoBlock from '../TextVideoBlock';
 import { validateBaseBlock, validateBlockByType } from '@/utils/blockCreators/validation';
 import { createBlock } from '@/utils/blockCreators/createBlock';
+import { 
+  isHeroBlock, isTextBlock, isFeaturesBlock, isBenefitsBlock,
+  isSpecificationsBlock, isImageBlock, isGalleryBlock, isImageTextBlock,
+  isTextImageBlock, isFAQBlock, isCTABlock, isVideoBlock,
+  isVideoTextBlock, isTextVideoBlock, getTypedBlock
+} from './BlockTypeUtils';
 
 interface BlockRendererOptions {
   block: Block;
@@ -53,33 +59,33 @@ export class BlockRendererFactory {
 
     switch (block.type) {
       case 'hero':
-        return <HeroBlock block={block} isPreview={isPreview} />;
+        return <HeroBlock block={getTypedBlock(block, isHeroBlock)} isPreview={isPreview} />;
       case 'text':
-        return <TextBlockComponent block={block} isPreview={isPreview} />;
+        return <TextBlockComponent block={getTypedBlock(block, isTextBlock)} isPreview={isPreview} />;
       case 'features':
-        return <FeaturesBlock block={block} isPreview={isPreview} />;
+        return <FeaturesBlock block={getTypedBlock(block, isFeaturesBlock)} isPreview={isPreview} />;
       case 'benefits':
-        return <BenefitsBlock block={block} isPreview={isPreview} />;
+        return <BenefitsBlock block={getTypedBlock(block, isBenefitsBlock)} isPreview={isPreview} />;
       case 'specifications':
-        return <SpecificationsBlock block={block} isPreview={isPreview} />;
+        return <SpecificationsBlock block={getTypedBlock(block, isSpecificationsBlock)} isPreview={isPreview} />;
       case 'image':
-        return <ImageBlock block={block} isPreview={isPreview} />;
+        return <ImageBlock block={getTypedBlock(block, isImageBlock)} isPreview={isPreview} />;
       case 'gallery':
-        return <GalleryBlock block={block} isPreview={isPreview} />;
+        return <GalleryBlock block={getTypedBlock(block, isGalleryBlock)} isPreview={isPreview} />;
       case 'imageText':
-        return <ImageTextBlock block={block} isPreview={isPreview} />;
+        return <ImageTextBlock block={getTypedBlock(block, isImageTextBlock)} isPreview={isPreview} />;
       case 'textImage':
-        return <TextImageBlock block={block} isPreview={isPreview} />;
+        return <TextImageBlock block={getTypedBlock(block, isTextImageBlock)} isPreview={isPreview} />;
       case 'faq':
-        return <FAQBlock block={block} isPreview={isPreview} />;
+        return <FAQBlock block={getTypedBlock(block, isFAQBlock)} isPreview={isPreview} />;
       case 'cta':
-        return <CTABlock block={block} isPreview={isPreview} />;
+        return <CTABlock block={getTypedBlock(block, isCTABlock)} isPreview={isPreview} />;
       case 'video':
-        return <VideoBlock block={block} isPreview={isPreview} />;
+        return <VideoBlock block={getTypedBlock(block, isVideoBlock)} isPreview={isPreview} />;
       case 'videoText':
-        return <VideoTextBlock block={block} isPreview={isPreview} />;
+        return <VideoTextBlock block={getTypedBlock(block, isVideoTextBlock)} isPreview={isPreview} />;
       case 'textVideo':
-        return <TextVideoBlock block={block} isPreview={isPreview} />;
+        return <TextVideoBlock block={getTypedBlock(block, isTextVideoBlock)} isPreview={isPreview} />;
       default:
         return (
           <div className="p-4 border rounded-md bg-gray-100">

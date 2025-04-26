@@ -11,7 +11,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template }) => {
     <div className="relative group overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all">
       <div className="aspect-video bg-gray-200 overflow-hidden">
         <img 
-          src={template.thumbnail} 
+          src={template.thumbnailUrl} 
           alt={`Preview de ${template.name}`}
           className="w-full h-full object-cover transition-transform group-hover:scale-105"
         />

@@ -25,6 +25,7 @@ export interface BlockStyle {
   boxShadow?: string;
   padding?: string;
   margin?: string;
+  imageFit?: 'cover' | 'contain' | 'fill' | 'none';
 }
 
 export interface ProductDescription {
@@ -37,6 +38,7 @@ export interface ProductDescription {
   userId?: string;
   storeId?: string;
   isPublished?: boolean;
+  category?: string;
   seo?: {
     title?: string;
     description?: string;
