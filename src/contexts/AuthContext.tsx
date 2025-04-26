@@ -1,180 +1,53 @@
 
-import React, { 
-  createContext, 
-  useState, 
-  useEffect, 
-  useContext, 
-  useCallback 
-} from 'react';
-import { isPremium, isBusiness, isAdmin, getRoles, hasRole } from '@/utils/roleUtils';
+import { createContext, useContext, ReactNode } from 'react';
+import { Profile } from '@/types/auth';
+import { useAuthProvider } from '@/hooks/useAuthProvider';
 
-interface AuthContextProps {
-  profile: {
-    id: string;
-    email: string;
-    name: string;
-    role: string | string[] | undefined;
-    avatarUrl?: string | null;
-    nome?: string;
-    criado_em?: string;
-  } | null;
+export interface AuthContextProps {
+  profile: Profile | null;
+  user: Profile | null; // Alias for profile
   loading: boolean;
   error: string | null;
-  login: () => Promise<void>;
+  isAuthenticated: boolean;
+  login: (credentials?: { email: string; password: string }) => Promise<Profile>;
+  signIn: (credentials?: { email: string; password: string }) => Promise<Profile>; // Alias for login
+  signUp: (userData: any) => Promise<any>;
   logout: () => void;
+  signOut: () => void; // Alias for logout
+  refreshProfile: () => Promise<Profile | undefined>;
   isPremium: () => boolean;
   isBusiness: () => boolean;
   isAdmin: () => boolean;
-  hasRole: (role: string) => boolean;
-  // Add these properties to match what's used in the components
-  user: any;
-  signOut: () => void;
+  hasRole: (requiredRole: string) => boolean;
   isSubscribed: () => boolean;
   subscriptionTier: string;
   descriptionCount: number;
   canCreateMoreDescriptions: () => boolean;
   openCustomerPortal: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  refreshSubscription: () => Promise<void>;
+  session: any;
 }
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-const AuthContext = createContext<AuthContextProps>({
-  profile: null,
-  loading: true,
-  error: null,
-  login: async () => {},
-  logout: () => {},
-  isPremium: () => false,
-  isBusiness: () => false,
-  isAdmin: () => false,
-  hasRole: () => false,
-  // Add these properties to match what's used in the components
-  user: null,
-  signOut: () => {},
-  isSubscribed: () => false,
-  subscriptionTier: '',
-  descriptionCount: 0,
-  canCreateMoreDescriptions: () => false,
-  openCustomerPortal: async () => {},
-  refreshProfile: async () => {},
-});
-
-export const useAuth = () => useContext(AuthContext);
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [profile, setProfile] = useState<{
-    id: string;
-    email: string;
-    name: string;
-    role: string | string[] | undefined;
-    avatarUrl?: string | null;
-    nome?: string;
-    criado_em?: string;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  // Add these properties to match what's used in the components
-  const [descriptionCount, setDescriptionCount] = useState(0);
-  const [subscriptionTier, setSubscriptionTier] = useState('');
-
-  useEffect(() => {
-    const storedProfile = localStorage.getItem('userProfile');
-    if (storedProfile) {
-      setProfile(JSON.parse(storedProfile));
-    }
-    setLoading(false);
-  }, []);
-
-  const login = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Simulate fetching user profile
-      const mockProfile = {
-        id: 'user-123',
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'user',
-        avatarUrl: 'https://i.pravatar.cc/150?img=3',
-        nome: 'Test User', // Add this for backward compatibility
-      };
-      setProfile(mockProfile);
-      localStorage.setItem('userProfile', JSON.stringify(mockProfile));
-    } catch (err: any) {
-      setError(err.message || 'Failed to login');
-    } finally {
-      setLoading(false);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const auth = useAuthProvider();
+  
+  // Define the refreshSubscription function if it doesn't exist in the provider
+  const contextValue: AuthContextProps = {
+    ...auth,
+    signIn: auth.login,
+    signUp: async (userData: any) => {
+      console.warn('signUp not implemented, using login instead');
+      return auth.login(userData);
+    },
+    session: { user: auth.profile },
+    refreshSubscription: async () => {
+      await auth.refreshProfile();
+      console.log('Subscription refreshed');
     }
   };
-
-  const logout = () => {
-    setProfile(null);
-    localStorage.removeItem('userProfile');
-  };
   
-  const checkIsPremium = useCallback(() => {
-    if (!profile?.role) return false;
-    return isPremium(profile.role);
-  }, [profile]);
-  
-  const checkIsBusiness = useCallback(() => {
-    if (!profile?.role) return false;
-    return isBusiness(profile.role);
-  }, [profile]);
-  
-  const checkIsAdmin = useCallback(() => {
-    if (!profile?.role) return false;
-    return isAdmin(profile.role);
-  }, [profile]);
-  
-  const checkHasRole = useCallback((requiredRole: string) => {
-    if (!profile?.role) return false;
-    return hasRole(profile.role, requiredRole);
-  }, [profile]);
-
-  // Add these methods to match what's used in the components
-  const checkIsSubscribed = useCallback(() => {
-    return checkIsPremium() || checkIsBusiness();
-  }, [checkIsPremium, checkIsBusiness]);
-
-  const canCreateMoreDescriptions = useCallback(() => {
-    return checkIsSubscribed() || descriptionCount < 3;
-  }, [checkIsSubscribed, descriptionCount]);
-
-  const refreshProfile = async () => {
-    // Mock implementation
-    return Promise.resolve();
-  };
-
-  const openCustomerPortal = async () => {
-    // Mock implementation
-    return Promise.resolve();
-  };
-
-  const contextValue = {
-    profile,
-    loading,
-    error,
-    login,
-    logout,
-    isPremium: checkIsPremium,
-    isBusiness: checkIsBusiness,
-    isAdmin: checkIsAdmin,
-    hasRole: checkHasRole,
-    // Add these properties to match what's used in the components
-    user: profile,
-    signOut: logout,
-    isSubscribed: checkIsSubscribed,
-    subscriptionTier: 'free',
-    descriptionCount: descriptionCount,
-    canCreateMoreDescriptions,
-    openCustomerPortal,
-    refreshProfile,
-  };
-
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
@@ -182,4 +55,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export default AuthContext;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

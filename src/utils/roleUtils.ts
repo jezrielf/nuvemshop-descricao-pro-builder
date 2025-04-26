@@ -1,43 +1,40 @@
 
-export const isPremium = (role?: string | string[]): boolean => {
-  if (!role) return false;
-  
-  const roles = getRoles(role);
-  return roles.includes('premium') || roles.includes('business') || roles.includes('admin');
-};
-
-export const isBusiness = (role?: string | string[]): boolean => {
-  if (!role) return false;
-  
-  const roles = getRoles(role);
-  return roles.includes('business') || roles.includes('admin');
-};
-
-export const isAdmin = (role?: string | string[]): boolean => {
-  if (!role) return false;
-  
-  const roles = getRoles(role);
-  return roles.includes('admin');
-};
-
-// Add the getRoles function to extract roles from a role string
-export const getRoles = (role?: string | string[]): string[] => {
-  if (!role) return ['user'];
-  
-  // If it's already an array, return it
-  if (Array.isArray(role)) return role;
-  
-  // If it's a string with comma-separated values, split it
-  if (role.includes(',')) {
-    return role.split(',').map(r => r.trim());
+/**
+ * Checks if a role or array of roles includes 'premium'
+ */
+export const isPremium = (role: string | string[]): boolean => {
+  if (Array.isArray(role)) {
+    return role.includes('premium') || role.includes('business') || role.includes('admin');
   }
-  
-  // Otherwise, just return it as a single-element array
-  return [role];
+  return role === 'premium' || role === 'business' || role === 'admin';
 };
 
-// Add hasRole function to check if user has a specific role
-export const hasRole = (userRole: string | string[] | undefined, requiredRole: string): boolean => {
-  const roles = getRoles(userRole);
-  return roles.includes(requiredRole);
+/**
+ * Checks if a role or array of roles includes 'business'
+ */
+export const isBusiness = (role: string | string[]): boolean => {
+  if (Array.isArray(role)) {
+    return role.includes('business') || role.includes('admin');
+  }
+  return role === 'business' || role === 'admin';
+};
+
+/**
+ * Checks if a role or array of roles includes 'admin'
+ */
+export const isAdmin = (role: string | string[]): boolean => {
+  if (Array.isArray(role)) {
+    return role.includes('admin');
+  }
+  return role === 'admin';
+};
+
+/**
+ * Checks if a role or array of roles includes a specific role
+ */
+export const hasRole = (role: string | string[], requiredRole: string): boolean => {
+  if (Array.isArray(role)) {
+    return role.includes(requiredRole);
+  }
+  return role === requiredRole;
 };

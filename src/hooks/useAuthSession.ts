@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { convertToProfile } from './useAuthProvider';
 import { Profile } from '@/types/auth';
