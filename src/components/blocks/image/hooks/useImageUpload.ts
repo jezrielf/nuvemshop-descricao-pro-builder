@@ -25,10 +25,12 @@ export const useImageUpload = (props?: UseImageUploadProps) => {
       // Convert the user to the format expected by storageService
       const user = auth.user ? {
         ...auth.user,
+        // Ensure these properties exist and are of the correct type
         app_metadata: auth.user.app_metadata || {},
         user_metadata: auth.user.user_metadata || {},
         aud: auth.user.aud || '',
-        created_at: auth.user.created_at || ''
+        created_at: auth.user.created_at || '',
+        role: typeof auth.user.role === 'object' ? auth.user.role[0] : auth.user.role || ''
       } : null;
 
       const result = await storageService.uploadFile({

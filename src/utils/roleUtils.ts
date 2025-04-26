@@ -1,50 +1,31 @@
 
-/**
- * Checks if a role or array of roles includes 'premium'
- */
+// If this file doesn't exist, we'll create it with the necessary functions
+
+export const getRoles = (roleData: string | string[]): string[] => {
+  if (Array.isArray(roleData)) {
+    return roleData;
+  } else if (typeof roleData === 'string') {
+    return roleData.split(',').map(r => r.trim());
+  }
+  return [];
+};
+
+export const hasRole = (userRole: string | string[], requiredRole: string): boolean => {
+  const roles = getRoles(userRole);
+  return roles.includes(requiredRole) || roles.includes('admin');
+};
+
 export const isPremium = (role: string | string[]): boolean => {
-  if (Array.isArray(role)) {
-    return role.includes('premium') || role.includes('business') || role.includes('admin');
-  }
-  return role === 'premium' || role === 'business' || role === 'admin';
+  const roles = getRoles(role);
+  return roles.includes('premium') || roles.includes('business') || roles.includes('admin');
 };
 
-/**
- * Checks if a role or array of roles includes 'business'
- */
 export const isBusiness = (role: string | string[]): boolean => {
-  if (Array.isArray(role)) {
-    return role.includes('business') || role.includes('admin');
-  }
-  return role === 'business' || role === 'admin';
+  const roles = getRoles(role);
+  return roles.includes('business') || roles.includes('admin');
 };
 
-/**
- * Checks if a role or array of roles includes 'admin'
- */
 export const isAdmin = (role: string | string[]): boolean => {
-  if (Array.isArray(role)) {
-    return role.includes('admin');
-  }
-  return role === 'admin';
-};
-
-/**
- * Checks if a role or array of roles includes a specific role
- */
-export const hasRole = (role: string | string[], requiredRole: string): boolean => {
-  if (Array.isArray(role)) {
-    return role.includes(requiredRole);
-  }
-  return role === requiredRole;
-};
-
-/**
- * Returns roles as an array for consistent handling
- */
-export const getRoles = (role: string | string[]): string[] => {
-  if (Array.isArray(role)) {
-    return role;
-  }
-  return [role];
+  const roles = getRoles(role);
+  return roles.includes('admin');
 };

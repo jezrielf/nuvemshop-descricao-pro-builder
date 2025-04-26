@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -94,7 +95,8 @@ export const useGalleryUpload = () => {
         app_metadata: auth.user.app_metadata || {},
         user_metadata: auth.user.user_metadata || {},
         aud: auth.user.aud || '',
-        created_at: auth.user.created_at || ''
+        created_at: auth.user.created_at || '',
+        role: typeof auth.user.role === 'object' ? auth.user.role[0] : auth.user.role || ''
       };
       
       const userId = userWithRequiredProps.id;

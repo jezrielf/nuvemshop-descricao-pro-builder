@@ -1,7 +1,17 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Profile } from '@/types/auth';
-import { isPremium, isBusiness, isAdmin, hasRole, getRoles } from '@/utils/roleUtils';
+import { isPremium, isBusiness, isAdmin, hasRole } from '@/utils/roleUtils';
+
+// Add getRoles function if it doesn't exist
+export const getRoles = (roleData: string | string[]): string[] => {
+  if (Array.isArray(roleData)) {
+    return roleData;
+  } else if (typeof roleData === 'string') {
+    return roleData.split(',').map(r => r.trim());
+  }
+  return [];
+};
 
 // Add profile conversion utility
 export const convertToProfile = (userData: any): Profile => {
