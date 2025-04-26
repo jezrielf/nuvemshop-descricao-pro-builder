@@ -1,211 +1,166 @@
-
 import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
-import { isPremium, isBusiness, isAdmin, hasRole } from '@/utils/roleUtils';
+import { convertProfileToUser } from '@/utils/typeConversion';
 
-// Add getRoles function if it doesn't exist
-export const getRoles = (roleData: string | string[]): string[] => {
-  if (Array.isArray(roleData)) {
-    return roleData;
-  } else if (typeof roleData === 'string') {
-    return roleData.split(',').map(r => r.trim());
-  }
-  return [];
-};
+interface AuthState {
+  user: Profile | null;
+  session: any | null;
+  isLoading: boolean;
+  isPremium: () => boolean;
+  isBusiness: () => boolean;
+  isSubscribed: () => boolean;
+  isSubscriptionLoading: boolean;
+  error: string | null;
+  signIn: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
 
-// Add profile conversion utility
-export const convertToProfile = (userData: any): Profile => {
-  if (!userData) return null;
-  
-  // Handle the case where we get a profile in the legacy format
-  if (userData.nome && !userData.name) {
-    return {
-      id: userData.id,
-      email: userData.email || '',
-      name: userData.nome, // Use nome as name
-      role: userData.role,
-      avatarUrl: userData.avatar_url || null,
-      // Keep original properties for backward compatibility
-      nome: userData.nome,
-      criado_em: userData.criado_em,
-      atualizado_em: userData.atualizado_em,
-      avatar_url: userData.avatar_url,
-      // Add User properties if they exist
-      app_metadata: userData.app_metadata || {},
-      user_metadata: userData.user_metadata || {},
-      aud: userData.aud || '',
-      created_at: userData.created_at || ''
-    };
-  }
-  
-  // Handle the standard format
-  const profile: Profile = {
-    ...userData,
-    // Ensure name is always set
-    name: userData.name || userData.nome || '',
-    // Ensure avatarUrl is set if avatar_url exists
-    avatarUrl: userData.avatarUrl || userData.avatar_url || null,
-    // Ensure required User properties exist
-    app_metadata: userData.app_metadata || {},
-    user_metadata: userData.user_metadata || {},
-    aud: userData.aud || '',
-    created_at: userData.created_at || ''
-  };
-  
-  return profile;
-};
-
-export const useAuthProvider = () => {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+export const useAuthProvider = (): AuthState => {
+  const [user, setUser] = useState<Profile | null>(null);
+  const [session, setSession] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSubscriptionLoading, setIsSubscriptionLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [subscriptionTier, setSubscriptionTier] = useState('free');
-  const [descriptionCount, setDescriptionCount] = useState(0);
+  const [isPremiumUser, setIsPremiumUser] = useState<boolean>(false);
+  const [isBusinessUser, setIsBusinessUser] = useState<boolean>(false);
+  const [isSubscribedUser, setIsSubscribedUser] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check for stored profile on mount
-    const storedProfile = localStorage.getItem('userProfile');
-    if (storedProfile) {
+    const loadSession = async () => {
+      setIsLoading(true);
       try {
-        const parsedProfile = JSON.parse(storedProfile);
-        setProfile(convertToProfile(parsedProfile));
-        setIsAuthenticated(true);
-      } catch (err) {
-        console.error('Error parsing stored profile:', err);
-        localStorage.removeItem('userProfile');
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user as Profile || null);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setLoading(false);
+    };
+
+    loadSession();
+
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      setUser(session?.user as Profile || null);
+    });
   }, []);
-  
-  // Update profile setter to use conversion utility
-  const setUserProfile = useCallback((userData: any) => {
-    if (!userData) {
-      setProfile(null);
-      return;
-    }
-    
-    const convertedProfile = convertToProfile(userData);
-    setProfile(convertedProfile);
-  }, []);
-  
-  const login = useCallback(async (credentials?: { email: string; password: string }) => {
-    setLoading(true);
+
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      if (!user?.id) {
+        setIsSubscriptionLoading(false);
+        return;
+      }
+
+      setIsSubscriptionLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('status, price_id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching subscription:', error);
+          setIsPremiumUser(false);
+          setIsBusinessUser(false);
+          setIsSubscribedUser(false);
+        } else if (data) {
+          setIsSubscribedUser(data.status === 'active' || data.status === 'trialing');
+          setIsPremiumUser(data.price_id === process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PLAN_PRICE_ID);
+          setIsBusinessUser(data.price_id === process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PLAN_PRICE_ID);
+        } else {
+          setIsPremiumUser(false);
+          setIsBusinessUser(false);
+          setIsSubscribedUser(false);
+        }
+      } catch (err: any) {
+        console.error('Error processing subscription:', err);
+        setIsPremiumUser(false);
+        setIsBusinessUser(false);
+        setIsSubscribedUser(false);
+      } finally {
+        setIsSubscriptionLoading(false);
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [user?.id]);
+
+  const isPremium = useCallback(() => isPremiumUser, [isPremiumUser]);
+  const isBusiness = useCallback(() => isBusinessUser, [isBusinessUser]);
+  const isSubscribed = useCallback(() => isSubscribedUser, [isSubscribedUser]);
+
+  // Update this function to include all required properties
+  const createEmptyProfile = (userId: string, email: string): Profile => {
+    return {
+      id: userId,
+      email,
+      name: email.split('@')[0],
+      role: 'user',
+      avatarUrl: null,
+      app_metadata: {},
+      user_metadata: {},
+      aud: '',
+      created_at: new Date().toISOString()
+    };
+  };
+
+  const signIn = async (email: string): Promise<void> => {
+    setIsLoading(true);
     setError(null);
-    
     try {
-      // Simulate API call for login
-      const response = await new Promise<Profile>((resolve) => {
-        setTimeout(() => {
-          resolve({
-            id: 'user-123',
-            email: credentials?.email || 'user@example.com',
-            name: 'Test User',
-            role: 'premium',
-            avatarUrl: 'https://i.pravatar.cc/150?img=3'
-          });
-        }, 1000);
-      });
-      
-      setUserProfile(response);
-      setIsAuthenticated(true);
-      localStorage.setItem('userProfile', JSON.stringify(response));
-      
-      return response;
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) throw error;
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
-      throw err;
+      setError(err.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [setUserProfile]);
-  
-  const logout = useCallback(() => {
-    setProfile(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('userProfile');
-  }, []);
-  
-  const refreshProfile = useCallback(async () => {
-    if (!profile?.id) return;
-    
-    setLoading(true);
+  };
+
+  const signOut = async (): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
     try {
-      // Simulate API call to refresh profile
-      const response = await new Promise<Profile>((resolve) => {
-        setTimeout(() => {
-          resolve({
-            ...profile,
-            // Add any updated fields here
-          });
-        }, 500);
-      });
-      
-      setUserProfile(response);
-      localStorage.setItem('userProfile', JSON.stringify(response));
-      return response;
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     } catch (err: any) {
-      console.error('Error refreshing profile:', err);
-      setError(err.message || 'Failed to refresh profile');
+      setError(err.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [profile, setUserProfile]);
-  
-  const checkIsPremium = useCallback(() => {
-    if (!profile?.role) return false;
-    return isPremium(profile.role);
-  }, [profile]);
-  
-  const checkIsBusiness = useCallback(() => {
-    if (!profile?.role) return false;
-    return isBusiness(profile.role);
-  }, [profile]);
-  
-  const checkIsAdmin = useCallback(() => {
-    if (!profile?.role) return false;
-    return isAdmin(profile.role);
-  }, [profile]);
-  
-  const checkHasRole = useCallback((requiredRole: string) => {
-    if (!profile?.role) return false;
-    return hasRole(profile.role, requiredRole);
-  }, [profile]);
-  
-  const checkIsSubscribed = useCallback(() => {
-    return checkIsPremium() || checkIsBusiness();
-  }, [checkIsPremium, checkIsBusiness]);
-  
-  const canCreateMoreDescriptions = useCallback(() => {
-    return checkIsSubscribed() || descriptionCount < 3;
-  }, [checkIsSubscribed, descriptionCount]);
-  
-  const openCustomerPortal = useCallback(async () => {
-    // Simulate opening customer portal
-    window.open('https://example.com/customer-portal', '_blank');
-    return Promise.resolve();
-  }, []);
-  
+  };
+
+  const createProfile = async (userId: string, email: string): Promise<Profile> => {
+    // Create a complete profile with all required properties
+    const newProfile = createEmptyProfile(userId, email);
+    
+    // Persist to database
+    const { error } = await supabase
+      .from('profiles')
+      .insert([newProfile]);
+      
+    if (error) {
+      console.error('Error creating profile:', error);
+    }
+    
+    return newProfile;
+  };
+
   return {
-    profile,
-    loading,
+    user,
+    session,
+    isLoading,
+    isPremium,
+    isBusiness,
+    isSubscribed,
+    isSubscriptionLoading,
     error,
-    isAuthenticated,
-    login,
-    logout,
-    refreshProfile,
-    isPremium: checkIsPremium,
-    isBusiness: checkIsBusiness,
-    isAdmin: checkIsAdmin,
-    hasRole: checkHasRole,
-    isSubscribed: checkIsSubscribed,
-    subscriptionTier,
-    descriptionCount,
-    canCreateMoreDescriptions,
-    openCustomerPortal,
-    // Aliases for backward compatibility
-    user: profile,
-    signOut: logout,
+    signIn,
+    signOut
   };
 };

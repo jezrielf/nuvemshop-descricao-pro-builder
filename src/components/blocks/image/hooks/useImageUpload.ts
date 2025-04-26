@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/services/storage';
+import { convertProfileToUser } from '@/utils/typeConversion';
 
 interface UseImageUploadProps {
   onSuccess?: (url: string, alt: string) => void;
@@ -23,18 +24,7 @@ export const useImageUpload = (props?: UseImageUploadProps) => {
     
     try {
       // Convert the user to the format expected by storageService
-      const user = auth.user ? {
-        ...auth.user,
-        // Ensure these properties exist and are of the correct type
-        app_metadata: auth.user.app_metadata || {},
-        user_metadata: auth.user.user_metadata || {},
-        aud: auth.user.aud || '',
-        created_at: auth.user.created_at || '',
-        // Convert role to string if it's an array
-        role: typeof auth.user.role === 'object' && Array.isArray(auth.user.role) 
-          ? auth.user.role[0] || '' 
-          : auth.user.role || ''
-      } : null;
+      const user = auth.user ? convertProfileToUser(auth.user) : null;
 
       const result = await storageService.uploadFile({
         user,

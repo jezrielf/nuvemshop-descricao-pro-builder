@@ -1,8 +1,8 @@
-
 import { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { convertProfileToUser } from '@/utils/typeConversion';
 
 export const useImageLibraryUpload = () => {
   const [uploading, setUploading] = useState(false);
@@ -114,7 +114,10 @@ export const useImageLibraryUpload = () => {
         throw new Error('Não foi possível preparar o armazenamento');
       }
       
-      const userId = auth.user.id;
+      // Convert user to format with all required properties
+      const userWithRequiredProps = convertProfileToUser(auth.user);
+      
+      const userId = userWithRequiredProps.id;
       if (!userId) {
         throw new Error('ID de usuário não disponível');
       }

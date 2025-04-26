@@ -1,5 +1,6 @@
 
 import { Block } from '@/types/editor';
+import { Profile } from '@/types/auth';
 
 /**
  * Ensures that a block object conforms to the Block type
@@ -16,4 +17,29 @@ export function ensureBlockType(block: any): Block {
   }
   
   return block as Block;
+}
+
+/**
+ * Converts a Profile object to a User-compatible object
+ * This is useful when dealing with Profile objects that need to be used as User objects
+ */
+export function convertProfileToUser(profile: Profile): any {
+  return {
+    ...profile,
+    // Ensure required User properties exist
+    app_metadata: profile.app_metadata || {},
+    user_metadata: profile.user_metadata || {},
+    aud: profile.aud || '',
+    created_at: profile.created_at || '',
+    // Convert role to string if it's an array
+    role: Array.isArray(profile.role) ? (profile.role[0] || '') : (profile.role || '')
+  };
+}
+
+/**
+ * Gets role as string from a user/profile object that might have role as string or string[]
+ */
+export function getRoleAsString(user: { role: string | string[] }): string {
+  if (!user?.role) return '';
+  return Array.isArray(user.role) ? (user.role[0] || '') : user.role;
 }
