@@ -1,7 +1,21 @@
 
 import { useState, useEffect } from 'react';
-import { convertToProfile } from './useAuthProvider';
 import { Profile } from '@/types/auth';
+
+// This function converts any user-like object to a Profile
+export const convertToProfile = (userData: any): Profile => {
+  return {
+    id: userData.id || '',
+    email: userData.email || '',
+    name: userData.nome || userData.name || '',
+    role: userData.role || 'user',
+    avatarUrl: userData.avatar_url || userData.avatarUrl || null,
+    app_metadata: userData.app_metadata || {},
+    user_metadata: userData.user_metadata || {},
+    aud: userData.aud || '',
+    created_at: userData.criado_em || userData.created_at || new Date().toISOString()
+  };
+};
 
 export const useAuthSession = () => {
   const [user, setUser] = useState<Profile | null>(null);

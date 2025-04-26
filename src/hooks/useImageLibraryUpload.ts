@@ -1,66 +1,30 @@
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/services/storage';
+import { convertProfileToUser } from '@/utils/typeConversion';
 
 export const useImageLibraryUpload = () => {
-  const [uploading, setUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageAlt, setImageAlt] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const auth = useAuth();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) return null;
     
-    // Validações básicas
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Tipo de arquivo inválido",
-        description: "Por favor, selecione uma imagem nos formatos JPG, PNG ou GIF.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Arquivo muito grande",
-        description: "O tamanho máximo permitido é 5MB.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setImageFile(file);
-    setImageAlt(file.name.split('.')[0] || '');
-    
-    // Criar preview da imagem
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const uploadImage = async () => {
-    if (!imageFile) {
-      return null;
-    }
-    
-    setUploading(true);
+    setIsUploading(true);
     setUploadProgress(0);
     
     try {
+      // Convert the user to the format expected by storageService
+      const user = auth.user ? convertProfileToUser(auth.user) : null;
+
       const result = await storageService.uploadFile({
-        user: auth.user,
-        file: imageFile,
-        path: 'library',
+        user,
+        file,
         onProgress: setUploadProgress
       });
       
@@ -73,15 +37,9 @@ export const useImageLibraryUpload = () => {
         description: "Sua imagem foi enviada com sucesso."
       });
       
-      // Resetar o formulário após o upload bem-sucedido
-      resetForm();
-      
-      return { 
-        url: result.url!, 
-        alt: imageAlt 
-      };
+      return result.url;
     } catch (error: any) {
-      console.error('Erro ao fazer upload:', error);
+      console.error('Erro no upload:', error);
       
       toast({
         title: "Erro no upload",
@@ -91,30 +49,14 @@ export const useImageLibraryUpload = () => {
       
       return null;
     } finally {
-      setUploading(false);
-      setUploadProgress(0);
-    }
-  };
-
-  const resetForm = () => {
-    setImageFile(null);
-    setPreviewUrl(null);
-    setImageAlt('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      setIsUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 
   return {
-    uploading,
+    isUploading,
     uploadProgress,
-    imageFile,
-    previewUrl,
-    imageAlt,
-    fileInputRef,
-    handleFileChange,
-    uploadImage,
-    setImageAlt,
-    resetForm
+    handleFileChange
   };
 };
