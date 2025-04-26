@@ -1,6 +1,7 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Profile } from '@/types/auth';
-import { isPremium, isBusiness, isAdmin, hasRole } from '@/utils/roleUtils';
+import { isPremium, isBusiness, isAdmin, hasRole, getRoles } from '@/utils/roleUtils';
 
 // Add profile conversion utility
 export const convertToProfile = (userData: any): Profile => {
@@ -20,10 +21,10 @@ export const convertToProfile = (userData: any): Profile => {
       atualizado_em: userData.atualizado_em,
       avatar_url: userData.avatar_url,
       // Add User properties if they exist
-      app_metadata: userData.app_metadata,
-      user_metadata: userData.user_metadata,
-      aud: userData.aud,
-      created_at: userData.created_at
+      app_metadata: userData.app_metadata || {},
+      user_metadata: userData.user_metadata || {},
+      aud: userData.aud || '',
+      created_at: userData.created_at || ''
     };
   }
   
@@ -34,6 +35,11 @@ export const convertToProfile = (userData: any): Profile => {
     name: userData.name || userData.nome || '',
     // Ensure avatarUrl is set if avatar_url exists
     avatarUrl: userData.avatarUrl || userData.avatar_url || null,
+    // Ensure required User properties exist
+    app_metadata: userData.app_metadata || {},
+    user_metadata: userData.user_metadata || {},
+    aud: userData.aud || '',
+    created_at: userData.created_at || ''
   };
   
   return profile;

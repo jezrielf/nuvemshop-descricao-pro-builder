@@ -22,8 +22,17 @@ export const useImageUpload = (props?: UseImageUploadProps) => {
     setUploadProgress(0);
     
     try {
+      // Convert the user to the format expected by storageService
+      const user = auth.user ? {
+        ...auth.user,
+        app_metadata: auth.user.app_metadata || {},
+        user_metadata: auth.user.user_metadata || {},
+        aud: auth.user.aud || '',
+        created_at: auth.user.created_at || ''
+      } : null;
+
       const result = await storageService.uploadFile({
-        user: auth.user,
+        user,
         file,
         onProgress: setUploadProgress
       });

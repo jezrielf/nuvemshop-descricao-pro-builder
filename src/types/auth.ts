@@ -13,8 +13,8 @@ export interface Profile {
   avatar_url?: string; // Alias for avatarUrl
   
   // Add User properties that might be needed for compatibility
-  app_metadata?: any;
-  user_metadata?: any;
-  aud?: string;
-  created_at?: string;
+  app_metadata: any;
+  user_metadata: any;
+  aud: string;
+  created_at: string;
 }

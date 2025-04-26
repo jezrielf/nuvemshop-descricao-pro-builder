@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -59,7 +58,7 @@ export const useGalleryUpload = () => {
       });
       return null;
     }
-    
+
     // Validações
     if (!file.type.startsWith('image/')) {
       toast({
@@ -89,7 +88,16 @@ export const useGalleryUpload = () => {
         throw new Error('Não foi possível preparar o armazenamento');
       }
       
-      const userId = auth.user.id;
+      // Ensure user has required properties for compatibility
+      const userWithRequiredProps = {
+        ...auth.user,
+        app_metadata: auth.user.app_metadata || {},
+        user_metadata: auth.user.user_metadata || {},
+        aud: auth.user.aud || '',
+        created_at: auth.user.created_at || ''
+      };
+      
+      const userId = userWithRequiredProps.id;
       if (!userId) {
         throw new Error('ID de usuário não disponível');
       }
