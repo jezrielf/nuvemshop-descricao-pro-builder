@@ -38,7 +38,10 @@ function getDefaultTitle(type: BlockType): string {
     textImage: 'Texto e Imagem',
     faq: 'Perguntas Frequentes',
     cta: 'Chamada para Ação',
-    video: 'Vídeo'
+    video: 'Vídeo',
+    videoText: 'Vídeo e Texto',
+    textVideo: 'Texto e Vídeo',
+    carousel: 'Carrossel'
   };
   
   return titles[type] || 'Bloco';

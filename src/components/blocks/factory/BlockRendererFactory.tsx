@@ -26,6 +26,16 @@ interface BlockRendererProps {
 
 export class BlockRendererFactory {
   static createBlockComponent({ block, isPreview = false }: BlockRendererProps): React.ReactNode {
+    // Verificar se o bloco tem uma propriedade type válida
+    if (!block || typeof block !== 'object' || !('type' in block)) {
+      console.error('Invalid block:', block);
+      return (
+        <div className="p-4 border border-red-300 bg-red-50 rounded text-red-700">
+          Bloco inválido ou mal formado
+        </div>
+      );
+    }
+    
     switch (block.type) {
       case 'hero':
         return <HeroBlock block={block as any} isPreview={isPreview} />;
@@ -75,7 +85,7 @@ export class BlockRendererFactory {
       default:
         return (
           <div className="p-4 border border-red-300 bg-red-50 rounded text-red-700">
-            Bloco desconhecido: {block.type}
+            Bloco desconhecido: {String(block.type)}
           </div>
         );
     }

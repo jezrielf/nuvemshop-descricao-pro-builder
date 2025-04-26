@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BlockBase, BlockStyle } from '@/types/editor';
+import { BlockBase, BlockStyle, BlockSpacing } from '@/types/editor';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -20,7 +20,7 @@ const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle })
     updateStyle({ margin: value });
   };
 
-  const handleBlockSpacingChange = (value: string) => {
+  const handleBlockSpacingChange = (value: BlockSpacing) => {
     console.log('Changing block spacing to:', value);
     updateStyle({ blockSpacing: value });
   };
@@ -71,19 +71,17 @@ const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle })
       <div className="mt-3">
         <Label htmlFor="blockSpacing">Espaçamento entre blocos</Label>
         <Select 
-          value={block.style?.blockSpacing || 'md'} 
-          onValueChange={handleBlockSpacingChange}
+          value={block.style?.blockSpacing || 'medium'} 
+          onValueChange={(value) => handleBlockSpacingChange(value as BlockSpacing)}
         >
           <SelectTrigger id="blockSpacing">
             <SelectValue placeholder="Espaçamento entre blocos" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">Nenhum (conectados)</SelectItem>
-            <SelectItem value="xs">Muito pequeno</SelectItem>
-            <SelectItem value="sm">Pequeno</SelectItem>
-            <SelectItem value="md">Médio</SelectItem>
-            <SelectItem value="lg">Grande</SelectItem>
-            <SelectItem value="xl">Muito grande</SelectItem>
+            <SelectItem value="small">Pequeno</SelectItem>
+            <SelectItem value="medium">Médio</SelectItem>
+            <SelectItem value="large">Grande</SelectItem>
           </SelectContent>
         </Select>
       </div>

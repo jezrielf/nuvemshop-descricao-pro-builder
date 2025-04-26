@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ProductDescription } from '@/types/editor';
@@ -25,11 +24,18 @@ interface MetaTags {
   ogImage: string;
 }
 
+type FeedbackStatus = 'success' | 'warning' | 'error';
+
+interface FeedbackItem {
+  status: FeedbackStatus;
+  message: string;
+}
+
 interface MetaTagFeedback {
-  titleLength: { status: 'success' | 'warning' | 'error'; message: string };
-  descriptionLength: { status: 'success' | 'warning' | 'error'; message: string };
-  keywordsCount: { status: 'success' | 'warning' | 'error'; message: string };
-  ogFields: { status: 'success' | 'warning' | 'error'; message: string };
+  titleLength: FeedbackItem;
+  descriptionLength: FeedbackItem;
+  keywordsCount: FeedbackItem;
+  ogFields: FeedbackItem;
 }
 
 const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
@@ -130,10 +136,10 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
   
   const validateMetaTags = () => {
     const newFeedback = {
-      titleLength: { status: 'success', message: 'Título com tamanho adequado' } as const,
-      descriptionLength: { status: 'success', message: 'Descrição com tamanho adequado' } as const,
-      keywordsCount: { status: 'success', message: 'Quantidade de palavras-chave adequada' } as const,
-      ogFields: { status: 'success', message: 'Campos Open Graph preenchidos corretamente' } as const
+      titleLength: { status: 'success' as FeedbackStatus, message: 'Título com tamanho adequado' },
+      descriptionLength: { status: 'success' as FeedbackStatus, message: 'Descrição com tamanho adequado' },
+      keywordsCount: { status: 'success' as FeedbackStatus, message: 'Quantidade de palavras-chave adequada' },
+      ogFields: { status: 'success' as FeedbackStatus, message: 'Campos Open Graph preenchidos corretamente' }
     };
     
     // Validar título
@@ -177,7 +183,7 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
     setFeedback(newFeedback);
   };
   
-  const getHtmlOutput = (): string => {
+  function getHtmlOutput(): string {
     return `<!-- Meta Tags SEO -->
 <meta name="title" content="${metaTags.title}">
 <meta name="description" content="${metaTags.description}">
@@ -189,9 +195,9 @@ const MetaTagValidator: React.FC<MetaTagValidatorProps> = ({ description }) => {
 <meta property="og:description" content="${metaTags.ogDescription || metaTags.description}">
 ${metaTags.ogImage ? `<meta property="og:image" content="${metaTags.ogImage}">` : ''}
 `;
-  };
+  }
   
-  const getStatusIcon = (status: 'success' | 'warning' | 'error') => {
+  function getStatusIcon(status: FeedbackStatus) {
     switch (status) {
       case 'success':
         return <CheckCircle className="text-green-500 h-4 w-4" />;
@@ -200,13 +206,13 @@ ${metaTags.ogImage ? `<meta property="og:image" content="${metaTags.ogImage}">` 
       case 'error':
         return <AlertCircle className="text-red-500 h-4 w-4" />;
     }
-  };
+  }
   
-  const copyToClipboard = () => {
+  function copyToClipboard() {
     navigator.clipboard.writeText(getHtmlOutput());
     alert('Meta tags copiadas para a área de transferência!');
-  };
-  
+  }
+
   if (!description) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>

@@ -1,20 +1,14 @@
-
 import React, { useState } from 'react';
-import { CarouselBlock as CarouselBlockType } from '@/types/editor/blocks/carousel';
+import { CarouselBlock as CarouselBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
 import { useEditorStore } from '@/store/editor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { ChevronLeft, ChevronRight, Plus, Trash } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Card, CardContent } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
+import { Trash2, Plus, ArrowUp, ArrowDown } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CarouselBlockProps {
   block: CarouselBlockType;
@@ -23,146 +17,117 @@ interface CarouselBlockProps {
 
 const CarouselBlock: React.FC<CarouselBlockProps> = ({ block, isPreview = false }) => {
   const { updateBlock } = useEditorStore();
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [slidesPerView, setSlidesPerView] = useState(1); // Para fins de preview
-  
-  const handleImageUpdate = (index: number, field: string, value: string) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const handleImageChange = (index: number, field: keyof typeof block.images[0], value: string) => {
     const updatedImages = [...block.images];
-    updatedImages[index] = { ...updatedImages[index], [field]: value };
-    
+    updatedImages[index] = {
+      ...updatedImages[index],
+      [field]: value
+    };
     updateBlock(block.id, { images: updatedImages });
   };
-  
+
   const handleAddImage = () => {
     const newImage = {
       id: uuidv4(),
-      src: 'https://via.placeholder.com/800x400',
-      alt: `Imagem ${block.images.length + 1}`,
-      caption: `Legenda da imagem ${block.images.length + 1}`
+      src: 'https://via.placeholder.com/800x600?text=Nova+Imagem',
+      alt: 'Nova imagem',
+      caption: ''
     };
-    
     updateBlock(block.id, { images: [...block.images, newImage] });
   };
-  
+
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...block.images];
     updatedImages.splice(index, 1);
-    
-    // Ajustar o activeSlide para não ficar fora dos limites
-    if (activeSlide >= updatedImages.length) {
-      setActiveSlide(Math.max(0, updatedImages.length - 1));
+    updateBlock(block.id, { images: updatedImages });
+    if (currentSlide >= updatedImages.length) {
+      setCurrentSlide(Math.max(0, updatedImages.length - 1));
     }
+  };
+
+  const handleMoveImage = (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) || 
+      (direction === 'down' && index === block.images.length - 1)
+    ) {
+      return;
+    }
+
+    const updatedImages = [...block.images];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = updatedImages[index];
+    updatedImages[index] = updatedImages[newIndex];
+    updatedImages[newIndex] = temp;
     
     updateBlock(block.id, { images: updatedImages });
+    setCurrentSlide(newIndex);
   };
-  
-  const form = useForm({
-    defaultValues: {
-      autoplay: block.autoplay ?? true,
-      autoplaySpeed: block.autoplaySpeed ?? 3000,
-      showArrows: block.showArrows ?? true,
-      showDots: block.showDots ?? true,
-      infinite: block.infinite ?? true
-    }
-  });
-  
-  const nextSlide = () => {
-    setActiveSlide((prev) => 
-      block.infinite 
-        ? (prev + 1) % block.images.length 
-        : Math.min(prev + 1, block.images.length - 1)
-    );
+
+  const handleToggleOption = (option: keyof CarouselBlockType, value: boolean) => {
+    updateBlock(block.id, { [option]: value });
   };
-  
-  const prevSlide = () => {
-    setActiveSlide((prev) => 
-      block.infinite 
-        ? (prev - 1 + block.images.length) % block.images.length 
-        : Math.max(prev - 1, 0)
-    );
+
+  const handleSpeedChange = (value: number[]) => {
+    updateBlock(block.id, { autoplaySpeed: value[0] });
   };
-  
-  // Efeito de autoplay para o preview
-  React.useEffect(() => {
-    if (!isPreview || !block.autoplay) return;
-    
-    const interval = setInterval(() => {
-      nextSlide();
-    }, block.autoplaySpeed || 3000);
-    
-    return () => clearInterval(interval);
-  }, [isPreview, block.autoplay, block.autoplaySpeed, activeSlide, block.images.length]);
-  
-  const handleUpdateSetting = (field: string, value: any) => {
-    updateBlock(block.id, { [field]: value });
-  };
-  
-  const previewClassName = 
-    "transition-all transform duration-500 h-full flex items-center justify-center";
-  
+
   if (isPreview) {
     return (
       <BlockWrapper block={block} isEditing={false}>
-        <div className="relative overflow-hidden">
-          <div className="relative h-[400px]">
-            {/* Slides */}
-            <div className="h-full whitespace-nowrap">
-              {block.images.map((image, idx) => (
-                <div 
-                  key={image.id}
-                  className={`${previewClassName} absolute inset-0 ${
-                    idx === activeSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                >
-                  <div className="w-full h-full relative">
-                    <img 
-                      src={image.src} 
-                      alt={image.alt || `Slide ${idx + 1}`} 
-                      className="object-contain w-full h-full"
-                    />
-                    {image.caption && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-center">
-                        {image.caption}
-                      </div>
-                    )}
+        <div className="carousel-container relative">
+          {block.images?.length > 0 ? (
+            <div className="carousel-inner">
+              <div className="relative">
+                <img 
+                  src={block.images[currentSlide].src} 
+                  alt={block.images[currentSlide].alt || ''} 
+                  className="w-full h-auto rounded-lg" 
+                />
+                {block.images[currentSlide].caption && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm">
+                    {block.images[currentSlide].caption}
                   </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Arrows */}
-            {block.showArrows && block.images.length > 1 && (
-              <>
-                <button 
-                  onClick={prevSlide}
-                  className="absolute top-1/2 -translate-y-1/2 left-2 z-20 bg-black bg-opacity-50 rounded-full p-2 text-white hover:bg-opacity-70"
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button 
-                  onClick={nextSlide}
-                  className="absolute top-1/2 -translate-y-1/2 right-2 z-20 bg-black bg-opacity-50 rounded-full p-2 text-white hover:bg-opacity-70"
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              </>
-            )}
-            
-            {/* Dots */}
-            {block.showDots && block.images.length > 1 && (
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
-                {block.images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    className={`h-2 w-2 rounded-full mx-1 ${
-                      idx === activeSlide ? 'bg-white' : 'bg-white bg-opacity-50'
-                    }`}
-                    onClick={() => setActiveSlide(idx)}
-                  />
-                ))}
+                )}
+                
+                {/* Arrows */}
+                {block.showArrows && block.images.length > 1 && (
+                  <>
+                    <button 
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full"
+                      onClick={() => setCurrentSlide((prev) => (prev === 0 ? block.images.length - 1 : prev - 1))}
+                    >
+                      <ArrowUp className="rotate-90" size={20} />
+                    </button>
+                    <button 
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full"
+                      onClick={() => setCurrentSlide((prev) => (prev === block.images.length - 1 ? 0 : prev + 1))}
+                    >
+                      <ArrowDown className="rotate-90" size={20} />
+                    </button>
+                  </>
+                )}
+                
+                {/* Dots */}
+                {block.showDots && block.images.length > 1 && (
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                    {block.images.map((_, index) => (
+                      <button 
+                        key={index} 
+                        className={`h-3 w-3 rounded-full ${index === currentSlide ? 'bg-white' : 'bg-white/50'}`}
+                        onClick={() => setCurrentSlide(index)}
+                      ></button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="bg-gray-100 p-12 flex items-center justify-center rounded-lg">
+              <p className="text-gray-400">Nenhuma imagem adicionada ao carrossel</p>
+            </div>
+          )}
         </div>
       </BlockWrapper>
     );
@@ -171,278 +136,198 @@ const CarouselBlock: React.FC<CarouselBlockProps> = ({ block, isPreview = false 
   return (
     <BlockWrapper block={block} isEditing={true}>
       <div className="space-y-6">
-        <Tabs defaultValue="images">
-          <TabsList className="w-full">
-            <TabsTrigger value="images" className="flex-1">Imagens</TabsTrigger>
-            <TabsTrigger value="settings" className="flex-1">Configurações</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="images" className="space-y-4 pt-4">
-            <div className="grid gap-4">
-              {block.images.map((image, idx) => (
-                <Card key={image.id}>
-                  <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      <div className="md:w-1/3">
-                        <div className="aspect-video bg-gray-100 relative mb-2 overflow-hidden rounded-md border border-gray-200">
-                          <img 
-                            src={image.src} 
-                            alt={image.alt} 
-                            className="object-contain w-full h-full"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = 'https://placehold.co/600x400/EAEAEA/CCCCCC?text=Erro';
-                            }}
-                          />
-                        </div>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handleRemoveImage(idx)}
-                          className="w-full"
-                          disabled={block.images.length <= 1}
-                        >
-                          <Trash className="h-4 w-4 mr-2" />
-                          Remover Imagem
-                        </Button>
-                      </div>
-                      
-                      <div className="md:w-2/3 space-y-4">
-                        <div>
-                          <Label htmlFor={`image-${idx}-src`}>URL da Imagem</Label>
-                          <Input 
-                            id={`image-${idx}-src`}
-                            value={image.src}
-                            onChange={(e) => handleImageUpdate(idx, 'src', e.target.value)}
-                            placeholder="https://exemplo.com/imagem.jpg"
-                            className="mt-1"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor={`image-${idx}-alt`}>Texto Alternativo</Label>
-                          <Input 
-                            id={`image-${idx}-alt`}
-                            value={image.alt}
-                            onChange={(e) => handleImageUpdate(idx, 'alt', e.target.value)}
-                            placeholder="Descrição da imagem"
-                            className="mt-1"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor={`image-${idx}-caption`}>Legenda (opcional)</Label>
-                          <Textarea 
-                            id={`image-${idx}-caption`}
-                            value={image.caption || ''}
-                            onChange={(e) => handleImageUpdate(idx, 'caption', e.target.value)}
-                            placeholder="Legenda da imagem"
-                            className="mt-1"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              <Button variant="outline" onClick={handleAddImage} className="mt-2">
-                <Plus className="h-4 w-4 mr-2" />
-                Adicionar Imagem
-              </Button>
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">Configurações do Carrossel</h3>
+          <Button onClick={handleAddImage} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" /> Adicionar Imagem
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="autoplay">Reprodução Automática</Label>
+              <Switch 
+                id="autoplay" 
+                checked={block.autoplay} 
+                onCheckedChange={(checked) => handleToggleOption('autoplay', checked)} 
+              />
             </div>
-          </TabsContent>
-          
-          <TabsContent value="settings" className="space-y-6 pt-4">
-            <Form {...form}>
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="autoplay"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Reprodução Automática</FormLabel>
-                        <FormDescription>
-                          Navegar automaticamente entre os slides
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleUpdateSetting('autoplay', checked);
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
+            
+            {block.autoplay && (
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label htmlFor="autoplaySpeed">Velocidade (ms)</Label>
+                  <span className="text-sm">{block.autoplaySpeed}ms</span>
+                </div>
+                <Slider 
+                  id="autoplaySpeed"
+                  min={1000} 
+                  max={10000} 
+                  step={500} 
+                  value={[block.autoplaySpeed]} 
+                  onValueChange={handleSpeedChange} 
                 />
-                
-                {form.watch('autoplay') && (
-                  <div className="space-y-2">
-                    <Label>Velocidade de Reprodução (ms)</Label>
-                    <div className="flex items-center gap-4">
-                      <Slider
-                        defaultValue={[block.autoplaySpeed || 3000]}
-                        min={1000}
-                        max={10000}
-                        step={500}
-                        className="flex-1"
-                        onValueChange={(value) => {
-                          form.setValue('autoplaySpeed', value[0]);
-                          handleUpdateSetting('autoplaySpeed', value[0]);
-                        }}
-                      />
-                      <span className="w-16 text-center">
-                        {form.watch('autoplaySpeed')}ms
-                      </span>
-                    </div>
+              </div>
+            )}
+            
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="showArrows">Mostrar Setas</Label>
+              <Switch 
+                id="showArrows" 
+                checked={block.showArrows} 
+                onCheckedChange={(checked) => handleToggleOption('showArrows', checked)} 
+              />
+            </div>
+            
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="showDots">Mostrar Indicadores</Label>
+              <Switch 
+                id="showDots" 
+                checked={block.showDots} 
+                onCheckedChange={(checked) => handleToggleOption('showDots', checked)} 
+              />
+            </div>
+            
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="infinite">Loop Infinito</Label>
+              <Switch 
+                id="infinite" 
+                checked={block.infinite} 
+                onCheckedChange={(checked) => handleToggleOption('infinite', checked)} 
+              />
+            </div>
+          </div>
+          
+          <div className="border rounded-md p-4">
+            <h4 className="text-sm font-medium mb-2">Pré-visualização</h4>
+            {block.images.length > 0 ? (
+              <div className="relative aspect-video bg-gray-100 rounded overflow-hidden">
+                <img 
+                  src={block.images[currentSlide].src} 
+                  alt={block.images[currentSlide].alt} 
+                  className="w-full h-full object-cover"
+                />
+                {block.images[currentSlide].caption && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-1 text-xs">
+                    {block.images[currentSlide].caption}
                   </div>
                 )}
                 
-                <FormField
-                  control={form.control}
-                  name="showArrows"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Mostrar Setas</FormLabel>
-                        <FormDescription>
-                          Exibir botões para navegação
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleUpdateSetting('showArrows', checked);
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="showDots"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Mostrar Indicadores</FormLabel>
-                        <FormDescription>
-                          Exibir pontos para indicar a posição atual
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleUpdateSetting('showDots', checked);
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="infinite"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Loop Infinito</FormLabel>
-                        <FormDescription>
-                          Continuar navegação após o último slide
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            handleUpdateSetting('infinite', checked);
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                {block.images.length > 1 && (
+                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                    {block.images.map((_, index) => (
+                      <button 
+                        key={index} 
+                        className={`h-2 w-2 rounded-full ${index === currentSlide ? 'bg-white' : 'bg-white/50'}`}
+                        onClick={() => setCurrentSlide(index)}
+                      ></button>
+                    ))}
+                  </div>
+                )}
               </div>
-            </Form>
-          </TabsContent>
-        </Tabs>
+            ) : (
+              <div className="aspect-video bg-gray-100 rounded flex items-center justify-center">
+                <p className="text-xs text-gray-400">Sem imagens</p>
+              </div>
+            )}
+          </div>
+        </div>
         
-        <div className="border-t pt-4">
-          <h3 className="text-sm font-medium mb-4">Pré-visualização</h3>
-          <div className="relative overflow-hidden rounded-lg border h-[300px]">
-            {/* Slides */}
-            <div className="h-full whitespace-nowrap">
-              {block.images.map((image, idx) => (
-                <div 
-                  key={image.id}
-                  className={`${previewClassName} absolute inset-0 ${
-                    idx === activeSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                >
-                  <div className="w-full h-full relative">
+        <div className="space-y-4 pt-4 border-t">
+          <h4 className="font-medium">Imagens do Carrossel</h4>
+          
+          {block.images.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-md">
+              <p className="text-gray-500">Nenhuma imagem adicionada</p>
+              <Button onClick={handleAddImage} variant="outline" className="mt-2">
+                <Plus className="h-4 w-4 mr-1" /> Adicionar Imagem
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {block.images.map((image, index) => (
+                <div key={image.id} className="border rounded-md p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">Imagem {index + 1}</h5>
+                    <div className="flex space-x-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleMoveImage(index, 'up')}
+                        disabled={index === 0}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleMoveImage(index, 'down')}
+                        disabled={index === block.images.length - 1}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`image-src-${index}`}>URL da Imagem</Label>
+                      <Input 
+                        id={`image-src-${index}`}
+                        value={image.src} 
+                        onChange={(e) => handleImageChange(index, 'src', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`image-alt-${index}`}>Texto Alternativo</Label>
+                      <Input 
+                        id={`image-alt-${index}`}
+                        value={image.alt} 
+                        onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor={`image-caption-${index}`}>Legenda (opcional)</Label>
+                    <Input 
+                      id={`image-caption-${index}`}
+                      value={image.caption || ''} 
+                      onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div className="aspect-video bg-gray-100 rounded-md overflow-hidden">
                     <img 
                       src={image.src} 
-                      alt={image.alt || `Slide ${idx + 1}`} 
-                      className="object-contain w-full h-full"
+                      alt={image.alt} 
+                      className="w-full h-full object-cover"
                       onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://placehold.co/600x400/EAEAEA/CCCCCC?text=Erro';
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Imagem+Inválida';
                       }}
                     />
-                    {image.caption && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-center">
-                        {image.caption}
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
             </div>
-            
-            {/* Navigation */}
-            <div className="absolute z-20 bottom-4 left-0 right-0 flex justify-center items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={prevSlide}
-                className="bg-white bg-opacity-75 hover:bg-opacity-100"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex gap-1">
-                {block.images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    className={`h-2 w-2 rounded-full ${
-                      idx === activeSlide ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
-                    onClick={() => setActiveSlide(idx)}
-                  />
-                ))}
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={nextSlide}
-                className="bg-white bg-opacity-75 hover:bg-opacity-100"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          )}
+          
+          {block.images.length > 0 && (
+            <Button onClick={handleAddImage} variant="outline" className="w-full">
+              <Plus className="h-4 w-4 mr-1" /> Adicionar Outra Imagem
+            </Button>
+          )}
         </div>
       </div>
     </BlockWrapper>
