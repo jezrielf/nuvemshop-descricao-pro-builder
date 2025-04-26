@@ -4,48 +4,65 @@ import { supabase } from '@/integrations/supabase/client';
 // Get dashboard statistics
 const getDashboardStats = async () => {
   try {
-    const stats = {
-      totalUsers: 0,
-      activeUsers: 0,
-      premiumUsers: 0,
-      totalTemplates: 0,
-      totalDescriptions: 0,
-    };
-    
-    // In a production app, we would fetch real statistics from a database
-    const { count: userCount } = await supabase
+    // Count total users
+    const { count: userCount, error: userError } = await supabase
       .from('profiles')
-      .select('*', { count: 'exact', head: true });
+      .select('id', { count: 'exact', head: true });
     
-    const { count: premiumCount } = await supabase
-      .from('subscribers')
-      .select('*', { count: 'exact', head: true })
-      .eq('subscribed', true);
+    if (userError) throw userError;
     
-    const { count: templateCount } = await supabase
+    // Count total templates
+    const { count: templateCount, error: templateError } = await supabase
       .from('templates')
-      .select('*', { count: 'exact', head: true });
+      .select('id', { count: 'exact', head: true });
+      
+    if (templateError) throw templateError;
     
-    stats.totalUsers = userCount || 0;
-    stats.activeUsers = Math.floor(stats.totalUsers * 0.7); // Placeholder: 70% of users are active
-    stats.premiumUsers = premiumCount || 0;
-    stats.totalTemplates = templateCount || 0;
-    stats.totalDescriptions = Math.floor(stats.totalTemplates * 3); // Placeholder: average 3 descriptions per template
+    // Count total subscribers
+    const { count: subscriberCount, error: subscriberError } = await supabase
+      .from('subscribers')
+      .select('id', { count: 'exact', head: true })
+      .eq('subscribed', true);
+      
+    if (subscriberError) throw subscriberError;
     
-    return stats;
-  } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    // Return default values if there's an error
+    // Get recent users
+    const { data: recentUsers, error: recentUsersError } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('criado_em', { ascending: false })
+      .limit(5);
+      
+    if (recentUsersError) throw recentUsersError;
+    
+    // Calculate active percentage (mock for now)
+    const activePercentage = 65; // This would be calculated based on real data
+    
     return {
-      totalUsers: 0,
-      activeUsers: 0,
-      premiumUsers: 0,
-      totalTemplates: 0,
-      totalDescriptions: 0,
+      users: {
+        total: userCount || 0,
+        active: Math.round((userCount || 0) * (activePercentage / 100)),
+        activePercentage,
+        recentUsers: recentUsers || []
+      },
+      templates: {
+        total: templateCount || 0
+      },
+      subscribers: {
+        total: subscriberCount || 0,
+        percentage: subscriberCount && userCount ? Math.round((subscriberCount / userCount) * 100) : 0
+      }
+    };
+  } catch (error) {
+    console.error('Error getting dashboard stats:', error);
+    return {
+      users: { total: 0, active: 0, activePercentage: 0, recentUsers: [] },
+      templates: { total: 0 },
+      subscribers: { total: 0, percentage: 0 }
     };
   }
 };
 
 export const analyticsService = {
-  getDashboardStats,
+  getDashboardStats
 };

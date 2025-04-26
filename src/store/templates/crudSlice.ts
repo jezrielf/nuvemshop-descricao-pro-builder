@@ -1,17 +1,9 @@
 
 import { StateCreator } from 'zustand';
-import { TemplateState } from './types';
+import { TemplateState, TemplateCRUDSlice } from './types';
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import templateService from '@/services/admin/templateService';
-import { useEditorStore } from '@/store/editor';
-
-export interface TemplateCRUDSlice {
-  addTemplate: (template: Template) => void;
-  updateTemplate: (id: string, template: Partial<Template>) => void;
-  deleteTemplate: (id: string) => void;
-  applyTemplate: (template: Template) => void;
-}
 
 export const createTemplateCRUDSlice: StateCreator<
   TemplateState & TemplateCRUDSlice
@@ -59,8 +51,12 @@ export const createTemplateCRUDSlice: StateCreator<
   },
 
   applyTemplate: (template: Template) => {
-    // Get the loadDescription function from editor store
-    const { loadDescription, createNewDescription } = useEditorStore.getState();
+    if (!template) return;
+    
+    // Import dynamically to avoid circular dependency
+    const { useEditorStore } = require('@/store/editor');
+    
+    const { createNewDescription, loadDescription } = useEditorStore.getState();
     
     if (template && template.blocks) {
       // Create a new description based on the template

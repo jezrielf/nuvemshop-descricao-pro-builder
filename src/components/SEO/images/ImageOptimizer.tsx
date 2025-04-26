@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Image as ImageIcon } from 'lucide-react';
-import { BlockBase, BlockType, HeroBlock, ImageBlock, GalleryBlock, ImageTextBlock, TextImageBlock } from '@/types/editor';
+import { BlockBase, BlockType, HeroBlock, ImageBlock, GalleryBlock } from '@/types/editor';
 
 interface ImageOptimizerProps {
   block: BlockBase;
@@ -10,114 +10,91 @@ interface ImageOptimizerProps {
 }
 
 const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ block, onUpdateImage }) => {
-  const handleOptimizeImage = (imageUrl: string, imageType: string) => {
-    // In a real app, we would send this image URL to an optimization service
-    // For now, we'll simulate optimization by adding a query parameter
-    const optimizedUrl = `${imageUrl}?optimized=true&w=800&q=80`;
-    onUpdateImage(block.id, imageType, optimizedUrl);
-  };
+  // Helper function to check if a block has images
+  const blockHasImages = (block: BlockBase): boolean => {
+    if (!block) return false;
 
-  // Check if the block has images to optimize
-  const hasImages = (): boolean => {
     switch (block.type) {
       case 'hero':
-        return !!(block as HeroBlock).image?.src;
+        return !!(block as HeroBlock).imageUrl;
       case 'image':
         return !!(block as ImageBlock).src;
       case 'gallery':
         return (block as GalleryBlock).images && (block as GalleryBlock).images.length > 0;
-      case 'imageText':
-        return !!(block as ImageTextBlock).image?.src;
-      case 'textImage':
-        return !!(block as TextImageBlock).image?.src;
+      case 'image-text':
+        return !!(block as any).imageUrl;
+      case 'text-image':
+        return !!(block as any).imageUrl;
       default:
         return false;
     }
   };
 
-  const renderOptimizeButtons = () => {
-    // If no images, don't render any buttons
-    if (!hasImages()) return null;
+  // Get image URL based on block type
+  const getImageUrl = (block: BlockBase): string => {
+    if (!block) return '';
 
-    // Based on block type, render different optimize buttons
     switch (block.type) {
-      case 'hero': {
-        const heroBlock = block as HeroBlock;
-        if (!heroBlock.image || !heroBlock.image.src) return null;
-
-        return (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleOptimizeImage(heroBlock.image.src, 'image.src')}
-          >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Otimizar Imagem de Fundo
-          </Button>
-        );
-      }
-      case 'image': {
-        const imageBlock = block as ImageBlock;
-        if (!imageBlock.src) return null;
-
-        return (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleOptimizeImage(imageBlock.src, 'src')}
-          >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Otimizar Imagem
-          </Button>
-        );
-      }
-      case 'gallery': {
-        const galleryBlock = block as GalleryBlock;
-        if (!galleryBlock.images || galleryBlock.images.length === 0) return null;
-
-        return (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // Optimize the first image as an example
-              const firstImage = galleryBlock.images[0];
-              if (firstImage && firstImage.src) {
-                handleOptimizeImage(firstImage.src, `images[0].src`);
-              }
-            }}
-          >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Otimizar Primeira Imagem
-          </Button>
-        );
-      }
-      case 'imageText':
-      case 'textImage': {
-        const withImageBlock = block as ImageTextBlock | TextImageBlock;
-        if (!withImageBlock.image || !withImageBlock.image.src) return null;
-        
-        return (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleOptimizeImage(withImageBlock.image.src, 'image.src')}
-          >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Otimizar Imagem
-          </Button>
-        );
-      }
+      case 'hero':
+        return (block as HeroBlock).imageUrl || '';
+      case 'image':
+        return (block as ImageBlock).src || '';
+      case 'gallery':
+        return (block as GalleryBlock).images?.[0]?.src || '';
+      case 'image-text':
+        return (block as any).imageUrl || '';
+      case 'text-image':
+        return (block as any).imageUrl || '';
       default:
-        return null;
+        return '';
     }
   };
 
+  // Get image type for the update function
+  const getImageType = (block: BlockBase): string => {
+    if (!block) return '';
+
+    switch (block.type) {
+      case 'hero':
+        return 'imageUrl';
+      case 'image':
+        return 'src';
+      case 'gallery':
+        return 'images[0].src';
+      case 'image-text':
+      case 'text-image':
+        return 'imageUrl';
+      default:
+        return '';
+    }
+  };
+
+  // Check if the block has images to optimize
+  if (!blockHasImages(block)) {
+    return null;
+  }
+
+  const handleOptimizeImage = () => {
+    const imageUrl = getImageUrl(block);
+    const imageType = getImageType(block);
+    
+    // For now, just apply a simple optimization (add a parameter to the URL)
+    // In a real application, you would call an optimization service
+    const optimizedUrl = `${imageUrl}?optimized=true`;
+    
+    onUpdateImage(block.id, imageType, optimizedUrl);
+  };
+
   return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-medium">Otimização de Imagem</h4>
-      {renderOptimizeButtons()}
-    </div>
+    <Button 
+      variant="outline" 
+      size="sm"
+      onClick={handleOptimizeImage}
+      className="flex items-center gap-1"
+    >
+      <ImageIcon className="h-3 w-3" />
+      <span className="text-xs">Otimizar Imagem</span>
+    </Button>
   );
 };
 

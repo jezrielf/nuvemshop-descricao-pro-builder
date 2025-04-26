@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { analyzeHtmlToTemplate } from '@/utils/htmlParsers/htmlTemplateAnalyzer';
-import { Template, BlockType } from '@/types/editor';
+import { Template } from '@/types/editor';
 
 interface ImportHtmlSectionProps {
   onTemplateGenerated: (template: Template) => void;
