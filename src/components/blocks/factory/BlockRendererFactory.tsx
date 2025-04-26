@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Block } from '@/types/editor';
+import { ensureBlockType } from '@/utils/typeConversion';
 
 // Block Types
 import HeroBlock from '../HeroBlock';
@@ -26,66 +26,60 @@ interface BlockRendererProps {
 
 export class BlockRendererFactory {
   static createBlockComponent({ block, isPreview = false }: BlockRendererProps): React.ReactNode {
-    // Verificar se o bloco tem uma propriedade type válida
-    if (!block || typeof block !== 'object' || !('type' in block)) {
-      console.error('Invalid block:', block);
-      return (
-        <div className="p-4 border border-red-300 bg-red-50 rounded text-red-700">
-          Bloco inválido ou mal formado
-        </div>
-      );
-    }
+    // Ensure the block is valid and properly typed
+    const validBlock = ensureBlockType(block);
     
-    switch (block.type) {
+    // Now we can safely access the type property
+    switch (validBlock.type) {
       case 'hero':
-        return <HeroBlock block={block as any} isPreview={isPreview} />;
+        return <HeroBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'text':
-        return <TextBlock block={block as any} isPreview={isPreview} />;
+        return <TextBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'features':
-        return <FeaturesBlock block={block as any} isPreview={isPreview} />;
+        return <FeaturesBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'benefits':
-        return <BenefitsBlock block={block as any} isPreview={isPreview} />;
+        return <BenefitsBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'specifications':
-        return <SpecificationsBlock block={block as any} isPreview={isPreview} />;
+        return <SpecificationsBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'image':
-        return <ImageBlock block={block as any} isPreview={isPreview} />;
+        return <ImageBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'gallery':
-        return <GalleryBlock block={block as any} isPreview={isPreview} />;
+        return <GalleryBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'imageText':
-        return <ImageTextBlock block={block as any} isPreview={isPreview} />;
+        return <ImageTextBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'textImage':
-        return <TextImageBlock block={block as any} isPreview={isPreview} />;
+        return <TextImageBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'faq':
-        return <FAQBlock block={block as any} isPreview={isPreview} />;
+        return <FAQBlock block={validBlock as any} isPreview={isPreview} />;
       
       case 'cta':
-        return <CTABlock block={block as any} isPreview={isPreview} />;
+        return <CTABlock block={validBlock as any} isPreview={isPreview} />;
         
       case 'video':
-        return <VideoBlock block={block as any} isPreview={isPreview} />;
+        return <VideoBlock block={validBlock as any} isPreview={isPreview} />;
         
       case 'videoText':
-        return <VideoTextBlock block={block as any} isPreview={isPreview} />;
+        return <VideoTextBlock block={validBlock as any} isPreview={isPreview} />;
         
       case 'textVideo':
-        return <TextVideoBlock block={block as any} isPreview={isPreview} />;
+        return <TextVideoBlock block={validBlock as any} isPreview={isPreview} />;
         
       case 'carousel':
-        return <CarouselBlock block={block as any} isPreview={isPreview} />;
+        return <CarouselBlock block={validBlock as any} isPreview={isPreview} />;
       
       default:
         return (
           <div className="p-4 border border-red-300 bg-red-50 rounded text-red-700">
-            Bloco desconhecido: {String(block.type)}
+            Bloco desconhecido: {String(validBlock.type)}
           </div>
         );
     }

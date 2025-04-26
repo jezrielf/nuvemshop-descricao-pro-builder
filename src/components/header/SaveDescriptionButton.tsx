@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Save, Lock } from 'lucide-react';
@@ -91,7 +90,9 @@ const SaveDescriptionButton: React.FC<SaveDescriptionButtonProps> = ({
     
     // Atualizar o nome da descrição
     if (description) {
-      useEditorStore.getState().updateBlock('description', { name: descriptionName });
+      // Update description in the store with the new name
+      const updatedDescription = { ...description, name: descriptionName };
+      useEditorStore.getState().loadDescription(updatedDescription);
     }
     
     // Salvar a descrição

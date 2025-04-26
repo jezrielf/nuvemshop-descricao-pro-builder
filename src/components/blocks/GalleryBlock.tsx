@@ -2,6 +2,10 @@
 import React from 'react';
 import { GalleryBlock as GalleryBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
+import { useEditorStore } from '@/store/editor';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface GalleryBlockProps {
   block: GalleryBlockType;
@@ -9,6 +13,9 @@ interface GalleryBlockProps {
 }
 
 const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false }) => {
+  const { updateBlock, selectedBlockId } = useEditorStore();
+  const isEditing = selectedBlockId === block.id && !isPreview;
+  
   if (isPreview) {
     return (
       <BlockWrapper block={block} isEditing={false}>
