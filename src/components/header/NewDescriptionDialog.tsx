@@ -9,9 +9,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 
 interface NewDescriptionDialogProps {
-  isPremium: () => boolean;
+  isPremium: boolean;
   descriptionCount: number;
-  canCreateMoreDescriptions: () => boolean;
+  canCreateMoreDescriptions: boolean;
 }
 
 const NewDescriptionDialog: React.FC<NewDescriptionDialogProps> = ({ 
@@ -34,7 +34,7 @@ const NewDescriptionDialog: React.FC<NewDescriptionDialogProps> = ({
       return;
     }
     
-    if (!canCreateMoreDescriptions()) {
+    if (!canCreateMoreDescriptions) {
       toast({
         title: "Limite atingido",
         description: "Você atingiu o limite de 3 descrições gratuitas. Faça upgrade para o plano premium para criar mais.",
@@ -66,7 +66,7 @@ const NewDescriptionDialog: React.FC<NewDescriptionDialogProps> = ({
           <DialogTitle>Nova Descrição de Produto</DialogTitle>
           <DialogDescription>
             Crie uma nova descrição para seu produto na Nuvemshop.
-            {!isPremium() && (
+            {!isPremium && (
               <div className="mt-2 text-yellow-600 text-sm flex items-center">
                 <BadgeAlert className="mr-1 h-4 w-4" />
                 Você usou {descriptionCount}/3 descrições gratuitas.

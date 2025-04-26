@@ -57,7 +57,7 @@ const HeaderControls = memo(({ description, isPremium, isSubscribed, canCreateMo
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex items-center gap-2">
         <NewDescriptionDialog 
-          isPremium={isPremium} 
+          isPremium={isPremium}
           descriptionCount={description?.descriptionCount}
           canCreateMoreDescriptions={canCreateMore}
         />

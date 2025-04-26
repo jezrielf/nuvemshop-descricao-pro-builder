@@ -1,19 +1,21 @@
 
 /**
  * Utility function to convert various role formats to a unified array format
- * Uses memoization to avoid repeated calculations
  */
 export const getRoles = (role: string | string[] | null): string[] => {
   if (!role) return ['user'];
   
   if (typeof role === 'string') {
     if (role.includes(',')) {
-      return role.split(',').map(r => r.trim()).filter(Boolean);
+      // Split by comma and remove duplicates
+      const roles = role.split(',').map(r => r.trim()).filter(Boolean);
+      return [...new Set(roles)]; // Remove duplicates
     }
     return [role];
   }
   
-  return role;
+  // Remove duplicates if it's already an array
+  return [...new Set(role)];
 };
 
 /**
@@ -26,7 +28,6 @@ export const rolesToString = (role: string | string[] | null): string => {
 
 /**
  * Checks if user has a specific role
- * Optimized to handle common cases quickly
  */
 export const hasRole = (userRole: string | string[] | null, roleToCheck: string): boolean => {
   // Early return for direct match in string format
