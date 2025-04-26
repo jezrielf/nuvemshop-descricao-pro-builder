@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Template, ProductCategory } from '@/types/editor';
 import { useTemplateStore } from '@/store/templates';
 import { v4 as uuidv4 } from 'uuid';
-import { convertBlock } from '@/utils/blockConverter';
+import { convertBlock, convertBlocks } from '@/utils/blockConverter';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -28,7 +28,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<ProductCategory>('other' as ProductCategory);
   
-  const { addTemplate } = useTemplateStore();
+  const { createTemplate } = useTemplateStore();
   const { toast } = useToast();
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,7 +53,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
       updatedAt: new Date().toISOString()
     };
     
-    addTemplate(newTemplate);
+    createTemplate(newTemplate);
     
     toast({
       title: "Template criado",
@@ -68,7 +68,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
     { value: 'clothing', label: 'Roupas' },
     { value: 'accessories', label: 'Acessórios' },
     { value: 'shoes', label: 'Calçados' },
-    { value: 'electronics', label: 'Eletrônicos' },
+    { value: 'Eletrônicos', label: 'Eletrônicos' },
     { value: 'energy', label: 'Energia' },
     { value: 'Casa e decoração', label: 'Casa e Decoração' },
     { value: 'Alimentos', label: 'Alimentos' },
@@ -76,7 +76,6 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
     { value: 'Beleza', label: 'Beleza' },
     { value: 'Casa', label: 'Casa' },
     { value: 'Decoração', label: 'Decoração' },
-    { value: 'Eletrônicos', label: 'Eletrônicos' },
     { value: 'Esporte', label: 'Esporte' },
     { value: 'Moda', label: 'Moda' },
     { value: 'Saúde', label: 'Saúde' },

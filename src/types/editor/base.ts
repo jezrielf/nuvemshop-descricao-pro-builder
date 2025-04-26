@@ -29,6 +29,10 @@ export interface BlockStyle {
   hasBorder?: boolean;
   hasShadow?: boolean;
   blockSpacing?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  backgroundImage?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+  lineHeight?: string;
 }
 
 export interface ProductDescription {
@@ -81,7 +85,7 @@ export type ProductCategory =
 
 export type ColumnLayout = 'full' | '2col' | '3col' | '4col' | 1 | 2 | 3 | 4 | '1/2' | '1/3' | '2/3' | '1/4' | '3/4';
 
-export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
+export type BlockSpacing = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type BlockType = 
   | 'hero' 

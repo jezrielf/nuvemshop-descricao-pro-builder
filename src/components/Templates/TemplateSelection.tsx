@@ -10,52 +10,37 @@ interface TemplateSelectionProps {
 
 const TemplateSelection: React.FC<TemplateSelectionProps> = ({ onSelectTemplate }) => {
   const { templates, categories, selectedCategory, setSelectedCategory } = useTemplateStore();
-  
-  // Get templates for the selected category
-  const filteredTemplates = selectedCategory
-    ? templates.filter(t => t.category === selectedCategory)
-    : templates;
-  
+
+  // Filter templates by selected category
+  const filteredTemplates = selectedCategory === 'all'
+    ? templates
+    : templates.filter(template => template.category === selectedCategory);
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-4">
-        <div className="flex flex-wrap gap-2 mb-4">
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        {categories.map((category) => (
           <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-3 py-1.5 text-sm rounded-full ${
-              selectedCategory === null
+            key={category.value}
+            onClick={() => setSelectedCategory(category.value as any)}
+            className={`px-3 py-1 text-sm rounded-full transition-colors ${
+              selectedCategory === category.value
                 ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary text-secondary-foreground'
+                : 'bg-muted hover:bg-muted/80'
             }`}
           >
-            Todos
+            {category.label}
           </button>
-          
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-3 py-1.5 text-sm rounded-full capitalize ${
-                selectedCategory === category
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-secondary-foreground'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+        ))}
       </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pb-4">
-        {filteredTemplates.map(template => (
-          <div 
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {filteredTemplates.map((template) => (
+          <TemplatePreview 
             key={template.id} 
-            onClick={() => onSelectTemplate(template)}
-            className="cursor-pointer"
-          >
-            <TemplatePreview template={template} />
-          </div>
+            template={template}
+            onPreview={onSelectTemplate}
+          />
         ))}
       </div>
     </div>

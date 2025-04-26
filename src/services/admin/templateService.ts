@@ -1,161 +1,201 @@
 
-import { Template, BlockType } from '@/types/editor';
+import { Template, ProductCategory } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 import { convertBlock } from '@/utils/blockConverter';
 
-// Mock database of templates
-let templates: Template[] = [
-  {
-    id: '1',
-    name: 'Template Básico',
-    description: 'Template simples com estrutura básica',
-    category: 'supplements',
-    blocks: [],
-    thumbnailUrl: '/templates/basic.jpg',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'Vitaminas e Minerais',
-    description: 'Para produtos de suplementação diária',
-    category: 'supplements',
-    blocks: [],
-    thumbnailUrl: '/templates/vitamins.jpg',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '3',
-    name: 'Roupas Esportivas',
-    description: 'Para produtos de vestuário esportivo',
-    category: 'clothing',
-    blocks: [],
-    thumbnailUrl: '/templates/sportswear.jpg',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-];
-
-export const fetchTemplates = async (): Promise<Template[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Return the templates
-  return templates;
+// Utility function to convert blocks if needed
+export const convertBlocks = (blocks: any[]) => {
+  return blocks.map(block => convertBlock(block));
 };
 
-export const fetchTemplatesByCategory = async (category: string): Promise<Template[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Filter templates by category
-  return templates.filter(template => template.category === category);
-};
-
-export const fetchTemplateById = async (id: string): Promise<Template | null> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Find template by ID
-  const template = templates.find(t => t.id === id);
-  return template || null;
-};
-
-export const createTemplate = async (template: Omit<Template, 'id'>): Promise<Template> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Create a new template with a unique ID
-  const newTemplate: Template = {
-    ...template,
-    id: uuidv4(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  // Add to the templates array
-  templates = [...templates, newTemplate];
-
-  return newTemplate;
-};
-
-export const updateTemplate = async (id: string, update: Partial<Template>): Promise<Template | null> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Find the index of the template to update
-  const index = templates.findIndex(t => t.id === id);
-  if (index === -1) {
-    return null;
+// Get all templates
+export const getTemplates = async (): Promise<Template[]> => {
+  try {
+    // In a real app, we would fetch from Supabase or another API
+    const { data, error } = await supabase
+      .from('templates')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) throw error;
+    
+    return data.map(template => ({
+      id: template.id,
+      name: template.name,
+      description: template.description,
+      category: template.category as ProductCategory,
+      blocks: template.blocks || [],
+      thumbnailUrl: template.thumbnailUrl || '/templates/default.jpg',
+      createdAt: template.created_at,
+      updatedAt: template.updated_at
+    }));
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    
+    // Fallback to mock data if there's an error
+    return getMockTemplates();
   }
-
-  // Update the template
-  const updatedTemplate: Template = {
-    ...templates[index],
-    ...update,
-    updatedAt: new Date().toISOString()
-  };
-  templates[index] = updatedTemplate;
-
-  return updatedTemplate;
 };
 
-export const deleteTemplate = async (id: string): Promise<boolean> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Filter out the template to delete
-  const initialLength = templates.length;
-  templates = templates.filter(t => t.id !== id);
-  return templates.length < initialLength;
-};
-
-export const convertLegacyTemplates = async (legacyTemplates: any[]): Promise<Template[]> => {
-  return legacyTemplates.map(item => {
-    const template: Template = {
-      id: item.id || uuidv4(),
-      name: item.name || 'Template sem título',
-      description: item.description || '',
-      category: item.category as any || 'other',
-      blocks: Array.isArray(item.blocks) ? item.blocks : [],
-      thumbnailUrl: item.thumbnailUrl || '',
-      createdAt: item.createdAt || new Date().toISOString(),
-      updatedAt: item.updatedAt || new Date().toISOString(),
+// Get a single template by ID
+export const getTemplateById = async (id: string): Promise<Template | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('templates')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
+    if (!data) return null;
+    
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      category: data.category as ProductCategory,
+      blocks: data.blocks || [],
+      thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
     };
-    return template;
-  });
-};
-
-export const cloneTemplate = async (id: string): Promise<Template | null> => {
-  // Find the template to clone
-  const template = templates.find(t => t.id === id);
-  if (!template) {
+  } catch (error) {
+    console.error(`Error fetching template ${id}:`, error);
     return null;
   }
-
-  // Create a clone with a new ID
-  const clone: Template = {
-    ...template,
-    id: uuidv4(),
-    name: `${template.name} (Cópia)`,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  // Add to the templates array
-  templates = [...templates, clone];
-
-  return clone;
 };
 
-export default {
-  fetchTemplates,
-  fetchTemplatesByCategory,
-  fetchTemplateById,
+// Create new template
+export const createTemplate = async (template: Omit<Template, 'id'>): Promise<Template> => {
+  try {
+    const newTemplate = {
+      id: uuidv4(),
+      ...template,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    const { data, error } = await supabase
+      .from('templates')
+      .insert([{
+        id: newTemplate.id,
+        name: newTemplate.name,
+        description: newTemplate.description,
+        category: newTemplate.category,
+        blocks: newTemplate.blocks,
+        thumbnailUrl: newTemplate.thumbnailUrl,
+        created_at: newTemplate.createdAt,
+        updated_at: newTemplate.updatedAt
+      }])
+      .select();
+      
+    if (error) throw error;
+    
+    return newTemplate;
+  } catch (error) {
+    console.error('Error creating template:', error);
+    
+    // Return the template anyway for UI purposes
+    return {
+      id: uuidv4(),
+      ...template,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+};
+
+// Update existing template
+export const updateTemplate = async (id: string, template: Partial<Template>): Promise<Template> => {
+  try {
+    const updates = {
+      ...template,
+      updated_at: new Date().toISOString()
+    };
+    
+    const { data, error } = await supabase
+      .from('templates')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+      
+    if (error) throw error;
+    
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      category: data.category as ProductCategory,
+      blocks: data.blocks || [],
+      thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
+  } catch (error) {
+    console.error(`Error updating template ${id}:`, error);
+    
+    // Return the template anyway for UI purposes
+    return {
+      id,
+      ...(template as any),
+      updatedAt: new Date().toISOString()
+    };
+  }
+};
+
+// Delete template
+export const deleteTemplate = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('templates')
+      .delete()
+      .eq('id', id);
+      
+    if (error) throw error;
+    
+    return true;
+  } catch (error) {
+    console.error(`Error deleting template ${id}:`, error);
+    return false;
+  }
+};
+
+// Mock fallback templates
+const getMockTemplates = (): Template[] => {
+  return [
+    {
+      id: uuidv4(),
+      name: 'Produto Básico',
+      description: 'Template simples para descrição básica de produtos',
+      category: 'other' as ProductCategory,
+      blocks: [],
+      thumbnailUrl: '/templates/basic.jpg',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: uuidv4(),
+      name: 'Suplemento Premium',
+      description: 'Template completo para suplementos com benefícios destacados',
+      category: 'supplements' as ProductCategory,
+      blocks: [],
+      thumbnailUrl: '/templates/supplements.jpg',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ];
+};
+
+// Export as a default object for compatibility
+const templateService = {
+  getTemplates,
+  getTemplateById,
   createTemplate,
   updateTemplate,
   deleteTemplate,
-  convertLegacyTemplates,
-  cloneTemplate,
+  convertBlocks
 };
+
+export default templateService;

@@ -56,7 +56,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
     
     description.blocks.forEach((block: Block) => {
       // Check for hero block with background image
-      if (block.type === 'hero' && block.backgroundImage) {
+      if (block.type === 'hero' && 'backgroundImage' in block && block.backgroundImage) {
         imagesList.push({
           blockId: block.id,
           blockType: 'Hero',
@@ -68,31 +68,31 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
       }
       
       // Check for image block
-      if (block.type === 'image' && block.src) {
+      if (block.type === 'image' && 'src' in block && block.src) {
         imagesList.push({
           blockId: block.id,
           blockType: 'Image',
           imageUrl: block.src,
           imageType: 'src',
           issues: analyzeImage(block.src),
-          alt: block.alt || block.title
+          alt: ('alt' in block ? block.alt : block.title) || ''
         });
       }
       
       // Check for imageText and textImage blocks
-      if ((block.type === 'imageText' || block.type === 'textImage') && block.imageSrc) {
+      if ((block.type === 'imageText' || block.type === 'textImage') && 'imageSrc' in block && block.imageSrc) {
         imagesList.push({
           blockId: block.id,
           blockType: block.type === 'imageText' ? 'Image + Text' : 'Text + Image',
           imageUrl: block.imageSrc,
           imageType: 'imageSrc',
           issues: analyzeImage(block.imageSrc),
-          alt: block.alt || block.title
+          alt: ('alt' in block ? block.alt : block.title) || ''
         });
       }
       
       // Check for gallery block
-      if (block.type === 'gallery' && block.images && block.images.length > 0) {
+      if (block.type === 'gallery' && 'images' in block && block.images && block.images.length > 0) {
         block.images.forEach((image, index) => {
           if (image.src) {
             imagesList.push({
@@ -150,11 +150,6 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
         color: 'muted'
       });
     }
-    
-    // In a real scenario, we would do more analysis:
-    // - Image size check
-    // - Resolution analysis
-    // - Alt text quality
     
     return issues;
   };
@@ -291,7 +286,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                                 </p>
                                 <div className="flex flex-wrap gap-1 mt-1">
                                   {image.issues.map((issue, i) => (
-                                    <Badge key={i} variant={typeof issue !== 'string' ? issue.color as any : 'default'} className="text-xs">
+                                    <Badge key={i} variant={(typeof issue !== 'string' && issue.color) as any || 'default'} className="text-xs">
                                       {typeof issue !== 'string' ? issue.label : issue}
                                     </Badge>
                                   ))}
@@ -345,7 +340,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                                   </p>
                                   <div className="flex flex-wrap gap-1 mt-1">
                                     {image.issues.map((issue, i) => (
-                                      <Badge key={i} variant={typeof issue !== 'string' ? issue.color as any : 'default'} className="text-xs">
+                                      <Badge key={i} variant={(typeof issue !== 'string' && issue.color) as any || 'default'} className="text-xs">
                                         {typeof issue !== 'string' ? issue.label : issue}
                                       </Badge>
                                     ))}
@@ -399,7 +394,7 @@ const ImageOptimizer: React.FC<ImageOptimizerProps> = ({ description, onUpdateIm
                                   </p>
                                   <div className="flex flex-wrap gap-1 mt-1">
                                     {image.issues.map((issue, i) => (
-                                      <Badge key={i} variant={typeof issue !== 'string' ? issue.color as any : 'default'} className="text-xs">
+                                      <Badge key={i} variant={(typeof issue !== 'string' && issue.color) as any || 'default'} className="text-xs">
                                         {typeof issue !== 'string' ? issue.label : issue}
                                       </Badge>
                                     ))}

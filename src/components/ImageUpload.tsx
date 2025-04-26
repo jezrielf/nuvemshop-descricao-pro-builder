@@ -1,70 +1,109 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, Image as ImageIcon } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Loader2, Upload, X } from 'lucide-react';
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
+  initialImage?: string;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUploaded }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUploaded, initialImage }) => {
+  const [image, setImage] = useState<string | null>(initialImage || null);
   const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
-
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione um arquivo de imagem válido.');
+      return;
+    }
+    
     setIsUploading(true);
     
-    // Simulate upload for now
-    // In a real implementation, this would upload to a cloud storage service
-    setTimeout(() => {
-      // Create a local URL for the demo
-      const imageUrl = URL.createObjectURL(file);
-      
-      onImageUploaded(imageUrl);
-      
+    // Read file as data URL (base64)
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        // In a real application, here we would upload to a server
+        // For now, we'll use the base64 string directly
+        setImage(reader.result);
+        onImageUploaded(reader.result);
+        setIsUploading(false);
+      }
+    };
+    reader.onerror = () => {
+      console.error('Error reading file');
       setIsUploading(false);
-      toast({
-        title: "Imagem enviada",
-        description: "A imagem foi enviada com sucesso!",
-      });
-    }, 1000);
+    };
+    reader.readAsDataURL(file);
   };
-
+  
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+  
+  const handleRemoveImage = () => {
+    setImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  
   return (
-    <div className="flex flex-col items-center justify-center py-4">
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-        <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
-        <p className="mt-2 text-sm text-gray-500">
-          Clique para fazer upload de uma imagem otimizada
-        </p>
-        <p className="mt-1 text-xs text-gray-400">
-          Formatos suportados: JPG, PNG, WebP
-        </p>
-        <div className="mt-4">
-          <label htmlFor="file-upload">
-            <input
-              id="file-upload"
-              name="file-upload"
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              onChange={handleUpload}
-              disabled={isUploading}
-            />
-            <Button
-              disabled={isUploading}
-              className="relative cursor-pointer"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {isUploading ? 'Enviando...' : 'Enviar imagem'}
-            </Button>
-          </label>
+    <div className="image-upload">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+      
+      {image ? (
+        <div className="relative border rounded-md overflow-hidden">
+          <img 
+            src={image} 
+            alt="Preview" 
+            className="w-full h-auto max-h-[200px] object-contain"
+          />
+          <Button
+            variant="destructive"
+            size="icon"
+            className="absolute top-2 right-2"
+            onClick={handleRemoveImage}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-      </div>
+      ) : (
+        <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center">
+          {isUploading ? (
+            <div className="flex flex-col items-center space-y-2">
+              <Loader2 className="h-10 w-10 text-primary animate-spin" />
+              <p>Enviando imagem...</p>
+            </div>
+          ) : (
+            <>
+              <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 mb-4">
+                Arraste e solte uma imagem aqui ou clique para selecionar
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={triggerFileInput}
+                className="mx-auto"
+              >
+                Selecionar Imagem
+              </Button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

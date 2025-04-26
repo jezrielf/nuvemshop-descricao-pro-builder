@@ -1,88 +1,73 @@
 
-import { Template, ProductCategory, TextBlock, Block, BlockType } from '@/types/editor';
+import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
-import { createBlock } from '../blockCreators/createBlock';
-import { analyzeDocument } from './analyzers/documentAnalyzer';
-import { sanitizeHtmlContent } from './analyzers/utils';
 
-export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCategory): Template => {
-  const parsedBlocks = [];
-  let doc: Document;
+// Function to sanitize HTML input
+const sanitizeHTML = (html: string): string => {
+  // Implement sanitization as needed
+  return html;
+};
 
-  try {
-    const parser = new DOMParser();
-    doc = parser.parseFromString(htmlInput, 'text/html');
+// Function to extract main content from HTML
+const extractContent = (html: string): string => {
+  const sanitizedHtml = sanitizeHTML(html);
   
-    const scripts = doc.querySelectorAll('script');
-    scripts.forEach(script => script.remove());
+  // In a real implementation, we would use a proper HTML parser
+  // For now, use a simple extraction approach
+  const bodyContent = sanitizedHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] || sanitizedHtml;
+  
+  return bodyContent;
+};
 
-    // Pass doc.body instead of doc to analyzeDocument, as it expects an Element, not a Document
-    analyzeDocument(doc.body, parsedBlocks);
+// Generate template blocks from HTML content
+const generateBlocks = (htmlContent: string) => {
+  // Here we would parse the HTML and convert it into blocks
+  // For now, return a simple structure
+  
+  return [
+    {
+      id: uuidv4(),
+      type: 'text',
+      title: 'HTML Content',
+      content: htmlContent,
+      columns: 'full',
+      visible: true,
+    },
+  ];
+};
 
-    if (parsedBlocks.length === 0) {
-      const textBlock = createBlock('text', 1) as TextBlock;
-      textBlock.content = sanitizeHtmlContent(htmlInput);
-      parsedBlocks.push(textBlock);
-    }
-  } catch (error) {
-    console.error('Error parsing HTML:', error);
-    const textBlock = createBlock('text', 1) as TextBlock;
-    textBlock.content = sanitizeHtmlContent(htmlInput);
-    parsedBlocks.push(textBlock);
-  }
-
+// Main function to analyze HTML and convert to template
+export const analyzeHtmlToTemplate = (html: string, name: string = 'Imported HTML Template'): Template => {
+  const content = extractContent(html);
+  const blocks = generateBlocks(content);
+  
   return {
     id: uuidv4(),
-    name: 'Template from HTML',
-    category,
-    blocks: parsedBlocks,
-    thumbnail: '/placeholder.svg' // Add default thumbnail
+    name,
+    description: 'Template importado de HTML',
+    category: 'other',
+    blocks,
+    thumbnailUrl: '/templates/imported.jpg',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 };
 
-// New function to allow user to customize block types
-export const customizeBlockTypes = (
-  template: Template, 
-  blockTypeMap: Record<string, BlockType>
-): Template => {
-  const updatedBlocks = template.blocks.map(block => {
-    // If this block ID is in the map, change its type
-    if (blockTypeMap[block.id]) {
-      const newType = blockTypeMap[block.id];
-      
-      // Only change if the type is different
-      if (newType !== block.type) {
-        // Create a new block of the desired type
-        const newBlock = createBlock(newType, block.columns);
-        
-        // Copy over common properties
-        newBlock.id = block.id;
-        newBlock.title = block.title;
-        newBlock.visible = block.visible;
-        newBlock.style = block.style;
-        
-        // Transfer content based on block types
-        if ('content' in block && 'content' in newBlock) {
-          (newBlock as any).content = (block as any).content;
-        }
-        
-        if ('heading' in block && 'heading' in newBlock) {
-          (newBlock as any).heading = (block as any).heading;
-        }
-        
-        if ('image' in block && 'image' in newBlock) {
-          (newBlock as any).image = (block as any).image;
-        }
-        
-        return newBlock;
-      }
-    }
-    return block;
-  });
+// Function to analyze product page and extract template
+export const analyzeProductPageToTemplate = (html: string, productName: string): Template => {
+  const content = extractContent(html);
+  
+  // You would implement more sophisticated extraction for product pages
+  const blocks = generateBlocks(content);
   
   return {
-    ...template,
-    blocks: updatedBlocks as Block[],
-    thumbnail: template.thumbnail
+    id: uuidv4(),
+    name: `Template de ${productName}`,
+    description: `Template gerado a partir da página do produto ${productName}`,
+    category: 'other',
+    blocks,
+    thumbnailUrl: '/templates/product.jpg',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 };

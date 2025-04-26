@@ -5,7 +5,7 @@ import { ProductCategory } from '@/types/editor';
 export const useTemplateUtils = () => {
   // Mapping for display names
   const categoryNames = useMemo(() => {
-    const names: Partial<Record<ProductCategory, string>> = {
+    const names: Record<string, string> = {
       'Alimentos': 'Alimentos',
       'Bebidas': 'Bebidas',
       'Beleza': 'Beleza e Cuidados Pessoais',
