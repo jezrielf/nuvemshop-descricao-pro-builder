@@ -36,3 +36,4 @@ export * from './health';
 export * from './fashion';
 export * from './accessories';
 export * from './hauteCouture';
+export * from './fixTemplateProps';

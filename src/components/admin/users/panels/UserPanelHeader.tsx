@@ -11,10 +11,15 @@ import UserSearchBar from './UserSearchBar';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserPanelHeaderProps {
+  filterUsers: (query: string) => void;
   onRefresh: () => void;
   loading: boolean;
-  filterUsers: (query: string) => void;
   onUserCreated?: () => Promise<void>;
+  searchTerm?: string;
+  onSearchChange?: (value: string) => void;
+  isCreateUserSheetOpen?: boolean;
+  setIsCreateUserSheetOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  handleCreateUser?: () => Promise<void>;
 }
 
 const UserPanelHeader: React.FC<UserPanelHeaderProps> = ({
@@ -22,14 +27,21 @@ const UserPanelHeader: React.FC<UserPanelHeaderProps> = ({
   loading,
   filterUsers,
   onUserCreated,
+  searchTerm = '',
+  onSearchChange = (value: string) => filterUsers(value),
+  isCreateUserSheetOpen = false,
+  setIsCreateUserSheetOpen = () => {},
+  handleCreateUser = async () => {}
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    filterUsers(value);
+    if (onSearchChange) {
+      onSearchChange(value);
+    } else {
+      filterUsers(value);
+    }
   };
 
   return (

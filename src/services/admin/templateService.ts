@@ -3,6 +3,7 @@ import { Template, ProductCategory } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import { convertBlock } from '@/utils/blockConverter';
+import { fixTemplateProps } from '@/utils/templates/fixTemplateProps';
 
 // Utility function to convert blocks if needed
 export const convertBlocks = (blocks: any[]) => {
@@ -20,17 +21,16 @@ export const getTemplates = async (): Promise<Template[]> => {
       
     if (error) throw error;
     
-    return data.map(template => ({
-      id: template.id,
-      name: template.name,
-      // Handle missing properties with default values
-      description: '',  // Default empty string since description doesn't exist in DB
-      category: template.category as ProductCategory,
-      blocks: Array.isArray(template.blocks) ? template.blocks : [],
-      thumbnailUrl: '/templates/default.jpg',  // Default value since thumbnailUrl doesn't exist in DB
-      createdAt: template.created_at,
-      updatedAt: template.updated_at
-    }));
+    return data.map(template => {
+      return fixTemplateProps({
+        id: template.id,
+        name: template.name,
+        category: template.category as ProductCategory,
+        blocks: Array.isArray(template.blocks) ? template.blocks : [],
+        createdAt: template.created_at,
+        updatedAt: template.updated_at
+      });
+    });
   } catch (error) {
     console.error('Error fetching templates:', error);
     
@@ -51,17 +51,14 @@ export const getTemplateById = async (id: string): Promise<Template | null> => {
     if (error) throw error;
     if (!data) return null;
     
-    return {
+    return fixTemplateProps({
       id: data.id,
       name: data.name,
-      // Handle missing properties with default values
-      description: '',  // Default empty string since description doesn't exist in DB
       category: data.category as ProductCategory,
       blocks: Array.isArray(data.blocks) ? data.blocks : [],
-      thumbnailUrl: '/templates/default.jpg',  // Default value since thumbnailUrl doesn't exist in DB
       createdAt: data.created_at,
       updatedAt: data.updated_at
-    };
+    });
   } catch (error) {
     console.error(`Error fetching template ${id}:`, error);
     return null;
@@ -127,17 +124,14 @@ export const updateTemplate = async (id: string, template: Partial<Template>): P
       
     if (error) throw error;
     
-    return {
+    return fixTemplateProps({
       id: data.id,
       name: data.name,
-      // Handle missing properties with default values
-      description: '',  // Default empty string since description doesn't exist in DB
       category: data.category as ProductCategory,
       blocks: Array.isArray(data.blocks) ? data.blocks : [],
-      thumbnailUrl: '/templates/default.jpg',  // Default value since thumbnailUrl doesn't exist in DB
       createdAt: data.created_at,
       updatedAt: data.updated_at
-    };
+    });
   } catch (error) {
     console.error(`Error updating template ${id}:`, error);
     

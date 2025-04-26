@@ -70,16 +70,17 @@ const UsersPanel: React.FC = () => {
     });
   };
 
+  const filterUsers = (query: string) => {
+    setSearchTerm(query);
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <UserPanelHeader
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        filterUsers={filterUsers}
         onRefresh={fetchProfiles}
         loading={loading}
-        isCreateUserSheetOpen={isCreateUserSheetOpen}
-        setIsCreateUserSheetOpen={setIsCreateUserSheetOpen}
-        handleCreateUser={handleCreateUser}
+        onUserCreated={handleCreateUser}
       />
       
       <UserPanelContent

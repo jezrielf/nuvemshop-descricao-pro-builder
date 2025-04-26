@@ -1,166 +1,182 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { Profile } from '@/types/auth';
+import { v4 as uuidv4 } from 'uuid';
 
-// Define valid roles for typing
-type UserRole = 'user' | 'premium' | 'admin';
-
-// Get all users
-const getUsers = async () => {
-  try {
-    // Get profiles with user details
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('criado_em', { ascending: false });
-      
-    if (error) throw error;
-    
-    return profiles || [];
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    return [];
+const validateRole = (role: string): "user" | "premium" | "admin" => {
+  if (role === "user" || role === "premium" || role === "admin") {
+    return role;
   }
-};
-
-// Get a user by ID
-const getUserById = async (id: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', id)
-      .single();
-      
-    if (error) throw error;
-    
-    return data;
-  } catch (error) {
-    console.error(`Error fetching user ${id}:`, error);
-    return null;
-  }
-};
-
-// Create a new user (admin only)
-const createUser = async (email: string, password: string, userData: any) => {
-  try {
-    // Create a new user with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      user_metadata: {
-        nome: userData.nome
-      }
-    });
-
-    if (authError) throw authError;
-    
-    // Update the user role if specified
-    if (userData.role && userData.role !== 'user') {
-      // Make sure role is a valid role type
-      const role = validateRole(userData.role);
-      
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: authData.user.id,
-          role: role
-        });
-        
-      if (roleError) throw roleError;
-    }
-    
-    return authData.user;
-  } catch (error) {
-    console.error('Error creating user:', error);
-    throw error;
-  }
-};
-
-// Update user profile
-const updateUserProfile = async (userId: string, profileData: any) => {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({
-        nome: profileData.nome,
-        atualizado_em: new Date().toISOString()
-      })
-      .eq('id', userId)
-      .select();
-      
-    if (error) throw error;
-    
-    return data;
-  } catch (error) {
-    console.error(`Error updating user profile ${userId}:`, error);
-    throw error;
-  }
-};
-
-// Helper to validate role string to enum type
-const validateRole = (role: string): UserRole => {
-  if (role === 'user' || role === 'premium' || role === 'admin') {
-    return role as UserRole;
-  }
-  return 'user'; // Default to user if invalid role
-};
-
-// Update user role
-const updateUserRole = async (userId: string, role: string | string[]) => {
-  try {
-    // Delete existing roles
-    const { error: deleteError } = await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', userId);
-      
-    if (deleteError) throw deleteError;
-    
-    // Add new roles
-    const roles = Array.isArray(role) ? role : [role];
-    
-    // Insert role data one by one to avoid array insertion issues
-    for (const r of roles) {
-      const validRole = validateRole(r);
-      
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: userId,
-          role: validRole
-        });
-        
-      if (error) throw error;
-    }
-    
-    return { success: true };
-  } catch (error) {
-    console.error(`Error updating user role ${userId}:`, error);
-    throw error;
-  }
-};
-
-// Delete user
-const deleteUser = async (userId: string) => {
-  try {
-    // Delete user authentication
-    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-    
-    if (authError) throw authError;
-    
-    // Profile should be automatically deleted by trigger
-    return true;
-  } catch (error) {
-    console.error(`Error deleting user ${userId}:`, error);
-    throw error;
-  }
+  return "user"; // Default to user if invalid role
 };
 
 export const userService = {
-  getUsers,
-  getUserById,
-  createUser,
-  updateUserProfile,
-  updateUserRole,
-  deleteUser
+  // Get all users
+  getUsers: async (): Promise<Profile[]> => {
+    try {
+      console.log('Fetching users...');
+      
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('criado_em', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw new Error('Failed to fetch users');
+      }
+      
+      console.log(`Found ${profiles.length} users`);
+      return profiles as Profile[];
+    } catch (error: any) {
+      console.error('Error in getUsers:', error);
+      throw new Error(error.message || 'Failed to fetch users');
+    }
+  },
+  
+  // Get user by ID
+  getUserById: async (userId: string): Promise<Profile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) throw error;
+      
+      return data as Profile;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      return null;
+    }
+  },
+  
+  // Create new user
+  createUser: async (email: string, password: string, userData: Partial<Profile>): Promise<Profile | null> => {
+    try {
+      // First create the user in auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      
+      if (authError) throw authError;
+      
+      if (!authData.user) {
+        throw new Error('Failed to create user account');
+      }
+      
+      const userId = authData.user.id;
+      
+      // Then create the profile
+      const newProfile: Profile = {
+        id: userId,
+        nome: userData.nome || email.split('@')[0],
+        avatar_url: userData.avatar_url || null,
+        role: userData.role || 'user',
+        criado_em: new Date().toISOString(),
+        atualizado_em: new Date().toISOString(),
+      };
+      
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([newProfile]);
+        
+      if (profileError) throw profileError;
+      
+      // If role is specified and not 'user', set it in the user_roles table
+      if (userData.role && userData.role !== 'user') {
+        const validatedRole = validateRole(userData.role);
+        
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            role: validatedRole
+          });
+          
+        if (roleError) {
+          console.error('Error setting user role:', roleError);
+          // We don't throw here since the user was already created
+        }
+      }
+      
+      return newProfile;
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      throw new Error(error.message || 'Failed to create user');
+    }
+  },
+  
+  // Update user
+  updateUser: async (userId: string, userData: Partial<Profile>): Promise<Profile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({
+          ...userData,
+          atualizado_em: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // If role is being updated, update the user_roles table
+      if (userData.role) {
+        const validatedRole = validateRole(userData.role);
+        
+        // Check if there's an existing role
+        const { data: existingRole, error: fetchError } = await supabase
+          .from('user_roles')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+          
+        if (fetchError && !fetchError.message.includes('No rows found')) {
+          console.error('Error fetching user role:', fetchError);
+        }
+        
+        if (existingRole) {
+          // Update existing role
+          const { error: updateError } = await supabase
+            .from('user_roles')
+            .update({ role: validatedRole })
+            .eq('id', existingRole.id);
+            
+          if (updateError) console.error('Error updating user role:', updateError);
+        } else {
+          // Create new role
+          const { error: insertError } = await supabase
+            .from('user_roles')
+            .insert({ user_id: userId, role: validatedRole });
+            
+          if (insertError) console.error('Error creating user role:', insertError);
+        }
+      }
+      
+      return data as Profile;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return null;
+    }
+  },
+  
+  // Delete user
+  deleteUser: async (userId: string): Promise<boolean> => {
+    try {
+      // This will cascade delete the profile due to RLS
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+      
+      if (error) throw error;
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
+  },
 };

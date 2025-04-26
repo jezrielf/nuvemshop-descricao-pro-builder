@@ -1,56 +1,54 @@
 
 import React from 'react';
 import { Profile } from '@/types/auth';
-import UserTable from '../UserTable';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
+import UserTable from '../UserTable';
 
 interface UserPanelContentProps {
+  profiles: Profile[];
   loading: boolean;
   error: string | null;
-  profiles: Profile[];
   onRefresh: () => void;
 }
 
 const UserPanelContent: React.FC<UserPanelContentProps> = ({
+  profiles,
   loading,
   error,
-  profiles,
-  onRefresh,
+  onRefresh
 }) => {
   if (error) {
     return (
-      <Alert variant="destructive" className="mb-6">
+      <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Erro ao carregar usuários</AlertTitle>
         <AlertDescription>
           {error}
-          <div className="mt-4">
-            <Button variant="outline" size="sm" onClick={onRefresh}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Tentar novamente
-            </Button>
-          </div>
         </AlertDescription>
       </Alert>
     );
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center p-8">
+        <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (profiles.length === 0) {
+    return (
+      <Card className="p-6 text-center text-gray-500">
+        <p>Nenhum usuário encontrado.</p>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="p-6">
-      <UserTable
-        profiles={profiles}
-        loading={loading}
-        error={error}
-        onRefresh={onRefresh}
-      />
-    </Card>
+    <UserTable profiles={profiles} loading={loading} error={error} onRefresh={onRefresh} />
   );
 };
 

@@ -15,32 +15,34 @@ export function ensureBlockType<T extends Block>(block: Partial<T> & { type: Blo
     style: block.style || {}
   };
 
+  const anyBlock = block as any;
+  
   switch (block.type) {
     case 'hero':
       return {
         ...baseBlock,
-        heading: block.heading || 'Hero Heading',
-        subheading: block.subheading || 'Hero Subheading',
-        backgroundImage: block.backgroundImage || '',
-        ctaText: block.ctaText || 'Learn More',
-        ctaUrl: block.ctaUrl || '#',
-        overlay: block.overlay !== undefined ? block.overlay : true,
-        alignment: block.alignment || 'center',
+        heading: anyBlock.heading || 'Hero Heading',
+        subheading: anyBlock.subheading || 'Hero Subheading',
+        backgroundImage: anyBlock.backgroundImage || '',
+        ctaText: anyBlock.ctaText || 'Learn More',
+        ctaUrl: anyBlock.ctaUrl || '#',
+        overlay: anyBlock.overlay !== undefined ? anyBlock.overlay : true,
+        alignment: anyBlock.alignment || 'center',
       } as unknown as T;
     
     case 'text':
       return {
         ...baseBlock,
-        heading: block.heading || 'Text Block Heading',
-        content: block.content || '<p>Add your content here.</p>',
-        align: block.align || 'left',
+        heading: anyBlock.heading || 'Text Block Heading',
+        content: anyBlock.content || '<p>Add your content here.</p>',
+        align: anyBlock.align || 'left',
       } as unknown as T;
       
     case 'features':
       return {
         ...baseBlock,
-        heading: block.heading || 'Features',
-        features: block.features || [
+        heading: anyBlock.heading || 'Features',
+        features: anyBlock.features || [
           { id: uuidv4(), title: 'Feature 1', description: 'Description 1', icon: 'Star' },
           { id: uuidv4(), title: 'Feature 2', description: 'Description 2', icon: 'Star' },
           { id: uuidv4(), title: 'Feature 3', description: 'Description 3', icon: 'Star' },
@@ -50,8 +52,8 @@ export function ensureBlockType<T extends Block>(block: Partial<T> & { type: Blo
     case 'benefits':
       return {
         ...baseBlock,
-        heading: block.heading || 'Benefits',
-        benefits: block.benefits || [
+        heading: anyBlock.heading || 'Benefits',
+        benefits: anyBlock.benefits || [
           { id: uuidv4(), title: 'Benefit 1', description: 'Description 1' },
           { id: uuidv4(), title: 'Benefit 2', description: 'Description 2' },
           { id: uuidv4(), title: 'Benefit 3', description: 'Description 3' },
@@ -61,17 +63,17 @@ export function ensureBlockType<T extends Block>(block: Partial<T> & { type: Blo
     case 'image':
       return {
         ...baseBlock,
-        src: block.src || '',
-        alt: block.alt || 'Image description',
-        caption: block.caption || '',
-        fullWidth: block.fullWidth !== undefined ? block.fullWidth : false,
+        src: anyBlock.src || '',
+        alt: anyBlock.alt || 'Image description',
+        caption: anyBlock.caption || '',
+        fullWidth: anyBlock.fullWidth !== undefined ? anyBlock.fullWidth : false,
       } as unknown as T;
       
     case 'gallery':
       return {
         ...baseBlock,
-        heading: block.heading || 'Gallery',
-        images: block.images || [
+        heading: anyBlock.heading || 'Gallery',
+        images: anyBlock.images || [
           { id: uuidv4(), src: '', alt: 'Image 1', caption: '' },
           { id: uuidv4(), src: '', alt: 'Image 2', caption: '' },
           { id: uuidv4(), src: '', alt: 'Image 3', caption: '' },
@@ -81,26 +83,26 @@ export function ensureBlockType<T extends Block>(block: Partial<T> & { type: Blo
     case 'imageText':
       return {
         ...baseBlock,
-        imageSrc: block.imageSrc || '',
-        alt: block.alt || 'Image description',
-        heading: block.heading || 'Image + Text',
-        content: block.content || '<p>Content goes here.</p>',
+        imageSrc: anyBlock.imageSrc || '',
+        alt: anyBlock.alt || 'Image description',
+        heading: anyBlock.heading || 'Image + Text',
+        content: anyBlock.content || '<p>Content goes here.</p>',
       } as unknown as T;
       
     case 'textImage':
       return {
         ...baseBlock,
-        imageSrc: block.imageSrc || '',
-        alt: block.alt || 'Image description',
-        heading: block.heading || 'Text + Image',
-        content: block.content || '<p>Content goes here.</p>',
+        imageSrc: anyBlock.imageSrc || '',
+        alt: anyBlock.alt || 'Image description',
+        heading: anyBlock.heading || 'Text + Image',
+        content: anyBlock.content || '<p>Content goes here.</p>',
       } as unknown as T;
       
     case 'specifications':
       return {
         ...baseBlock,
-        heading: block.heading || 'Specifications',
-        specs: block.specs || [
+        heading: anyBlock.heading || 'Specifications',
+        specs: anyBlock.specs || [
           { id: uuidv4(), name: 'Spec 1', value: 'Value 1' },
           { id: uuidv4(), name: 'Spec 2', value: 'Value 2' },
           { id: uuidv4(), name: 'Spec 3', value: 'Value 3' },
@@ -110,8 +112,8 @@ export function ensureBlockType<T extends Block>(block: Partial<T> & { type: Blo
     case 'faq':
       return {
         ...baseBlock,
-        heading: block.heading || 'Frequently Asked Questions',
-        items: block.items || [
+        heading: anyBlock.heading || 'Frequently Asked Questions',
+        items: anyBlock.items || [
           { id: uuidv4(), question: 'Question 1?', answer: 'Answer 1' },
           { id: uuidv4(), question: 'Question 2?', answer: 'Answer 2' },
           { id: uuidv4(), question: 'Question 3?', answer: 'Answer 3' },
@@ -121,44 +123,44 @@ export function ensureBlockType<T extends Block>(block: Partial<T> & { type: Blo
     case 'cta':
       return {
         ...baseBlock,
-        heading: block.heading || 'Call to Action',
-        content: block.content || 'Take action now.',
-        buttonText: block.buttonText || 'Buy Now',
-        buttonUrl: block.buttonUrl || '#',
-        secondaryButtonText: block.secondaryButtonText || '',
-        secondaryButtonUrl: block.secondaryButtonUrl || '',
+        heading: anyBlock.heading || 'Call to Action',
+        content: anyBlock.content || 'Take action now.',
+        buttonText: anyBlock.buttonText || 'Buy Now',
+        buttonUrl: anyBlock.buttonUrl || '#',
+        secondaryButtonText: anyBlock.secondaryButtonText || '',
+        secondaryButtonUrl: anyBlock.secondaryButtonUrl || '',
       } as unknown as T;
       
     case 'video':
       return {
         ...baseBlock,
-        videoUrl: block.videoUrl || '',
-        title: block.title || 'Video Title',
-        description: block.description || '',
-        aspectRatio: block.aspectRatio || '16:9',
-        autoplay: block.autoplay !== undefined ? block.autoplay : false,
+        videoUrl: anyBlock.videoUrl || '',
+        title: anyBlock.title || 'Video Title',
+        description: anyBlock.description || '',
+        aspectRatio: anyBlock.aspectRatio || '16:9',
+        autoplay: anyBlock.autoplay !== undefined ? anyBlock.autoplay : false,
       } as unknown as T;
       
     case 'videoText':
       return {
         ...baseBlock,
-        videoUrl: block.videoUrl || '',
-        aspectRatio: block.aspectRatio || '16:9',
-        autoplay: block.autoplay !== undefined ? block.autoplay : false,
-        muteAudio: block.muteAudio !== undefined ? block.muteAudio : true,
-        heading: block.heading || 'Video + Text',
-        content: block.content || '<p>Add your content here.</p>',
+        videoUrl: anyBlock.videoUrl || '',
+        aspectRatio: anyBlock.aspectRatio || '16:9',
+        autoplay: anyBlock.autoplay !== undefined ? anyBlock.autoplay : false,
+        muteAudio: anyBlock.muteAudio !== undefined ? anyBlock.muteAudio : true,
+        heading: anyBlock.heading || 'Video + Text',
+        content: anyBlock.content || '<p>Add your content here.</p>',
       } as unknown as T;
       
     case 'textVideo':
       return {
         ...baseBlock,
-        videoUrl: block.videoUrl || '',
-        aspectRatio: block.aspectRatio || '16:9',
-        autoplay: block.autoplay !== undefined ? block.autoplay : false,
-        muteAudio: block.muteAudio !== undefined ? block.muteAudio : true,
-        heading: block.heading || 'Text + Video',
-        content: block.content || '<p>Add your content here.</p>',
+        videoUrl: anyBlock.videoUrl || '',
+        aspectRatio: anyBlock.aspectRatio || '16:9',
+        autoplay: anyBlock.autoplay !== undefined ? anyBlock.autoplay : false,
+        muteAudio: anyBlock.muteAudio !== undefined ? anyBlock.muteAudio : true,
+        heading: anyBlock.heading || 'Text + Video',
+        content: anyBlock.content || '<p>Add your content here.</p>',
       } as unknown as T;
       
     default:
