@@ -4,9 +4,7 @@ import { userService } from './userService';
 
 // Create a centralized adminService object that exports all admin services
 export const adminService = {
-  ...templateService,
-  ...userService,
-  // Add other admin services here as needed
+  // Plan-related methods
   getPlans: async () => {
     console.info('Buscando planos no Stripe via Edge Function');
     // Mock implementation - in a real app this would connect to an API
@@ -26,7 +24,45 @@ export const adminService = {
     console.info('Excluindo plano:', id);
     // Mock implementation
     return true;
-  }
+  },
+
+  // User-related methods
+  getUsers: async () => userService.getUserList(),
+  createUser: async (email: string, password: string, userData: any) => {
+    console.info('Creating user:', email, userData);
+    // Mock implementation
+    return { id: `user-${Date.now()}`, email, ...userData };
+  },
+  updateUserProfile: async (userId: string, data: any) => {
+    console.info('Updating user profile:', userId, data);
+    // Mock implementation
+    return { id: userId, ...data };
+  },
+  updateUserRole: async (userId: string, role: string | string[]) => {
+    console.info('Updating user role:', userId, role);
+    // Mock implementation
+    return { id: userId, role };
+  },
+  deleteUser: async (userId: string) => {
+    console.info('Deleting user:', userId);
+    // Mock implementation
+    return true;
+  },
+
+  // Dashboard-related methods
+  getDashboardStats: async () => {
+    console.info('Fetching dashboard stats');
+    // Mock implementation
+    return {
+      users: 25,
+      descriptions: 42,
+      templates: 15,
+      plans: 3
+    };
+  },
+
+  // Template methods from templateService
+  ...templateService
 };
 
 // Re-export individual services for direct usage

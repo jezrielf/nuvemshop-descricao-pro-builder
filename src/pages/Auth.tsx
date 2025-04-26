@@ -27,7 +27,7 @@ const Auth: React.FC = () => {
     setError(null);
 
     try {
-      await signIn({ email });
+      await signIn(email); // Updated to accept a single parameter
       
       toast({
         title: 'Email enviado',

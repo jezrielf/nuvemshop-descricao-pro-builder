@@ -21,10 +21,12 @@ const Success: React.FC = () => {
     const fetchSubscriptionInfo = async () => {
       try {
         // Mock subscription info for now
-        setSubscriptionInfo({
+        const mockSubscription = {
           status: 'active',
           plan: 'premium'
-        });
+        };
+        
+        setSubscriptionInfo(mockSubscription);
       } catch (error) {
         console.error('Error fetching subscription info:', error);
         toast({

@@ -1,31 +1,28 @@
-
-// If this file doesn't exist, we'll create it with the necessary functions
-
-export const getRoles = (roleData: string | string[]): string[] => {
-  if (Array.isArray(roleData)) {
-    return roleData;
-  } else if (typeof roleData === 'string') {
-    return roleData.split(',').map(r => r.trim());
+/**
+ * Convert role property (string or string[]) to array of strings
+ */
+export const getRoles = (role: string | string[] | null): string[] => {
+  // If no role is provided, default to 'user'
+  if (!role) return ['user'];
+  
+  // If role is already an array, return it
+  if (Array.isArray(role)) {
+    return role.length > 0 ? role : ['user'];
   }
-  return [];
+  
+  // If role is a comma-separated string, split it
+  if (typeof role === 'string' && role.includes(',')) {
+    return role.split(',').map(r => r.trim());
+  }
+  
+  // Otherwise, return as single-item array
+  return [role];
 };
 
-export const hasRole = (userRole: string | string[], requiredRole: string): boolean => {
+/**
+ * Check if a user has a specific role
+ */
+export const hasRole = (userRole: string | string[] | null, roleToCheck: string): boolean => {
   const roles = getRoles(userRole);
-  return roles.includes(requiredRole) || roles.includes('admin');
-};
-
-export const isPremium = (role: string | string[]): boolean => {
-  const roles = getRoles(role);
-  return roles.includes('premium') || roles.includes('business') || roles.includes('admin');
-};
-
-export const isBusiness = (role: string | string[]): boolean => {
-  const roles = getRoles(role);
-  return roles.includes('business') || roles.includes('admin');
-};
-
-export const isAdmin = (role: string | string[]): boolean => {
-  const roles = getRoles(role);
-  return roles.includes('admin');
+  return roles.includes(roleToCheck);
 };

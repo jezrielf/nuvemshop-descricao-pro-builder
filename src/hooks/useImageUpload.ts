@@ -59,8 +59,8 @@ export const useImageUpload = () => {
   };
 
   return {
-    uploading: isUploading, // Match the property name used in ImageUpload
-    isUploading, // Keep this for backwards compatibility
+    uploading: isUploading, // For backwards compatibility with components using 'uploading'
+    isUploading, 
     uploadProgress,
     imageUrl,
     handleFileChange
