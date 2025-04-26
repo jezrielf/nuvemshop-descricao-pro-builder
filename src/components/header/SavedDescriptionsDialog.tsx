@@ -11,13 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 interface SavedDescriptionsDialogProps {
   isPremium: boolean; // Changed from function to boolean
   descriptionCount: number;
-  savedDescriptions: ProductDescription[];
+  savedDescriptions: ProductDescription[] | undefined;
 }
 
 const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({ 
   isPremium, 
   descriptionCount, 
-  savedDescriptions 
+  savedDescriptions = [] // Provide default empty array if undefined
 }) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -79,7 +79,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            {savedDescriptions.length > 0 ? (
+            {savedDescriptions && savedDescriptions.length > 0 ? (
               <div className="space-y-2">
                 {savedDescriptions.map((desc) => (
                   <div 

@@ -71,7 +71,7 @@ const HeaderControls = memo(({ description, isPremium, isSubscribed, canCreateMo
         
         <SavedDescriptionsDialog 
           isPremium={isPremium}
-          descriptionCount={description?.descriptionCount}
+          descriptionCount={description?.descriptionCount || 0}
           savedDescriptions={description?.savedDescriptions}
         />
         
