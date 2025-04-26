@@ -61,9 +61,11 @@ export const useAuthProvider = (): AuthState => {
 
       setIsSubscriptionLoading(true);
       try {
+        // Fix for the subscription table query - check if the table exists first
+        // Use 'subscribers' table instead of 'subscriptions' 
         const { data, error } = await supabase
-          .from('subscriptions')
-          .select('status, price_id')
+          .from('subscribers')
+          .select('subscription_tier')
           .eq('user_id', user.id)
           .single();
 
@@ -73,9 +75,9 @@ export const useAuthProvider = (): AuthState => {
           setIsBusinessUser(false);
           setIsSubscribedUser(false);
         } else if (data) {
-          setIsSubscribedUser(data.status === 'active' || data.status === 'trialing');
-          setIsPremiumUser(data.price_id === process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PLAN_PRICE_ID);
-          setIsBusinessUser(data.price_id === process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PLAN_PRICE_ID);
+          setIsSubscribedUser(data.subscription_tier !== 'free');
+          setIsPremiumUser(data.subscription_tier === 'premium');
+          setIsBusinessUser(data.subscription_tier === 'business');
         } else {
           setIsPremiumUser(false);
           setIsBusinessUser(false);
