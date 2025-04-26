@@ -1,50 +1,45 @@
 
+import { User } from '@/types/auth';
+
 /**
- * Convert role property (string or string[]) to array of strings
+ * Check if a user has a premium or business subscription
  */
-export const getRoles = (role: string | string[] | null): string[] => {
-  // If no role is provided, default to 'user'
-  if (!role) return ['user'];
+export const isPremium = (user?: User | null): boolean => {
+  if (!user) return false;
   
-  // If role is already an array, return it
-  if (Array.isArray(role)) {
-    return role.length > 0 ? role : ['user'];
-  }
+  // Check if user has a subscription role or plan
+  const userRole = user.role?.toLowerCase();
+  const userPlan = user.plan?.toLowerCase();
   
-  // If role is a comma-separated string, split it
-  if (typeof role === 'string' && role.includes(',')) {
-    return role.split(',').map(r => r.trim());
-  }
+  return (
+    userRole === 'premium' || 
+    userRole === 'business' || 
+    userPlan === 'premium' || 
+    userPlan === 'business'
+  );
+};
+
+/**
+ * Check if a user can create more descriptions 
+ * (either premium/business or has created less than the free limit)
+ */
+export const canCreateMoreDescriptions = (user?: User | null, freeLimit: number = 3): boolean => {
+  if (!user) return false;
   
-  // Otherwise, return as single-item array
-  return [role];
+  // Premium users can always create more
+  if (isPremium(user)) return true;
+  
+  // Check if the user has created less than the free limit
+  const savedCount = user.savedDescriptionsCount || 0;
+  return savedCount < freeLimit;
 };
 
 /**
- * Check if a user has a specific role
+ * Check if a user is an admin
  */
-export const hasRole = (userRole: string | string[] | null, roleToCheck: string): boolean => {
-  const roles = getRoles(userRole);
-  return roles.includes(roleToCheck);
-};
-
-/**
- * Check if a user has a premium role
- */
-export const isPremium = (userRole: string | string[] | null): boolean => {
-  return hasRole(userRole, 'premium') || hasRole(userRole, 'business');
-};
-
-/**
- * Check if a user has a business role
- */
-export const isBusiness = (userRole: string | string[] | null): boolean => {
-  return hasRole(userRole, 'business');
-};
-
-/**
- * Check if a user has an admin role
- */
-export const isAdmin = (userRole: string | string[] | null): boolean => {
-  return hasRole(userRole, 'admin');
+export const isAdmin = (user?: User | null): boolean => {
+  if (!user) return false;
+  
+  const userRole = user.role?.toLowerCase();
+  return userRole === 'admin' || userRole === 'administrator';
 };

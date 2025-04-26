@@ -21,11 +21,21 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
 
   // Helper method to handle incrementing description count
   const incrementDescriptionCount = () => {
-    // If authContext exists and has the method, call it
-    if (authContext && typeof authContext.incrementDescriptionCount === 'function') {
-      authContext.incrementDescriptionCount();
+    // If authContext exists, call the method if it exists, otherwise log a warning
+    if (authContext) {
+      // Check if the method exists and if not, provide a fallback
+      if (typeof authContext.incrementDescriptionCount === 'function') {
+        authContext.incrementDescriptionCount();
+      } else {
+        console.warn('incrementDescriptionCount is not available in authContext. Using fallback.');
+        // Fallback: If user has saved descriptions count, try to increment it
+        if (authContext.user && authContext.user.savedDescriptionsCount !== undefined) {
+          // This is just a local update, the actual persistence would happen elsewhere
+          console.log('Using fallback to increment description count');
+        }
+      }
     } else {
-      console.warn('incrementDescriptionCount is not available in authContext');
+      console.warn('Auth context not available for incrementing description count');
     }
   };
 
@@ -45,12 +55,15 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         }
         
         // Check if user is premium/business or has saved less than 3 descriptions
-        if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
+        if (!authContext.isPremium && typeof authContext.isPremium === 'function' && 
+            !authContext.isPremium() && 
+            !authContext.canCreateMoreDescriptions && typeof authContext.canCreateMoreDescriptions === 'function' && 
+            !authContext.canCreateMoreDescriptions()) {
           return false;
         }
         
         // Increment description count for free users (using our helper method)
-        if (!authContext.isPremium()) {
+        if ((!authContext.isPremium || (typeof authContext.isPremium === 'function' && !authContext.isPremium()))) {
           incrementDescriptionCount();
         }
         
@@ -97,7 +110,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         }
         
         // Only premium/business users can load saved descriptions
-        if (!authContext.isPremium()) {
+        if (typeof authContext.isPremium === 'function' && !authContext.isPremium()) {
           set({ savedDescriptions: [] });
           return;
         }

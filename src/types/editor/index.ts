@@ -31,8 +31,13 @@ export {
   type ColumnLayout, 
   type BlockStyle, 
   type BlockBase, 
-  type BlockSpacing 
+  type BlockSpacing, 
+  type ProductCategory
 } from './base';
 
 // Also export any utility types from other editor-related type files
 export * from './products';
+
+// Create a re-export for the simpler "editor" import path
+const editorTypes = {};
+export default editorTypes;

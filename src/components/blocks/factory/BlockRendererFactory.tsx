@@ -29,10 +29,14 @@ export class BlockRendererFactory {
   static createBlockComponent({ block, isPreview = false }: BlockRendererProps): React.ReactNode {
     // Ensure the block is valid and properly typed
     try {
+      // Ensure the block is properly typed before attempting to access properties
       const validBlock = ensureBlockType(block);
       
+      // Type assertion to make TypeScript happy - we know this is a valid block with a type property
+      const blockType = (validBlock as Block).type;
+      
       // Now we can safely access the type property
-      switch (validBlock.type) {
+      switch (blockType) {
         case 'hero':
           return <HeroBlock block={validBlock as any} isPreview={isPreview} />;
         
@@ -81,7 +85,7 @@ export class BlockRendererFactory {
         default:
           return (
             <div className="p-4 border border-red-300 bg-red-50 rounded text-red-700">
-              Bloco desconhecido: {String(validBlock.type)}
+              Bloco desconhecido: {String(blockType)}
             </div>
           );
       }

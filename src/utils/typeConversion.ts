@@ -1,61 +1,53 @@
 
-import { Profile } from '@/types/auth';
-import { Block } from '@/types/editor/blocks';
+import { Block, BlockType } from '@/types/editor';
 
-// Convert Profile to User for storage service compatibility
-export const convertProfileToUser = (profile: Profile): any => {
+/**
+ * Ensures that a block object is properly typed based on its type property
+ * This is useful when retrieving blocks from a database or API
+ */
+export function ensureBlockType(block: any): Block {
+  // Check if the block is valid
+  if (!block || typeof block !== 'object') {
+    throw new Error('Invalid block: Block must be an object');
+  }
+
+  // Check if block has a valid type
+  if (!block.type || typeof block.type !== 'string') {
+    throw new Error('Invalid block: Block must have a type property');
+  }
+
+  // Check if block type is among the allowed types
+  const validTypes: BlockType[] = [
+    'hero', 'text', 'features', 'benefits', 'specifications',
+    'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta',
+    'video', 'videoText', 'textVideo', 'carousel'
+  ];
+
+  if (!validTypes.includes(block.type as BlockType)) {
+    throw new Error(`Invalid block type: ${block.type}`);
+  }
+
+  // Ensure block has an id
+  if (!block.id || typeof block.id !== 'string') {
+    throw new Error('Invalid block: Block must have an id property');
+  }
+
+  return block as Block;
+}
+
+/**
+ * Converts user profile from auth to a standard user object
+ */
+export function convertProfileToUser(profile: any): any {
+  if (!profile) return null;
+
+  // Basic conversion
   return {
     id: profile.id,
     email: profile.email,
-    name: typeof profile.name === 'string' ? profile.name : '',
-    role: getRoleAsString(profile),
-    avatar_url: profile.avatarUrl,
-    created_at: profile.created_at
+    name: profile.user_metadata?.full_name || profile.user_metadata?.name || '',
+    role: profile.user_metadata?.role || 'user',
+    plan: profile.user_metadata?.plan || 'free',
+    savedDescriptionsCount: profile.user_metadata?.savedDescriptionsCount || 0
   };
-};
-
-// Get role as string from Profile.role which could be string or string[]
-export const getRoleAsString = (profile: Profile): string => {
-  if (!profile.role) return 'user';
-  
-  if (Array.isArray(profile.role)) {
-    return profile.role.length > 0 ? profile.role[0] : 'user';
-  }
-  
-  return profile.role;
-};
-
-// Convert any data to Profile format for auth context
-export const convertToProfile = (userData: any): Profile => {
-  return {
-    id: userData.id || '',
-    email: userData.email || '',
-    name: userData.nome || userData.name || '',
-    role: userData.role || 'user',
-    avatarUrl: userData.avatar_url || userData.avatarUrl || null,
-    app_metadata: userData.app_metadata || {},
-    user_metadata: userData.user_metadata || {},
-    aud: userData.aud || '',
-    created_at: userData.criado_em || userData.created_at || new Date().toISOString()
-  };
-};
-
-// Ensure a block has the correct type 
-export const ensureBlockType = (block: any): Block => {
-  if (!block || typeof block !== 'object') {
-    throw new Error('Invalid block data');
-  }
-  
-  // Ensure the block has all required base properties
-  const ensuredBlock = {
-    id: block.id || '',
-    type: block.type || 'text',
-    title: block.title || block.type || 'Block',
-    visible: block.visible !== undefined ? block.visible : true,
-    columns: block.columns || 'full',
-    style: block.style || {},
-    ...block
-  };
-  
-  return ensuredBlock as Block;
-};
+}
