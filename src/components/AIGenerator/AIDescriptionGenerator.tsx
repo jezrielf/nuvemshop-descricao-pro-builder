@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '@/store/editor';
@@ -29,8 +28,8 @@ import AIGeneratorResult from './AIGeneratorResult';
 import { ProductCategory, ProductDescription, Block, BlockType } from '@/types/editor';
 import { isPremium } from '@/utils/roleUtils';
 
-// Rename the function to match what's expected in the imports
-import { generateAIDescription as generateDescription } from '@/utils/aiGenerators/descriptionGenerator';
+// Import generateDescription directly
+import { generateDescription } from '@/utils/aiGenerators/descriptionGenerator';
 
 // Form schema for AI description generation
 const formSchema = z.object({
@@ -129,7 +128,7 @@ const AIDescriptionGenerator: React.FC<AIDescriptionGeneratorProps> = ({
       // Fix: Convert tone value to the correct type explicitly 
       const toneValue = values.tone as ToneType;
 
-      // Use renamed function with correct parameters
+      // Use function with correct parameters
       const description = await generateDescription({
         productName: values.productName,                 
         productCategory: values.productCategory,         

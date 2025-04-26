@@ -1,3 +1,4 @@
+
 export const isPremium = (role?: string): boolean => {
   if (!role) return false;
   return role === 'premium' || role === 'business' || role === 'admin';
@@ -27,4 +28,10 @@ export const getRoles = (role?: string | string[]): string[] => {
   
   // Otherwise, just return it as a single-element array
   return [role];
+};
+
+// Add hasRole function to check if user has a specific role
+export const hasRole = (userRole: string | string[] | undefined, requiredRole: string): boolean => {
+  const roles = getRoles(userRole);
+  return roles.includes(requiredRole);
 };

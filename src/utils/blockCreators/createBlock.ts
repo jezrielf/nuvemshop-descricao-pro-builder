@@ -2,7 +2,7 @@
 import { Block, BlockType, ColumnLayout } from '@/types/editor';
 import * as blockCreators from './blocks';
 
-export const createBlock = (type: BlockType, columns: ColumnLayout): Block => {
+export const createBlock = (type: BlockType, columns: ColumnLayout = 'full'): Block => {
   switch (type) {
     case 'hero':
       return blockCreators.createHeroBlock(columns);
