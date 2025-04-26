@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+
+import React from 'react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -9,77 +10,77 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import CreateUserRoleSelector from './CreateUserRoleSelector';
 import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { userService } from '@/services/admin/userService';
+import { adminService } from '@/services/admin';
+
+export interface CreateUserFormProps {
+  onUserCreated?: () => Promise<void>;
+}
 
 const formSchema = z.object({
   nome: z.string().min(2, {
-    message: 'Nome deve ter pelo menos 2 caracteres.',
+    message: "Nome deve ter pelo menos 2 caracteres.",
   }),
   email: z.string().email({
-    message: 'Email inválido.',
+    message: "E-mail inválido.",
   }),
   password: z.string().min(6, {
-    message: 'Senha deve ter pelo menos 6 caracteres.',
+    message: "Senha deve ter pelo menos 6 caracteres.",
   }),
-  role: z.enum(['user', 'premium', 'admin']).default('user'),
+  role: z.string().default("user"),
 });
 
-interface CreateUserFormProps {
-  onSuccess: () => void;
-}
-
-const CreateUserForm: React.FC<CreateUserFormProps> = ({ onSuccess }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nome: '',
-      email: '',
-      password: '',
-      role: 'user',
+      nome: "",
+      email: "",
+      password: "",
+      role: "user",
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setIsSubmitting(true);
-      
-      const userData = {
+      setIsLoading(true);
+      await adminService.users.createUser(values.email, values.password, {
         nome: values.nome,
-        role: values.role
-      };
-      
-      await userService.createUser(values.email, values.password, userData);
+        role: values.role,
+      });
       
       toast({
-        title: 'Usuário criado com sucesso',
-        description: `O usuário ${values.email} foi criado com sucesso.`
+        title: "Usuário criado",
+        description: `Usuário ${values.nome} foi criado com sucesso.`,
       });
       
       form.reset();
-      onSuccess();
+      
+      if (onUserCreated) {
+        await onUserCreated();
+      }
     } catch (error: any) {
-      console.error('Erro ao criar usuário:', error);
+      console.error("Erro ao criar usuário:", error);
       toast({
-        title: 'Erro ao criar usuário',
-        description: error.message || 'Ocorreu um erro ao criar o usuário.',
-        variant: 'destructive',
+        title: "Erro ao criar usuário",
+        description: error.message || "Erro desconhecido",
+        variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="nome"
@@ -93,19 +94,21 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onSuccess }) => {
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>E-mail</FormLabel>
               <FormControl>
-                <Input placeholder="exemplo@email.com" {...field} />
+                <Input type="email" placeholder="email@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="password"
@@ -113,36 +116,29 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onSuccess }) => {
             <FormItem>
               <FormLabel>Senha</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input type="password" placeholder="••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="role"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Perfil</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um perfil" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="user">Usuário</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <CreateUserRoleSelector value={field.value} onChange={field.onChange} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Criando...' : 'Criar Usuário'}
+        
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Criando..." : "Criar Usuário"}
         </Button>
       </form>
     </Form>

@@ -14,6 +14,8 @@ export interface Plan {
   isActive: boolean;
   isDefault: boolean;
   priceId?: string;
+  interval?: string;
+  currency?: string;
 }
 
 export const defaultFeaturesTemplate = [

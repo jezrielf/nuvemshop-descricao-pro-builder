@@ -1,68 +1,116 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-// Get dashboard statistics
+// Get main dashboard statistics
 const getDashboardStats = async () => {
   try {
-    // Count total users
-    const { count: userCount, error: userError } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true });
-    
-    if (userError) throw userError;
-    
-    // Count total templates
-    const { count: templateCount, error: templateError } = await supabase
-      .from('templates')
-      .select('id', { count: 'exact', head: true });
-      
-    if (templateError) throw templateError;
-    
-    // Count total subscribers
-    const { count: subscriberCount, error: subscriberError } = await supabase
-      .from('subscribers')
-      .select('id', { count: 'exact', head: true })
-      .eq('subscribed', true);
-      
-    if (subscriberError) throw subscriberError;
-    
-    // Get recent users
-    const { data: recentUsers, error: recentUsersError } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('criado_em', { ascending: false })
-      .limit(5);
-      
-    if (recentUsersError) throw recentUsersError;
-    
-    // Calculate active percentage (mock for now)
-    const activePercentage = 65; // This would be calculated based on real data
-    
-    return {
-      users: {
-        total: userCount || 0,
-        active: Math.round((userCount || 0) * (activePercentage / 100)),
-        activePercentage,
-        recentUsers: recentUsers || []
-      },
-      templates: {
-        total: templateCount || 0
-      },
-      subscribers: {
-        total: subscriberCount || 0,
-        percentage: subscriberCount && userCount ? Math.round((subscriberCount / userCount) * 100) : 0
-      }
-    };
+    // In a real app, we would get this data from Supabase
+    // For now, we return mock data
+    return getMockDashboardStats();
   } catch (error) {
-    console.error('Error getting dashboard stats:', error);
-    return {
-      users: { total: 0, active: 0, activePercentage: 0, recentUsers: [] },
-      templates: { total: 0 },
-      subscribers: { total: 0, percentage: 0 }
-    };
+    console.error('Error fetching dashboard stats:', error);
+    return getMockDashboardStats();
   }
 };
 
+// Get sales performance data
+const getSalesPerformance = async (startDate: string, endDate: string) => {
+  try {
+    // Mock implementation for now
+    return getMockSalesPerformance(startDate, endDate);
+  } catch (error) {
+    console.error('Error fetching sales performance:', error);
+    return [];
+  }
+};
+
+// Get user growth data
+const getUserGrowth = async (period: 'day' | 'week' | 'month' | 'year') => {
+  try {
+    // Mock implementation for now
+    return getMockUserGrowth(period);
+  } catch (error) {
+    console.error('Error fetching user growth:', error);
+    return [];
+  }
+};
+
+// Mock data for development
+const getMockDashboardStats = () => {
+  return {
+    users: {
+      total: 245,
+      growth: 12.5,
+      new: 18
+    },
+    sales: {
+      total: 384,
+      growth: 8.2
+    },
+    revenue: {
+      total: 12950.75,
+      growth: 14.3
+    },
+    conversions: {
+      rate: 2.8,
+      growth: 1.2
+    },
+    charts: {
+      revenue: [
+        { name: 'Jan', value: 4000 },
+        { name: 'Fev', value: 3000 },
+        { name: 'Mar', value: 5000 },
+        { name: 'Abr', value: 4500 },
+        { name: 'Mai', value: 6000 },
+        { name: 'Jun', value: 5500 }
+      ],
+      visits: [
+        { name: 'Jan', value: 2400 },
+        { name: 'Fev', value: 1398 },
+        { name: 'Mar', value: 3000 },
+        { name: 'Abr', value: 2780 },
+        { name: 'Mai', value: 3908 },
+        { name: 'Jun', value: 3800 }
+      ]
+    },
+    recentActivities: [
+      {
+        title: 'Novo usuário registrado',
+        description: 'João Silva se cadastrou na plataforma',
+        time: 'Há 5 minutos'
+      },
+      {
+        title: 'Novo template adicionado',
+        description: 'O template "Produto Premium" foi criado',
+        time: 'Há 2 horas'
+      },
+      {
+        title: 'Assinatura atualizada',
+        description: 'Maria Oliveira atualizou para o plano Business',
+        time: 'Há 4 horas'
+      }
+    ]
+  };
+};
+
+const getMockSalesPerformance = (startDate: string, endDate: string) => {
+  return [
+    { date: '2023-01-01', sales: 12, revenue: 1250.75 },
+    { date: '2023-01-02', sales: 8, revenue: 845.20 },
+    { date: '2023-01-03', sales: 15, revenue: 1876.50 }
+  ];
+};
+
+const getMockUserGrowth = (period: string) => {
+  return [
+    { date: '2023-01-01', users: 120 },
+    { date: '2023-01-02', users: 125 },
+    { date: '2023-01-03', users: 132 }
+  ];
+};
+
 export const analyticsService = {
-  getDashboardStats
+  getDashboardStats,
+  getSalesPerformance,
+  getUserGrowth
 };

@@ -23,10 +23,10 @@ export const getTemplates = async (): Promise<Template[]> => {
     return data.map(template => ({
       id: template.id,
       name: template.name,
-      description: template.description,
+      description: template.description || '',  // Provide default empty string
       category: template.category as ProductCategory,
       blocks: Array.isArray(template.blocks) ? template.blocks : [],
-      thumbnailUrl: template.thumbnailUrl || '/templates/default.jpg',
+      thumbnailUrl: template.thumbnailUrl || '/templates/default.jpg',  // Provide default value
       createdAt: template.created_at,
       updatedAt: template.updated_at
     }));
@@ -53,10 +53,10 @@ export const getTemplateById = async (id: string): Promise<Template | null> => {
     return {
       id: data.id,
       name: data.name,
-      description: data.description,
+      description: data.description || '',  // Provide default empty string
       category: data.category as ProductCategory,
       blocks: Array.isArray(data.blocks) ? data.blocks : [],
-      thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',
+      thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',  // Provide default value
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };
@@ -81,10 +81,10 @@ export const createTemplate = async (template: Omit<Template, 'id'>): Promise<Te
       .insert([{
         id: newTemplate.id,
         name: newTemplate.name,
-        description: newTemplate.description,
+        description: newTemplate.description || '',  // Ensure field exists
         category: newTemplate.category,
         blocks: newTemplate.blocks,
-        thumbnailUrl: newTemplate.thumbnailUrl,
+        thumbnailUrl: newTemplate.thumbnailUrl || '/templates/default.jpg',  // Ensure field exists
         created_at: newTemplate.createdAt,
         updated_at: newTemplate.updatedAt
       }])
@@ -109,10 +109,19 @@ export const createTemplate = async (template: Omit<Template, 'id'>): Promise<Te
 // Update existing template
 export const updateTemplate = async (id: string, template: Partial<Template>): Promise<Template> => {
   try {
-    const updates = {
+    const updates: any = {
       ...template,
       updated_at: new Date().toISOString()
     };
+    
+    // Only add these fields if they exist in the template object
+    if (template.description !== undefined) {
+      updates.description = template.description;
+    }
+    
+    if (template.thumbnailUrl !== undefined) {
+      updates.thumbnailUrl = template.thumbnailUrl;
+    }
     
     const { data, error } = await supabase
       .from('templates')
@@ -126,10 +135,10 @@ export const updateTemplate = async (id: string, template: Partial<Template>): P
     return {
       id: data.id,
       name: data.name,
-      description: data.description,
+      description: data.description || '',  // Provide default empty string
       category: data.category as ProductCategory,
       blocks: Array.isArray(data.blocks) ? data.blocks : [],
-      thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',
+      thumbnailUrl: data.thumbnailUrl || '/templates/default.jpg',  // Provide default value
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };

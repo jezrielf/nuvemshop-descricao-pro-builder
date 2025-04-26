@@ -2,11 +2,42 @@
 import { Plan } from '@/types/subscription';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
+import { PlanFeature } from '@/components/admin/plans/types';
 
-// Using Stripe API integration for plans instead of direct database access
-// This service acts as a facade to the Stripe API via Supabase Edge Functions
+// Convert between different Plan types
+const adaptPlanFormat = (plan: any): Plan => {
+  // Convert features array based on its type
+  let features: any[] = [];
+  if (plan.features) {
+    if (typeof plan.features[0] === 'string') {
+      // If features are strings, convert to objects
+      features = plan.features.map((feature: string) => ({
+        name: feature,
+        included: true
+      }));
+    } else {
+      // Features are already objects
+      features = plan.features;
+    }
+  }
 
-// Get all plans
+  return {
+    id: plan.id,
+    name: plan.name,
+    description: plan.description || '',
+    price: plan.price,
+    interval: plan.interval || 'month',
+    currency: plan.currency || 'BRL',
+    features: features,
+    priceId: plan.priceId,
+    isActive: plan.isActive !== undefined ? plan.isActive : true,
+    isDefault: plan.isDefault !== undefined ? plan.isDefault : false,
+    createdAt: plan.createdAt || plan.created_at,
+    updatedAt: plan.updatedAt || plan.updated_at
+  };
+};
+
+// Using mock data approach for plans as Supabase doesn't have a plans table
 const getPlans = async (): Promise<Plan[]> => {
   try {
     // For development, use a more reliable approach by mocking the data
@@ -38,6 +69,8 @@ const createPlan = async (planData: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>
     const newPlan: Plan = {
       id: uuidv4(),
       ...planData,
+      interval: planData.interval || 'month',
+      currency: planData.currency || 'BRL',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

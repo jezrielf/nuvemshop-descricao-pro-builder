@@ -3,7 +3,7 @@ import React from 'react';
 import { Profile } from '@/types/auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import UserTable from '../index';
+import UserTable from '../UserTable';
 import { Button } from '@/components/ui/button';
 
 interface UserPanelContentProps {
@@ -56,6 +56,7 @@ const UserPanelContent: React.FC<UserPanelContentProps> = ({
         <UserTable 
           profiles={profiles} 
           loading={loading}
+          error={error}
           onRefresh={onRefresh}
         />
       )}

@@ -53,12 +53,15 @@ const createUser = async (email: string, password: string, userData: any) => {
     
     // Update the user role if specified
     if (userData.role && userData.role !== 'user') {
+      // Get the user's role enum value
+      const role = userData.role;
+      
       const { error: roleError } = await supabase
         .from('user_roles')
-        .insert([{
+        .insert({
           user_id: authData.user.id,
-          role: userData.role
-        }]);
+          role: role
+        });
         
       if (roleError) throw roleError;
     }
@@ -109,14 +112,16 @@ const updateUserRole = async (userId: string, role: string | string[]) => {
       role: r
     }));
     
-    const { data, error } = await supabase
-      .from('user_roles')
-      .insert(roleData)
-      .select();
-      
-    if (error) throw error;
+    // Insert role data one by one to avoid array insertion issues
+    for (const rd of roleData) {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert(rd);
+        
+      if (error) throw error;
+    }
     
-    return data;
+    return { success: true };
   } catch (error) {
     console.error(`Error updating user role ${userId}:`, error);
     throw error;
