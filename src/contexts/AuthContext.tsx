@@ -15,6 +15,8 @@ interface AuthContextProps {
     name: string;
     role: string | string[] | undefined;
     avatarUrl?: string | null;
+    nome?: string;
+    criado_em?: string;
   } | null;
   loading: boolean;
   error: string | null;
@@ -69,6 +71,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     name: string;
     role: string | string[] | undefined;
     avatarUrl?: string | null;
+    nome?: string;
+    criado_em?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,6 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         name: 'Test User',
         role: 'user',
         avatarUrl: 'https://i.pravatar.cc/150?img=3',
+        nome: 'Test User', // Add this for backward compatibility
       };
       setProfile(mockProfile);
       localStorage.setItem('userProfile', JSON.stringify(mockProfile));
@@ -112,17 +117,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const checkIsPremium = useCallback(() => {
     if (!profile?.role) return false;
-    return isPremium(Array.isArray(profile.role) ? profile.role[0] : profile.role);
+    return isPremium(profile.role);
   }, [profile]);
   
   const checkIsBusiness = useCallback(() => {
     if (!profile?.role) return false;
-    return isBusiness(Array.isArray(profile.role) ? profile.role[0] : profile.role);
+    return isBusiness(profile.role);
   }, [profile]);
   
   const checkIsAdmin = useCallback(() => {
     if (!profile?.role) return false;
-    return isAdmin(Array.isArray(profile.role) ? profile.role[0] : profile.role);
+    return isAdmin(profile.role);
   }, [profile]);
   
   const checkHasRole = useCallback((requiredRole: string) => {
