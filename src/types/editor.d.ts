@@ -18,6 +18,8 @@ export interface BlockStyle {
   fontWeight?: string;
   textAlign?: 'left' | 'center' | 'right' | 'justify';
   imageFit?: 'cover' | 'contain' | 'fill' | 'none';
+  // Allow any other properties
+  [key: string]: any;
 }
 
 // Add this to ensure name is allowed in Block updates
@@ -48,3 +50,9 @@ export type BlockType =
   | 'videoText'
   | 'textVideo'
   | 'carousel';
+
+// Re-export ProductCategory
+export type ProductCategory = string;
+
+// Define ColumnLayout type
+export type ColumnLayout = 'full' | '1/2' | '1/3' | '2/3' | '1/4' | '3/4' | 1 | 2 | 3 | 4;

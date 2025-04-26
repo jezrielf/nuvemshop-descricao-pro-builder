@@ -14,7 +14,9 @@ interface AIDescriptionInput {
   imageUrl?: string;
 }
 
-// Renamed from generateDescription to generateAIDescription to match usage
+// Export both function names to maintain backward compatibility
+export const generateDescription = generateAIDescription;
+
 export const generateAIDescription = async (input: AIDescriptionInput): Promise<ProductDescription> => {
   // Mock implementation that simulates AI-generated description
   // In a real implementation, this would call an external AI service

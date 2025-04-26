@@ -1,4 +1,3 @@
-
 export const isPremium = (role?: string): boolean => {
   if (!role) return false;
   return role === 'premium' || role === 'business' || role === 'admin';
@@ -12,4 +11,20 @@ export const isBusiness = (role?: string): boolean => {
 export const isAdmin = (role?: string): boolean => {
   if (!role) return false;
   return role === 'admin';
+};
+
+// Add the getRoles function to extract roles from a role string
+export const getRoles = (role?: string | string[]): string[] => {
+  if (!role) return ['user'];
+  
+  // If it's already an array, return it
+  if (Array.isArray(role)) return role;
+  
+  // If it's a string with comma-separated values, split it
+  if (role.includes(',')) {
+    return role.split(',').map(r => r.trim());
+  }
+  
+  // Otherwise, just return it as a single-element array
+  return [role];
 };
