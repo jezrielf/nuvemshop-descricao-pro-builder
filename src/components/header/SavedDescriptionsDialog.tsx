@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 
 interface SavedDescriptionsDialogProps {
-  isPremium: boolean; // Changed from function to boolean
+  isPremium: boolean; // Boolean prop instead of function
   descriptionCount: number;
   savedDescriptions: ProductDescription[] | undefined;
 }
@@ -23,6 +23,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState<ProductDescription | null>(null);
   const { toast } = useToast();
+  const { loadSavedDescriptions } = useEditorStore(); // Get the function from the store
   
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent click
@@ -32,7 +33,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
-      // Obter a chave correta do localStorage baseada no usuário atual
+      // Get the correct key from localStorage based on current user
       const { user } = useEditorStore.getState();
       const key = user ? `savedDescriptions_${user.id}` : 'savedDescriptions_anonymous';
       
@@ -43,8 +44,8 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
         const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
         localStorage.setItem(key, JSON.stringify(updatedDescriptions));
         
-        // Update the store
-        useEditorStore.getState().loadSavedDescriptions();
+        // Update the store - use the function reference to avoid calling it directly during render
+        loadSavedDescriptions();
         
         toast({
           title: "Descrição excluída",
@@ -70,7 +71,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
             <DialogTitle>Suas Descrições Salvas</DialogTitle>
             <DialogDescription>
               Selecione uma descrição para continuar editando.
-              {!isPremium && ( // Changed from function call to direct boolean check
+              {!isPremium && (
                 <div className="mt-2 text-yellow-600 text-sm flex items-center">
                   <BadgeAlert className="mr-1 h-4 w-4" />
                   Você usou {descriptionCount}/3 descrições gratuitas.
