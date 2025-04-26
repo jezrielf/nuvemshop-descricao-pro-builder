@@ -1,24 +1,29 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { storageService } from '@/services/storage';
+import { convertProfileToUser } from '@/utils/typeConversion';
 
 export const useImageUpload = () => {
-  const [uploading, setUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const auth = useAuth();
 
-  const uploadImage = async (file: File) => {
-    if (!file) return;
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return null;
     
-    setUploading(true);
+    setIsUploading(true);
     setUploadProgress(0);
     
     try {
+      // Convert the user to the format expected by storageService
+      const user = auth.user ? convertProfileToUser(auth.user) : null;
+
       const result = await storageService.uploadFile({
-        user: auth.user,
+        user,
         file,
         onProgress: setUploadProgress
       });
@@ -26,8 +31,6 @@ export const useImageUpload = () => {
       if (!result.success) {
         throw new Error(result.error);
       }
-      
-      setImageUrl(result.url);
       
       toast({
         title: "Upload concluído",
@@ -46,22 +49,14 @@ export const useImageUpload = () => {
       
       return null;
     } finally {
-      setUploading(false);
+      setIsUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    return uploadImage(file);
-  };
-
   return {
-    uploading,
+    isUploading,
     uploadProgress,
-    imageUrl,
-    uploadImage,
     handleFileChange
   };
 };
