@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     refreshProfile: auth.refreshProfile || (async () => undefined),
     isPremium: auth.isPremium,
     isBusiness: auth.isBusiness,
-    isAdmin: auth.isAdmin,
+    isAdmin: auth.isAdmin || (() => false),
     hasRole: (role: string) => !!auth.user?.role && (
       typeof auth.user.role === 'string' 
         ? auth.user.role === role

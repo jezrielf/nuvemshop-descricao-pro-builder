@@ -10,7 +10,7 @@ interface AuthState {
   isLoading: boolean;
   isPremium: () => boolean;
   isBusiness: () => boolean;
-  isAdmin: () => boolean; // Add the isAdmin method explicitly
+  isAdmin: () => boolean;
   isSubscribed: () => boolean;
   isSubscriptionLoading: boolean;
   error: string | null;
