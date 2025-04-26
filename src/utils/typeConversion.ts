@@ -44,3 +44,18 @@ export const ensureBlockType = (block: any): Block => {
   
   return ensuredBlock as Block;
 };
+
+// Export the convertToProfile function as well
+export const convertToProfile = (userData: any): Profile => {
+  return {
+    id: userData.id || '',
+    email: userData.email || '',
+    name: userData.nome || userData.name || '',
+    role: userData.role || 'user',
+    avatarUrl: userData.avatar_url || userData.avatarUrl || null,
+    app_metadata: userData.app_metadata || {},
+    user_metadata: userData.user_metadata || {},
+    aud: userData.aud || '',
+    created_at: userData.criado_em || userData.created_at || new Date().toISOString()
+  };
+};

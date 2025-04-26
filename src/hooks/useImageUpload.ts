@@ -8,6 +8,7 @@ import { convertProfileToUser } from '@/utils/typeConversion';
 export const useImageUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const auth = useAuth();
 
@@ -32,6 +33,9 @@ export const useImageUpload = () => {
         throw new Error(result.error);
       }
       
+      // Set the image URL for display
+      setImageUrl(result.url);
+      
       toast({
         title: "Upload concluído",
         description: "Sua imagem foi enviada com sucesso."
@@ -55,8 +59,10 @@ export const useImageUpload = () => {
   };
 
   return {
-    isUploading,
+    uploading: isUploading, // Match the property name used in ImageUpload
+    isUploading, // Keep this for backwards compatibility
     uploadProgress,
+    imageUrl,
     handleFileChange
   };
 };
