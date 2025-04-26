@@ -13,8 +13,9 @@ interface AuthState {
   isSubscribed: () => boolean;
   isSubscriptionLoading: boolean;
   error: string | null;
-  signIn: (email: string) => Promise<void>;
+  signIn: (credentials: { email: string; password?: string }) => Promise<Profile>;
   signOut: () => Promise<void>;
+  refreshProfile?: () => Promise<Profile | undefined>;
 }
 
 export const useAuthProvider = (): AuthState => {
@@ -95,7 +96,7 @@ export const useAuthProvider = (): AuthState => {
   const isBusiness = useCallback(() => isBusinessUser, [isBusinessUser]);
   const isSubscribed = useCallback(() => isSubscribedUser, [isSubscribedUser]);
 
-  // Update this function to include all required properties
+  // Create a complete profile with all required properties
   const createEmptyProfile = (userId: string, email: string): Profile => {
     return {
       id: userId,
@@ -110,14 +111,20 @@ export const useAuthProvider = (): AuthState => {
     };
   };
 
-  const signIn = async (email: string): Promise<void> => {
+  const signIn = async (credentials: { email: string; password?: string }): Promise<Profile> => {
     setIsLoading(true);
     setError(null);
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({ email: credentials.email });
       if (error) throw error;
+      
+      // This is a placeholder since we can't actually return the profile immediately after OTP request
+      // In a real implementation, we'd handle this differently
+      const tempProfile = createEmptyProfile('pending-auth', credentials.email);
+      return tempProfile;
     } catch (err: any) {
       setError(err.message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -131,25 +138,46 @@ export const useAuthProvider = (): AuthState => {
       if (error) throw error;
     } catch (err: any) {
       setError(err.message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const createProfile = async (userId: string, email: string): Promise<Profile> => {
-    // Create a complete profile with all required properties
-    const newProfile = createEmptyProfile(userId, email);
+  const refreshProfile = async (): Promise<Profile | undefined> => {
+    if (!user?.id) return undefined;
     
-    // Persist to database
-    const { error } = await supabase
-      .from('profiles')
-      .insert([newProfile]);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
       
-    if (error) {
-      console.error('Error creating profile:', error);
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return undefined;
+      }
+      
+      if (data) {
+        // Merge with existing user data
+        const updatedUser: Profile = {
+          ...user,
+          ...data,
+          app_metadata: user.app_metadata,
+          user_metadata: user.user_metadata,
+          aud: user.aud,
+          created_at: user.created_at
+        };
+        setUser(updatedUser);
+        return updatedUser;
+      }
+      
+      return user;
+    } catch (err) {
+      console.error('Error refreshing profile:', err);
+      return undefined;
     }
-    
-    return newProfile;
   };
 
   return {
@@ -162,6 +190,7 @@ export const useAuthProvider = (): AuthState => {
     isSubscriptionLoading,
     error,
     signIn,
-    signOut
+    signOut,
+    refreshProfile
   };
 };

@@ -33,19 +33,41 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = useAuthProvider();
   
-  // Define the refreshSubscription function if it doesn't exist in the provider
+  // Create a compatible context value
   const contextValue: AuthContextProps = {
-    ...auth,
-    signIn: auth.login,
+    profile: auth.user,
+    user: auth.user,
+    loading: auth.isLoading,
+    error: auth.error,
+    isAuthenticated: !!auth.user,
+    login: auth.signIn || (async () => { throw new Error('Not implemented'); }),
+    signIn: auth.signIn || (async () => { throw new Error('Not implemented'); }),
     signUp: async (userData: any) => {
-      console.warn('signUp not implemented, using login instead');
-      return auth.login(userData);
+      console.warn('signUp not implemented, using signIn instead');
+      if (auth.signIn) return auth.signIn({ email: userData.email, password: userData.password });
+      throw new Error('Not implemented');
     },
-    session: { user: auth.profile },
+    logout: auth.signOut || (() => {}),
+    signOut: auth.signOut || (() => {}),
+    refreshProfile: auth.refreshProfile || (async () => undefined),
+    isPremium: auth.isPremium || (() => false),
+    isBusiness: auth.isBusiness || (() => false),
+    isAdmin: auth.isAdmin || (() => false),
+    hasRole: (role: string) => !!auth.user?.role && (
+      typeof auth.user.role === 'string' 
+        ? auth.user.role === role
+        : auth.user.role.includes(role)
+    ),
+    isSubscribed: auth.isSubscribed || (() => false),
+    subscriptionTier: 'free', // Default value
+    descriptionCount: 0, // Default value
+    canCreateMoreDescriptions: () => true, // Default implementation
+    openCustomerPortal: async () => { console.warn('openCustomerPortal not implemented'); },
     refreshSubscription: async () => {
-      await auth.refreshProfile();
+      if (auth.refreshProfile) await auth.refreshProfile();
       console.log('Subscription refreshed');
-    }
+    },
+    session: auth.session || { user: auth.user }
   };
   
   return (

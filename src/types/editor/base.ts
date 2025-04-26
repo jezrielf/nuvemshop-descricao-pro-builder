@@ -74,5 +74,5 @@ export interface ProductDescription {
   blocks: any[];
 }
 
-// Export ProductCategory
+// Export type ProductCategory
 export { type ProductCategory };
