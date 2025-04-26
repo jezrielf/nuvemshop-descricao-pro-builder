@@ -1,80 +1,60 @@
-
-import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
+import { fixTemplateProps } from './fixTemplateProps';
 
 // Supplements Template Collection
-export const supplementsTemplates: Template[] = [
-  // TEMPLATE 1: Sports Supplements
+const supplementsTemplatesRaw = [
+  // TEMPLATE 1: Supplements
   {
     id: uuidv4(),
-    name: 'Suplementos Esportivos',
+    name: 'Suplementos Básico',
     category: 'supplements',
-    thumbnail: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1532980400857-4a0c0a9ee8e2',
     blocks: [
-      // Hero Block
       {
         id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Suplementos de Alta Performance',
-        subheading: 'Aumente sua energia e alcance seus objetivos',
-        buttonText: 'Compre Agora',
-        buttonUrl: '/suplementos',
-        backgroundImage: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd',
+        heading: 'Encontre os melhores suplementos para você',
+        subheading: 'Qualidade e variedade para sua saúde e bem-estar',
+        buttonText: 'Ver Suplementos',
+        buttonUrl: '#suplementos',
+        backgroundImage: 'https://images.unsplash.com/photo-1532980400857-4a0c0a9ee8e2',
         style: {
-          backgroundColor: '#f7f7f7',
+          backgroundColor: '#f0f8ff',
           headingColor: '#000000',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // Benefits Block
       {
         id: uuidv4(),
         type: 'benefits',
-        title: 'Benefícios',
+        title: 'Nossos Diferenciais',
         columns: 3,
         visible: true,
-        heading: 'Nossos Suplementos Oferecem',
+        heading: 'Por que escolher nossos suplementos',
         benefits: [
           {
             id: uuidv4(),
-            title: 'Aumento de Energia',
-            description: 'Sinta-se mais disposto para seus treinos',
-            icon: "⚡"
+            title: 'Qualidade Premium',
+            description: 'Suplementos produzidos com os melhores ingredientes e alta tecnologia.',
+            icon: '✅'
           },
           {
             id: uuidv4(),
-            title: 'Recuperação Muscular',
-            description: 'Recupere-se mais rápido entre os treinos',
-            icon: "💪"
+            title: 'Variedade',
+            description: 'Grande variedade de suplementos para atender todas as suas necessidades.',
+            icon: '💪'
           },
           {
             id: uuidv4(),
-            title: 'Ganho de Massa',
-            description: 'Construa músculos mais facilmente',
-            icon: "🏋️"
-          },
-          {
-            id: uuidv4(),
-            title: 'Foco Mental',
-            description: 'Melhore sua concentração durante os exercícios',
-            icon: "🧠"
-          },
-          {
-            id: uuidv4(),
-            title: 'Nutrição Completa',
-            description: 'Vitaminas e minerais essenciais para seu corpo',
-            icon: "🥗"
-          },
-          {
-            id: uuidv4(),
-            title: 'Resultado Garantido',
-            description: 'Fórmulas testadas e aprovadas por atletas',
-            icon: "✅"
+            title: 'Entrega Rápida',
+            description: 'Entrega rápida e segura para todo o Brasil.',
+            icon: '🚚'
           }
         ],
         style: {
@@ -85,52 +65,17 @@ export const supplementsTemplates: Template[] = [
           blockSpacing: 'md'
         }
       },
-      // Text Block
       {
         id: uuidv4(),
-        type: 'text',
-        title: 'Descrição',
+        type: 'image',
+        title: 'Imagem dos Suplementos',
         columns: 1,
         visible: true,
-        heading: 'Sobre Nossos Suplementos',
-        content: '<p>Nossos suplementos são formulados com ingredientes de alta qualidade para garantir o máximo desempenho e resultados. Cada produto é desenvolvido por especialistas em nutrição esportiva e testado rigorosamente para assegurar sua eficácia e segurança.</p><p>Utilizamos processos de fabricação avançados que preservam a integridade dos nutrientes, garantindo que você receba todos os benefícios em cada dose. Nossos produtos são livres de substâncias proibidas e seguem os mais altos padrões de qualidade da indústria.</p>',
+        src: 'https://images.unsplash.com/photo-1563225422-dc2783157c3a',
+        alt: 'Suplementos',
+        caption: 'Nossa linha completa de suplementos',
         style: {
-          backgroundColor: '#f7f7f7',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Linha de Produtos',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1579722820903-01d3d6a3e6fc',
-            alt: 'Whey Protein',
-            caption: 'Whey Protein Premium'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1616606103915-dea7be788566',
-            alt: 'BCAA',
-            caption: 'BCAA 2:1:1'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1611079830811-dad04e2a1bdb',
-            alt: 'Creatina',
-            caption: 'Creatina Monohidratada'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: '#f8f9fa',
           headingColor: '#000000',
           textColor: '#333333',
           padding: 'lg',
@@ -138,19 +83,65 @@ export const supplementsTemplates: Template[] = [
           imageFit: 'cover'
         }
       },
-      // CTA Block
+      {
+        id: uuidv4(),
+        type: 'features',
+        title: 'Características dos Suplementos',
+        columns: 1,
+        visible: true,
+        heading: 'Conheça os benefícios de cada suplemento',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Whey Protein',
+            description: 'Auxilia no ganho de massa muscular e recuperação pós-treino.',
+            icon: '🥛'
+          },
+          {
+            id: uuidv4(),
+            title: 'Creatina',
+            description: 'Aumenta a força e a energia durante os treinos.',
+            icon: '⚡'
+          },
+          {
+            id: uuidv4(),
+            title: 'BCAA',
+            description: 'Reduz a fadiga muscular e melhora a recuperação.',
+            icon: '💊'
+          },
+          {
+            id: uuidv4(),
+            title: 'Multivitamínico',
+            description: 'Fornece as vitaminas e minerais essenciais para o bom funcionamento do organismo.',
+            icon: '💊'
+          },
+          {
+            id: uuidv4(),
+            title: 'Ômega 3',
+            description: 'Auxilia na saúde cardiovascular e cerebral.',
+            icon: '🐟'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
       {
         id: uuidv4(),
         type: 'cta',
         title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Potencialize seus Resultados',
-        content: 'Descubra como nossos suplementos podem ajudar você a atingir o próximo nível em seus treinos.',
+        heading: 'Invista na sua saúde e bem-estar',
+        content: 'Aproveite nossas ofertas exclusivas e garanta os melhores suplementos para você.',
         buttonText: 'Comprar Agora',
-        buttonUrl: '#comprar',
+        buttonUrl: '#',
         style: {
-          backgroundColor: '#00a8e8',
+          backgroundColor: '#28a745',
           headingColor: '#ffffff',
           textColor: '#ffffff',
           padding: 'lg',
@@ -160,150 +151,154 @@ export const supplementsTemplates: Template[] = [
     ]
   },
   
-  // TEMPLATE 2: Natural Supplements
+  // TEMPLATE 2: Performance Supplements
   {
     id: uuidv4(),
-    name: 'Suplementos Naturais',
+    name: 'Suplementos de Performance',
     category: 'supplements',
-    thumbnail: 'https://images.unsplash.com/photo-1597773150796-e5c14ebecbf5',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1577003833619-76bbd7f82948',
     blocks: [
-      // Hero Block
       {
         id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'A Nutrição que a Natureza Oferece',
-        subheading: 'Suplementos 100% naturais para uma vida mais saudável',
-        buttonText: 'Descobrir',
-        buttonUrl: '#natural',
-        backgroundImage: 'https://images.unsplash.com/photo-1597773150796-e5c14ebecbf5',
+        heading: 'Maximize seu desempenho com nossos suplementos',
+        subheading: 'Fórmulas avançadas para atletas e praticantes de atividades físicas',
+        buttonText: 'Ver Suplementos',
+        buttonUrl: '#suplementos',
+        backgroundImage: 'https://images.unsplash.com/photo-1577003833619-76bbd7f82948',
         style: {
-          backgroundColor: '#f0f7ee',
-          headingColor: '#2d6a4f',
+          backgroundColor: '#e9f7ef',
+          headingColor: '#196f3d',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // Text Block
       {
         id: uuidv4(),
         type: 'text',
-        title: 'Nossa Filosofia',
+        title: 'A Importância dos Suplementos',
         columns: 1,
         visible: true,
-        heading: 'O Poder dos Ingredientes Naturais',
-        content: '<p>Acreditamos que a natureza oferece tudo o que precisamos para uma saúde plena. Nossos suplementos naturais são cuidadosamente formulados utilizando apenas ingredientes orgânicos de alta qualidade, sem aditivos químicos, conservantes artificiais ou organismos geneticamente modificados.</p><p>Cada produto é desenvolvido para trabalhar em harmonia com seu corpo, proporcionando nutrição de forma suave e eficaz, como a natureza pretendia.</p>',
+        heading: 'Por que usar suplementos de performance?',
+        content: '<p>Os suplementos de performance são formulados para auxiliar atletas e praticantes de atividades físicas a atingir seus objetivos de forma mais rápida e eficiente. Eles fornecem nutrientes essenciais para o ganho de massa muscular, aumento da força, melhora da resistência e recuperação pós-treino.</p><p>Nossa linha de suplementos de performance é desenvolvida com ingredientes de alta qualidade e tecnologia avançada, garantindo resultados superiores e segurança para sua saúde.</p>',
         style: {
           backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
+          headingColor: '#196f3d',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // ImageText Block
       {
         id: uuidv4(),
-        type: 'imageText',
-        title: 'Nosso Processo',
-        columns: 1,
+        type: 'gallery',
+        title: 'Linha de Suplementos',
+        columns: 3,
         visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1518465444133-2b3d0dceb29a',
-          alt: 'Processamento de suplementos naturais'
-        },
-        heading: 'Da Natureza ao Frasco',
-        content: 'Mantemos a integridade dos nutrientes através de um processo de fabricação suave e de baixa temperatura. Colhemos os ingredientes no momento ideal e utilizamos métodos de extração que preservam seus componentes ativos. Isso garante que você receba o máximo de benefícios que a natureza tem a oferecer em cada dose dos nossos suplementos.',
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1587370560942-1ca2e0e57f69',
+            alt: 'Whey Protein',
+            caption: 'Whey Protein Isolado'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1599420186946-7b6a440646c6',
+            alt: 'Creatina',
+            caption: 'Creatina Monohidratada'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1590779033149-5f3314dd9998',
+            alt: 'BCAA',
+            caption: 'BCAA 2:1:1'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1598515220547-431558ddc74a',
+            alt: 'Glutamina',
+            caption: 'Glutamina Pura'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1563225433-440e56514c63',
+            alt: 'Cafeína',
+            caption: 'Cafeína Anidra'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1587854680352-936b22b91030',
+            alt: 'Ômega 3',
+            caption: 'Ômega 3 Ultra Concentrado'
+          }
+        ],
         style: {
-          backgroundColor: '#f0f7ee',
-          headingColor: '#2d6a4f',
+          backgroundColor: '#f8f9fa',
+          headingColor: '#196f3d',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md',
           imageFit: 'cover'
         }
       },
-      // Benefits Block
       {
         id: uuidv4(),
         type: 'benefits',
-        title: 'Benefícios',
+        title: 'Diferenciais',
         columns: 3,
         visible: true,
-        heading: 'Por que escolher suplementos naturais?',
+        heading: 'Por que escolher nossos suplementos',
         benefits: [
           {
             id: uuidv4(),
-            title: 'Sem Químicos',
-            description: 'Livres de corantes, aromatizantes e conservantes artificiais',
-            icon: '🌱'
+            title: 'Alta Qualidade',
+            description: 'Ingredientes importados e rigoroso controle de qualidade.',
+            icon: '✅'
           },
           {
             id: uuidv4(),
-            title: 'Biodisponibilidade',
-            description: 'Seu corpo absorve melhor os nutrientes de fontes naturais',
-            icon: '🔄'
+            title: 'Fórmulas Exclusivas',
+            description: 'Desenvolvidas por especialistas em nutrição esportiva.',
+            icon: '🧪'
           },
           {
             id: uuidv4(),
-            title: 'Sustentabilidade',
-            description: 'Práticas de cultivo e produção que respeitam o meio ambiente',
-            icon: '🌍'
+            title: 'Resultados Comprovados',
+            description: 'Suplementos que auxiliam no alcance de seus objetivos.',
+            icon: '🏆'
           },
           {
             id: uuidv4(),
-            title: 'Sinergia Natural',
-            description: 'Combinações de ingredientes que potencializam os efeitos um do outro',
-            icon: '⚡'
+            title: 'Sem Aditivos',
+            description: 'Livre de corantes, aromatizantes artificiais e glúten.',
+            icon: '🌿'
           },
           {
             id: uuidv4(),
-            title: 'Menos Efeitos Colaterais',
-            description: 'Gentil com seu organismo, minimizando reações adversas',
-            icon: '😌'
+            title: 'Fácil Digestão',
+            description: 'Fórmulas que não causam desconforto gastrointestinal.',
+            icon: '👌'
           },
           {
             id: uuidv4(),
-            title: 'Nutrição Completa',
-            description: 'Complexos naturais com todos os cofatores necessários',
-            icon: '🍃'
+            title: 'Entrega Rápida',
+            description: 'Receba seus suplementos em casa com agilidade e segurança.',
+            icon: '🚚'
           }
         ],
         style: {
           backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
+          headingColor: '#196f3d',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // Specifications Block
-      {
-        id: uuidv4(),
-        type: 'specifications',
-        title: 'Especificações',
-        columns: 1,
-        visible: true,
-        heading: 'Especificações dos Nossos Produtos',
-        specs: [
-          { id: uuidv4(), name: 'Certificações', value: 'Orgânico, Non-GMO, Vegano' },
-          { id: uuidv4(), name: 'Processo', value: 'Extração a frio para preservar nutrientes' },
-          { id: uuidv4(), name: 'Embalagem', value: 'Sustentável e reciclável' },
-          { id: uuidv4(), name: 'Testes', value: 'Testado para pureza e potência' },
-          { id: uuidv4(), name: 'Armazenamento', value: 'Local fresco e seco, protegido da luz' }
-        ],
-        style: {
-          backgroundColor: '#f0f7ee',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // FAQ Block
       {
         id: uuidv4(),
         type: 'faq',
@@ -314,225 +309,270 @@ export const supplementsTemplates: Template[] = [
         questions: [
           {
             id: uuidv4(),
-            question: 'Os suplementos naturais são tão eficazes quanto os sintéticos?',
-            answer: 'Sim, muitos estudos mostram que nutrientes de fontes naturais têm melhor biodisponibilidade e oferecem benefícios adicionais devido aos cofatores naturalmente presentes.'
+            question: 'Qual a dosagem ideal de Whey Protein?',
+            answer: 'A dosagem ideal varia de acordo com o peso e o nível de atividade física. Consulte um nutricionista para saber a quantidade ideal para você.'
           },
           {
             id: uuidv4(),
-            question: 'Quanto tempo leva para ver resultados?',
-            answer: 'Os suplementos naturais funcionam gradualmente com seu corpo. A maioria das pessoas começa a notar benefícios após 2-4 semanas de uso consistente.'
+            question: 'Creatina causa retenção de líquidos?',
+            answer: 'A creatina pode causar uma leve retenção de líquidos intramuscular, o que é benéfico para o ganho de massa muscular.'
           },
           {
             id: uuidv4(),
-            question: 'São adequados para veganos?',
-            answer: 'Sim, todos os nossos produtos são 100% veganos e livres de qualquer ingrediente de origem animal.'
+            question: 'BCAA engorda?',
+            answer: 'O BCAA não engorda, pois possui baixas calorias e auxilia na recuperação muscular.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Qual a diferença entre Whey Protein Concentrado, Isolado e Hidrolisado?',
+            answer: 'O Whey Protein Concentrado possui maior quantidade de carboidratos e gorduras, o Isolado possui menor quantidade e o Hidrolisado é pré-digerido, facilitando a absorção.'
           }
         ],
         style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 3: Weight Management Supplements
-  {
-    id: uuidv4(),
-    name: 'Suplementos para Gerenciamento de Peso',
-    category: 'supplements',
-    thumbnail: 'https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Alcance Seus Objetivos de Forma Saudável',
-        subheading: 'Suplementos avançados para ajudar em sua jornada de gerenciamento de peso',
-        buttonText: 'Transforme seu Corpo',
-        buttonUrl: '#weight-management',
-        backgroundImage: 'https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14',
-        style: {
-          backgroundColor: '#f0f0f0',
-          headingColor: '#1e3a8a',
+          backgroundColor: '#e9f7ef',
+          headingColor: '#196f3d',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // Benefits Block
-      {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Principais Benefícios',
-        columns: 2,
-        visible: true,
-        heading: 'Como Nossos Suplementos Podem Ajudar',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Aumento do Metabolismo',
-            description: 'Ingredientes termogênicos que ajudam a queimar calorias de forma mais eficiente',
-            icon: '🔥'
-          },
-          {
-            id: uuidv4(),
-            title: 'Controle do Apetite',
-            description: 'Ajuda a reduzir a fome e os desejos por alimentos calóricos',
-            icon: '🍽️'
-          },
-          {
-            id: uuidv4(),
-            title: 'Níveis de Energia',
-            description: 'Melhora a disposição durante o dia, especialmente em períodos de déficit calórico',
-            icon: '⚡'
-          },
-          {
-            id: uuidv4(),
-            title: 'Preservação Muscular',
-            description: 'Ajuda a manter a massa muscular durante a perda de peso',
-            icon: '💪'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Features Block
-      {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Ingredientes Principais',
-        columns: 2,
-        visible: true,
-        heading: 'Componentes Ativos',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Chá Verde',
-            description: 'Rico em catequinas que auxiliam na queima de gordura e no metabolismo',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Garcinia Cambogia',
-            description: 'Contém HCA que ajuda a bloquear enzimas que produzem gordura',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'L-Carnitina',
-            description: 'Transporta ácidos graxos para serem usados como energia',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Cromo',
-            description: 'Mineral que ajuda a regular os níveis de açúcar no sangue',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Glucomanano',
-            description: 'Fibra natural que aumenta a saciedade',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Cafeína',
-            description: 'Estimulante natural que aumenta a energia e o foco',
-            icon: '✓'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // ImageText Block
-      {
-        id: uuidv4(),
-        type: 'imageText',
-        title: 'Abordagem Científica',
-        columns: 1,
-        visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1551727974-8af20a3b41b2',
-          alt: 'Pesquisa científica de suplementos'
-        },
-        heading: 'Baseado em Ciência',
-        content: 'Nossos suplementos para gerenciamento de peso são desenvolvidos por uma equipe de nutricionistas e cientistas com base nas mais recentes pesquisas. Cada ingrediente é cuidadosamente selecionado e dosado para trabalhar em sinergia, maximizando os resultados de forma segura e saudável.',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Linha de Produtos',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1505751171710-1f6d0ace5a85',
-            alt: 'Termogênico',
-            caption: 'Termogênico Avançado'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1607004772621-ec30a8a512e6',
-            alt: 'Controlador de apetite',
-            caption: 'Controlador de Apetite Natural'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1611079830811-dad04e2a1bdb',
-            alt: 'Bloqueador de carboidratos',
-            caption: 'Bloqueador de Carboidratos'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#1e3a8a',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // CTA Block
       {
         id: uuidv4(),
         type: 'cta',
         title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Comece Sua Transformação Hoje',
-        content: 'Nossos suplementos são parte de uma abordagem completa para gerenciamento de peso saudável, incluindo dieta equilibrada e exercícios regulares.',
-        buttonText: 'Começar Agora',
-        buttonUrl: '#start',
+        heading: 'Eleve seu desempenho ao máximo',
+        content: 'Aproveite nossas ofertas exclusivas e garanta os melhores suplementos para seus treinos.',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#',
         style: {
-          backgroundColor: '#1e3a8a',
+          backgroundColor: '#27ae60',
+          headingColor: '#ffffff',
+          textColor: '#ffffff',
+          padding: 'lg',
+          blockSpacing: 'none'
+        }
+      }
+    ]
+  },
+  
+  // TEMPLATE 3: Wellness Supplements
+  {
+    id: uuidv4(),
+    name: 'Suplementos de Bem-estar',
+    category: 'supplements',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55',
+    blocks: [
+      {
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        columns: 1,
+        visible: true,
+        heading: 'Cuide da sua saúde e bem-estar com nossos suplementos',
+        subheading: 'Fórmulas naturais para uma vida mais equilibrada e saudável',
+        buttonText: 'Ver Suplementos',
+        buttonUrl: '#suplementos',
+        backgroundImage: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55',
+        style: {
+          backgroundColor: '#1a237e',
+          headingColor: '#ffffff',
+          textColor: '#e0e0e0',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        title: 'A Importância do Bem-Estar',
+        columns: 1,
+        visible: true,
+        heading: 'Por que investir em suplementos de bem-estar?',
+        content: '<p>Os suplementos de bem-estar são formulados para auxiliar na manutenção da saúde e do equilíbrio do organismo. Eles fornecem nutrientes essenciais para o bom funcionamento do corpo, fortalecendo o sistema imunológico, melhorando a qualidade do sono, reduzindo o estresse e promovendo a sensação de bem-estar geral.</p><p>Nossa linha de suplementos de bem-estar é desenvolvida com ingredientes naturais e tecnologia avançada, garantindo segurança e eficácia para sua saúde.</p>',
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#1a237e',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'imageText',
+        title: 'Ingredientes Naturais',
+        columns: 1,
+        visible: true,
+        image: {
+          src: 'https://images.unsplash.com/photo-1505778221682-dca9bca5a7ca',
+          alt: 'Ingredientes Naturais'
+        },
+        heading: 'O poder dos ingredientes naturais',
+        content: 'Nossos suplementos de bem-estar são formulados com ingredientes naturais cuidadosamente selecionados, como vitaminas, minerais, ervas e extratos de plantas. Esses ingredientes possuem propriedades benéficas para a saúde, auxiliando no fortalecimento do sistema imunológico, na melhora da qualidade do sono, na redução do estresse e na promoção da sensação de bem-estar geral.',
+        style: {
+          backgroundColor: '#f5f5f5',
+          headingColor: '#1a237e',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Benefícios',
+        columns: 3,
+        visible: true,
+        heading: 'Como nossos suplementos podem te ajudar',
+        benefits: [
+          {
+            id: uuidv4(),
+            title: 'Fortalecimento do Sistema Imunológico',
+            description: 'Auxilia na proteção contra doenças e infecções.',
+            icon: '🛡️'
+          },
+          {
+            id: uuidv4(),
+            title: 'Melhora da Qualidade do Sono',
+            description: 'Promove um sono mais profundo e reparador.',
+            icon: '😴'
+          },
+          {
+            id: uuidv4(),
+            title: 'Redução do Estresse',
+            description: 'Auxilia no controle do estresse e da ansiedade.',
+            icon: '🧘'
+          },
+          {
+            id: uuidv4(),
+            title: 'Aumento da Energia',
+            description: 'Fornece mais energia e disposição para o dia a dia.',
+            icon: '⚡'
+          },
+          {
+            id: uuidv4(),
+            title: 'Melhora do Humor',
+            description: 'Auxilia na melhora do humor e da sensação de bem-estar.',
+            icon: '😊'
+          },
+          {
+            id: uuidv4(),
+            title: 'Ação Antioxidante',
+            description: 'Combate os radicais livres e previne o envelhecimento precoce.',
+            icon: '🍇'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#1a237e',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Linha de Suplementos',
+        columns: 3,
+        visible: true,
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1563225422-dc2783157c3a',
+            alt: 'Multivitamínico',
+            caption: 'Multivitamínico Completo'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1587854680352-936b22b91030',
+            alt: 'Ômega 3',
+            caption: 'Ômega 3 Ultra Concentrado'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1590779033149-5f3314dd9998',
+            alt: 'Vitamina D',
+            caption: 'Vitamina D3'
+          }
+        ],
+        style: {
+          backgroundColor: '#f5f5f5',
+          headingColor: '#1a237e',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'features',
+        title: 'Dicas para uma Vida Mais Saudável',
+        columns: 2,
+        visible: true,
+        heading: 'Maximize os resultados com hábitos saudáveis',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Alimentação Equilibrada',
+            description: 'Consuma alimentos nutritivos e variados.',
+            icon: '🍎'
+          },
+          {
+            id: uuidv4(),
+            title: 'Atividade Física Regular',
+            description: 'Pratique exercícios físicos regularmente.',
+            icon: '🏃'
+          },
+          {
+            id: uuidv4(),
+            title: 'Sono de Qualidade',
+            description: 'Durma de 7 a 8 horas por noite.',
+            icon: '😴'
+          },
+          {
+            id: uuidv4(),
+            title: 'Controle do Estresse',
+            description: 'Pratique técnicas de relaxamento e meditação.',
+            icon: '🧘'
+          },
+          {
+            id: uuidv4(),
+            title: 'Hidratação Adequada',
+            description: 'Beba bastante água ao longo do dia.',
+            icon: '💧'
+          },
+          {
+            id: uuidv4(),
+            title: 'Evite Hábitos Nocivos',
+            description: 'Não fume e limite o consumo de álcool.',
+            icon: '🚭'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#1a237e',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'cta',
+        title: 'Chamada para Ação',
+        columns: 1,
+        visible: true,
+        heading: 'Invista na sua saúde e bem-estar',
+        content: 'Aproveite nossas ofertas exclusivas e garanta os melhores suplementos para uma vida mais equilibrada e saudável.',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#',
+        style: {
+          backgroundColor: '#303f9f',
           headingColor: '#ffffff',
           textColor: '#ffffff',
           padding: 'lg',
@@ -542,6 +582,9 @@ export const supplementsTemplates: Template[] = [
     ]
   }
 ];
+
+// Apply fixTemplateProps to ensure all templates have the correct properties
+export const supplementsTemplates: Template[] = supplementsTemplatesRaw.map(fixTemplateProps);
 
 // For backward compatibility with existing code that might expect a single template
 export const supplementsTemplate = supplementsTemplates[0];

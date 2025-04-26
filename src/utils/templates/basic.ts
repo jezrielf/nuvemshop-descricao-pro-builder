@@ -1,15 +1,15 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { fixTemplateProps } from './fixTemplateProps';
 
 // Basic Template Collection
-export const basicTemplates: Template[] = [
+const basicTemplatesRaw = [
   // TEMPLATE 1: Basic Template
   {
     id: uuidv4(),
     name: "Template Básico",
     category: "other",
-    thumbnail: "https://images.unsplash.com/photo-1553531384-411a247cce73",
+    thumbnailUrl: "https://images.unsplash.com/photo-1553531384-411a247cce73",
     blocks: [
       {
         id: uuidv4(),
@@ -83,7 +83,7 @@ export const basicTemplates: Template[] = [
     id: uuidv4(),
     name: "Template Completo de Produto",
     category: "other",
-    thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    thumbnailUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
     blocks: [
       {
         id: uuidv4(),
@@ -335,7 +335,7 @@ export const basicTemplates: Template[] = [
     id: uuidv4(),
     name: "Descrição Minimalista",
     category: "other",
-    thumbnail: "https://images.unsplash.com/photo-1555421689-d68471e189f2",
+    thumbnailUrl: "https://images.unsplash.com/photo-1555421689-d68471e189f2",
     blocks: [
       {
         id: uuidv4(),
@@ -452,6 +452,9 @@ export const basicTemplates: Template[] = [
     ]
   }
 ];
+
+// Apply the fixTemplateProps utility to ensure all templates have the correct properties
+export const basicTemplates: Template[] = basicTemplatesRaw.map(fixTemplateProps);
 
 // For backward compatibility with existing code that might expect a single template
 export const basicTemplate = basicTemplates[0];

@@ -1,15 +1,15 @@
-
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
+import { fixTemplateProps } from './fixTemplateProps';
 
 // Electronics Template Collection
-export const electronicsTemplates: Template[] = [
+const electronicsTemplatesRaw = [
   // TEMPLATE 1: Modern Electronics
   {
     id: uuidv4(),
     name: 'Eletrônicos Modernos',
     category: 'electronics',
-    thumbnail: 'https://images.unsplash.com/photo-1498049794561-7780e7231661',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1498049794561-7780e7231661',
     blocks: [
       // Hero Block
       {
@@ -141,7 +141,7 @@ export const electronicsTemplates: Template[] = [
     id: uuidv4(),
     name: 'Casa Inteligente',
     category: 'electronics',
-    thumbnail: 'https://images.unsplash.com/photo-1558002038-1055908f0ba7',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1558002038-1055908f0ba7',
     blocks: [
       // Hero Block
       {
@@ -316,7 +316,7 @@ export const electronicsTemplates: Template[] = [
     id: uuidv4(),
     name: 'Eletrônicos para Gamers',
     category: 'electronics',
-    thumbnail: 'https://images.unsplash.com/photo-1542751371-adc38448a05e',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e',
     blocks: [
       // Hero Block
       {
@@ -492,6 +492,9 @@ export const electronicsTemplates: Template[] = [
     ]
   }
 ];
+
+// Apply fixTemplateProps to ensure all templates have the correct properties
+export const electronicsTemplates: Template[] = electronicsTemplatesRaw.map(fixTemplateProps);
 
 // For backward compatibility with existing code that might expect a single template
 export const electronicsTemplate = electronicsTemplates[0];

@@ -1,68 +1,60 @@
-
-import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
+import { fixTemplateProps } from './fixTemplateProps';
 
 // Shoes Template Collection
-export const shoesTemplates: Template[] = [
-  // TEMPLATE 1: Casual Shoes
+const shoesTemplatesRaw = [
+  // TEMPLATE 1: Athletic Shoes
   {
     id: uuidv4(),
-    name: 'Calçados Casuais',
+    name: 'Calçados Esportivos',
     category: 'shoes',
-    thumbnail: 'https://images.unsplash.com/photo-1542296660-6e538a53498a',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
     blocks: [
-      // Hero Block
       {
         id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Encontre o Seu Par Perfeito',
-        subheading: 'Descubra nossa nova coleção de sapatos casuais',
-        buttonText: 'Compre Agora',
+        heading: 'Performance e Conforto para Seus Treinos',
+        subheading: 'Encontre o tênis ideal para cada tipo de atividade física',
+        buttonText: 'Ver Coleção',
         buttonUrl: '#',
-        backgroundImage: 'https://images.unsplash.com/photo-1542296660-6e538a53498a',
+        backgroundImage: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
         style: {
-          backgroundColor: '#f5f5f5',
+          backgroundColor: '#f0f0f0',
           headingColor: '#000000',
           textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // Benefits Block
       {
         id: uuidv4(),
         type: 'benefits',
-        title: 'Benefícios',
-        columns: 2,
+        title: 'Tecnologias Inovadoras',
+        columns: 3,
         visible: true,
-        heading: 'Por que Escolher Nossos Sapatos?',
+        heading: 'Por que escolher nossos tênis esportivos',
         benefits: [
           {
             id: uuidv4(),
-            title: 'Conforto Excepcional',
-            description: 'Tecnologia de amortecimento que se adapta a cada passo',
-            icon: "👟"
+            title: 'Amortecimento Avançado',
+            description: 'Absorção de impacto superior para proteger suas articulações',
+            icon: '🛡️'
           },
           {
             id: uuidv4(),
-            title: 'Estilo Moderno',
-            description: 'Design contemporâneo para qualquer ocasião',
-            icon: "✨"
-          },
-          {
-            id: uuidv4(),
-            title: 'Material Durável',
-            description: 'Construído para durar, mesmo sob uso intenso',
-            icon: "🔄"
+            title: 'Suporte e Estabilidade',
+            description: 'Design que oferece segurança e firmeza em cada movimento',
+            icon: '💪'
           },
           {
             id: uuidv4(),
             title: 'Respirabilidade',
-            description: 'Mantém seus pés frescos mesmo nos dias mais quentes',
-            icon: "💨"
+            description: 'Materiais que mantêm seus pés secos e confortáveis durante todo o treino',
+            icon: '💨'
           }
         ],
         style: {
@@ -73,31 +65,30 @@ export const shoesTemplates: Template[] = [
           blockSpacing: 'md'
         }
       },
-      // Gallery Block
       {
         id: uuidv4(),
         type: 'gallery',
-        title: 'Galeria de Sapatos',
+        title: 'Destaques da Coleção',
         columns: 3,
         visible: true,
         images: [
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1515955656352-a1a717cedcd6',
-            alt: 'Sapato Esportivo',
-            caption: 'Conforto e estilo para seus treinos'
+            src: 'https://images.unsplash.com/photo-1588943115091-894649292a47',
+            alt: 'Tênis de corrida',
+            caption: 'Tênis de Corrida Performance'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1588361035994-295e21daa67a',
-            alt: 'Sapato Casual',
-            caption: 'Perfeito para o dia a dia'
+            src: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a',
+            alt: 'Tênis de treino',
+            caption: 'Tênis de Treino Crossfit'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d',
-            alt: 'Tênis Moderno',
-            caption: 'A união perfeita entre estilo e conforto'
+            src: 'https://images.unsplash.com/photo-1606107557195-0a29a5b4b4aa',
+            alt: 'Tênis de basquete',
+            caption: 'Tênis de Basquete Pro'
           }
         ],
         style: {
@@ -109,20 +100,39 @@ export const shoesTemplates: Template[] = [
           imageFit: 'cover'
         }
       },
-      // Specifications Block
       {
         id: uuidv4(),
         type: 'specifications',
-        title: 'Especificações',
+        title: 'Especificações Técnicas',
         columns: 1,
         visible: true,
-        heading: 'Detalhes Técnicos',
+        heading: 'Detalhes que fazem a diferença',
         specs: [
-          { id: uuidv4(), name: 'Material Superior', value: 'Mesh respirável / Couro sintético' },
-          { id: uuidv4(), name: 'Solado', value: 'Borracha anti-derrapante' },
-          { id: uuidv4(), name: 'Palmilha', value: 'Memory foam removível' },
-          { id: uuidv4(), name: 'Peso', value: 'Aproximadamente 280g por pé (tamanho 40)' },
-          { id: uuidv4(), name: 'Altura do Salto', value: '2.5 cm' }
+          {
+            id: uuidv4(),
+            name: 'Material do Cabedal',
+            value: 'Mesh respirável com tecnologia Primeknit'
+          },
+          {
+            id: uuidv4(),
+            name: 'Entressola',
+            value: 'Tecnologia Boost para máximo amortecimento e retorno de energia'
+          },
+          {
+            id: uuidv4(),
+            name: 'Solado',
+            value: 'Borracha Continental para maior aderência e durabilidade'
+          },
+          {
+            id: uuidv4(),
+            name: 'Peso',
+            value: 'Aproximadamente 300g (tamanho 40)'
+          },
+          {
+            id: uuidv4(),
+            name: 'Drop',
+            value: '10mm'
+          }
         ],
         style: {
           backgroundColor: '#ffffff',
@@ -132,19 +142,18 @@ export const shoesTemplates: Template[] = [
           blockSpacing: 'md'
         }
       },
-      // CTA Block
       {
         id: uuidv4(),
         type: 'cta',
         title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Experimente o Conforto Inovador',
-        content: 'Nossos calçados foram projetados para oferecer o máximo de conforto e estilo. Experimente e sinta a diferença.',
+        heading: 'Eleve seu desempenho com os melhores tênis esportivos',
+        content: 'Aproveite nossas ofertas exclusivas e encontre o modelo perfeito para você',
         buttonText: 'Comprar Agora',
-        buttonUrl: '#buy',
+        buttonUrl: '#',
         style: {
-          backgroundColor: '#212529',
+          backgroundColor: '#007bff',
           headingColor: '#ffffff',
           textColor: '#ffffff',
           padding: 'lg',
@@ -154,338 +163,316 @@ export const shoesTemplates: Template[] = [
     ]
   },
   
-  // TEMPLATE 2: Athletic Shoes
+  // TEMPLATE 2: Casual Shoes
   {
     id: uuidv4(),
-    name: 'Tênis Esportivos',
+    name: 'Calçados Casuais',
     category: 'shoes',
-    thumbnail: 'https://images.unsplash.com/photo-1606107557195-0a29a5b4b4aa',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1549298916-b41d501d3772',
     blocks: [
-      // Hero Block
       {
         id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Supere Seus Limites',
-        subheading: 'Tênis esportivos projetados para alto desempenho',
+        heading: 'Estilo e Conforto para o Seu Dia a Dia',
+        subheading: 'Descubra a coleção de calçados casuais que combinam com você',
         buttonText: 'Ver Coleção',
-        buttonUrl: '#collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1606107557195-0a29a5b4b4aa',
+        buttonUrl: '#',
+        backgroundImage: 'https://images.unsplash.com/photo-1549298916-b41d501d3772',
         style: {
-          backgroundColor: '#e9ecef',
-          headingColor: '#000000',
-          textColor: '#333333',
+          backgroundColor: '#f8f8f8',
+          headingColor: '#222222',
+          textColor: '#444444',
           padding: 'lg',
           blockSpacing: 'md'
         }
       },
-      // Text Block
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Tecnologia Avançada',
-        columns: 1,
-        visible: true,
-        heading: 'Tecnologia que Impulsiona seu Desempenho',
-        content: '<p>Nossos tênis esportivos são desenvolvidos com as mais avançadas tecnologias para garantir conforto, estabilidade e desempenho superior durante suas atividades físicas.</p><p>Cada elemento foi cuidadosamente projetado e testado por atletas profissionais para assegurar que você tenha a melhor experiência possível, seja correndo, treinando ou praticando seu esporte favorito.</p>',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // ImageText Block
-      {
-        id: uuidv4(),
-        type: 'imageText',
-        title: 'Detalhes do Produto',
-        columns: 1,
-        visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1562183241-b937e95585b6',
-          alt: 'Detalhes do tênis esportivo'
-        },
-        heading: 'Projetado para Performance',
-        content: 'Com uma combinação única de amortecimento responsivo e suporte estrutural, nosso tênis esportivo oferece estabilidade excepcional durante os treinos mais intensos. O sistema de ventilação avançado mantém seus pés secos e confortáveis mesmo nas atividades mais exigentes.',
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Features Block
-      {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Características',
-        columns: 2,
-        visible: true,
-        heading: 'Características Principais',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Amortecimento Responsivo',
-            description: 'Tecnologia que retorna energia a cada passada',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Suporte Estabilizador',
-            description: 'Previne torções e oferece segurança durante movimentos laterais',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Sistema de Ventilação',
-            description: 'Canais de fluxo de ar que mantêm os pés frescos',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Tração Superior',
-            description: 'Solado multi-superfície para aderência em qualquer terreno',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Design Anatômico',
-            description: 'Moldagem que acompanha os contornos naturais dos pés',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Peso Ultraleve',
-            description: 'Materiais avançados que reduzem o peso sem comprometer a durabilidade',
-            icon: '✓'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Modelos Disponíveis',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-            alt: 'Tênis de corrida vermelho',
-            caption: 'Runner Pro - Vermelho'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5',
-            alt: 'Tênis de treino preto',
-            caption: 'Training Max - Preto'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519',
-            alt: 'Tênis para cross-training',
-            caption: 'Cross Elite - Cinza/Azul'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 3: Luxury Footwear
-  {
-    id: uuidv4(),
-    name: 'Calçados de Luxo',
-    category: 'shoes',
-    thumbnail: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Elegância em Cada Passo',
-        subheading: 'Calçados de luxo feitos à mão com os melhores materiais',
-        buttonText: 'Explorar Coleção',
-        buttonUrl: '#luxury-collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2',
-        style: {
-          backgroundColor: '#0a0908',
-          headingColor: '#e6ccb2',
-          textColor: '#ebebeb',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Text Block
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Tradição e Artesanato',
-        columns: 1,
-        visible: true,
-        heading: 'Artesanato de Excelência',
-        content: '<p>Cada par de nossos calçados de luxo é meticulosamente criado por artesãos mestres com décadas de experiência, utilizando técnicas tradicionais transmitidas por gerações.</p><p>Comprometemo-nos com a excelência em cada etapa do processo de fabricação, desde a seleção dos melhores couros até o acabamento perfeito de cada peça.</p>',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Image Block
-      {
-        id: uuidv4(),
-        type: 'image',
-        title: 'Imagem Destaque',
-        columns: 1,
-        visible: true,
-        src: 'https://images.unsplash.com/photo-1573309463328-ec43614b3def',
-        alt: 'Fabricação artesanal de sapatos',
-        caption: 'Cada sapato é cuidadosamente confeccionado à mão por nossos mestres artesãos',
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Benefits Block
       {
         id: uuidv4(),
         type: 'benefits',
-        title: 'Diferenciais',
+        title: 'Design e Versatilidade',
         columns: 3,
         visible: true,
-        heading: 'A Excelência dos Nossos Calçados',
+        heading: 'Por que escolher nossos calçados casuais',
         benefits: [
           {
             id: uuidv4(),
-            title: 'Couro Premium',
-            description: 'Selecionamos apenas os melhores couros de curtumes italianos e franceses',
-            icon: '🥇'
+            title: 'Conforto Duradouro',
+            description: 'Materiais macios e palmilhas que garantem o bem-estar dos seus pés',
+            icon: '☁️'
           },
           {
             id: uuidv4(),
-            title: 'Produção Artesanal',
-            description: 'Mais de 200 etapas manuais para criar cada par',
-            icon: '👌'
+            title: 'Estilo Atemporal',
+            description: 'Modelos que nunca saem de moda e combinam com diversos looks',
+            icon: '⭐'
           },
           {
             id: uuidv4(),
-            title: 'Solas Blake',
-            description: 'Método de costura que garante flexibilidade e durabilidade',
-            icon: '🔄'
-          },
-          {
-            id: uuidv4(),
-            title: 'Personalização',
-            description: 'Serviço de customização para criar um par único',
-            icon: '✨'
-          },
-          {
-            id: uuidv4(),
-            title: 'Conforto Excepcional',
-            description: 'Fôrmas desenvolvidas após anos de estudos ergonômicos',
-            icon: '👣'
-          },
-          {
-            id: uuidv4(),
-            title: 'Garantia Vitalícia',
-            description: 'Compromisso com a qualidade que dura para sempre',
-            icon: '♾️'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Coleção de Luxo',
-        columns: 2,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1605812860427-4024433a70fd',
-            alt: 'Oxford clássico',
-            caption: 'Oxford Clássico em Couro Italiano'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e',
-            alt: 'Loafer elegante',
-            caption: 'Loafer Elegante em Couro Escovado'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1613987876445-fcb353cd8e27',
-            alt: 'Bota masculina',
-            caption: 'Bota Chelsea em Couro Encerado'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1535043934128-cf0b28d52f95',
-            alt: 'Sapato feminino',
-            caption: 'Scarpin Clássico em Couro Suede'
+            title: 'Qualidade Superior',
+            description: 'Acabamento impecável e materiais resistentes para maior durabilidade',
+            icon: '💎'
           }
         ],
         style: {
           backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
+          headingColor: '#222222',
+          textColor: '#444444',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Tendências da Estação',
+        columns: 3,
+        visible: true,
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1560769629-975ef6bbefb3',
+            alt: 'Tênis casual',
+            caption: 'Tênis Casual Street Style'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1586315075701-47251b45453a',
+            alt: 'Sapatênis',
+            caption: 'Sapatênis Conforto Premium'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1515599982437-a42595f2502b',
+            alt: 'Mocassim',
+            caption: 'Mocassim Elegante Casual'
+          }
+        ],
+        style: {
+          backgroundColor: '#f0f0f0',
+          headingColor: '#222222',
+          textColor: '#444444',
           padding: 'lg',
           blockSpacing: 'md',
           imageFit: 'cover'
         }
       },
-      // CTA Block
+      {
+        id: uuidv4(),
+        type: 'specifications',
+        title: 'Características',
+        columns: 1,
+        visible: true,
+        heading: 'Detalhes que você vai amar',
+        specs: [
+          {
+            id: uuidv4(),
+            name: 'Material Externo',
+            value: 'Couro legítimo ou camurça de alta qualidade'
+          },
+          {
+            id: uuidv4(),
+            name: 'Material Interno',
+            value: 'Tecido macio e respirável'
+          },
+          {
+            id: uuidv4(),
+            name: 'Palmilha',
+            value: 'Anatômica com tecnologia de amortecimento'
+          },
+          {
+            id: uuidv4(),
+            name: 'Solado',
+            value: 'Borracha antiderrapante para maior segurança'
+          },
+          {
+            id: uuidv4(),
+            name: 'Fechamento',
+            value: 'Cadarço, elástico ou fivela para ajuste perfeito'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#222222',
+          textColor: '#444444',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
       {
         id: uuidv4(),
         type: 'cta',
         title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Experimente o Verdadeiro Luxo',
-        content: 'Descubra calçados que combinam beleza atemporal com conforto excepcional. Uma experiência única para seus pés.',
-        buttonText: 'Conhecer a Coleção',
-        buttonUrl: '#luxury',
+        heading: 'Encontre o calçado casual perfeito para cada momento',
+        content: 'Aproveite nossas condições especiais e renove seu guarda-roupa com estilo e conforto',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#',
         style: {
-          backgroundColor: '#1c1c1c',
-          headingColor: '#e6ccb2',
+          backgroundColor: '#6c757d',
+          headingColor: '#ffffff',
+          textColor: '#ffffff',
+          padding: 'lg',
+          blockSpacing: 'none'
+        }
+      }
+    ]
+  },
+  
+  // TEMPLATE 3: Formal Shoes
+  {
+    id: uuidv4(),
+    name: 'Calçados Formais',
+    category: 'shoes',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2',
+    blocks: [
+      {
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        columns: 1,
+        visible: true,
+        heading: 'Elegância e Sofisticação para Ocasiões Especiais',
+        subheading: 'Descubra a coleção de calçados formais que elevam seu estilo',
+        buttonText: 'Ver Coleção',
+        buttonUrl: '#',
+        backgroundImage: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2',
+        style: {
+          backgroundColor: '#222222',
+          headingColor: '#ffffff',
+          textColor: '#dddddd',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Design e Acabamento',
+        columns: 3,
+        visible: true,
+        heading: 'Por que escolher nossos calçados formais',
+        benefits: [
+          {
+            id: uuidv4(),
+            title: 'Elegância Impecável',
+            description: 'Modelos clássicos e sofisticados que transmitem confiança e bom gosto',
+            icon: '🎩'
+          },
+          {
+            id: uuidv4(),
+            title: 'Conforto Surpreendente',
+            description: 'Construção que prioriza o bem-estar dos seus pés, mesmo em longos eventos',
+            icon: '😌'
+          },
+          {
+            id: uuidv4(),
+            title: 'Durabilidade Excepcional',
+            description: 'Materiais nobres e técnicas de fabricação que garantem a longevidade do seu calçado',
+            icon: '🕰️'
+          }
+        ],
+        style: {
+          backgroundColor: '#333333',
+          headingColor: '#ffffff',
+          textColor: '#dddddd',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Destaques da Coleção',
+        columns: 3,
+        visible: true,
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1508417541894-89c53b943797',
+            alt: 'Sapato Oxford',
+            caption: 'Sapato Oxford Clássico'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1527521655244-5940999362c9',
+            alt: 'Sapato Derby',
+            caption: 'Sapato Derby Moderno'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1520322784853-c49c3925269c',
+            alt: 'Bota Chelsea',
+            caption: 'Bota Chelsea Elegante'
+          }
+        ],
+        style: {
+          backgroundColor: '#444444',
+          headingColor: '#ffffff',
+          textColor: '#dddddd',
+          padding: 'lg',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'specifications',
+        title: 'Detalhes',
+        columns: 1,
+        visible: true,
+        heading: 'O que torna nossos calçados únicos',
+        specs: [
+          {
+            id: uuidv4(),
+            name: 'Material Externo',
+            value: 'Couro nobre com acabamento impecável'
+          },
+          {
+            id: uuidv4(),
+            name: 'Forro Interno',
+            value: 'Couro macio para maior conforto'
+          },
+          {
+            id: uuidv4(),
+            name: 'Solado',
+            value: 'Couro com antiderrapante para segurança'
+          },
+          {
+            id: uuidv4(),
+            name: 'Construção',
+            value: 'Feito à mão com técnicas tradicionais'
+          },
+          {
+            id: uuidv4(),
+            name: 'Acabamento',
+            value: 'Pintura e lustro que realçam a beleza do couro'
+          }
+        ],
+        style: {
+          backgroundColor: '#333333',
+          headingColor: '#ffffff',
+          textColor: '#dddddd',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      {
+        id: uuidv4(),
+        type: 'cta',
+        title: 'Chamada para Ação',
+        columns: 1,
+        visible: true,
+        heading: 'Destaque-se com elegância em todas as ocasiões',
+        content: 'Aproveite nossas condições exclusivas e adquira o calçado formal perfeito para você',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#',
+        style: {
+          backgroundColor: '#343a40',
+          headingColor: '#ffffff',
           textColor: '#ffffff',
           padding: 'lg',
           blockSpacing: 'none'
@@ -495,6 +482,8 @@ export const shoesTemplates: Template[] = [
   }
 ];
 
+// Apply fixTemplateProps to ensure all templates have the correct properties
+export const shoesTemplates: Template[] = shoesTemplatesRaw.map(fixTemplateProps);
+
 // For backward compatibility with existing code that might expect a single template
-export const shoesTemplateA = shoesTemplates[0];
-export const shoesTemplateB = shoesTemplates[1];
+export const shoesTemplate = shoesTemplates[0];

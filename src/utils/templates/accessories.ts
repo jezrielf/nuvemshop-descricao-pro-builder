@@ -1,16 +1,15 @@
-// Fix this file to use thumbnailUrl instead of thumbnail
-
 // Import the fixTemplateProps utility
 import { fixTemplateProps } from './fixTemplateProps';
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 
-// Export templates using the fixTemplateProps utility
-export const accessoriesTemplates = [
+// Define raw accessories templates
+const accessoriesTemplatesRaw = [
   {
     id: 'accessories-basic',
     name: 'Accessories Basic',
     description: 'A simple template for accessories',
-    thumbnailUrl: '/templates/accessories/basic.jpg', // Changed from thumbnail to thumbnailUrl
+    thumbnailUrl: '/templates/accessories/basic.jpg',
     category: 'accessories',
     blocks: [
       {
@@ -272,4 +271,7 @@ export const accessoriesTemplates = [
 ];
 
 // Apply fixTemplateProps to ensure all templates have the correct properties
-export const fixedAccessoriesTemplates: Template[] = accessoriesTemplates.map(fixTemplateProps);
+export const accessoriesTemplates: Template[] = accessoriesTemplatesRaw.map(fixTemplateProps);
+
+// Export the fixed templates
+export const fixedAccessoriesTemplates: Template[] = accessoriesTemplates;
