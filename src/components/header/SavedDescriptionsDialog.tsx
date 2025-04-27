@@ -25,24 +25,6 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   const { toast } = useToast();
   const { loadSavedDescriptions, loadDescription } = useEditorStore();
   
-  // Store the user in a state variable instead of accessing it during render
-  const [userId, setUserId] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // Get auth state once during component mount
-    const { user } = useEditorStore.getState();
-    
-    // Format user ID properly
-    const formattedUserId = user?.id ? String(user.id) : null;
-    setUserId(formattedUserId);
-    
-    console.log('SavedDescriptionsDialog initialized with user ID:', formattedUserId);
-  }, []);
-  
-  useEffect(() => {
-    console.log('SavedDescriptionsDialog received saved descriptions:', savedDescriptions?.length || 0);
-  }, [savedDescriptions]);
-  
   const handleRefresh = () => {
     loadSavedDescriptions();
     toast({
@@ -52,35 +34,22 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   };
   
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the parent click
+    e.stopPropagation();
     setSelectedDescription(desc);
     setDeleteDialogOpen(true);
   };
   
   const handleDeleteConfirm = () => {
-    if (selectedDescription) {
+    if (selectedDescription && savedDescriptions) {
       try {
-        // Generate storage key consistently
-        const key = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
-        console.log('Deleting description from storage key:', key);
+        const updatedDescriptions = savedDescriptions.filter(d => d.id !== selectedDescription.id);
+        localStorage.setItem('savedDescriptions', JSON.stringify(updatedDescriptions));
+        loadSavedDescriptions();
         
-        // Get current descriptions from localStorage
-        const saved = localStorage.getItem(key);
-        if (saved) {
-          const descriptions = JSON.parse(saved) as ProductDescription[];
-          const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
-          localStorage.setItem(key, JSON.stringify(updatedDescriptions));
-          
-          // Update store
-          loadSavedDescriptions();
-          
-          toast({
-            title: "Descrição excluída",
-            description: "A descrição foi removida com sucesso."
-          });
-        } else {
-          console.warn('No saved descriptions found in storage key:', key);
-        }
+        toast({
+          title: "Descrição excluída",
+          description: "A descrição foi removida com sucesso."
+        });
       } catch (error) {
         console.error('Error deleting description:', error);
         toast({
@@ -95,7 +64,6 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   };
   
   const handleLoadDescription = (desc: ProductDescription) => {
-    console.log('Loading description:', desc.name || desc.id);
     loadDescription(desc);
     setOpen(false);
   };

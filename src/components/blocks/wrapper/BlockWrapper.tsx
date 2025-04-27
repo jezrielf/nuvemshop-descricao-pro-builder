@@ -11,13 +11,11 @@ interface BlockWrapperProps {
   children: React.ReactNode;
 }
 
-// Using memo to prevent unnecessary re-renders
 const BlockWrapper: React.FC<BlockWrapperProps> = memo(({ 
   block, 
   isPreview = false, 
   children 
 }) => {
-  // Only regenerate style classes if block or its style props change
   const blockClasses = generateStyleClasses(block);
   
   return (
@@ -38,7 +36,6 @@ const BlockWrapper: React.FC<BlockWrapperProps> = memo(({
   );
 });
 
-// Add display name for easier debugging
 BlockWrapper.displayName = 'BlockWrapper';
 
 export default BlockWrapper;

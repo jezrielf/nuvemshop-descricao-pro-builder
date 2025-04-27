@@ -21,10 +21,12 @@ export function createVideoTextBlock(columns: ColumnLayout = 'full'): VideoTextB
         headingColor: '#333333',
         backgroundColor: '#ffffff',
         textColor: '#333333',
-        headingWeight: 'medium', // Changed from 'normal' to 'medium'
+        headingWeight: 'medium',
         blockSpacing: 'md',
         borderRadius: 'md',
-        boxShadow: 'none'
+        boxShadow: 'none',
+        padding: 'md',
+        textAlign: 'left'
       }
     };
     
