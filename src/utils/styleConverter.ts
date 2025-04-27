@@ -1,4 +1,3 @@
-
 import { BlockStyle, Block, BlockSpacing } from '@/types/editor';
 
 // Converte um objeto de estilo em uma string CSS para uso inline
@@ -9,19 +8,19 @@ export const getStylesFromBlock = (block: Block): string => {
   const styleProps: string[] = [];
   
   // Background styles
-  if (style.backgroundColor) styleProps.push(`background-color: ${style.backgroundColor}`);
+  if (style.backgroundGradient) {
+    styleProps.push(`background: ${style.backgroundGradient}`);
+  } else if (style.backgroundColor) {
+    styleProps.push(`background-color: ${style.backgroundColor}`);
+  }
+  
   if (style.backgroundImage) styleProps.push(`background-image: url(${style.backgroundImage})`);
   if (style.backgroundPosition) styleProps.push(`background-position: ${style.backgroundPosition}`);
   if (style.backgroundSize) styleProps.push(`background-size: ${style.backgroundSize}`);
   
   // Typography styles
   if (style.fontFamily) {
-    const fontFamilyMap = {
-      'sans': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      'serif': 'Georgia, Cambria, "Times New Roman", Times, serif',
-      'mono': 'SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace'
-    };
-    styleProps.push(`font-family: ${fontFamilyMap[style.fontFamily]}`);
+    styleProps.push(`font-family: ${style.fontFamily}`);
   }
   
   if (style.fontSize) {

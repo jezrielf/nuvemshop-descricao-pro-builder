@@ -1,4 +1,3 @@
-
 import { ProductCategory } from './products';
 
 export type BlockType = 
@@ -21,6 +20,7 @@ export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
 
 export interface BlockStyle {
   backgroundColor?: string;
+  backgroundGradient?: string;
   backgroundImage?: string;
   textColor?: string;
   padding?: string;
