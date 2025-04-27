@@ -12,10 +12,10 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     authContext = context;
     
     // Update user information in the store with proper formatting
-    if (context && context.user) {
+    if (context && context.user && context.profile) {
       set({ user: { 
         id: context.user.id,
-        name: context.user.nome || 'Usuário',
+        name: context.profile?.nome || context.user.email?.split('@')[0] || 'Usuário',
         email: context.user.email || ''
       }});
     } else {
