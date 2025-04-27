@@ -7,7 +7,8 @@ export const templateService = {
   getTemplates: async (): Promise<Template[]> => {
     try {
       console.log('Iniciando carregamento de templates do banco de dados');
-      // Primeiro tentamos obter templates do banco de dados
+      
+      // First try to get templates from database
       const { data, error } = await supabase
         .from('templates')
         .select('*')
@@ -15,13 +16,13 @@ export const templateService = {
       
       if (error) {
         console.warn('Erro ao carregar templates do banco de dados:', error);
-        // Se houve erro, retornamos templates locais
+        // If there's an error, return local templates
         const localTemplates = getAllTemplates();
         console.log(`Fallback para ${localTemplates.length} templates locais devido a erro no banco`);
         return localTemplates;
       }
       
-      // Se não há dados ou o array está vazio, retornamos templates locais
+      // If no data or empty array, return local templates
       if (!data || data.length === 0) {
         console.log('Nenhum template encontrado no banco de dados, usando templates locais');
         const localTemplates = getAllTemplates();
@@ -29,14 +30,12 @@ export const templateService = {
         return localTemplates;
       }
       
-      // Convert the database response to Template format with proper type handling
+      // Convert database response to Template format with proper type handling
       const templates: Template[] = (data || []).map((template) => {
-        // Convert string category to ProductCategory
+        // Convert string category to ProductCategory with validation
         let category: ProductCategory = 'other';
         
-        // Try to match the string category with a valid ProductCategory
         if (template.category && typeof template.category === 'string') {
-          // Check if it's a valid ProductCategory
           const validCategories: ProductCategory[] = [
             'supplements', 'clothing', 'accessories', 'shoes', 
             'electronics', 'energy', 'Casa e decoração', 'other'
@@ -61,17 +60,16 @@ export const templateService = {
           name: template.name,
           category: category,
           blocks: blockData,
-          thumbnail: '/placeholder.svg' // Default thumbnail as it's not in the database
+          thumbnail: '/placeholder.svg' // Default thumbnail
         };
       });
       
-      // Se ainda não retornamos, significa que temos templates do banco de dados
       console.log(`Carregados ${templates.length} templates do banco de dados com sucesso`);
       
-      // Se tivermos templates do banco, mas são poucos, combinamos com os locais
+      // If we have database templates but they're few, combine with local ones
       if (templates.length < 10) {
         const localTemplates = getAllTemplates();
-        // Filtramos para não ter IDs duplicados
+        // Filter to avoid duplicate IDs
         const localWithoutDuplicates = localTemplates.filter(
           local => !templates.some(db => db.id === local.id)
         );
@@ -83,7 +81,7 @@ export const templateService = {
       return templates;
     } catch (error) {
       console.error('Error in getTemplates:', error);
-      // Em caso de qualquer erro, retornamos os templates locais como fallback
+      // In case of any error, return local templates as fallback
       const localTemplates = getAllTemplates();
       console.log(`Usando ${localTemplates.length} templates locais como fallback devido a erro geral`);
       return localTemplates;

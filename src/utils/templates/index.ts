@@ -9,7 +9,7 @@ import { accessoriesTemplates } from './accessories';
 import { hauteCoutureTemplates } from './hauteCouture';
 import { waterFilterTemplate } from './products/water-filter';
 
-// Combining all templates
+// Combining all templates with proper categorization
 export const advancedTemplates: Template[] = [
   waterFilterTemplate,
   ...supplementsTemplates,
@@ -20,11 +20,20 @@ export const advancedTemplates: Template[] = [
   ...hauteCoutureTemplates
 ];
 
+// Enhanced getAllTemplates function with error handling
 export const getAllTemplates = (): Template[] => {
-  return [...basicTemplates, ...advancedTemplates];
+  try {
+    const templates = [...basicTemplates, ...advancedTemplates];
+    console.log(`Successfully loaded ${templates.length} templates`);
+    return templates;
+  } catch (error) {
+    console.error('Error loading templates:', error);
+    // Return at least basic templates as fallback
+    return [...basicTemplates];
+  }
 };
 
-// Export individual template collections
+// Export individual template collections for granular access
 export * from './basic';
 export * from './supplements';
 export * from './shoes';
@@ -33,4 +42,3 @@ export * from './fashion';
 export * from './accessories';
 export * from './hauteCouture';
 export * from './products/water-filter';
-
