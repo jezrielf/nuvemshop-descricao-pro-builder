@@ -25,7 +25,8 @@ export const createLoadingSlice: StateCreator<
       return templates;
     } catch (error) {
       console.error("Error loading templates:", error);
-      set({ error: error as Error, isLoading: false });
+      // Convert the Error object to a string to match the expected type
+      set({ error: error instanceof Error ? error.message : String(error), isLoading: false });
       return [];
     }
   }
