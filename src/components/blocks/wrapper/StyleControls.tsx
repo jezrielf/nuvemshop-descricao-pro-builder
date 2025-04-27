@@ -44,13 +44,16 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
         <TooltipTrigger asChild>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hover:bg-gray-100">
                 <Palette className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80">
+            <PopoverContent className="w-80 p-4">
               <div className="space-y-4">
-                <h4 className="font-medium">Personalização do Bloco</h4>
+                <div className="border-b pb-2">
+                  <h4 className="font-medium">Personalização do Bloco</h4>
+                  <p className="text-xs text-muted-foreground">Personalize as cores e estilos do seu bloco</p>
+                </div>
                 
                 <ColorPickers block={block} updateStyle={updateStyle} />
                 <TypographyControls block={block} updateStyle={updateStyle} />

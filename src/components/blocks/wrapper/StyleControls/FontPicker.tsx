@@ -47,6 +47,7 @@ const FontPicker: React.FC<FontPickerProps> = ({ style, updateStyle }) => {
               key={fontFamily}
               value={fontFamily}
               style={{ fontFamily }}
+              className="text-base py-2"
             >
               {name}
             </SelectItem>

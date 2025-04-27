@@ -22,6 +22,9 @@ export type BlockSpacing = 'none' | 'small' | 'medium' | 'large';
 export interface BlockStyle {
   backgroundColor?: string;
   backgroundGradient?: string;
+  backgroundGradientDirection?: string;
+  backgroundGradientStartColor?: string;
+  backgroundGradientEndColor?: string;
   backgroundImage?: string;
   textColor?: string;
   padding?: string;
