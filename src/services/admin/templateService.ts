@@ -5,6 +5,11 @@ import { convertBlock } from '@/utils/blockConverter';
 import { fixTemplateProps } from '@/utils/templates/fixTemplateProps';
 import { getAllTemplates } from '@/utils/templates';
 
+// Cache of templates to prevent excessive database calls
+let templateCache: Template[] | null = null;
+let lastFetchTime = 0;
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+
 // Utility function to convert blocks if needed
 export const convertBlocks = (blocks: any[]) => {
   return blocks.map(block => convertBlock(block));
@@ -13,6 +18,13 @@ export const convertBlocks = (blocks: any[]) => {
 // Get all templates
 export const getTemplates = async (): Promise<Template[]> => {
   try {
+    // Check cache first to prevent excessive database calls
+    const now = Date.now();
+    if (templateCache && lastFetchTime > now - CACHE_EXPIRY) {
+      console.log("Using template cache", templateCache.length);
+      return templateCache;
+    }
+    
     // First try to get templates from Supabase
     const { data: dbTemplates, error } = await supabase
       .from('templates')
@@ -22,20 +34,32 @@ export const getTemplates = async (): Promise<Template[]> => {
     if (error) {
       console.warn('Error fetching templates from database:', error);
       // Fallback to local templates if database fetch fails
-      return getAllTemplates();
+      const localTemplates = getAllTemplates();
+      templateCache = localTemplates;
+      lastFetchTime = now;
+      return localTemplates;
     }
     
     if (dbTemplates && dbTemplates.length > 0) {
-      return dbTemplates.map(template => fixTemplateProps(template));
+      const fixedTemplates = dbTemplates.map(template => fixTemplateProps(template));
+      templateCache = fixedTemplates;
+      lastFetchTime = now;
+      return fixedTemplates;
     }
     
     // If no templates in database, use local templates
-    return getAllTemplates();
+    const localTemplates = getAllTemplates();
+    templateCache = localTemplates;
+    lastFetchTime = now;
+    return localTemplates;
     
   } catch (error) {
     console.error('Error managing templates:', error);
     // Fallback to local templates in case of any error
-    return getAllTemplates();
+    const localTemplates = getAllTemplates();
+    templateCache = localTemplates;
+    lastFetchTime = Date.now();
+    return localTemplates;
   }
 };
 
@@ -161,53 +185,37 @@ export const deleteTemplate = async (id: string): Promise<boolean> => {
   }
 };
 
-// Mock fallback templates
-const getMockTemplates = (): Template[] => {
-  return [
-    {
-      id: uuidv4(),
-      name: 'Produto Básico',
-      description: 'Template simples para descrição básica de produtos',
-      category: 'other' as ProductCategory,
-      blocks: [],
-      thumbnailUrl: '/templates/basic.jpg',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: uuidv4(),
-      name: 'Suplemento Premium',
-      description: 'Template completo para suplementos com benefícios destacados',
-      category: 'supplements' as ProductCategory,
-      blocks: [],
-      thumbnailUrl: '/templates/supplements.jpg',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-  ];
-};
-
 // Function to apply a template
 const applyTemplate = (template: Template) => {
-  // Import dynamically to avoid circular dependency
-  const { useEditorStore } = require('@/store/editor');
-  const { loadDescription } = useEditorStore.getState();
-  
-  if (!loadDescription) {
-    console.error("Failed to apply template: Editor store not available");
-    return;
+  try {
+    // Import dynamically to avoid circular dependency
+    const { useEditorStore } = require('@/store/editor');
+    const { loadDescription } = useEditorStore.getState();
+    
+    if (!loadDescription) {
+      console.error("Failed to apply template: Editor store not available");
+      return;
+    }
+    
+    const templateDescription = {
+      id: uuidv4(),
+      name: `Descrição baseada em "${template.name}"`,
+      blocks: template.blocks ? [...template.blocks] : [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      category: template.category
+    };
+    
+    loadDescription(templateDescription);
+  } catch (error) {
+    console.error("Error applying template:", error);
   }
-  
-  const templateDescription = {
-    id: uuidv4(),
-    name: `Descrição baseada em "${template.name}"`,
-    blocks: template.blocks ? [...template.blocks] : [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    category: template.category
-  };
-  
-  loadDescription(templateDescription);
+};
+
+// Function to clear template cache (useful for admin operations)
+export const clearTemplateCache = () => {
+  templateCache = null;
+  lastFetchTime = 0;
 };
 
 // Export as a default object for compatibility
@@ -218,7 +226,8 @@ const templateService = {
   updateTemplate,
   deleteTemplate,
   convertBlocks,
-  applyTemplate
+  applyTemplate,
+  clearTemplateCache
 };
 
 export default templateService;

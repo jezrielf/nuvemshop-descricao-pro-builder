@@ -12,8 +12,15 @@ export const createLoadingSlice: StateCreator<
   error: null,
   
   loadTemplates: async () => {
-    // If already loading or has templates, don't fetch again
-    if (get().isLoading || (get().templates.length > 0 && !get().error)) {
+    // Prevent infinite loading loops
+    // If already loading, just return current templates
+    if (get().isLoading) {
+      return get().templates;
+    }
+    
+    // If has templates and no error, don't reload unless forced
+    // This prevents unnecessary loading loops
+    if (get().templates.length > 0 && !get().error) {
       return get().templates;
     }
     
@@ -21,7 +28,15 @@ export const createLoadingSlice: StateCreator<
     
     try {
       const templates = await templateService.getTemplates();
-      set({ templates, isLoading: false });
+      
+      // Only update state if we actually got templates
+      if (templates && templates.length > 0) {
+        set({ templates, isLoading: false });
+      } else {
+        // Handle empty result properly 
+        set({ isLoading: false });
+        console.log("No templates were loaded");
+      }
       return templates;
     } catch (error) {
       console.error("Error loading templates:", error);

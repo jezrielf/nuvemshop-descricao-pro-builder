@@ -76,6 +76,7 @@ const Index = () => {
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
+  const [hasLoadedTemplates, setHasLoadedTemplates] = useState(false);
   const { 
     success: storeConnected, 
     storeName, 
@@ -94,42 +95,41 @@ const Index = () => {
       clearAuthCodeFromUrl();
     }
     
-    // Load templates with error handling - modificado para evitar loop infinito
-    const initializeTemplates = async () => {
-      try {
-        setIsLoadingTemplates(true);
-        const loadedTemplates = await loadTemplates();
-        
-        if (loadedTemplates && loadedTemplates.length > 0) {
+    // Only load templates once to prevent loops
+    if (!hasLoadedTemplates) {
+      const initializeTemplates = async () => {
+        try {
+          setIsLoadingTemplates(true);
+          const loadedTemplates = await loadTemplates();
+          
+          if (loadedTemplates && loadedTemplates.length > 0) {
+            toast({
+              title: "Templates carregados",
+              description: `${loadedTemplates.length} templates disponíveis`,
+            });
+          } else {
+            toast({
+              title: "Atenção",
+              description: "Problemas ao carregar templates. Tente atualizar a página.",
+              variant: "destructive",
+            });
+          }
+          setHasLoadedTemplates(true);
+        } catch (error) {
+          console.error("Erro ao carregar templates:", error);
           toast({
-            title: "Templates carregados",
-            description: `${loadedTemplates.length} templates disponíveis`,
-          });
-        } else {
-          toast({
-            title: "Atenção",
-            description: "Problemas ao carregar templates. Tente atualizar a página.",
+            title: "Erro ao carregar templates",
+            description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
             variant: "destructive",
           });
+        } finally {
+          setIsLoadingTemplates(false);
         }
-      } catch (error) {
-        console.error("Erro ao carregar templates:", error);
-        toast({
-          title: "Erro ao carregar templates",
-          description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoadingTemplates(false);
-      }
-    };
-    
-    initializeTemplates();
-    
-    // Removido o intervalo de atualização para evitar possíveis loops
-    // Template refresh interval será reintroduzido de uma forma melhor depois
-    
-  }, [loadTemplates, toast, handleTestCode]);
+      };
+      
+      initializeTemplates();
+    }
+  }, [loadTemplates, toast, handleTestCode, hasLoadedTemplates]);
 
   const handleNuvemshopDisconnect = () => {
     handleDisconnectNuvemshop();

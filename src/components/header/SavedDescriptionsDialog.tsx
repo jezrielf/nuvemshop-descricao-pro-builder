@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ListTodo, BadgeAlert, Trash2 } from 'lucide-react';
@@ -22,7 +23,16 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState<ProductDescription | null>(null);
   const { toast } = useToast();
-  const { loadSavedDescriptions } = useEditorStore(); // Get the function from the store
+  const { loadSavedDescriptions, loadDescription } = useEditorStore(); // Get functions from store
+  
+  // Store the user in a state variable instead of accessing it during render
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Get auth state once during component mount
+    const { user } = useEditorStore.getState();
+    setUserId(user ? user.id : null);
+  }, []);
   
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent click
@@ -32,9 +42,8 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
-      // Get auth state outside of render
-      const { user } = useEditorStore.getState();
-      const key = user ? `savedDescriptions_${user.id}` : 'savedDescriptions_anonymous';
+      // Use stored userId instead of accessing it during render
+      const key = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
       
       // Get current descriptions from localStorage
       const saved = localStorage.getItem(key);
@@ -54,6 +63,11 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
     }
     setDeleteDialogOpen(false);
     setSelectedDescription(null);
+  };
+  
+  const handleLoadDescription = (desc: ProductDescription) => {
+    loadDescription(desc);
+    setOpen(false);
   };
   
   return (
@@ -85,10 +99,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
                   <div 
                     key={desc.id} 
                     className="p-3 border rounded-md hover:bg-gray-50 cursor-pointer flex justify-between items-center group"
-                    onClick={() => {
-                      useEditorStore.getState().loadDescription(desc);
-                      setOpen(false);
-                    }}
+                    onClick={() => handleLoadDescription(desc)}
                   >
                     <div>
                       <p className="font-medium">{desc.name}</p>

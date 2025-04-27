@@ -12,13 +12,25 @@ export function useTemplateStore() {
     updateTemplate,
     deleteTemplate,
     getTemplatesByCategory,
-    applyTemplate
+    applyTemplate,
+    isLoading,
+    error
   } = useZustandTemplateStore();
 
-  // Load templates on mount
+  // Load templates on mount - but only once
   useEffect(() => {
-    loadTemplates();
-  }, [loadTemplates]);
+    // Using a function to avoid unnecessary re-renders
+    const loadTemplatesOnce = async () => {
+      try {
+        await loadTemplates();
+      } catch (err) {
+        console.error("Error loading templates:", err);
+      }
+    };
+    
+    loadTemplatesOnce();
+    // Deliberate empty dependency array to ensure this runs only once
+  }, []);
 
   // Wrapper for creating a template with logging
   const createTemplate = async (templateData: Omit<Template, "id">) => {
@@ -69,6 +81,8 @@ export function useTemplateStore() {
     deleteTemplate,
     getTemplatesByCategory,
     searchTemplates,
-    applyTemplate
+    applyTemplate,
+    isLoading,
+    error
   };
 }
