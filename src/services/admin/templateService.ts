@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import { convertBlock } from '@/utils/blockConverter';
 import { fixTemplateProps } from '@/utils/templates/fixTemplateProps';
+import { getAllTemplates } from '@/utils/templates';
 
 // Utility function to convert blocks if needed
 export const convertBlocks = (blocks: any[]) => {
@@ -12,30 +13,29 @@ export const convertBlocks = (blocks: any[]) => {
 // Get all templates
 export const getTemplates = async (): Promise<Template[]> => {
   try {
-    // Primeiro, tenta limpar todos os templates existentes
-    try {
-      const { error: deleteError } = await supabase
-        .from('templates')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Apaga todos os templates
-        
-      if (deleteError) {
-        console.warn('Erro ao limpar templates existentes:', deleteError);
-      } else {
-        console.log('Templates existentes foram limpos com sucesso');
-      }
-    } catch (clearError) {
-      console.warn('Erro ao tentar limpar templates:', clearError);
+    // First try to get templates from Supabase
+    const { data: dbTemplates, error } = await supabase
+      .from('templates')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+      console.warn('Error fetching templates from database:', error);
+      // Fallback to local templates if database fetch fails
+      return getAllTemplates();
     }
     
-    // Retornamos uma lista vazia, pois o usuário indicou que prefere criar novos templates
-    return [];
+    if (dbTemplates && dbTemplates.length > 0) {
+      return dbTemplates.map(template => fixTemplateProps(template));
+    }
+    
+    // If no templates in database, use local templates
+    return getAllTemplates();
     
   } catch (error) {
     console.error('Error managing templates:', error);
-    
-    // Retorna lista vazia em caso de erro também
-    return [];
+    // Fallback to local templates in case of any error
+    return getAllTemplates();
   }
 };
 

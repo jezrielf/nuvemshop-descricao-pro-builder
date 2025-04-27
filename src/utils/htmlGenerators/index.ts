@@ -1,4 +1,3 @@
-
 import { Block, BlockType } from '@/types/editor';
 import { generateHeroHtml } from './heroGenerator';
 import { generateTextHtml } from './textGenerator';
@@ -33,28 +32,53 @@ const blockGenerators: Record<BlockType, (block: any) => string> = {
   textVideo: generateTextVideoBlockHtml
 };
 
-// Generate HTML for a specific block based on its type
+// More robust generateBlockHtml function
 export const generateBlockHtml = (block: Block): string => {
   try {
-    // Check if the block type is supported
     if (!block || !block.type || !(block.type in blockGenerators)) {
-      console.error(`Unsupported block type: ${block?.type}`);
-      return `<div class="error-block">Tipo de bloco não suportado: ${block?.type || 'indefinido'}</div>`;
+      console.error(`Invalid block or unsupported type: ${block?.type}`);
+      return `<div class="error-block p-4 bg-red-50 text-red-600 rounded">
+        Tipo de bloco não suportado: ${block?.type || 'indefinido'}
+      </div>`;
     }
     
-    // Check if the block is visible
+    // Only render if block is visible
     if (block.visible === false) {
-      return ''; // Return empty string for invisible blocks
+      return '';
     }
     
-    // Generate HTML using the appropriate generator
+    // Validate block before generating HTML
+    if (!validateBlock(block)) {
+      console.error(`Invalid block structure:`, block);
+      return `<div class="error-block p-4 bg-yellow-50 text-yellow-600 rounded">
+        Bloco com estrutura inválida
+      </div>`;
+    }
+    
     const generator = blockGenerators[block.type as BlockType];
-    return generator(block);
+    const html = generator(block);
+    
+    if (!html) {
+      console.error(`Empty HTML generated for block:`, block);
+      return `<div class="error-block p-4 bg-yellow-50 text-yellow-600 rounded">
+        Erro ao gerar HTML do bloco
+      </div>`;
+    }
+    
+    return html;
   } catch (error) {
     console.error(`Error generating HTML for block ${block?.id}:`, error);
-    return `<div class="error-block">Erro ao gerar HTML para o bloco: ${error instanceof Error ? error.message : 'Erro desconhecido'}</div>`;
+    return `<div class="error-block p-4 bg-red-50 text-red-600 rounded">
+      Erro ao gerar HTML do bloco: ${error instanceof Error ? error.message : 'Erro desconhecido'}
+    </div>`;
   }
 };
+
+// Helper function to validate block structure
+function validateBlock(block: any): boolean {
+  const requiredFields = ['id', 'type', 'title', 'columns'];
+  return requiredFields.every(field => field in block);
+}
 
 // Export all generators for use in other modules
 export {

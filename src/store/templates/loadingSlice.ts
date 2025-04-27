@@ -12,8 +12,8 @@ export const createLoadingSlice: StateCreator<
   error: null,
   
   loadTemplates: async () => {
-    // Evitar múltiplas chamadas quando já está carregando
-    if (get().isLoading) {
+    // If already loading or has templates, don't fetch again
+    if (get().isLoading || (get().templates.length > 0 && !get().error)) {
       return get().templates;
     }
     
@@ -25,7 +25,7 @@ export const createLoadingSlice: StateCreator<
       return templates;
     } catch (error) {
       console.error("Error loading templates:", error);
-      set({ error, isLoading: false, templates: [] }); // Reset templates em caso de erro
+      set({ error: error as Error, isLoading: false });
       return [];
     }
   }

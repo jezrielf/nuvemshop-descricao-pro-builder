@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -33,18 +32,18 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
-      // Get the correct key from localStorage based on current user
+      // Get auth state outside of render
       const { user } = useEditorStore.getState();
       const key = user ? `savedDescriptions_${user.id}` : 'savedDescriptions_anonymous';
       
-      // Get current descriptions
+      // Get current descriptions from localStorage
       const saved = localStorage.getItem(key);
       if (saved) {
         const descriptions = JSON.parse(saved) as ProductDescription[];
         const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
         localStorage.setItem(key, JSON.stringify(updatedDescriptions));
         
-        // Update the store - use the function reference to avoid calling it directly during render
+        // Update store
         loadSavedDescriptions();
         
         toast({
