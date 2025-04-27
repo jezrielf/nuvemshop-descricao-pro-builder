@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import GradientPicker from './GradientPicker';
 import FontPicker from './FontPicker';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Paint, GalleryThumbnails, Gradient } from 'lucide-react';
+import { Palette, Grid2X2, PaintBucket } from 'lucide-react';
 
 interface ColorPickersProps {
   block: BlockBase;
@@ -62,13 +62,13 @@ const ColorPickers: React.FC<ColorPickersProps> = ({ block, updateStyle }) => {
           <Label>Estilo de fundo</Label>
           <ToggleGroup type="single" value={colorMode} onValueChange={(value: 'solid' | 'gradient' | 'predefined') => setColorMode(value)}>
             <ToggleGroupItem value="solid" aria-label="Cor sólida">
-              <Paint className="h-4 w-4" />
+              <PaintBucket className="h-4 w-4" />
             </ToggleGroupItem>
             <ToggleGroupItem value="gradient" aria-label="Gradiente">
-              <Gradient className="h-4 w-4" />
+              <Palette className="h-4 w-4" />
             </ToggleGroupItem>
             <ToggleGroupItem value="predefined" aria-label="Cores pré-definidas">
-              <GalleryThumbnails className="h-4 w-4" />
+              <Grid2X2 className="h-4 w-4" />
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
