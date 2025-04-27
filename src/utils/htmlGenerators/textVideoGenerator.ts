@@ -9,6 +9,12 @@ export function generateTextVideoBlockHtml(block: TextVideoBlock): string {
   
   // Extract YouTube video ID and create embed URL
   const getYouTubeEmbedUrl = (url: string) => {
+    // Guard against undefined or empty URL
+    if (!url || typeof url !== 'string') {
+      console.warn('Invalid video URL in TextVideoBlock:', url);
+      return '';
+    }
+    
     const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&?/]+)/;
     const match = url.match(regExp);
     

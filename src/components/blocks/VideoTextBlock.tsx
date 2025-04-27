@@ -41,11 +41,16 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
   };
 
   const getEmbedUrl = (url: string): string => {
+    // Guard against invalid URLs
+    if (!url || typeof url !== 'string') {
+      return '';
+    }
+    
     // Convert YouTube URLs to embed format
     const youtubeRegex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/i;
     const youtubeMatch = url.match(youtubeRegex);
     
-    if (youtubeMatch) {
+    if (youtubeMatch && youtubeMatch[1]) {
       const videoId = youtubeMatch[1];
       return `https://www.youtube.com/embed/${videoId}`;
     }
@@ -54,7 +59,7 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
     const vimeoRegex = /(?:vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^/]+\/videos\/|)(\d+)(?:|\/\?))/i;
     const vimeoMatch = url.match(vimeoRegex);
     
-    if (vimeoMatch) {
+    if (vimeoMatch && vimeoMatch[1]) {
       const videoId = vimeoMatch[1];
       return `https://player.vimeo.com/video/${videoId}`;
     }
@@ -74,7 +79,7 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
   };
 
   // Get embed URL from the video URL
-  const embedUrl = getEmbedUrl(block.videoUrl);
+  const embedUrl = block.videoUrl ? getEmbedUrl(block.videoUrl) : '';
 
   return (
     <BlockWrapper block={block} isPreview={isPreview}>
@@ -85,14 +90,14 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
             <div className="space-y-4">
               <input
                 type="text"
-                value={block.videoUrl}
+                value={block.videoUrl || ''}
                 onChange={onVideoUrlChange}
                 placeholder="URL do vídeo (YouTube ou Vimeo)"
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              {block.videoUrl && (
-                <div className="border border-gray-200 rounded-md overflow-hidden">
-                  <AspectRatio ratio={getAspectRatioValue(block.aspectRatio || '16:9')}>
+              <div className="border border-gray-200 rounded-md overflow-hidden">
+                <AspectRatio ratio={getAspectRatioValue(block.aspectRatio || '16:9')}>
+                  {embedUrl ? (
                     <iframe
                       src={embedUrl}
                       title="Video Player"
@@ -100,14 +105,18 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
                       allowFullScreen
                       className="w-full h-full"
                     />
-                  </AspectRatio>
-                </div>
-              )}
+                  ) : (
+                    <div className="bg-gray-100 p-4 rounded text-center w-full h-full flex items-center justify-center">
+                      <p>Insira uma URL de vídeo válida</p>
+                    </div>
+                  )}
+                </AspectRatio>
+              </div>
             </div>
           ) : (
-            block.videoUrl && (
-              <div className="border border-gray-200 rounded-md overflow-hidden">
-                <AspectRatio ratio={getAspectRatioValue(block.aspectRatio || '16:9')}>
+            <div className="border border-gray-200 rounded-md overflow-hidden">
+              <AspectRatio ratio={getAspectRatioValue(block.aspectRatio || '16:9')}>
+                {embedUrl ? (
                   <iframe
                     src={`${embedUrl}${block.autoplay ? '?autoplay=1' : ''}${block.muteAudio ? '&mute=1' : ''}`}
                     title="Video Player"
@@ -115,9 +124,13 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
                     allowFullScreen
                     className="w-full h-full"
                   />
-                </AspectRatio>
-              </div>
-            )
+                ) : (
+                  <div className="bg-gray-100 p-4 rounded text-center w-full h-full flex items-center justify-center">
+                    <p>URL de vídeo inválida</p>
+                  </div>
+                )}
+              </AspectRatio>
+            </div>
           )}
         </div>
 
@@ -133,7 +146,7 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <RichTextEditor
-                value={block.content}
+                value={block.content || '<p>Conteúdo da descrição...</p>'}
                 onChange={onContentChange}
                 placeholder="Conteúdo da descrição..."
               />
@@ -141,7 +154,7 @@ const VideoTextBlockComponent: React.FC<VideoTextBlockProps> = ({
           ) : (
             <div>
               {block.heading && <h3 className="text-xl font-semibold mb-3">{block.heading}</h3>}
-              <div dangerouslySetInnerHTML={{ __html: block.content }} />
+              <div dangerouslySetInnerHTML={{ __html: block.content || '<p>Conteúdo não disponível</p>' }} />
             </div>
           )}
         </div>

@@ -78,6 +78,16 @@ export function isTextVideoBlock(block: any): block is TextVideoBlock {
 export function getTypedBlock<T extends Block>(block: Block, typeGuard: (block: any) => block is T): T {
   if (!typeGuard(block)) {
     console.warn(`Block with ID ${block.id} does not match expected type. Using as-is.`);
+    
+    // For video blocks, ensure they have the required properties
+    if (block.type === 'videoText' || block.type === 'textVideo') {
+      if (!block.videoUrl) {
+        (block as any).videoUrl = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+      }
+      if (!block.content) {
+        (block as any).content = '<p>Adicione o texto aqui.</p>';
+      }
+    }
   }
   return block as T;
 }
