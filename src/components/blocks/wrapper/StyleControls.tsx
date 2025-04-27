@@ -38,6 +38,10 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
     });
   };
 
+  // Log the current block and its styles for debugging
+  console.log('StyleControls rendering for block:', block.type, block.id);
+  console.log('Current block styles:', block.style);
+
   return (
     <TooltipProvider>
       <Tooltip>

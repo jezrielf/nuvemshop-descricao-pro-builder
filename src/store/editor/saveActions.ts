@@ -23,6 +23,14 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     }
   };
 
+  // Helper for consistent storage key generation
+  const getStorageKey = (userId: string | number | undefined | null): string => {
+    if (!userId) return 'savedDescriptions_anonymous';
+    
+    // Always convert to string and ensure consistent format
+    return `savedDescriptions_${String(userId)}`;
+  };
+
   return {
     // Add the setter function for auth context
     setAuthContext,
@@ -67,42 +75,62 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         
         // Get proper user ID for storage key
         const userId = authContext.user?.id;
-        const userIdString = userId ? String(userId) : 'anonymous';
-        const storageKey = `savedDescriptions_${userIdString}`;
+        const primaryKey = getStorageKey(userId);
         
-        // For backward compatibility, also check the old format
-        const oldStorageKey = `savedDescriptions_${JSON.stringify(userId)}`;
+        // Log for debugging
+        console.log(`Saving descriptions for user ID: ${userId} using key: ${primaryKey}`);
+        
+        // For backward compatibility, check multiple formats
+        const possibleKeys = [
+          primaryKey,
+          `savedDescriptions_${JSON.stringify(userId)}`,
+          'savedDescriptions_anonymous'
+        ];
         
         // Try to migrate descriptions from old format if they exist
         try {
-          const oldSaved = localStorage.getItem(oldStorageKey);
-          if (oldSaved) {
-            const oldDescriptions = JSON.parse(oldSaved) as ProductDescription[];
-            if (Array.isArray(oldDescriptions) && oldDescriptions.length > 0) {
-              console.log(`Migrating ${oldDescriptions.length} descriptions from old format`);
-              
-              // Combine old and new descriptions, ensuring no duplicates
-              const allDescriptions = [...savedDescriptions];
-              
-              for (const oldDesc of oldDescriptions) {
-                if (!allDescriptions.some(d => d.id === oldDesc.id)) {
-                  allDescriptions.push(oldDesc);
+          // Check all possible keys for existing descriptions
+          let allDescriptions = [...savedDescriptions];
+          let migratedCount = 0;
+          
+          for (const key of possibleKeys) {
+            if (key === primaryKey) continue; // Skip primary key as we'll save to it later
+            
+            const oldSaved = localStorage.getItem(key);
+            if (oldSaved) {
+              try {
+                const oldDescriptions = JSON.parse(oldSaved) as ProductDescription[];
+                if (Array.isArray(oldDescriptions) && oldDescriptions.length > 0) {
+                  console.log(`Migrating ${oldDescriptions.length} descriptions from key: ${key}`);
+                  
+                  // Combine without duplicates
+                  for (const oldDesc of oldDescriptions) {
+                    if (!allDescriptions.some(d => d.id === oldDesc.id)) {
+                      allDescriptions.push(oldDesc);
+                      migratedCount++;
+                    }
+                  }
+                  
+                  // Remove old format after migration
+                  localStorage.removeItem(key);
                 }
+              } catch (parseError) {
+                console.error(`Error parsing descriptions from key ${key}:`, parseError);
               }
-              
-              // Update state and storage
-              savedDescriptions = allDescriptions;
-              localStorage.setItem(storageKey, JSON.stringify(allDescriptions));
-              localStorage.removeItem(oldStorageKey); // Remove old format
             }
+          }
+          
+          if (migratedCount > 0) {
+            console.log(`Successfully migrated ${migratedCount} descriptions to primary key: ${primaryKey}`);
+            savedDescriptions = allDescriptions;
           }
         } catch (migrationError) {
           console.error('Error during description migration:', migrationError);
           // Continue with saving even if migration failed
         }
         
-        // Save to localStorage
-        localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
+        // Save to localStorage with consistent key
+        localStorage.setItem(primaryKey, JSON.stringify(savedDescriptions));
         
         // Update state
         set({ 
@@ -110,6 +138,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           description: updatedDescription
         });
         
+        console.log(`Saved ${savedDescriptions.length} descriptions successfully`);
         return true;
       } catch (error) {
         console.error('Error saving description:', error);
@@ -125,30 +154,31 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           return;
         }
         
-        // Only premium/business users can load saved descriptions
-        if (!authContext.isPremium()) {
-          set({ savedDescriptions: [] });
-          return;
-        }
-        
+        // Get user ID and generate consistent key
         const userId = authContext.user?.id;
-        const userIdString = userId ? String(userId) : 'anonymous';
+        const primaryKey = getStorageKey(userId);
+        
+        console.log(`Loading descriptions for user ID: ${userId} using key: ${primaryKey}`);
         
         // Try multiple storage keys for backward compatibility
-        const storageKeys = [
-          `savedDescriptions_${userIdString}`,
+        const possibleKeys = [
+          primaryKey,
           `savedDescriptions_${JSON.stringify(userId)}`,
           'savedDescriptions_anonymous'
         ];
         
         let allDescriptions: ProductDescription[] = [];
+        let foundDescriptions = false;
         
-        for (const key of storageKeys) {
+        for (const key of possibleKeys) {
           const saved = localStorage.getItem(key);
           if (saved) {
             try {
               const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
               if (Array.isArray(parsedDescriptions)) {
+                foundDescriptions = true;
+                console.log(`Found ${parsedDescriptions.length} descriptions in key: ${key}`);
+                
                 // Add only descriptions that aren't already in the list
                 for (const desc of parsedDescriptions) {
                   if (!allDescriptions.some(d => d.id === desc.id)) {
@@ -164,20 +194,26 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         
         // If descriptions were found, consolidate them to the primary storage key
         if (allDescriptions.length > 0) {
-          const primaryKey = `savedDescriptions_${userIdString}`;
+          console.log(`Consolidating ${allDescriptions.length} descriptions to primary key: ${primaryKey}`);
           localStorage.setItem(primaryKey, JSON.stringify(allDescriptions));
           
           // Clean up old storage formats
-          for (const key of storageKeys) {
+          for (const key of possibleKeys) {
             if (key !== primaryKey) {
               localStorage.removeItem(key);
             }
           }
         }
         
+        // Set the descriptions in the store
         set({ savedDescriptions: allDescriptions });
+        
+        console.log(`Loaded ${allDescriptions.length} descriptions successfully`);
+        
+        return allDescriptions;
       } catch (error) {
         console.error('Error loading saved descriptions:', error);
+        return [];
       }
     },
     

@@ -50,11 +50,44 @@ export const generateCompleteHtml = (state: EditorState): string => {
       // Get all custom styles from block
       const blockStyles = getStylesFromBlock(block);
       
+      // Add background color if specified
+      const backgroundColor = block.style?.backgroundColor ? 
+        `background-color: ${block.style.backgroundColor};` : '';
+      
+      // Add text color if specified
+      const textColor = block.style?.textColor ? 
+        `color: ${block.style.textColor};` : '';
+      
+      // Add border radius if specified
+      const borderRadius = block.style?.borderRadius ? 
+        `border-radius: ${
+          block.style.borderRadius === 'none' ? '0' : 
+          block.style.borderRadius === 'sm' ? '0.125rem' : 
+          block.style.borderRadius === 'md' ? '0.375rem' : 
+          block.style.borderRadius === 'lg' ? '0.5rem' : 
+          block.style.borderRadius === 'xl' ? '0.75rem' : 
+          block.style.borderRadius === 'full' ? '9999px' : '0.375rem'
+        };` : '';
+      
+      // Add box shadow if specified
+      const boxShadow = block.style?.boxShadow ? 
+        `box-shadow: ${
+          block.style.boxShadow === 'none' ? 'none' : 
+          block.style.boxShadow === 'sm' ? '0 1px 2px rgba(0, 0, 0, 0.05)' : 
+          block.style.boxShadow === 'md' ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 
+          block.style.boxShadow === 'lg' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 
+          block.style.boxShadow === 'xl' ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : 'none'
+        };` : '';
+      
       // Combine all styles
       const combinedStyles = [
         blockStyles,
-        marginStyle
-      ].filter(Boolean).join('; ');
+        marginStyle,
+        backgroundColor,
+        textColor,
+        borderRadius,
+        boxShadow
+      ].filter(Boolean).join(' ');
       
       // Add CSS for heading colors and weights if specified
       const headingStyles = block.style?.headingColor || block.style?.headingWeight ? 

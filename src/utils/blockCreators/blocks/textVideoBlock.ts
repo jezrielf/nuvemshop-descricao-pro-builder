@@ -19,6 +19,12 @@ export function createTextVideoBlock(columns: ColumnLayout = 'full'): TextVideoB
       content: '<p>Adicione o texto aqui.</p>',
       style: {
         headingColor: '#333333',
+        backgroundColor: '#ffffff',
+        textColor: '#333333',
+        headingWeight: 'bold',
+        blockSpacing: 'normal',
+        borderRadius: 'md',
+        boxShadow: 'none'
       }
     };
     

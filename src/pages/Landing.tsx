@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { Plan } from '@/types/subscription';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
 import { planService } from '@/services/admin/planService';
+import { useLandingPageContent } from '@/hooks/useLandingPageContent';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +20,7 @@ const Landing: React.FC = () => {
   const { toast } = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { content, loading: contentLoading } = useLandingPageContent();
   
   useEffect(() => {
     if (user) {
@@ -64,69 +67,68 @@ const Landing: React.FC = () => {
     fetchPlans();
   }, []);
   
+  // Get content from landing page settings or use default
+  const heroContent = content?.hero || {
+    title: 'Otimize suas descrições de produtos com IA',
+    subtitle: 'Crie descrições envolventes e otimizadas para SEO em segundos.',
+    cta_primary: 'Começar agora',
+    cta_secondary: 'Saiba mais'
+  };
+  
+  const featuresContent = content?.features || {
+    title: 'Recursos da Plataforma',
+    description: 'Nossas ferramentas para seu sucesso',
+    items: [
+      {
+        title: 'Gere descrições rapidamente',
+        description: 'Use a IA para criar descrições de alta qualidade em segundos.',
+        image: '/placeholder.svg'
+      },
+      {
+        title: 'Otimize para SEO',
+        description: 'Melhore o ranking dos seus produtos nos motores de busca.',
+        image: '/placeholder.svg'
+      },
+      {
+        title: 'Converta mais clientes',
+        description: 'Descrições persuasivas que destacam os benefícios do seu produto.',
+        image: '/placeholder.svg'
+      }
+    ]
+  };
+  
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="container mx-auto px-4">
         <header className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Otimize suas descrições de produtos com IA
+            {heroContent.title}
           </h1>
           <p className="text-xl text-gray-600">
-            Crie descrições envolventes e otimizadas para SEO em segundos.
+            {heroContent.subtitle}
           </p>
           <div className="mt-8">
             <Link to="/auth">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Começar agora
+                {heroContent.cta_primary}
               </Button>
             </Link>
           </div>
         </header>
         
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          <Card className="bg-white shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">
-                <Rocket className="mr-2 h-4 w-4 inline-block align-middle" />
-                Gere descrições rapidamente
-              </CardTitle>
-              <CardDescription className="text-gray-500">
-                Use a IA para criar descrições de alta qualidade em segundos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              Economize tempo e esforço na criação de conteúdo.
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">
-                <CheckCircle2 className="mr-2 h-4 w-4 inline-block align-middle" />
-                Otimize para SEO
-              </CardTitle>
-              <CardDescription className="text-gray-500">
-                Melhore o ranking dos seus produtos nos motores de busca.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              Aumente a visibilidade e atraia mais clientes.
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">
-                Converta mais clientes
-              </CardTitle>
-              <CardDescription className="text-gray-500">
-                Descrições persuasivas que destacam os benefícios do seu produto.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              Aumente suas vendas com conteúdo de alta conversão.
-            </CardContent>
-          </Card>
+          {featuresContent.items.map((item, index) => (
+            <Card key={index} className="bg-white shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  {item.title}
+                </CardTitle>
+                <CardDescription className="text-gray-500">
+                  {item.description}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
         </section>
         
         <section className="mb-16">
@@ -175,7 +177,7 @@ const Landing: React.FC = () => {
         </section>
         
         <footer className="text-center text-gray-500 mt-12">
-          <p>&copy; 2024 Otimize Descrições. Todos os direitos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Otimize Descrições. Todos os direitos reservados.</p>
         </footer>
       </div>
     </div>

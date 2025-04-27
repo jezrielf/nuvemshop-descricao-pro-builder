@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ListTodo, BadgeAlert, Trash2 } from 'lucide-react';
+import { ListTodo, BadgeAlert, Trash2, RefreshCcw } from 'lucide-react';
 import { useEditorStore } from '@/store/editor';
 import { ProductDescription } from '@/types/editor';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface SavedDescriptionsDialogProps {
-  isPremium: boolean; // Boolean prop instead of function
+  isPremium: boolean;
   descriptionCount: number;
   savedDescriptions: ProductDescription[] | undefined;
 }
@@ -17,13 +17,13 @@ interface SavedDescriptionsDialogProps {
 const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({ 
   isPremium, 
   descriptionCount, 
-  savedDescriptions = [] // Provide default empty array if undefined
+  savedDescriptions = []
 }) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState<ProductDescription | null>(null);
   const { toast } = useToast();
-  const { loadSavedDescriptions, loadDescription } = useEditorStore(); // Get functions from store
+  const { loadSavedDescriptions, loadDescription } = useEditorStore();
   
   // Store the user in a state variable instead of accessing it during render
   const [userId, setUserId] = useState<string | null>(null);
@@ -43,6 +43,14 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
     console.log('SavedDescriptionsDialog received saved descriptions:', savedDescriptions?.length || 0);
   }, [savedDescriptions]);
   
+  const handleRefresh = () => {
+    loadSavedDescriptions();
+    toast({
+      title: "Atualizando descrições",
+      description: "Buscando descrições salvas..."
+    });
+  };
+  
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent click
     setSelectedDescription(desc);
@@ -52,7 +60,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
       try {
-        // Use stored userId instead of accessing it during render
+        // Generate storage key consistently
         const key = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
         console.log('Deleting description from storage key:', key);
         
@@ -103,7 +111,12 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Suas Descrições Salvas</DialogTitle>
+            <div className="flex justify-between items-center">
+              <DialogTitle>Suas Descrições Salvas</DialogTitle>
+              <Button size="sm" variant="ghost" onClick={handleRefresh}>
+                <RefreshCcw className="h-4 w-4" />
+              </Button>
+            </div>
             <DialogDescription>
               Selecione uma descrição para continuar editando.
               {!isPremium && (
