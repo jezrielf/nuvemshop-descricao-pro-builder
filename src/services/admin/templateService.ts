@@ -1,8 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
-import { convertBlocks } from '@/utils/blockConverter';
 import { getAllTemplates } from '@/utils/templates';
 
 export const templateService = {
