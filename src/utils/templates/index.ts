@@ -8,10 +8,12 @@ import { fashionTemplates } from './fashion';
 import { accessoriesTemplates } from './accessories';
 import { hauteCoutureTemplates } from './hauteCouture';
 import { waterFilterTemplate } from './products/water-filter';
+import { waterFilterPremiumTemplate } from './products/water-filter-premium';
 
 // Combining all templates with proper categorization
 export const advancedTemplates: Template[] = [
   waterFilterTemplate,
+  waterFilterPremiumTemplate,
   ...supplementsTemplates,
   ...shoesTemplates,
   ...electronicsTemplates,
@@ -42,3 +44,4 @@ export * from './fashion';
 export * from './accessories';
 export * from './hauteCouture';
 export * from './products/water-filter';
+export * from './products/water-filter-premium';
