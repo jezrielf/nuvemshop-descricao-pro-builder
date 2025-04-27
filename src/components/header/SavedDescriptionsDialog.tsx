@@ -31,8 +31,17 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   useEffect(() => {
     // Get auth state once during component mount
     const { user } = useEditorStore.getState();
-    setUserId(user ? user.id : null);
+    
+    // Format user ID properly
+    const formattedUserId = user?.id ? String(user.id) : null;
+    setUserId(formattedUserId);
+    
+    console.log('SavedDescriptionsDialog initialized with user ID:', formattedUserId);
   }, []);
+  
+  useEffect(() => {
+    console.log('SavedDescriptionsDialog received saved descriptions:', savedDescriptions?.length || 0);
+  }, [savedDescriptions]);
   
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent click
@@ -42,22 +51,34 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
-      // Use stored userId instead of accessing it during render
-      const key = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
-      
-      // Get current descriptions from localStorage
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        const descriptions = JSON.parse(saved) as ProductDescription[];
-        const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
-        localStorage.setItem(key, JSON.stringify(updatedDescriptions));
+      try {
+        // Use stored userId instead of accessing it during render
+        const key = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
+        console.log('Deleting description from storage key:', key);
         
-        // Update store
-        loadSavedDescriptions();
-        
+        // Get current descriptions from localStorage
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          const descriptions = JSON.parse(saved) as ProductDescription[];
+          const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
+          localStorage.setItem(key, JSON.stringify(updatedDescriptions));
+          
+          // Update store
+          loadSavedDescriptions();
+          
+          toast({
+            title: "Descrição excluída",
+            description: "A descrição foi removida com sucesso."
+          });
+        } else {
+          console.warn('No saved descriptions found in storage key:', key);
+        }
+      } catch (error) {
+        console.error('Error deleting description:', error);
         toast({
-          title: "Descrição excluída",
-          description: "A descrição foi removida com sucesso."
+          title: "Erro ao excluir descrição",
+          description: "Ocorreu um erro ao tentar excluir a descrição.",
+          variant: "destructive"
         });
       }
     }
@@ -66,6 +87,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   };
   
   const handleLoadDescription = (desc: ProductDescription) => {
+    console.log('Loading description:', desc.name || desc.id);
     loadDescription(desc);
     setOpen(false);
   };
@@ -76,7 +98,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
         <DialogTrigger asChild>
           <Button variant="outline" className="flex items-center">
             <ListTodo className="mr-2 h-4 w-4" />
-            Descrições Salvas
+            Descrições Salvas ({savedDescriptions?.length || 0})
           </Button>
         </DialogTrigger>
         <DialogContent>
@@ -102,7 +124,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
                     onClick={() => handleLoadDescription(desc)}
                   >
                     <div>
-                      <p className="font-medium">{desc.name}</p>
+                      <p className="font-medium">{desc.name || "Descrição sem nome"}</p>
                       <p className="text-xs text-gray-500">
                         Atualizado em: {new Date(desc.updatedAt).toLocaleDateString()}
                       </p>
@@ -137,7 +159,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir a descrição "{selectedDescription?.name}"? 
+              Tem certeza que deseja excluir a descrição "{selectedDescription?.name || 'sem nome'}"? 
               Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>

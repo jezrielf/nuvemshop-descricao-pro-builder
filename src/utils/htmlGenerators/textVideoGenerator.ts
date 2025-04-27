@@ -4,9 +4,13 @@ import { getStylesFromBlock } from "../styleConverter";
 
 export function generateTextVideoBlockHtml(block: TextVideoBlock): string {
   try {
-    const { videoUrl = '', aspectRatio = '16:9', heading = '', content = '' } = block;
-    const autoplay = block.autoplay || false;
-    const muteAudio = block.muteAudio || false;
+    // Use default values if properties are missing
+    const videoUrl = block.videoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+    const aspectRatio = block.aspectRatio || '16:9';
+    const heading = block.heading || '';
+    const content = block.content || '<p>Adicione o texto aqui.</p>';
+    const autoplay = block.autoplay ?? false;
+    const muteAudio = block.muteAudio ?? true;
     
     // Set aspect ratio CSS class
     let aspectRatioClass = '';
@@ -24,7 +28,7 @@ export function generateTextVideoBlockHtml(block: TextVideoBlock): string {
         aspectRatioClass = 'pb-[56.25%]';
     }
 
-    // Extract YouTube video ID
+    // Extract YouTube video ID with improved error handling
     const videoId = (() => {
       try {
         if (!videoUrl) return null;
@@ -37,7 +41,7 @@ export function generateTextVideoBlockHtml(block: TextVideoBlock): string {
       }
     })();
 
-    // Generate embed URL
+    // Generate embed URL with safety checks
     const embedUrl = videoId 
       ? `https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? '1' : '0'}&mute=${muteAudio ? '1' : '0'}&rel=0`
       : '';
@@ -76,7 +80,7 @@ export function generateTextVideoBlockHtml(block: TextVideoBlock): string {
     console.error('Error generating TextVideo block HTML:', error);
     return `
       <div class="error-block p-4 bg-red-50 text-red-600 rounded">
-        Erro ao gerar bloco de Texto e Vídeo
+        Erro ao gerar bloco de Texto e Vídeo: ${error instanceof Error ? error.message : 'Erro desconhecido'}
       </div>
     `;
   }

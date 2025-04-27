@@ -36,7 +36,9 @@ const NuvemshopConnectionStatus = memo(({
 }) => {
   if (!storeConnected) return null;
 
-  const storeDisplayName = storeName || (storeId ? `ID ${storeId}` : 'Loja conectada');
+  // Format storeId to string display
+  const storeIdFormatted = storeId ? String(storeId) : 'N/A';
+  const storeDisplayName = storeName || (storeId ? `ID ${storeIdFormatted}` : 'Loja conectada');
   
   return (
     <div className="flex items-center gap-3">
@@ -57,6 +59,7 @@ const NuvemshopConnectionStatus = memo(({
   );
 });
 
+// Memoized components for better performance
 const NuvemshopConnectButton = memo(({ onConnect }: { onConnect: (e: React.MouseEvent) => void }) => {
   return (
     <Button 

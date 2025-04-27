@@ -1,3 +1,4 @@
+
 import { BlockBase, BlockType } from '@/types/editor/base';
 
 export function validateBaseBlock(block: any): boolean {
@@ -6,7 +7,7 @@ export function validateBaseBlock(block: any): boolean {
     return false;
   }
   
-  const requiredProperties = ['id', 'type', 'title', 'visible', 'columns', 'style'];
+  const requiredProperties = ['id', 'type', 'title', 'visible'];
   
   const missingProps = requiredProperties.filter(prop => !(prop in block));
   if (missingProps.length > 0) {
@@ -14,10 +15,16 @@ export function validateBaseBlock(block: any): boolean {
     return false;
   }
   
-  // Style should be an object
+  // Add missing properties with defaults
+  if (!('columns' in block)) {
+    console.warn(`Block missing 'columns', adding default 'full' value`);
+    block.columns = 'full';
+  }
+  
+  // Make sure style is an object
   if (!block.style || typeof block.style !== 'object') {
-    console.error('Block style is not an object:', block.style);
-    return false;
+    console.warn(`Block missing 'style', adding default empty object`);
+    block.style = {};
   }
   
   return true;
@@ -56,9 +63,39 @@ export function validateBlockByType(block: any): boolean {
     case 'video':
       return 'videoUrl' in block;
     case 'videoText':
-      return 'videoUrl' in block && 'content' in block;
+      try {
+        const valid = 'videoUrl' in block && 'content' in block;
+        // Auto-fix missing properties
+        if (!valid) {
+          if (!('videoUrl' in block)) block.videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+          if (!('content' in block)) block.content = '<p>Adicione o texto aqui.</p>';
+          if (!('heading' in block)) block.heading = 'Título da Seção';
+          if (!('aspectRatio' in block)) block.aspectRatio = '16:9';
+          if (!('autoplay' in block)) block.autoplay = false;
+          if (!('muteAudio' in block)) block.muteAudio = true;
+        }
+        return true;
+      } catch (error) {
+        console.error('Error validating videoText block:', error);
+        return false;
+      }
     case 'textVideo':
-      return 'videoUrl' in block && 'content' in block;
+      try {
+        const valid = 'videoUrl' in block && 'content' in block;
+        // Auto-fix missing properties
+        if (!valid) {
+          if (!('videoUrl' in block)) block.videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+          if (!('content' in block)) block.content = '<p>Adicione o texto aqui.</p>';
+          if (!('heading' in block)) block.heading = 'Título da Seção';
+          if (!('aspectRatio' in block)) block.aspectRatio = '16:9';
+          if (!('autoplay' in block)) block.autoplay = false;
+          if (!('muteAudio' in block)) block.muteAudio = true;
+        }
+        return true;
+      } catch (error) {
+        console.error('Error validating textVideo block:', error);
+        return false;
+      }
     default:
       console.error(`Unknown block type: ${type}`);
       return false;
@@ -66,15 +103,31 @@ export function validateBlockByType(block: any): boolean {
 }
 
 export function ensureValidBlock(block: any, expectedType: BlockType): any {
-  if (!block || typeof block !== 'object' || block.type !== expectedType) {
-    console.error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
-    throw new Error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
+  try {
+    if (!block || typeof block !== 'object' || block.type !== expectedType) {
+      console.error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
+      throw new Error(`Invalid block type: expected ${expectedType}, got ${block?.type}`);
+    }
+    
+    // Try to fix missing properties based on the type
+    if (expectedType === 'videoText' || expectedType === 'textVideo') {
+      if (!block.videoUrl) block.videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+      if (!block.content) block.content = '<p>Adicione o texto aqui.</p>';
+      if (!block.heading) block.heading = 'Título da Seção';
+      if (!block.aspectRatio) block.aspectRatio = '16:9';
+      if (block.autoplay === undefined) block.autoplay = false;
+      if (block.muteAudio === undefined) block.muteAudio = true;
+      if (!block.style) block.style = { headingColor: '#333333' };
+    }
+    
+    if (!validateBlockByType(block)) {
+      console.error(`Block of type ${expectedType} is missing required properties`);
+      throw new Error(`Block of type ${expectedType} is missing required properties`);
+    }
+    
+    return block;
+  } catch (error) {
+    console.error('Error ensuring valid block:', error);
+    throw error;
   }
-  
-  if (!validateBlockByType(block)) {
-    console.error(`Block of type ${expectedType} is missing required properties`);
-    throw new Error(`Block of type ${expectedType} is missing required properties`);
-  }
-  
-  return block;
 }

@@ -67,39 +67,39 @@ export function isVideoBlock(block: any): block is VideoBlock {
 }
 
 export function isVideoTextBlock(block: any): block is VideoTextBlock {
-  return block?.type === 'videoText' && 
-    typeof block?.videoUrl === 'string' &&
-    typeof block?.content === 'string';
+  return block?.type === 'videoText' && block !== null;
 }
 
 export function isTextVideoBlock(block: any): block is TextVideoBlock {
-  return block?.type === 'textVideo' && 
-    typeof block?.videoUrl === 'string' &&
-    typeof block?.content === 'string';
+  return block?.type === 'textVideo' && block !== null;
 }
 
 // Generic typed block casting function
 export function getTypedBlock<T extends Block>(block: Block, typeGuard: (block: any) => block is T): T {
   if (!typeGuard(block)) {
-    console.warn(`Block with ID ${block.id} does not match expected type. Using as-is.`);
+    console.warn(`Block with ID ${block.id} does not match expected type ${block.type}. Attempting to fix.`);
     
-    // Add default values for video blocks
-    if (block.type === 'videoText' || block.type === 'textVideo') {
+    // Fix common missing properties based on block type
+    if (block.type === 'videoText') {
       const videoBlock = block as any;
-      if (!videoBlock.videoUrl) {
-        videoBlock.videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-      }
-      if (!videoBlock.content) {
-        videoBlock.content = '<p>Adicione o texto aqui.</p>';
-      }
-      if (!videoBlock.heading) {
-        videoBlock.heading = 'Título da Seção';
-      }
-      if (!videoBlock.aspectRatio) {
-        videoBlock.aspectRatio = '16:9';
-      }
+      if (!videoBlock.videoUrl) videoBlock.videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+      if (!videoBlock.content) videoBlock.content = '<p>Adicione o texto aqui.</p>';
+      if (!videoBlock.heading) videoBlock.heading = 'Título da Seção';
+      if (!videoBlock.aspectRatio) videoBlock.aspectRatio = '16:9';
+      if (videoBlock.autoplay === undefined) videoBlock.autoplay = false;
+      if (videoBlock.muteAudio === undefined) videoBlock.muteAudio = true;
+    } 
+    
+    else if (block.type === 'textVideo') {
+      const videoBlock = block as any;
+      if (!videoBlock.videoUrl) videoBlock.videoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+      if (!videoBlock.content) videoBlock.content = '<p>Adicione o texto aqui.</p>';
+      if (!videoBlock.heading) videoBlock.heading = 'Título da Seção';
+      if (!videoBlock.aspectRatio) videoBlock.aspectRatio = '16:9';
+      if (videoBlock.autoplay === undefined) videoBlock.autoplay = false;
+      if (videoBlock.muteAudio === undefined) videoBlock.muteAudio = true;
     }
   }
+  
   return block as T;
 }
-
