@@ -1,4 +1,3 @@
-
 import { BlockBase, BlockType } from '@/types/editor/base';
 
 export function validateBaseBlock(block: any): boolean {
@@ -56,6 +55,10 @@ export function validateBlockByType(block: any): boolean {
       return 'heading' in block && 'content' in block && 'buttonText' in block;
     case 'video':
       return 'videoUrl' in block;
+    case 'videoText':
+      return 'videoUrl' in block && 'content' in block;
+    case 'textVideo':
+      return 'videoUrl' in block && 'content' in block;
     default:
       console.error(`Unknown block type: ${type}`);
       return false;

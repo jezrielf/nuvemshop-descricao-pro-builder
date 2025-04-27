@@ -8,14 +8,14 @@ export function createVideoTextBlock(columns: ColumnLayout = 'full'): VideoTextB
     id: uuidv4(),
     type: 'videoText',
     title: 'Vídeo e Texto',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    columns,
+    visible: true,
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     aspectRatio: '16:9',
     autoplay: false,
     muteAudio: true,
     heading: 'Título da Seção',
-    content: '<p>Adicione o texto aqui para descrever seu vídeo ou produto. Este texto será exibido ao lado do vídeo.</p>',
-    columns,
-    visible: true,
+    content: '<p>Adicione o texto aqui.</p>',
     style: {
       headingColor: '#333333',
     }
