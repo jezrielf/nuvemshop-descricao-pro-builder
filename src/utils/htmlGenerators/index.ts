@@ -1,3 +1,4 @@
+
 import { Block, BlockType } from '@/types/editor';
 import { generateHeroHtml } from './heroGenerator';
 import { generateTextHtml } from './textGenerator';
@@ -11,8 +12,6 @@ import { generateTextImageHtml } from './textImageGenerator';
 import { generateFAQHtml } from './faqGenerator';
 import { generateCTAHtml } from './ctaGenerator';
 import { generateVideoBlockHtml } from './videoGenerator';
-import { generateVideoTextBlockHtml } from './videoTextGenerator';
-import { generateTextVideoBlockHtml } from './textVideoGenerator';
 
 // Map block types to their respective HTML generator functions
 const blockGenerators: Record<BlockType, (block: any) => string> = {
@@ -27,58 +26,31 @@ const blockGenerators: Record<BlockType, (block: any) => string> = {
   textImage: generateTextImageHtml,
   faq: generateFAQHtml,
   cta: generateCTAHtml,
-  video: generateVideoBlockHtml,
-  videoText: generateVideoTextBlockHtml,
-  textVideo: generateTextVideoBlockHtml
+  video: generateVideoBlockHtml
 };
 
-// More robust generateBlockHtml function
+// Generate HTML for a specific block based on its type
 export const generateBlockHtml = (block: Block): string => {
   try {
+    // Check if the block type is supported
     if (!block || !block.type || !(block.type in blockGenerators)) {
-      console.error(`Invalid block or unsupported type: ${block?.type}`);
-      return `<div class="error-block p-4 bg-red-50 text-red-600 rounded">
-        Tipo de bloco não suportado: ${block?.type || 'indefinido'}
-      </div>`;
+      console.error(`Unsupported block type: ${block?.type}`);
+      return `<div class="error-block">Tipo de bloco não suportado: ${block?.type || 'indefinido'}</div>`;
     }
     
-    // Only render if block is visible
+    // Check if the block is visible
     if (block.visible === false) {
-      return '';
+      return ''; // Return empty string for invisible blocks
     }
     
-    // Validate block before generating HTML
-    if (!validateBlock(block)) {
-      console.error(`Invalid block structure:`, block);
-      return `<div class="error-block p-4 bg-yellow-50 text-yellow-600 rounded">
-        Bloco com estrutura inválida
-      </div>`;
-    }
-    
+    // Generate HTML using the appropriate generator
     const generator = blockGenerators[block.type as BlockType];
-    const html = generator(block);
-    
-    if (!html) {
-      console.error(`Empty HTML generated for block:`, block);
-      return `<div class="error-block p-4 bg-yellow-50 text-yellow-600 rounded">
-        Erro ao gerar HTML do bloco
-      </div>`;
-    }
-    
-    return html;
+    return generator(block);
   } catch (error) {
     console.error(`Error generating HTML for block ${block?.id}:`, error);
-    return `<div class="error-block p-4 bg-red-50 text-red-600 rounded">
-      Erro ao gerar HTML do bloco: ${error instanceof Error ? error.message : 'Erro desconhecido'}
-    </div>`;
+    return `<div class="error-block">Erro ao gerar HTML para o bloco: ${error instanceof Error ? error.message : 'Erro desconhecido'}</div>`;
   }
 };
-
-// Helper function to validate block structure
-function validateBlock(block: any): boolean {
-  const requiredFields = ['id', 'type', 'title', 'columns'];
-  return requiredFields.every(field => field in block);
-}
 
 // Export all generators for use in other modules
 export {
@@ -93,7 +65,5 @@ export {
   generateTextImageHtml,
   generateFAQHtml,
   generateCTAHtml,
-  generateVideoBlockHtml,
-  generateVideoTextBlockHtml,
-  generateTextVideoBlockHtml
+  generateVideoBlockHtml
 };

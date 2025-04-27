@@ -1,211 +1,153 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
-import { v4 as uuidv4 } from 'uuid';
-import { rolesToString } from '@/utils/roleUtils';
-
-// Define allowed roles to match database constraints
-type AllowedRole = 'user' | 'premium' | 'admin';
-
-const validateRole = (role: string): AllowedRole => {
-  if (role === "user" || role === "premium" || role === "admin") {
-    return role as AllowedRole;
-  }
-  return "user"; // Default to user if invalid role
-};
 
 export const userService = {
-  // Get all users
   getUsers: async (): Promise<Profile[]> => {
     try {
-      console.log('Fetching users...');
-      
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('criado_em', { ascending: false });
-        
-      if (error) {
-        console.error('Error fetching users:', error);
-        throw new Error('Failed to fetch users');
-      }
-      
-      console.log(`Found ${profiles.length} users`);
-      return profiles as Profile[];
-    } catch (error: any) {
-      console.error('Error in getUsers:', error);
-      throw new Error(error.message || 'Failed to fetch users');
-    }
-  },
-  
-  // Get user by ID
-  getUserById: async (userId: string): Promise<Profile | null> => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (error) throw error;
-      
-      return data as Profile;
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      return null;
-    }
-  },
-  
-  // Create new user
-  createUser: async (email: string, password: string, userData: Partial<Profile>): Promise<Profile | null> => {
-    try {
-      // First create the user in auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
+      // Get users from auth.users through the admin API
+      const { data: authUsers, error: authError } = await supabase.functions.invoke('admin-list-users', {
+        body: {}
       });
       
-      if (authError) throw authError;
-      
-      if (!authData.user) {
-        throw new Error('Failed to create user account');
+      if (authError) {
+        console.error('Error fetching auth users:', authError);
+        throw authError;
       }
       
-      const userId = authData.user.id;
+      console.log('Auth users fetched:', authUsers);
       
-      // Then create the profile
-      const newProfile: Profile = {
-        id: userId,
-        nome: userData.nome || email.split('@')[0],
-        avatar_url: userData.avatar_url || null,
-        role: userData.role || 'user',
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString(),
-      };
-      
-      // Ensure role is a string when inserting into the database
-      const profileToInsert = {
-        ...newProfile,
-        role: typeof newProfile.role === 'string' ? newProfile.role : rolesToString(newProfile.role),
-      };
-      
-      const { error: profileError } = await supabase
+      // Now get profiles data
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .insert([profileToInsert]);
-        
-      if (profileError) throw profileError;
-      
-      // If role is specified and not 'user', set it in the user_roles table
-      if (userData.role && userData.role !== 'user') {
-        const validatedRole = validateRole(typeof userData.role === 'string' ? userData.role : 'user');
-        
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: userId,
-            role: validatedRole
-          });
-          
-        if (roleError) {
-          console.error('Error setting user role:', roleError);
-          // We don't throw here since the user was already created
-        }
+        .select('*');
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
       }
       
-      return newProfile;
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      throw new Error(error.message || 'Failed to create user');
+      // Create a map of profiles by ID for faster lookup
+      const profilesMap = new Map<string, Profile>();
+      profilesData?.forEach((profile: Profile) => {
+        profilesMap.set(profile.id, profile);
+      });
+      
+      // Map auth users to profiles and enrich with email
+      const enrichedProfiles: Profile[] = [];
+      
+      authUsers?.users?.forEach((user: any) => {
+        const profile = profilesMap.get(user.id) || {
+          id: user.id,
+          nome: null,
+          avatar_url: null,
+          criado_em: user.created_at,
+          atualizado_em: user.created_at,
+          role: 'user',
+        };
+        
+        // Add email from auth user to profile
+        enrichedProfiles.push({
+          ...profile,
+          email: user.email
+        });
+      });
+      
+      return enrichedProfiles;
+    } catch (error) {
+      console.error('Error in getUsers:', error);
+      throw error;
     }
   },
   
-  // Update user
-  updateUser: async (userId: string, userData: Partial<Profile>): Promise<Profile | null> => {
+  updateUserProfile: async (userId: string, data: Partial<Profile>): Promise<Profile> => {
     try {
-      const updateData: any = {
-        ...userData,
-        atualizado_em: new Date().toISOString()
-      };
-      
-      // Ensure role is string if passed
-      if (userData.role) {
-        updateData.role = typeof userData.role === 'string' ? userData.role : rolesToString(userData.role);
+      // Filter out non-string roles to fix compatibility with Supabase
+      const updateData: any = { ...data };
+      if (updateData.role && Array.isArray(updateData.role)) {
+        // If role is an array, convert it to a string (we'll use the first role)
+        // This is a workaround for the type mismatch
+        updateData.role = updateData.role.join(',');
       }
       
-      const { data, error } = await supabase
+      updateData.atualizado_em = new Date().toISOString();
+      
+      const { error } = await supabase
         .from('profiles')
         .update(updateData)
-        .eq('id', userId)
-        .select()
-        .single();
+        .eq('id', userId);
         
       if (error) throw error;
       
-      // If role is being updated, update the user_roles table
-      if (userData.role) {
-        const validatedRole = validateRole(
-          typeof userData.role === 'string' ? userData.role : 'user'
-        );
+      // Fetch the updated profile without using .single()
+      const { data: updatedProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
         
-        // Check if there's an existing role
-        const { data: existingRole, error: fetchError } = await supabase
-          .from('user_roles')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-          
-        if (fetchError && !fetchError.message.includes('No rows found')) {
-          console.error('Error fetching user role:', fetchError);
-        }
-        
-        if (existingRole) {
-          // Update existing role
-          const { error: updateError } = await supabase
-            .from('user_roles')
-            .update({ role: validatedRole })
-            .eq('id', existingRole.id);
-            
-          if (updateError) console.error('Error updating user role:', updateError);
-        } else {
-          // Create new role
-          const { error: insertError } = await supabase
-            .from('user_roles')
-            .insert({ user_id: userId, role: validatedRole });
-            
-          if (insertError) console.error('Error creating user role:', insertError);
-        }
+      if (fetchError) throw fetchError;
+      
+      if (!updatedProfile) {
+        throw new Error('Profile not found after update');
       }
       
-      return data as Profile;
+      return updatedProfile;
     } catch (error) {
-      console.error('Error updating user:', error);
-      return null;
+      console.error('Error in updateUserProfile:', error);
+      throw error;
     }
   },
   
-  // Delete user
-  deleteUser: async (userId: string): Promise<boolean> => {
+  updateUserRole: async (userId: string, role: string | string[]): Promise<void> => {
     try {
-      // This will cascade delete the profile due to RLS
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      // Convert array roles to comma-separated string if needed
+      const roleValue = Array.isArray(role) ? role.join(',') : role;
+      
+      console.log('Updating role for user', userId, 'to', roleValue);
+      
+      const { error } = await supabase.functions.invoke('admin-update-role', {
+        body: { userId, role: roleValue }
+      });
+      
+      if (error) {
+        console.error('Error invoking admin-update-role function:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error in updateUserRole:', error);
+      throw error;
+    }
+  },
+  
+  createUser: async (email: string, password: string, userData: any): Promise<any> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-create-user', {
+        body: {
+          email,
+          password,
+          userData
+        }
+      });
       
       if (error) throw error;
-      
-      return true;
+      return data;
     } catch (error) {
-      console.error('Error deleting user:', error);
-      return false;
+      console.error('Error in createUser:', error);
+      throw error;
     }
   },
-
-  // New method: Update user profile (wrapper for updateUser)
-  updateUserProfile: async (userId: string, data: { nome: string }): Promise<Profile | null> => {
-    return userService.updateUser(userId, data);
-  },
   
-  // New method: Update user role
-  updateUserRole: async (userId: string, role: string | string[]): Promise<Profile | null> => {
-    return userService.updateUser(userId, { role });
-  }
+  deleteUser: async (userId: string): Promise<void> => {
+    try {
+      const { error } = await supabase.functions.invoke('admin-delete-user', {
+        body: { userId }
+      });
+      
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error in deleteUser:', error);
+      throw error;
+    }
+  },
 };

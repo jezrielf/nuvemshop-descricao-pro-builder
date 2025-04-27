@@ -1,30 +1,25 @@
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React from 'react';
 import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
-export interface UserSearchBarProps {
-  onChange: (query: string) => void;
+interface UserSearchBarProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
 }
 
-export const UserSearchBar: React.FC<UserSearchBarProps> = ({ onChange }) => {
-  const [value, setValue] = useState('');
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setValue(query);
-    onChange(query);
-  };
-  
+const UserSearchBar: React.FC<UserSearchBarProps> = ({ searchTerm, onSearchChange }) => {
   return (
-    <div className="relative flex-1">
-      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+    <div className="relative flex-1 sm:flex-none">
+      <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
-        placeholder="Buscar usuários por nome, email ou perfil..."
-        className="pl-8"
-        value={value}
-        onChange={handleChange}
+        placeholder="Buscar usuários..."
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        className="pl-8 w-full sm:w-[300px]"
       />
     </div>
   );
 };
+
+export default UserSearchBar;

@@ -7,10 +7,10 @@ import { useEditorStore } from '@/store/editor';
 import { useNavigate } from 'react-router-dom';
 
 interface SaveDescriptionButtonProps {
-  isPremium: boolean;
-  isSubscribed: boolean;
+  isPremium: () => boolean;
+  isSubscribed: () => boolean;
   hasDescription: boolean;
-  canCreateMoreDescriptions: boolean;
+  canCreateMoreDescriptions: () => boolean;
 }
 
 const SaveDescriptionButton: React.FC<SaveDescriptionButtonProps> = ({ 
@@ -33,7 +33,7 @@ const SaveDescriptionButton: React.FC<SaveDescriptionButtonProps> = ({
       return;
     }
     
-    if (!isSubscribed && !canCreateMoreDescriptions) {
+    if (!isSubscribed() && !canCreateMoreDescriptions()) {
       toast({
         title: "Limite de descrições atingido",
         description: "Você atingiu o limite de 3 descrições gratuitas. Faça upgrade para um plano pago para continuar.",
@@ -77,7 +77,7 @@ const SaveDescriptionButton: React.FC<SaveDescriptionButtonProps> = ({
     >
       <Save className="mr-2 h-4 w-4" />
       Salvar Descrição
-      {!isSubscribed && <Lock className="ml-1 h-3 w-3 text-yellow-600" />}
+      {!isSubscribed() && <Lock className="ml-1 h-3 w-3 text-yellow-600" />}
     </Button>
   );
 };

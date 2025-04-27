@@ -1,15 +1,15 @@
+
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
-import { fixTemplateProps } from './fixTemplateProps';
 
 // Haute Couture Template Collection
-const hauteCoutureTemplatesRaw = [
+export const hauteCoutureTemplates: Template[] = [
   // TEMPLATE 1: Luxury Couture
   {
     id: uuidv4(),
     name: 'Alta Costura Luxuosa',
     category: 'clothing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
+    thumbnail: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
     blocks: [
       // Hero Block
       {
@@ -147,7 +147,7 @@ const hauteCoutureTemplatesRaw = [
     id: uuidv4(),
     name: 'Coleção de Designer',
     category: 'clothing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1537832816519-689ad163238b',
+    thumbnail: 'https://images.unsplash.com/photo-1537832816519-689ad163238b',
     blocks: [
       // Hero Block
       {
@@ -326,12 +326,12 @@ const hauteCoutureTemplatesRaw = [
     ]
   },
   
-  // TEMPLATE 3: Haute Couture Collection
+  // TEMPLATE 3: Bridal Couture
   {
     id: uuidv4(),
-    name: 'Coleção Alta Costura',
+    name: 'Alta Costura para Noivas',
     category: 'clothing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae',
+    thumbnail: 'https://images.unsplash.com/photo-1508467876889-77d4fcd7268a',
     blocks: [
       // Hero Block
       {
@@ -340,15 +340,15 @@ const hauteCoutureTemplatesRaw = [
         title: 'Banner Principal',
         columns: 1,
         visible: true,
-        heading: 'Descubra a Nova Coleção de Alta Costura',
-        subheading: 'Elegância e sofisticação para momentos inesquecíveis',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#new-collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1509631179647-0177331693ae',
+        heading: 'Vestidos de Noiva Exclusivos',
+        subheading: 'Criações únicas para o dia mais especial da sua vida',
+        buttonText: 'Conhecer Coleção',
+        buttonUrl: '#bridal',
+        backgroundImage: 'https://images.unsplash.com/photo-1508467876889-77d4fcd7268a',
         style: {
-          backgroundColor: '#f9f9f9',
-          headingColor: '#333',
-          textColor: '#666',
+          backgroundColor: '#f8f5f2',
+          headingColor: '#5a3535',
+          textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
@@ -357,15 +357,69 @@ const hauteCoutureTemplatesRaw = [
       {
         id: uuidv4(),
         type: 'text',
-        title: 'Sobre a Coleção',
+        title: 'Arte Nupcial',
         columns: 1,
         visible: true,
-        heading: 'A Essência da Elegância',
-        content: '<p>Nossa nova coleção de alta costura é uma celebração da feminilidade e do requinte. Cada peça foi cuidadosamente desenhada para realçar a beleza natural da mulher, utilizando tecidos nobres e detalhes artesanais que conferem um toque de exclusividade.</p><p>Deixe-se envolver pela magia da alta costura e encontre o vestido perfeito para os seus momentos mais especiais.</p>',
+        heading: 'A Arte da Alta Costura Nupcial',
+        content: '<p>Um vestido de noiva feito sob medida é muito mais do que uma peça para um único dia - é um legado que conta uma história de amor, tradição e individualidade. No ateliê de alta costura nupcial, cada vestido é concebido como uma obra de arte única, elaborada com a mais elevada dedicação e habilidade artesanal.</p><p>Desde os primeiros esboços até o último ponto, cada etapa do processo é conduzida com reverência à importância do momento que o vestido celebrará. Trabalhamos com as noivas para criar não apenas um vestido deslumbrante, mas uma experiência transformadora que honra seus sonhos e realça sua beleza natural.</p>',
         style: {
-          backgroundColor: '#fff',
-          headingColor: '#333',
-          textColor: '#666',
+          backgroundColor: '#ffffff',
+          headingColor: '#5a3535',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Benefits Block
+      {
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Vantagens',
+        columns: 3,
+        visible: true,
+        heading: 'Por que escolher um vestido exclusivo',
+        benefits: [
+          {
+            id: uuidv4(),
+            title: 'Personalização Total',
+            description: 'Um design criado especialmente para você, considerando sua personalidade e estilo do casamento',
+            icon: '✨'
+          },
+          {
+            id: uuidv4(),
+            title: 'Caimento Perfeito',
+            description: 'Ajuste impecável que considera todas as particularidades do seu corpo',
+            icon: '👗'
+          },
+          {
+            id: uuidv4(),
+            title: 'Materiais Excepcionais',
+            description: 'Acesso a tecidos raros, rendas artesanais e bordados exclusivos',
+            icon: '🧵'
+          },
+          {
+            id: uuidv4(),
+            title: 'Atenção aos Detalhes',
+            description: 'Acabamentos meticulosos e soluções criativas que só a alta costura pode oferecer',
+            icon: '🔍'
+          },
+          {
+            id: uuidv4(),
+            title: 'Experiência Inesquecível',
+            description: 'O processo de criação torna-se parte especial das memórias do seu casamento',
+            icon: '💍'
+          },
+          {
+            id: uuidv4(),
+            title: 'Peça de Herança',
+            description: 'Um vestido que pode ser preservado e passado para gerações futuras',
+            icon: '🌹'
+          }
+        ],
+        style: {
+          backgroundColor: '#f8f5f2',
+          headingColor: '#5a3535',
+          textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
@@ -374,76 +428,112 @@ const hauteCoutureTemplatesRaw = [
       {
         id: uuidv4(),
         type: 'gallery',
-        title: 'Destaques da Coleção',
+        title: 'Coleção Nupcial',
         columns: 3,
         visible: true,
         images: [
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1566667257538-7554e9995497',
-            alt: 'Vestido de festa',
-            caption: 'Vestido Longo Bordado'
+            src: 'https://images.unsplash.com/photo-1525257831372-1adeb6112a12',
+            alt: 'Vestido sereia',
+            caption: 'Modelo Afrodite - Renda Francesa'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1584395489947-86abb494544f',
-            alt: 'Vestido de gala',
-            caption: 'Vestido de Gala Exclusivo'
+            src: 'https://images.unsplash.com/photo-1550021955-d9a3a9555c5d',
+            alt: 'Vestido princesa',
+            caption: 'Modelo Aurora - Tule de Seda'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1547042985-c3991b91452c',
-            alt: 'Vestido de cocktail',
-            caption: 'Vestido de Cocktail Elegante'
+            src: 'https://images.unsplash.com/photo-1517263904808-5dc91e3e7044',
+            alt: 'Vestido boho',
+            caption: 'Modelo Flora - Algodão Orgânico'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1596455607563-ad6193f76b17',
+            alt: 'Detalhes de bordado',
+            caption: 'Bordado Manual com Cristais'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1594125311687-3b1b3eafa9f4',
+            alt: 'Véu artesanal',
+            caption: 'Véu Catedral com Apliques'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1580214080088-66c0abe2cc39',
+            alt: 'Acessórios nupciais',
+            caption: 'Tiara Artesanal com Pérolas'
           }
         ],
         style: {
-          backgroundColor: '#f9f9f9',
-          headingColor: '#333',
-          textColor: '#666',
+          backgroundColor: '#ffffff',
+          headingColor: '#5a3535',
+          textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md',
           imageFit: 'cover'
         }
       },
-      // Features Block
+      // ImageText Block
       {
         id: uuidv4(),
-        type: 'features',
-        title: 'Características Exclusivas',
-        columns: 2,
+        type: 'imageText',
+        title: 'Processo Nupcial',
+        columns: 1,
         visible: true,
-        heading: 'Detalhes que fazem a diferença',
-        features: [
+        image: {
+          src: 'https://images.unsplash.com/photo-1585241920473-b472eb9ffbae',
+          alt: 'Atelier nupcial'
+        },
+        heading: 'A Jornada de Criação',
+        content: 'Criar um vestido de noiva exclusivo é uma jornada especial que normalmente se estende por 6 a 12 meses. O processo começa com uma consulta aprofundada onde exploramos suas inspirações, o estilo do seu casamento e suas preferências pessoais. Avançamos para a seleção de materiais, provas de conceito e múltiplas sessões de ajuste para garantir que cada detalhe seja perfeito para o grande dia.',
+        style: {
+          backgroundColor: '#f8f5f2',
+          headingColor: '#5a3535',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
+      },
+      // FAQ Block
+      {
+        id: uuidv4(),
+        type: 'faq',
+        title: 'Perguntas Frequentes',
+        columns: 1,
+        visible: true,
+        heading: 'Dúvidas sobre Alta Costura Nupcial',
+        questions: [
           {
             id: uuidv4(),
-            title: 'Tecidos Nobres',
-            description: 'Utilizamos apenas tecidos da mais alta qualidade, como seda pura, renda francesa e chiffon de seda.',
-            icon: '✓'
+            question: 'Com quanto tempo de antecedência devo encomendar meu vestido?',
+            answer: 'Recomendamos iniciar o processo entre 10 e 12 meses antes do casamento. Vestidos mais elaborados com bordados extensivos podem exigir até 14 meses para criação.'
           },
           {
             id: uuidv4(),
-            title: 'Bordados Artesanais',
-            description: 'Nossos bordados são feitos à mão por artesãos especializados, garantindo um acabamento impecável.',
-            icon: '✓'
+            question: 'Quantas provas são necessárias?',
+            answer: 'Geralmente realizamos de 4 a 6 provas, dependendo da complexidade do vestido. Cada prova é uma oportunidade para refinamentos e ajustes precisos.'
           },
           {
             id: uuidv4(),
-            title: 'Modelagem Exclusiva',
-            description: 'Cada vestido é modelado para valorizar a silhueta feminina, proporcionando um caimento perfeito.',
-            icon: '✓'
+            question: 'Vocês criam acessórios coordenados?',
+            answer: 'Sim, oferecemos serviço completo de criação de véus, tiaras, joias e outros acessórios que complementam perfeitamente seu vestido exclusivo.'
           },
           {
             id: uuidv4(),
-            title: 'Acabamento Impecável',
-            description: 'Cuidamos de cada detalhe, desde a escolha dos botões até o forro, para garantir um acabamento impecável.',
-            icon: '✓'
+            question: 'É possível incorporar elementos sentimentais ao vestido?',
+            answer: 'Absolutamente. Podemos integrar rendas de família, joias herdadas ou outros elementos significativos ao design do seu vestido, criando uma peça ainda mais especial.'
           }
         ],
         style: {
-          backgroundColor: '#fff',
-          headingColor: '#333',
-          textColor: '#666',
+          backgroundColor: '#ffffff',
+          headingColor: '#5a3535',
+          textColor: '#333333',
           padding: 'lg',
           blockSpacing: 'md'
         }
@@ -455,14 +545,14 @@ const hauteCoutureTemplatesRaw = [
         title: 'Chamada para Ação',
         columns: 1,
         visible: true,
-        heading: 'Encontre o Seu Vestido Perfeito',
-        content: 'Agende uma visita ao nosso ateliê e descubra a coleção completa de alta costura.',
-        buttonText: 'Agendar Visita',
-        buttonUrl: '#appointment',
+        heading: 'Realize o Sonho do Vestido Perfeito',
+        content: 'Agende uma consulta em nosso ateliê para iniciar a jornada de criação do vestido que você sempre sonhou.',
+        buttonText: 'Marcar Consulta',
+        buttonUrl: '#bridal-appointment',
         style: {
-          backgroundColor: '#333',
-          headingColor: '#fff',
-          textColor: '#fff',
+          backgroundColor: '#9e7676',
+          headingColor: '#ffffff',
+          textColor: '#ffffff',
           padding: 'lg',
           blockSpacing: 'none'
         }
@@ -470,9 +560,6 @@ const hauteCoutureTemplatesRaw = [
     ]
   }
 ];
-
-// Apply fixTemplateProps to ensure all templates have the correct properties
-export const hauteCoutureTemplates: Template[] = hauteCoutureTemplatesRaw.map(fixTemplateProps);
 
 // For backward compatibility with existing code that might expect a single template
 export const hauteCoutureTemplate = hauteCoutureTemplates[0];

@@ -1,5 +1,4 @@
 
-// Only updating the problem areas
 import React from 'react';
 import { Block, BlockType, TextBlock } from '@/types/editor';
 import HeroBlock from '../HeroBlock';
@@ -14,16 +13,8 @@ import TextImageBlock from '../TextImageBlock';
 import FAQBlock from '../FAQBlock';
 import CTABlock from '../CTABlock';
 import VideoBlock from '../VideoBlock';
-import VideoTextBlock from '../VideoTextBlock';
-import TextVideoBlock from '../TextVideoBlock';
 import { validateBaseBlock, validateBlockByType } from '@/utils/blockCreators/validation';
 import { createBlock } from '@/utils/blockCreators/createBlock';
-import { 
-  isHeroBlock, isTextBlock, isFeaturesBlock, isBenefitsBlock,
-  isSpecificationsBlock, isImageBlock, isGalleryBlock, isImageTextBlock,
-  isTextImageBlock, isFAQBlock, isCTABlock, isVideoBlock,
-  isVideoTextBlock, isTextVideoBlock, getTypedBlock
-} from './BlockTypeUtils';
 
 interface BlockRendererOptions {
   block: Block;
@@ -60,33 +51,29 @@ export class BlockRendererFactory {
 
     switch (block.type) {
       case 'hero':
-        return <HeroBlock block={getTypedBlock(block, isHeroBlock)} isPreview={isPreview} />;
+        return <HeroBlock block={block} isPreview={isPreview} />;
       case 'text':
-        return <TextBlockComponent block={getTypedBlock(block, isTextBlock)} isPreview={isPreview} />;
+        return <TextBlockComponent block={block} isPreview={isPreview} />;
       case 'features':
-        return <FeaturesBlock block={getTypedBlock(block, isFeaturesBlock)} isPreview={isPreview} />;
+        return <FeaturesBlock block={block} isPreview={isPreview} />;
       case 'benefits':
-        return <BenefitsBlock block={getTypedBlock(block, isBenefitsBlock)} isPreview={isPreview} />;
+        return <BenefitsBlock block={block} isPreview={isPreview} />;
       case 'specifications':
-        return <SpecificationsBlock block={getTypedBlock(block, isSpecificationsBlock)} isPreview={isPreview} />;
+        return <SpecificationsBlock block={block} isPreview={isPreview} />;
       case 'image':
-        return <ImageBlock block={getTypedBlock(block, isImageBlock)} isPreview={isPreview} />;
+        return <ImageBlock block={block} isPreview={isPreview} />;
       case 'gallery':
-        return <GalleryBlock block={getTypedBlock(block, isGalleryBlock)} isPreview={isPreview} />;
+        return <GalleryBlock block={block} isPreview={isPreview} />;
       case 'imageText':
-        return <ImageTextBlock block={getTypedBlock(block, isImageTextBlock)} isPreview={isPreview} />;
+        return <ImageTextBlock block={block} isPreview={isPreview} />;
       case 'textImage':
-        return <TextImageBlock block={getTypedBlock(block, isTextImageBlock)} isPreview={isPreview} />;
+        return <TextImageBlock block={block} isPreview={isPreview} />;
       case 'faq':
-        return <FAQBlock block={getTypedBlock(block, isFAQBlock)} isPreview={isPreview} />;
+        return <FAQBlock block={block} isPreview={isPreview} />;
       case 'cta':
-        return <CTABlock block={getTypedBlock(block, isCTABlock)} isPreview={isPreview} />;
+        return <CTABlock block={block} isPreview={isPreview} />;
       case 'video':
-        return <VideoBlock block={getTypedBlock(block, isVideoBlock)} isPreview={isPreview} />;
-      case 'videoText':
-        return <VideoTextBlock block={getTypedBlock(block, isVideoTextBlock)} isPreview={isPreview} />;
-      case 'textVideo':
-        return <TextVideoBlock block={getTypedBlock(block, isTextVideoBlock)} isPreview={isPreview} />;
+        return <VideoBlock block={block} isPreview={isPreview} />;
       default:
         return (
           <div className="p-4 border rounded-md bg-gray-100">
@@ -141,10 +128,10 @@ export class BlockRendererFactory {
     // Para blocos de texto, verifica se tem heading e content
     if (fixedBlock.type === 'text') {
       if (!fixedBlock.heading) {
-        (fixedBlock as TextBlock).heading = 'Título do Texto';
+        fixedBlock.heading = 'Título do Texto';
       }
       if (!fixedBlock.content) {
-        (fixedBlock as TextBlock).content = '<p>Insira o conteúdo aqui.</p>';
+        fixedBlock.content = '<p>Insira o conteúdo aqui.</p>';
       }
     }
     
@@ -157,8 +144,7 @@ export class BlockRendererFactory {
   private static isValidBlockType(type: string): boolean {
     const validTypes = [
       'hero', 'text', 'features', 'benefits', 'specifications', 
-      'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta', 'video',
-      'videoText', 'textVideo' // Adicionados os dois tipos que estavam faltando
+      'image', 'gallery', 'imageText', 'textImage', 'faq', 'cta', 'video'
     ];
     
     return validTypes.includes(type);

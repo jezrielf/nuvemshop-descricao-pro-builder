@@ -4,91 +4,65 @@ import { EditorState } from './types';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const createSaveActions = (get: () => EditorState, set: any) => {
+  // We'll store the auth context reference globally
   let authContext: ReturnType<typeof useAuth> | null = null;
 
+  // Function to set the auth context from components
   const setAuthContext = (context: ReturnType<typeof useAuth>) => {
     authContext = context;
-    if (context && context.user && context.profile) {
-      set({ user: { 
-        id: context.user.id,
-        name: context.profile?.nome || context.user.email?.split('@')[0] || 'Usuário',
-        email: context.user.email || ''
-      }});
+    
+    // Update user information in the store
+    if (context && context.user) {
+      set({ user: { id: context.user.id } });
     } else {
       set({ user: null });
     }
   };
 
-  const getStorageKey = (userId: string | number | undefined | null): string => {
-    if (!userId) return 'savedDescriptions_anonymous';
-    return `savedDescriptions_${String(userId)}`;
-  };
-
-  const migratePreviousDescriptions = (userId: string | null, allDescriptions: ProductDescription[]) => {
-    // List of possible keys to check
-    const possibleKeys = [
-      getStorageKey(userId),
-      `savedDescriptions_${JSON.stringify(userId)}`,
-      'savedDescriptions_anonymous'
-    ];
-
-    // Check all possible keys for existing descriptions
-    for (const key of possibleKeys) {
-      const savedData = localStorage.getItem(key);
-      if (savedData) {
-        try {
-          const oldDescriptions = JSON.parse(savedData) as ProductDescription[];
-          if (Array.isArray(oldDescriptions) && oldDescriptions.length > 0) {
-            oldDescriptions.forEach(oldDesc => {
-              if (!allDescriptions.some(d => d.id === oldDesc.id)) {
-                allDescriptions.push(oldDesc);
-              }
-            });
-          }
-        } catch (err) {
-          console.error(`Error parsing data from ${key}:`, err);
-        }
-      }
-    }
-
-    return allDescriptions;
-  };
-
   return {
+    // Add the setter function for auth context
     setAuthContext,
     
     saveCurrentDescription: () => {
       const description = get().description;
-      if (!description || !authContext) return false;
-
+      if (!description) return false;
+      
       try {
-        // Check premium status or description count
-        if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
-          console.log('User cannot save more descriptions');
+        // Check if auth context is available
+        if (!authContext) {
+          console.warn('Auth context not available for saving description');
           return false;
         }
-
-        // Update timestamps
+        
+        // Check if user is premium/business or has saved less than 3 descriptions
+        if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
+          return false;
+        }
+        
+        // Increment description count for free users
+        if (!authContext.isPremium()) {
+          authContext.incrementDescriptionCount();
+        }
+        
+        // Update the timestamp
         const updatedDescription = {
           ...description,
           updatedAt: new Date().toISOString()
         };
-
-        // Get user ID and storage key
-        const userId = authContext.user?.id;
-        const storageKey = getStorageKey(userId);
-
-        // Get existing descriptions and update/add new one
-        let savedDescriptions = get().savedDescriptions;
-        const existingIndex = savedDescriptions.findIndex(d => d.id === description.id);
         
+        // Get existing saved descriptions
+        let savedDescriptions = get().savedDescriptions;
+        
+        // Check if this description already exists, if so update it
+        const existingIndex = savedDescriptions.findIndex(d => d.id === description.id);
         if (existingIndex >= 0) {
           savedDescriptions[existingIndex] = updatedDescription;
         } else {
           savedDescriptions = [...savedDescriptions, updatedDescription];
         }
-
-        // Save to localStorage with consistent key
+        
+        // Save to localStorage
+        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
         localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
         
         // Update state
@@ -96,61 +70,42 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           savedDescriptions,
           description: updatedDescription
         });
-
-        console.log(`Saved description successfully to ${storageKey}`);
+        
         return true;
       } catch (error) {
         console.error('Error saving description:', error);
         return false;
       }
     },
-
+    
     loadSavedDescriptions: () => {
-      if (!authContext) {
-        console.warn('Auth context not available');
-        return;
-      }
-
       try {
-        const userId = authContext.user?.id;
-        const primaryKey = getStorageKey(userId);
-        
-        console.log(`Loading descriptions for user ${userId} from ${primaryKey}`);
-        
-        let descriptions: ProductDescription[] = [];
-        
-        // Load from primary storage
-        const savedData = localStorage.getItem(primaryKey);
-        if (savedData) {
-          try {
-            descriptions = JSON.parse(savedData);
-            if (!Array.isArray(descriptions)) {
-              descriptions = [];
-            }
-          } catch (err) {
-            console.error('Error parsing saved descriptions:', err);
-            descriptions = [];
-          }
+        // Check if auth context is available
+        if (!authContext) {
+          console.warn('Auth context not available for loading descriptions');
+          return;
         }
         
-        // Migrate descriptions from other possible storage locations
-        descriptions = migratePreviousDescriptions(userId, descriptions);
-        
-        // Save consolidated descriptions to primary key
-        if (descriptions.length > 0) {
-          localStorage.setItem(primaryKey, JSON.stringify(descriptions));
+        // Only premium/business users can load saved descriptions
+        if (!authContext.isPremium()) {
+          set({ savedDescriptions: [] });
+          return;
         }
         
-        set({ savedDescriptions: descriptions });
-        console.log(`Loaded ${descriptions.length} descriptions`);
+        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
+        const saved = localStorage.getItem(storageKey);
         
-        return descriptions;
+        if (saved) {
+          const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
+          set({ savedDescriptions: parsedDescriptions });
+        }
       } catch (error) {
-        console.error('Error loading descriptions:', error);
-        return [];
+        console.error('Error loading saved descriptions:', error);
       }
     },
     
-    getSavedDescriptions: () => get().savedDescriptions
+    getSavedDescriptions: () => {
+      return get().savedDescriptions;
+    }
   };
 };

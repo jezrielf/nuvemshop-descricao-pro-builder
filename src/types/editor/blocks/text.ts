@@ -5,5 +5,5 @@ export interface TextBlock extends BlockBase {
   type: 'text';
   heading: string;
   content: string;
-  align?: 'left' | 'center' | 'right';
+  style: BlockBase['style']; // Explicitly inheriting the style from BlockBase
 }

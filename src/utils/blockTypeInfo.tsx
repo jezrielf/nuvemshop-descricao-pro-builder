@@ -1,91 +1,72 @@
 
-import { BlockType } from '@/types/editor';
 import React from 'react';
-import {
-  Type, 
-  ImageIcon, 
-  Columns, 
-  Image, 
-  Grid, 
-  LayoutGrid,
-  HelpCircle,
-  Award,
-  ClipboardList,
-  CircleDollarSign,
-  Video,
-  MessageSquare,
-} from 'lucide-react';
+import { BlockType } from '@/types/editor';
+import { Layout, Type, Image, ImagePlus, FileText, List, BarChart, MessageSquare, Target, Play } from 'lucide-react';
 
-// Define block type information for UI display
 export const blockTypeInfo: Record<BlockType, { name: string; icon: React.ReactNode; description: string }> = {
   hero: {
-    name: 'Hero',
-    icon: <LayoutGrid />,
-    description: 'Seção principal com título, subtítulo e imagem de destaque'
-  },
-  text: {
-    name: 'Texto',
-    icon: <Type />,
-    description: 'Bloco de texto rico para conteúdo detalhado'
+    name: 'Banner Principal',
+    icon: <Layout className="h-5 w-5" />,
+    description: 'Seção de destaque com título, subtítulo e botão opcional'
   },
   features: {
-    name: 'Características',
-    icon: <Columns />,
-    description: 'Lista de características do produto em colunas'
+    name: 'Recursos',
+    icon: <BarChart className="h-5 w-5" />,
+    description: 'Lista de recursos ou características do produto'
   },
   benefits: {
     name: 'Benefícios',
-    icon: <Award />,
+    icon: <List className="h-5 w-5" />,
     description: 'Destaque os principais benefícios do produto'
   },
   specifications: {
     name: 'Especificações',
-    icon: <ClipboardList />,
-    description: 'Lista detalhada de especificações técnicas'
+    icon: <FileText className="h-5 w-5" />,
+    description: 'Lista técnica de especificações do produto'
+  },
+  text: {
+    name: 'Texto',
+    icon: <Type className="h-5 w-5" />,
+    description: 'Bloco de texto com formatação livre'
   },
   image: {
     name: 'Imagem',
-    icon: <ImageIcon />,
+    icon: <Image className="h-5 w-5" />,
     description: 'Imagem única com legenda opcional'
   },
   gallery: {
     name: 'Galeria',
-    icon: <Grid />,
-    description: 'Múltiplas imagens em uma galeria'
+    icon: <ImagePlus className="h-5 w-5" />,
+    description: 'Conjunto de imagens em formato de galeria'
   },
   imageText: {
     name: 'Imagem + Texto',
-    icon: <Image />,
+    icon: <Layout className="h-5 w-5" />,
     description: 'Imagem à esquerda com texto à direita'
   },
   textImage: {
     name: 'Texto + Imagem',
-    icon: <Image />,
+    icon: <Layout className="h-5 w-5" />,
     description: 'Texto à esquerda com imagem à direita'
   },
   faq: {
     name: 'Perguntas Frequentes',
-    icon: <HelpCircle />,
+    icon: <MessageSquare className="h-5 w-5" />,
     description: 'Lista de perguntas e respostas comuns'
   },
   cta: {
     name: 'Chamada para Ação',
-    icon: <CircleDollarSign />,
-    description: 'Seção com botão de ação destacado'
+    icon: <Target className="h-5 w-5" />,
+    description: 'Bloco de conversão com botão de destaque'
   },
   video: {
     name: 'Vídeo',
-    icon: <Video />,
-    description: 'Incorporar um vídeo do YouTube ou Vimeo'
-  },
-  videoText: {
-    name: 'Vídeo + Texto',
-    icon: <Video />,
-    description: 'Vídeo à esquerda com texto à direita'
-  },
-  textVideo: {
-    name: 'Texto + Vídeo',
-    icon: <MessageSquare />,
-    description: 'Texto à esquerda com vídeo à direita'
+    icon: <Play className="h-5 w-5" />,
+    description: 'Vídeo do YouTube com autoplay'
   }
+};
+
+// Add the missing function that's being imported in BlockHeader.tsx
+export const getBlockTypeDisplayName = (type: BlockType): string => {
+  return blockTypeInfo[type]?.name || type;
 };

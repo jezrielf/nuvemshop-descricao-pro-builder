@@ -1,15 +1,15 @@
+
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
-import { fixTemplateProps } from './fixTemplateProps';
 
 // Fashion Template Collection
-const fashionTemplatesRaw = [
+export const fashionTemplates: Template[] = [
   // TEMPLATE 1: Premium Fashion
   {
     id: uuidv4(),
     name: 'Moda Premium',
     category: 'clothing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
+    thumbnail: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
     blocks: [
       // Hero Block
       {
@@ -173,7 +173,7 @@ const fashionTemplatesRaw = [
     id: uuidv4(),
     name: 'Moda Sustentável',
     category: 'clothing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d',
+    thumbnail: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d',
     blocks: [
       // Hero Block
       {
@@ -335,7 +335,7 @@ const fashionTemplatesRaw = [
     id: uuidv4(),
     name: 'Coleção Sazonal',
     category: 'clothing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b',
+    thumbnail: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b',
     blocks: [
       // Hero Block
       {
@@ -542,9 +542,6 @@ const fashionTemplatesRaw = [
     ]
   }
 ];
-
-// Apply fixTemplateProps to ensure all templates have the correct properties
-export const fashionTemplates: Template[] = fashionTemplatesRaw.map(fixTemplateProps);
 
 // For backward compatibility with existing code that might expect a single template
 export const fashionTemplate = fashionTemplates[0];

@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { Plan } from '@/types/subscription';
+import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { planService } from '@/services/admin/planService';
+import { adminService } from '@/services/admin';
 
 export const useUpdatePlan = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -18,7 +18,7 @@ export const useUpdatePlan = (
       setLoading(true);
       
       console.log("Atualizando plano:", planData.id, planData);
-      const updatedPlan = await planService.updatePlan(planData.id, planData);
+      const updatedPlan = await adminService.updatePlan(planData.id, planData);
       
       toast({
         title: 'Plano atualizado',

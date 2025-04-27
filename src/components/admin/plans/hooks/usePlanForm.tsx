@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { Plan } from '../types';
@@ -11,8 +10,6 @@ export interface PlanFormValues {
   isActive: boolean;
   isDefault: boolean;
   features: Array<{ id: string; name: string; included: boolean }>;
-  interval: string;
-  currency: string;
 }
 
 export const usePlanForm = (
@@ -30,8 +27,6 @@ export const usePlanForm = (
       isActive: initialData ? initialData.isActive : true,
       isDefault: initialData ? initialData.isDefault : false,
       features: initialData?.features || [],
-      interval: initialData?.interval || 'month',
-      currency: initialData?.currency || 'BRL',
     }
   });
 

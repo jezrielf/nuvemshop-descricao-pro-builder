@@ -1,3 +1,3 @@
 
+export { analyzeHtmlForTemplate, customizeBlockTypes } from './htmlTemplateAnalyzer';
 export { parseHtmlToBlocks } from './htmlToBlocks';
-export { analyzeHtmlToTemplate } from './htmlTemplateAnalyzer';

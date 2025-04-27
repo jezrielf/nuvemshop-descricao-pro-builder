@@ -2,47 +2,73 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import templateService from '@/services/admin/templateService';
+import { templateService } from '@/services/admin/templateService';
+import { getAllTemplates } from '@/utils/templates';
 
 export const createLoadingSlice: StateCreator<
-  TemplateState & TemplateLoadingSlice
+  TemplateState & TemplateLoadingSlice,
+  [],
+  [],
+  TemplateLoadingSlice
 > = (set, get) => ({
-  templates: [],
-  isLoading: false,
-  error: null,
-  
   loadTemplates: async () => {
-    // Prevent infinite loading loops
-    // If already loading, just return current templates
-    if (get().isLoading) {
-      return get().templates;
-    }
-    
-    // If has templates and no error, don't reload unless forced
-    // This prevents unnecessary loading loops
-    if (get().templates.length > 0 && !get().error) {
-      return get().templates;
-    }
-    
-    set({ isLoading: true, error: null });
-    
     try {
-      const templates = await templateService.getTemplates();
+      console.log('Tentando carregar templates do serviço...');
       
-      // Only update state if we actually got templates
-      if (templates && templates.length > 0) {
-        set({ templates, isLoading: false });
-      } else {
-        // Handle empty result properly 
-        set({ isLoading: false });
-        console.log("No templates were loaded");
+      // Sempre tenha um fallback de templates locais
+      const localTemplates = getAllTemplates();
+      
+      // Garantir que temos templates disponíveis imediatamente
+      if (get().templates.length === 0) {
+        console.log('Definindo templates locais para uso imediato enquanto carregamos do servidor');
+        set({ templates: localTemplates });
       }
+      
+      // Tenta carregar do servidor
+      let templates = await templateService.getTemplates();
+      
+      // Garantir que sempre temos templates disponíveis
+      if (!templates || templates.length === 0) {
+        console.log('Nenhum template retornado pelo serviço, usando templates locais');
+        templates = localTemplates;
+      }
+      
+      console.log(`Carregados ${templates.length} templates com sucesso`);
+      set({ templates });
       return templates;
     } catch (error) {
-      console.error("Error loading templates:", error);
-      // Convert the Error object to a string to match the expected type
-      set({ error: error instanceof Error ? error.message : String(error), isLoading: false });
+      console.error('Erro ao carregar templates:', error);
+      // Fallback para templates locais em caso de erro
+      const localTemplates = getAllTemplates();
+      set({ templates: localTemplates });
+      console.log(`Fallback para ${localTemplates.length} templates locais`);
+      return localTemplates;
+    }
+  },
+  
+  searchTemplates: (query, category) => {
+    const { templates } = get();
+    
+    // Se não há templates, verificamos se precisamos carregar
+    if (!templates || templates.length === 0) {
+      console.warn('Tentando buscar templates, mas nenhum está carregado');
+      // Retornamos um array vazio, mas o componente deve tratar este caso
       return [];
     }
+    
+    return templates.filter(template => {
+      // Filter by category if selected
+      if (category && template.category !== category) {
+        return false;
+      }
+      
+      // Filter by search query if provided
+      if (query && query.trim() !== '') {
+        const normalizedQuery = query.toLowerCase().trim();
+        return template.name.toLowerCase().includes(normalizedQuery);
+      }
+      
+      return true;
+    });
   }
 });

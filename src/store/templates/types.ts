@@ -1,25 +1,25 @@
 
 import { Template, ProductCategory } from '@/types/editor';
 
+// Base template state
 export interface TemplateState {
   templates: Template[];
 }
 
+// Template loading actions
 export interface TemplateLoadingSlice {
-  isLoading: boolean;
-  error: string | null;
   loadTemplates: () => Promise<Template[]>;
+  searchTemplates: (query: string, category: string | null) => Template[];
 }
 
+// Template CRUD actions
 export interface TemplateCRUDSlice {
-  addTemplate: (template: Template) => void;
-  updateTemplate: (id: string, template: Partial<Template>) => void;
-  deleteTemplate: (id: string) => void;
-  applyTemplate: (template: Template) => void;
-  createTemplate: (template: Omit<Template, "id">) => Promise<Template>;
-  searchTemplates: (query?: string, category?: string | null) => Template[];
+  createTemplate: (templateData: Omit<Template, "id">) => Promise<Template>;
+  updateTemplate: (id: string, templateData: Partial<Template>) => Promise<Template | null>;
+  deleteTemplate: (id: string) => Promise<boolean>;
 }
 
+// Template category management
 export interface TemplateCategorySlice {
   categories: string[];
   selectedCategory: string | null;

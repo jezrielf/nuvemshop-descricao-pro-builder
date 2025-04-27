@@ -6,77 +6,56 @@ import { Input } from '@/components/ui/input';
 
 interface ColorPickersProps {
   block: BlockBase;
-  updateStyle: (style: Partial<BlockStyle>) => void;
+  updateStyle: (updates: Partial<BlockStyle>) => void;
 }
 
 const ColorPickers: React.FC<ColorPickersProps> = ({ block, updateStyle }) => {
-  const handleBackgroundColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateStyle({ backgroundColor: e.target.value });
-  };
-  
-  const handleTextColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateStyle({ textColor: e.target.value });
-  };
-  
-  const handleHeadingColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateStyle({ headingColor: e.target.value });
+  const handleColorChange = (type: 'backgroundColor' | 'textColor' | 'headingColor', value: string) => {
+    console.log(`Updated ${type} to ${value} for block ${block.id}`);
+    updateStyle({ [type]: value });
   };
 
   return (
     <div className="space-y-3">
       <h5 className="text-sm font-medium">Cores</h5>
-      
-      <div className="space-y-1">
-        <Label htmlFor="background-color" className="text-xs">Cor de Fundo</Label>
-        <div className="flex items-center">
-          <Input 
-            id="background-color"
-            type="color" 
-            value={block.style?.backgroundColor || '#ffffff'} 
-            onChange={handleBackgroundColorChange}
-            className="h-8 w-12 p-1"
-          />
-          <Input 
-            value={block.style?.backgroundColor || '#ffffff'} 
-            onChange={handleBackgroundColorChange}
-            className="h-8 flex-1 ml-2"
-          />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor={`bgcolor-${block.id}`}>Cor de fundo</Label>
+          <div className="flex items-center mt-1">
+            <Input 
+              id={`bgcolor-${block.id}`}
+              type="color" 
+              value={block.style?.backgroundColor || '#ffffff'} 
+              onChange={(e) => handleColorChange('backgroundColor', e.target.value)}
+              className="h-8 w-full"
+            />
+          </div>
         </div>
-      </div>
-      
-      <div className="space-y-1">
-        <Label htmlFor="text-color" className="text-xs">Cor do Texto</Label>
-        <div className="flex items-center">
-          <Input 
-            id="text-color"
-            type="color" 
-            value={block.style?.textColor || '#333333'} 
-            onChange={handleTextColorChange}
-            className="h-8 w-12 p-1"
-          />
-          <Input 
-            value={block.style?.textColor || '#333333'} 
-            onChange={handleTextColorChange}
-            className="h-8 flex-1 ml-2"
-          />
+        
+        <div>
+          <Label htmlFor={`textcolor-${block.id}`}>Cor do texto</Label>
+          <div className="flex items-center mt-1">
+            <Input 
+              id={`textcolor-${block.id}`}
+              type="color" 
+              value={block.style?.textColor || '#000000'} 
+              onChange={(e) => handleColorChange('textColor', e.target.value)}
+              className="h-8 w-full"
+            />
+          </div>
         </div>
-      </div>
-      
-      <div className="space-y-1">
-        <Label htmlFor="heading-color" className="text-xs">Cor dos Títulos</Label>
-        <div className="flex items-center">
-          <Input 
-            id="heading-color"
-            type="color" 
-            value={block.style?.headingColor || '#111111'} 
-            onChange={handleHeadingColorChange}
-            className="h-8 w-12 p-1"
-          />
-          <Input 
-            value={block.style?.headingColor || '#111111'} 
-            onChange={handleHeadingColorChange}
-            className="h-8 flex-1 ml-2"
-          />
+        
+        <div className="col-span-2">
+          <Label htmlFor={`headingcolor-${block.id}`}>Cor dos títulos</Label>
+          <div className="flex items-center mt-1">
+            <Input 
+              id={`headingcolor-${block.id}`}
+              type="color" 
+              value={block.style?.headingColor || '#000000'} 
+              onChange={(e) => handleColorChange('headingColor', e.target.value)}
+              className="h-8 w-full"
+            />
+          </div>
         </div>
       </div>
     </div>

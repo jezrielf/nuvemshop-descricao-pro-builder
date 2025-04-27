@@ -2,92 +2,81 @@
 import React from 'react';
 import { BlockBase, BlockStyle } from '@/types/editor';
 import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Bold, Italic, Underline } from 'lucide-react';
 
 interface TypographyControlsProps {
   block: BlockBase;
-  updateStyle: (style: Partial<BlockStyle>) => void;
+  updateStyle: (updates: Partial<BlockStyle>) => void;
 }
 
 const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateStyle }) => {
   const handleFontFamilyChange = (value: string) => {
+    console.log('Changing font family to:', value);
     updateStyle({ fontFamily: value });
   };
-
+  
   const handleFontSizeChange = (value: string) => {
+    console.log('Changing font size to:', value);
     updateStyle({ fontSize: value });
   };
-
+  
+  const handleTextAlignChange = (value: string) => {
+    console.log('Changing text align to:', value);
+    // Ensure the value is one of the allowed types for textAlign
+    const textAlign = value as 'left' | 'center' | 'right' | 'justify';
+    updateStyle({ textAlign });
+  };
+  
   const handleFontWeightChange = (value: string) => {
+    console.log('Changing font weight to:', value);
     updateStyle({ fontWeight: value });
   };
-
+  
+  const handleFontStyleChange = (value: string) => {
+    console.log('Changing font style to:', value);
+    updateStyle({ fontStyle: value });
+  };
+  
+  const handleTextDecorationChange = (value: string) => {
+    console.log('Changing text decoration to:', value);
+    updateStyle({ textDecoration: value });
+  };
+  
   const handleHeadingWeightChange = (value: string) => {
+    console.log('Changing heading weight to:', value);
     updateStyle({ headingWeight: value });
   };
-
-  const toggleBold = () => {
-    updateStyle({
-      fontWeight: block.style?.fontWeight === 'bold' ? 'normal' : 'bold',
-    });
-  };
-
-  const toggleItalic = () => {
-    updateStyle({
-      fontStyle: block.style?.fontStyle === 'italic' ? 'normal' : 'italic',
-    });
-  };
-
-  const toggleUnderline = () => {
-    updateStyle({
-      textDecoration: block.style?.textDecoration === 'underline' ? undefined : 'underline',
-    });
-  };
-
-  const handleTextAlignChange = (value: 'left' | 'center' | 'right' | 'justify') => {
-    updateStyle({ textAlign: value });
-  };
-
+  
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <h5 className="text-sm font-medium">Tipografia</h5>
-
-      <div className="space-y-2">
-        <Label htmlFor="font-family" className="text-xs">Fonte</Label>
-        <Select 
-          value={block.style?.fontFamily || 'sans'} 
-          onValueChange={handleFontFamilyChange}
-        >
-          <SelectTrigger id="font-family" className="h-8">
-            <SelectValue placeholder="Escolher fonte" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="sans">Sans-serif</SelectItem>
-            <SelectItem value="serif">Serif</SelectItem>
-            <SelectItem value="mono">Monospace</SelectItem>
-            <SelectItem value="playfair">Playfair Display</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <Label htmlFor="font-size" className="text-xs">Tamanho da fonte</Label>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label htmlFor="fontFamily">Família da fonte</Label>
+          <Select 
+            value={block.style?.fontFamily || 'sans'} 
+            onValueChange={handleFontFamilyChange}
+          >
+            <SelectTrigger id="fontFamily">
+              <SelectValue placeholder="Família da fonte" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sans">Sans-serif</SelectItem>
+              <SelectItem value="serif">Serif</SelectItem>
+              <SelectItem value="mono">Monospace</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="fontSize">Tamanho da fonte</Label>
           <Select 
             value={block.style?.fontSize || 'base'} 
             onValueChange={handleFontSizeChange}
           >
-            <SelectTrigger id="font-size" className="h-8">
-              <SelectValue placeholder="Tamanho" />
+            <SelectTrigger id="fontSize">
+              <SelectValue placeholder="Tamanho da fonte" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="xs">Muito pequeno</SelectItem>
@@ -99,74 +88,75 @@ const TypographyControls: React.FC<TypographyControlsProps> = ({ block, updateSt
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="space-y-1">
-          <Label htmlFor="text-align" className="text-xs">Alinhamento</Label>
-          <Select 
-            value={block.style?.textAlign || 'left'} 
-            onValueChange={(value) => handleTextAlignChange(value as 'left' | 'center' | 'right' | 'justify')}
-          >
-            <SelectTrigger id="text-align" className="h-8">
-              <SelectValue placeholder="Alinhamento" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="left">Esquerda</SelectItem>
-              <SelectItem value="center">Centro</SelectItem>
-              <SelectItem value="right">Direita</SelectItem>
-              <SelectItem value="justify">Justificado</SelectItem>
-            </SelectContent>
-          </Select>
+      </div>
+      
+      <div>
+        <Label htmlFor="textAlign">Alinhamento</Label>
+        <Select 
+          value={block.style?.textAlign || 'left'} 
+          onValueChange={handleTextAlignChange}
+        >
+          <SelectTrigger id="textAlign">
+            <SelectValue placeholder="Alinhamento" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="left">Esquerda</SelectItem>
+            <SelectItem value="center">Centro</SelectItem>
+            <SelectItem value="right">Direita</SelectItem>
+            <SelectItem value="justify">Justificado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="fontWeight">Estilo do texto</Label>
+        <div className="flex space-x-2 mt-1">
+          <ToggleGroup type="single" value={block.style?.fontWeight || 'normal'} onValueChange={handleFontWeightChange}>
+            <ToggleGroupItem value="normal" aria-label="Normal">Normal</ToggleGroupItem>
+            <ToggleGroupItem value="medium" aria-label="Médio">Médio</ToggleGroupItem>
+            <ToggleGroupItem value="semibold" aria-label="Semi-negrito">Semi</ToggleGroupItem>
+            <ToggleGroupItem value="bold" aria-label="Negrito">Negrito</ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </div>
 
-      <div className="space-y-1">
-        <Label className="text-xs">Estilo</Label>
-        <div className="flex space-x-2">
-          <Button 
-            type="button" 
-            size="sm"
-            variant={block.style?.fontWeight === 'bold' ? 'default' : 'outline'}
-            onClick={toggleBold}
-            className="flex-1 h-8"
-          >
-            <Bold className="h-4 w-4" />
-          </Button>
-          <Button 
-            type="button" 
-            size="sm"
-            variant={block.style?.fontStyle === 'italic' ? 'default' : 'outline'}
-            onClick={toggleItalic}
-            className="flex-1 h-8"
-          >
-            <Italic className="h-4 w-4" />
-          </Button>
-          <Button 
-            type="button" 
-            size="sm"
-            variant={block.style?.textDecoration === 'underline' ? 'default' : 'outline'}
-            onClick={toggleUnderline}
-            className="flex-1 h-8"
-          >
-            <Underline className="h-4 w-4" />
-          </Button>
+      <div>
+        <Label>Formatação</Label>
+        <div className="flex items-center space-x-2 mt-1">
+          <ToggleGroup type="single" value={block.style?.fontStyle || 'normal'} onValueChange={handleFontStyleChange}>
+            <ToggleGroupItem value="normal" aria-label="Normal">
+              <span className="mr-2">Aa</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="Itálico">
+              <Italic className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+          
+          <ToggleGroup type="single" value={block.style?.textDecoration || 'none'} onValueChange={handleTextDecorationChange}>
+            <ToggleGroupItem value="none" aria-label="Sem decoração">
+              <span className="mr-2">Aa</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="Sublinhado">
+              <Underline className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </div>
-      
-      <div className="space-y-1">
-        <Label htmlFor="heading-weight" className="text-xs">Peso dos Títulos</Label>
+
+      <div>
+        <Label htmlFor="headingWeight">Estilo dos títulos</Label>
         <Select 
           value={block.style?.headingWeight || 'bold'} 
           onValueChange={handleHeadingWeightChange}
         >
-          <SelectTrigger id="heading-weight" className="h-8">
-            <SelectValue placeholder="Peso do Título" />
+          <SelectTrigger id="headingWeight">
+            <SelectValue placeholder="Estilo dos títulos" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="normal">Normal</SelectItem>
             <SelectItem value="medium">Médio</SelectItem>
-            <SelectItem value="semibold">Semi-bold</SelectItem>
-            <SelectItem value="bold">Bold</SelectItem>
-            <SelectItem value="extrabold">Extra Bold</SelectItem>
+            <SelectItem value="semibold">Semi-negrito</SelectItem>
+            <SelectItem value="bold">Negrito</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -1,4 +1,5 @@
-import React, { useEffect, useState, memo } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
 import Preview from '@/components/Preview';
@@ -15,71 +16,14 @@ import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
 import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
-import { Suspense, lazy } from 'react';
-
-// Lazy-loaded components
-const ProductEditorControllerLazy = lazy(() => 
-  import('@/components/Nuvemshop/components/ProductEditorController')
-);
-
-// Memoized components for better performance
-const NuvemshopConnectionStatus = memo(({ 
-  storeConnected, 
-  storeName, 
-  storeId,
-  onDisconnect 
-}: {
-  storeConnected: boolean;
-  storeName: string | null;
-  storeId: string | number | null;
-  onDisconnect: () => void;
-}) => {
-  if (!storeConnected) return null;
-
-  // Format storeId to string display
-  const storeIdFormatted = storeId ? String(storeId) : 'N/A';
-  const storeDisplayName = storeName || (storeId ? `ID ${storeIdFormatted}` : 'Loja conectada');
-  
-  return (
-    <div className="flex items-center gap-3">
-      <Badge variant="outline" className="bg-green-100 text-green-800">
-        <CheckCircle2 className="h-3 w-3 mr-1" />
-        Conectado: {storeDisplayName}
-      </Badge>
-      <Button 
-        variant="destructive" 
-        size="sm" 
-        onClick={onDisconnect}
-        className="flex items-center text-xs h-7"
-      >
-        <LogOut className="h-3 w-3 mr-1" />
-        Desconectar
-      </Button>
-    </div>
-  );
-});
-
-// Memoized components for better performance
-const NuvemshopConnectButton = memo(({ onConnect }: { onConnect: (e: React.MouseEvent) => void }) => {
-  return (
-    <Button 
-      variant="outline" 
-      size="sm" 
-      onClick={onConnect}
-      className="text-green-600 border-green-300 hover:bg-green-50 h-7 text-xs"
-    >
-      Conectar Nuvemshop
-    </Button>
-  );
-});
 
 const Index = () => {
-  const { loadTemplates } = useTemplateStore();
+  console.log("Index page renderizada");
+  const { loadTemplates, templates } = useTemplateStore();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
-  const [hasLoadedTemplates, setHasLoadedTemplates] = useState(false);
   const { 
     success: storeConnected, 
     storeName, 
@@ -91,48 +35,65 @@ const Index = () => {
   } = useNuvemshopAuth();
   
   useEffect(() => {
-    // Check for auth code in URL
+    // Verificar se há um código de autorização na URL
     const authCode = detectAuthCode();
     if (authCode) {
+      console.log("Código de autorização detectado no /editor:", authCode);
       handleTestCode(authCode);
       clearAuthCodeFromUrl();
     }
     
-    // Only load templates once to prevent loops
-    if (!hasLoadedTemplates) {
-      const initializeTemplates = async () => {
-        try {
-          setIsLoadingTemplates(true);
-          const loadedTemplates = await loadTemplates();
-          
-          if (loadedTemplates && loadedTemplates.length > 0) {
-            toast({
-              title: "Templates carregados",
-              description: `${loadedTemplates.length} templates disponíveis`,
-            });
-          } else {
-            toast({
-              title: "Atenção",
-              description: "Problemas ao carregar templates. Tente atualizar a página.",
-              variant: "destructive",
-            });
-          }
-          setHasLoadedTemplates(true);
-        } catch (error) {
-          console.error("Erro ao carregar templates:", error);
+    // Garantir que temos templates disponíveis tanto no desenvolvimento quanto em produção
+    const initializeTemplates = async () => {
+      try {
+        setIsLoadingTemplates(true);
+        console.log("Iniciando carregamento de templates na página inicial");
+        const loadedTemplates = await loadTemplates();
+        console.log("Templates carregados na inicialização:", loadedTemplates.length);
+        
+        if (loadedTemplates.length > 0) {
           toast({
-            title: "Erro ao carregar templates",
-            description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
+            title: "Templates carregados",
+            description: `${loadedTemplates.length} templates disponíveis`,
+          });
+        } else {
+          toast({
+            title: "Atenção",
+            description: "Problemas ao carregar templates. Tente atualizar a página.",
             variant: "destructive",
           });
-        } finally {
-          setIsLoadingTemplates(false);
         }
-      };
-      
-      initializeTemplates();
-    }
-  }, [loadTemplates, toast, handleTestCode, hasLoadedTemplates]);
+      } catch (error) {
+        console.error("Erro ao carregar templates:", error);
+        toast({
+          title: "Erro ao carregar templates",
+          description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    };
+    
+    initializeTemplates();
+    
+    // Configura um intervalo para verificar atualizações de templates a cada 5 minutos
+    const templateRefreshInterval = setInterval(() => {
+      loadTemplates()
+        .then(templates => console.log("Templates atualizados no background:", templates.length))
+        .catch(err => console.error("Erro ao atualizar templates no background:", err));
+    }, 5 * 60 * 1000); // 5 minutos
+    
+    // Limpar o intervalo quando o componente for desmontado
+    return () => {
+      clearInterval(templateRefreshInterval);
+    };
+  }, [loadTemplates]);
+
+  // Log sempre que os templates mudam
+  useEffect(() => {
+    console.log(`Index - Templates disponíveis: ${templates.length}`);
+  }, [templates]);
 
   const handleNuvemshopDisconnect = () => {
     handleDisconnectNuvemshop();
@@ -142,38 +103,63 @@ const Index = () => {
     });
   };
   
+  // Função para renderizar informações da loja conectada
+  const renderStoreInfo = () => {
+    let storeDisplayText = "Loja conectada";
+    
+    if (storeName) {
+      storeDisplayText = `Conectado com a ${storeName}`;
+    } else if (storeId) {
+      storeDisplayText = `Conectado com a loja ID: ${storeId}`;
+    }
+    
+    return storeDisplayText;
+  };
+  
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
       
-      <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-b">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
         <div className="flex-1">
           <ProductSearch onProductSelect={setSelectedProduct} />
         </div>
         
         {storeConnected ? (
-          <NuvemshopConnectionStatus 
-            storeConnected={storeConnected} 
-            storeName={storeName} 
-            storeId={storeId}
-            onDisconnect={handleNuvemshopDisconnect}
-          />
+          <div className="flex items-center gap-4">
+            <Badge variant="outline" className="bg-green-100 text-green-800">
+              <CheckCircle2 className="h-4 w-4 mr-1" />
+              {renderStoreInfo()}
+            </Badge>
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={handleNuvemshopDisconnect}
+              className="flex items-center"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Desconectar
+            </Button>
+          </div>
         ) : (
-          <div className="flex items-center">
-            <NuvemshopConnectButton 
-              onConnect={(e) => {
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={(e) => {
                 e.preventDefault();
                 handleConnectNuvemshop();
               }}
-            />
+              className="text-green-600 border-green-300 hover:bg-green-50 h-8"
+            >
+              Conectar Nuvemshop
+            </Button>
           </div>
         )}
       </div>
       
       {selectedProduct && (
-        <Suspense fallback={<div className="p-2 text-sm text-center">Carregando...</div>}>
-          <ProductEditorControllerLazy product={selectedProduct} />
-        </Suspense>
+        <ProductEditorController product={selectedProduct} />
       )}
       
       <div className="flex-1 overflow-hidden">

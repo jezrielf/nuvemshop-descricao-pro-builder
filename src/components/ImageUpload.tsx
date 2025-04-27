@@ -1,106 +1,84 @@
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import { Button } from '@/components/ui/button';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Upload, Image as ImageIcon, Check } from 'lucide-react';
 
-interface ImageUploadProps {
-  onImageUploaded: (imageUrl: string) => void;
-  initialImage?: string;
-}
-
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUploaded, initialImage }) => {
-  const [image, setImage] = useState<string | null>(initialImage || null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione um arquivo de imagem válido.');
-      return;
-    }
-    
-    setIsUploading(true);
-    
-    // Read file as data URL (base64)
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        // In a real application, here we would upload to a server
-        // For now, we'll use the base64 string directly
-        setImage(reader.result);
-        onImageUploaded(reader.result);
-        setIsUploading(false);
-      }
-    };
-    reader.onerror = () => {
-      console.error('Error reading file');
-      setIsUploading(false);
-    };
-    reader.readAsDataURL(file);
-  };
-  
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-  
-  const handleRemoveImage = () => {
-    setImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+const ImageUpload: React.FC = () => {
+  const { uploading, uploadProgress, imageUrl, handleFileChange } = useImageUpload();
   
   return (
-    <div className="image-upload">
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-      />
+    <div className="w-full max-w-md mx-auto p-4 border rounded-lg shadow-sm">
+      <h2 className="text-xl font-semibold mb-4">Upload de Imagem</h2>
       
-      {image ? (
-        <div className="relative border rounded-md overflow-hidden">
-          <img 
-            src={image} 
-            alt="Preview" 
-            className="w-full h-auto max-h-[200px] object-contain"
-          />
-          <Button
-            variant="destructive"
-            size="icon"
-            className="absolute top-2 right-2"
-            onClick={handleRemoveImage}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+      {imageUrl ? (
+        <div className="space-y-4">
+          <div className="relative bg-gray-50 p-2 rounded-md">
+            <img 
+              src={imageUrl} 
+              alt="Imagem enviada" 
+              className="w-full h-auto object-contain rounded-md"
+            />
+          </div>
+          <div className="flex items-center justify-center text-green-600">
+            <Check className="mr-2 h-5 w-5" />
+            <span>Upload realizado com sucesso!</span>
+          </div>
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const inputElement = document.getElementById('image-input') as HTMLInputElement;
+                if (inputElement) inputElement.click();
+              }}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Enviar outra imagem
+            </Button>
+            
+            <Button
+              variant="secondary"
+              onClick={() => navigator.clipboard.writeText(imageUrl)}
+            >
+              <ImageIcon className="h-4 w-4 mr-2" />
+              Copiar URL
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center">
-          {isUploading ? (
-            <div className="flex flex-col items-center space-y-2">
-              <Loader2 className="h-10 w-10 text-primary animate-spin" />
-              <p>Enviando imagem...</p>
+        <div className="space-y-4">
+          {uploading ? (
+            <div className="space-y-2">
+              <Progress value={uploadProgress} className="h-2" />
+              <p className="text-sm text-center text-gray-500">
+                Enviando... {uploadProgress}%
+              </p>
             </div>
           ) : (
-            <>
-              <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500 mb-4">
-                Arraste e solte uma imagem aqui ou clique para selecionar
-              </p>
-              <Button 
-                variant="outline" 
-                onClick={triggerFileInput}
-                className="mx-auto"
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <input
+                id="image-input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <Button
+                variant="ghost"
+                className="w-full h-32 flex flex-col items-center justify-center"
+                onClick={() => {
+                  const inputElement = document.getElementById('image-input') as HTMLInputElement;
+                  if (inputElement) inputElement.click();
+                }}
               >
-                Selecionar Imagem
+                <Upload className="h-10 w-10 text-gray-400 mb-2" />
+                <span className="text-gray-500">Clique para enviar uma imagem</span>
+                <span className="text-xs text-gray-400 mt-1">
+                  Formatos aceitos: JPG, PNG, GIF
+                </span>
               </Button>
-            </>
+            </div>
           )}
         </div>
       )}

@@ -1,25 +1,19 @@
 
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
+  FormControl,
   FormMessage,
 } from '@/components/ui/form';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { PlanFormValues } from '../hooks/usePlanForm';
 
 interface PlanBasicInfoProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<PlanFormValues>;
 }
 
 export const PlanBasicInfo: React.FC<PlanBasicInfoProps> = ({ form }) => {
@@ -30,9 +24,9 @@ export const PlanBasicInfo: React.FC<PlanBasicInfoProps> = ({ form }) => {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nome do plano</FormLabel>
+            <FormLabel>Nome do Plano</FormLabel>
             <FormControl>
-              <Input placeholder="Ex: Plano Premium" {...field} />
+              <Input placeholder="Ex: Plano Básico" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -47,7 +41,8 @@ export const PlanBasicInfo: React.FC<PlanBasicInfoProps> = ({ form }) => {
             <FormLabel>Descrição</FormLabel>
             <FormControl>
               <Textarea 
-                placeholder="Ex: Plano ideal para empresas em crescimento" 
+                placeholder="Descrição do plano" 
+                rows={3}
                 {...field} 
               />
             </FormControl>
@@ -61,78 +56,14 @@ export const PlanBasicInfo: React.FC<PlanBasicInfoProps> = ({ form }) => {
         name="price"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Preço</FormLabel>
+            <FormLabel>Preço Mensal (R$)</FormLabel>
             <FormControl>
-              <Input 
-                type="number" 
-                min="0" 
-                step="0.01" 
-                placeholder="0.00" 
-                {...field} 
-                onChange={e => field.onChange(parseFloat(e.target.value))}
-              />
+              <Input type="number" placeholder="0.00" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-      
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="interval"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Intervalo</FormLabel>
-              <Select 
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="month">Mensal</SelectItem>
-                  <SelectItem value="year">Anual</SelectItem>
-                  <SelectItem value="week">Semanal</SelectItem>
-                  <SelectItem value="day">Diário</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Moeda</FormLabel>
-              <Select 
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="BRL">Real (BRL)</SelectItem>
-                  <SelectItem value="USD">Dólar (USD)</SelectItem>
-                  <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
     </div>
   );
 };

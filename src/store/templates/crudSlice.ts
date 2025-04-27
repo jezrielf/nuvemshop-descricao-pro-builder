@@ -1,66 +1,74 @@
-
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
-import templateService from '@/services/admin/templateService';
+import { adminService } from '@/services/admin';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createCRUDSlice: StateCreator<
-  TemplateState & TemplateCRUDSlice
+  TemplateState & TemplateCRUDSlice,
+  [],
+  [],
+  TemplateCRUDSlice
 > = (set, get) => ({
-  templates: [],
-  
-  addTemplate: (template: Template) => {
-    set(state => ({
-      templates: [...state.templates, template]
-    }));
-  },
-  
-  updateTemplate: (id: string, template: Partial<Template>) => {
-    set(state => ({
-      templates: state.templates.map(t => 
-        t.id === id ? { ...t, ...template } : t
-      )
-    }));
-  },
-  
-  deleteTemplate: (id: string) => {
-    set(state => ({
-      templates: state.templates.filter(t => t.id !== id)
-    }));
-  },
-  
-  applyTemplate: (template: Template) => {
-    templateService.applyTemplate(template);
-  },
-  
-  createTemplate: async (template: Omit<Template, "id">) => {
+  createTemplate: async (templateData) => {
     try {
-      const newTemplate = await templateService.createTemplate(template);
+      const newTemplate: Omit<Template, 'id'> = {
+        ...templateData,
+        blocks: templateData.blocks || []
+      };
+      
+      const createdTemplate = await adminService.createTemplate(newTemplate);
+      
       set(state => ({
-        templates: [...state.templates, newTemplate]
+        templates: [...state.templates, createdTemplate]
       }));
-      return newTemplate;
+      
+      return createdTemplate;
     } catch (error) {
-      console.error("Failed to create template:", error);
+      console.error('Error in createTemplate:', error);
       throw error;
     }
   },
   
-  searchTemplates: (query?: string, category?: string | null) => {
-    const templates = get().templates;
-    
-    if (!query && !category) {
-      return templates;
+  updateTemplate: async (id, templateData) => {
+    try {
+      const { templates } = get();
+      const templateIndex = templates.findIndex(t => t.id === id);
+      
+      if (templateIndex === -1) return null;
+      
+      const existingTemplate = templates[templateIndex];
+      const updatedTemplate = await adminService.updateTemplate(id, {
+        ...templateData,
+        // Keep existing properties that aren't being updated
+        name: templateData.name || existingTemplate.name,
+        category: templateData.category || existingTemplate.category,
+        blocks: templateData.blocks || existingTemplate.blocks
+      });
+      
+      const newTemplates = [...templates];
+      newTemplates[templateIndex] = updatedTemplate;
+      set({ templates: newTemplates });
+      
+      return updatedTemplate;
+    } catch (error) {
+      console.error('Error in updateTemplate:', error);
+      return null;
     }
-    
-    return templates.filter(template => {
-      const matchesQuery = !query || 
-        template.name.toLowerCase().includes(query.toLowerCase()) || 
-        (template.description && template.description.toLowerCase().includes(query.toLowerCase()));
+  },
+  
+  deleteTemplate: async (id) => {
+    try {
+      await adminService.deleteTemplate(id);
       
-      const matchesCategory = !category || template.category === category;
+      set(state => ({
+        templates: state.templates.filter(template => template.id !== id)
+      }));
       
-      return matchesQuery && matchesCategory;
-    });
+      return true;
+    } catch (error) {
+      console.error('Error in deleteTemplate:', error);
+      return false;
+    }
   }
 });

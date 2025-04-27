@@ -1,16 +1,21 @@
 
-import { planService } from './planService';
+// Export all admin services from this central file
 import { userService } from './userService';
-import templateService from './templateService';
-import { analyticsService } from './analyticsService';
+import { planService } from './planService';
+import { templateService } from './templateService';
+import { dashboardService } from './dashboardService';
 
-// Export all admin services under one object
+// Re-export as a unified adminService object
 export const adminService = {
-  plans: planService,
-  users: userService,
-  templates: templateService,
-  analytics: analyticsService
+  // User related operations
+  ...userService,
+  
+  // Plans related operations
+  ...planService,
+  
+  // Templates related operations
+  ...templateService,
+  
+  // Dashboard related operations
+  ...dashboardService
 };
-
-// Export individual services for direct imports
-export { planService, userService, templateService, analyticsService };

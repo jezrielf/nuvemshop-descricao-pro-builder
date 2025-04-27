@@ -1,277 +1,423 @@
-// Import the fixTemplateProps utility
-import { fixTemplateProps } from './fixTemplateProps';
+
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define raw accessories templates
-const accessoriesTemplatesRaw = [
+// Accessories Template Collection
+export const accessoriesTemplates: Template[] = [
+  // TEMPLATE 1: Premium Accessories
   {
-    id: 'accessories-basic',
-    name: 'Accessories Basic',
-    description: 'A simple template for accessories',
-    thumbnailUrl: '/templates/accessories/basic.jpg',
+    id: uuidv4(),
+    name: 'Acessórios Premium',
     category: 'accessories',
+    thumbnail: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30',
     blocks: [
+      // Hero Block
       {
-        id: 'accessories-basic-title',
-        type: 'text',
-        title: 'Title',
-        heading: 'Título do Texto',
-        content: '<h1>Acessórios que complementam seu estilo</h1>',
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        columns: 1,
         visible: true,
-        columns: 'full',
-        style: {}
+        heading: 'Acessórios que complementam seu estilo',
+        subheading: 'Detalhes que fazem toda a diferença na composição do seu visual',
+        buttonText: 'Ver Coleção',
+        buttonUrl: '#collection',
+        backgroundImage: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30',
+        style: {
+          backgroundColor: '#f8f8f8',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
       },
+      // Benefits Block
       {
-        id: 'accessories-basic-subtitle',
-        type: 'text',
-        title: 'Subtitle',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Encontre os acessórios perfeitos para expressar sua individualidade e elevar seu visual.</p>',
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Diferenciais dos Acessórios',
+        columns: 3,
         visible: true,
-        columns: 'full',
-        style: {}
+        heading: 'Por que nossos acessórios são especiais',
+        benefits: [
+          {
+            id: uuidv4(),
+            title: 'Artesanato Premium',
+            description: 'Cada peça é desenvolvida por artesãos experientes com técnicas tradicionais e modernas.',
+            icon: '🔷'
+          },
+          {
+            id: uuidv4(),
+            title: 'Materiais Exclusivos',
+            description: 'Utilizamos apenas matérias-primas de alta qualidade, incluindo metais nobres e pedras naturais.',
+            icon: '💎'
+          },
+          {
+            id: uuidv4(),
+            title: 'Design Atemporal',
+            description: 'Peças que transcendem tendências e permanecem relevantes ao longo do tempo.',
+            icon: '⏱️'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
       },
+      // Gallery Block
       {
-        id: 'accessories-basic-image',
-        type: 'image',
-        title: 'Main Image',
-        imageUrl: 'https://images.unsplash.com/photo-1550345332-09e3ac9876fc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80',
-        altText: 'Acessórios',
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Galeria da Coleção',
+        columns: 3,
         visible: true,
-        columns: 'full',
-        style: {}
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f',
+            alt: 'Colar artesanal',
+            caption: 'Colar Ágata Azul'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1635767798638-3685bcb2b4b3',
+            alt: 'Pulseira de couro',
+            caption: 'Pulseira Toscana'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1608042314453-ae338d80c427',
+            alt: 'Conjunto de anéis',
+            caption: 'Anéis Minimalistas'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
       },
+      // CTA Block
       {
-        id: 'accessories-basic-section-title',
-        type: 'text',
-        title: 'Section Title',
-        heading: 'Título do Texto',
-        content: '<h2>Nossa Coleção de Acessórios</h2>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-basic-section-description',
-        type: 'text',
-        title: 'Section Description',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Explore nossa ampla gama de acessórios, desde joias elegantes até óculos de sol modernos e lenços estilosos.</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-basic-product-list',
-        type: 'text',
-        title: 'Product List',
-        heading: 'Lista de Produtos',
-        content: '<ul>\n  <li>Colares</li>\n  <li>Brincos</li>\n  <li>Pulseiras</li>\n  <li>Anéis</li>\n  <li>Óculos de sol</li>\n  <li>Lenços</li>\n  <li>Chapéus</li>\n  <li>Bolsas</li>\n</ul>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-basic-call-to-action',
-        type: 'text',
-        title: 'Call to Action',
-        heading: 'Chamada para Ação',
-        content: '<p>Descubra os acessórios que farão você se destacar. Compre agora e adicione um toque de estilo único ao seu look!</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      }
-    ],
-    createdAt: '2023-01-01T00:00:00.000Z',
-    updatedAt: '2023-01-01T00:00:00.000Z'
-  },
-  {
-    id: 'accessories-trendy',
-    name: 'Accessories Trendy',
-    description: 'Template moderno para acessórios de moda.',
-    thumbnailUrl: '/templates/accessories/trendy.jpg',
-    category: 'accessories',
-    blocks: [
-      {
-        id: 'accessories-trendy-title',
-        type: 'text',
-        title: 'Título Principal',
-        heading: 'Título do Texto',
-        content: '<h1>Acessórios da Moda: As Últimas Tendências</h1>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-intro',
-        type: 'text',
-        title: 'Introdução',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Mantenha-se à frente da moda com nossos acessórios mais recentes e modernos. Descubra o que é tendência agora!</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-image',
-        type: 'image',
-        title: 'Imagem Principal',
-        imageUrl: 'https://images.unsplash.com/photo-1588783884977-649a4c41a032?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1935&q=80',
-        altText: 'Acessórios da Moda',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-section1-title',
-        type: 'text',
-        title: 'Título da Seção 1',
-        heading: 'Título do Texto',
-        content: '<h2>Tendências Atuais em Acessórios</h2>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-section1-desc',
-        type: 'text',
-        title: 'Descrição da Seção 1',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Explore as tendências mais quentes, como correntes grossas, brincos statement e óculos de sol oversized.</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-section2-title',
-        type: 'text',
-        title: 'Título da Seção 2',
-        heading: 'Título do Texto',
-        content: '<h2>Como Incorporar Acessórios ao Seu Look</h2>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-section2-desc',
-        type: 'text',
-        title: 'Descrição da Seção 2',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Aprenda a combinar acessórios para criar looks únicos e personalizados que refletem seu estilo individual.</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-trendy-cta',
-        type: 'text',
+        id: uuidv4(),
+        type: 'cta',
         title: 'Chamada para Ação',
-        heading: 'Chamada para Ação',
-        content: '<p>Adquira os acessórios que estão fazendo sucesso e eleve seu estilo a um novo patamar. Compre agora e arrase!</p>',
+        columns: 1,
         visible: true,
-        columns: 'full',
-        style: {}
+        heading: 'Eleve seu estilo com nossos acessórios exclusivos',
+        content: 'Peças atemporais que transformam qualquer visual. Garantia de 1 ano em todas as peças.',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#',
+        style: {
+          backgroundColor: '#212121',
+          headingColor: '#ffffff',
+          textColor: '#ffffff',
+          padding: 'lg',
+          blockSpacing: 'none'
+        }
       }
-    ],
-    createdAt: '2023-01-01T00:00:00.000Z',
-    updatedAt: '2023-01-01T00:00:00.000Z'
+    ]
   },
+  
+  // TEMPLATE 2: Accessories Collection
   {
-    id: 'accessories-luxury',
-    name: 'Accessories Luxury',
-    description: 'Template sofisticado para acessórios de luxo.',
-    thumbnailUrl: '/templates/accessories/luxury.jpg',
+    id: uuidv4(),
+    name: 'Coleção de Acessórios',
     category: 'accessories',
+    thumbnail: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a',
     blocks: [
+      // Hero Block
       {
-        id: 'accessories-luxury-title',
-        type: 'text',
-        title: 'Título Principal',
-        heading: 'Título do Texto',
-        content: '<h1>Acessórios de Luxo: Elegância e Sofisticação</h1>',
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        columns: 1,
         visible: true,
-        columns: 'full',
-        style: {}
+        heading: 'Coleção Exclusiva de Acessórios',
+        subheading: 'Peças únicas para completar seu look com elegância',
+        buttonText: 'Explorar',
+        buttonUrl: '#explore',
+        backgroundImage: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a',
+        style: {
+          backgroundColor: '#f0f0f0',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
       },
+      // Image Block
       {
-        id: 'accessories-luxury-intro',
-        type: 'text',
-        title: 'Introdução',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Descubra nossa coleção exclusiva de acessórios de luxo, projetados para quem busca o requinte em cada detalhe.</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-luxury-image',
+        id: uuidv4(),
         type: 'image',
-        title: 'Imagem Principal',
-        imageUrl: 'https://images.unsplash.com/photo-1617196129458-c9c97a9848ca?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2069&q=80',
-        altText: 'Acessórios de Luxo',
+        title: 'Imagem Destaque',
+        columns: 1,
         visible: true,
-        columns: 'full',
-        style: {}
+        src: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed',
+        alt: 'Acessório Destaque da Coleção',
+        caption: 'Brincos Cristal - Edição Limitada',
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'md',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
       },
+      // Features Block
       {
-        id: 'accessories-luxury-section1-title',
-        type: 'text',
-        title: 'Título da Seção 1',
-        heading: 'Título do Texto',
-        content: '<h2>Materiais Nobres e Design Exclusivo</h2>',
+        id: uuidv4(),
+        type: 'features',
+        title: 'Características do Produto',
+        columns: 3,
         visible: true,
-        columns: 'full',
-        style: {}
+        heading: 'Características e Vantagens',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Hipoalergênico',
+            description: 'Materiais testados e seguros para todos os tipos de pele',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Feito à Mão',
+            description: 'Produção artesanal com atenção aos detalhes',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Resistente à Água',
+            description: 'Peças com tratamento especial para maior durabilidade',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Certificado de Autenticidade',
+            description: 'Cada peça acompanha certificado de originalidade',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Embalagem Exclusiva',
+            description: 'Apresentação premium para presente ou uso pessoal',
+            icon: '✓'
+          },
+          {
+            id: uuidv4(),
+            title: 'Garantia Estendida',
+            description: 'Garantia de 2 anos contra defeitos de fabricação',
+            icon: '✓'
+          }
+        ],
+        style: {
+          backgroundColor: '#f8f9fa',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
       },
+      // ImageText Block
       {
-        id: 'accessories-luxury-section1-desc',
-        type: 'text',
-        title: 'Descrição da Seção 1',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Cada acessório é confeccionado com materiais da mais alta qualidade e apresenta um design único que exala elegância.</p>',
+        id: uuidv4(),
+        type: 'imageText',
+        title: 'Sobre a Coleção',
+        columns: 1,
         visible: true,
-        columns: 'full',
-        style: {}
+        image: {
+          src: 'https://images.unsplash.com/photo-1631965004544-1762fc696476',
+          alt: 'Criação de acessórios'
+        },
+        heading: 'Inspiração e Processo Criativo',
+        content: 'Nossa nova coleção é inspirada em elementos geométricos e formas orgânicas da natureza. Cada peça é cuidadosamente desenhada e produzida por artesãos especializados, garantindo a mais alta qualidade e atenção aos detalhes. Utilizamos apenas materiais sustentáveis e éticos em nossa produção.',
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
       },
+      // Specifications Block
       {
-        id: 'accessories-luxury-section2-title',
-        type: 'text',
-        title: 'Título da Seção 2',
-        heading: 'Título do Texto',
-        content: '<h2>O Toque Final para Ocasiões Especiais</h2>',
+        id: uuidv4(),
+        type: 'specifications',
+        title: 'Especificações',
+        columns: 1,
         visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-luxury-section2-desc',
-        type: 'text',
-        title: 'Descrição da Seção 2',
-        heading: 'Subtítulo do Texto',
-        content: '<p>Adicione um toque de glamour aos seus looks para eventos e celebrações com nossos acessórios de luxo.</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
-      },
-      {
-        id: 'accessories-luxury-cta',
-        type: 'text',
-        title: 'Chamada para Ação',
-        heading: 'Chamada para Ação',
-        content: '<p>Invista em acessórios que transcendem tendências e tornam cada momento inesquecível. Compre agora e celebre o luxo!</p>',
-        visible: true,
-        columns: 'full',
-        style: {}
+        heading: 'Especificações do Produto',
+        specs: [
+          { id: uuidv4(), name: 'Material', value: 'Prata 925 / Ouro 18k' },
+          { id: uuidv4(), name: 'Peso', value: '3.5g - 8.2g (dependendo do modelo)' },
+          { id: uuidv4(), name: 'Dimensões', value: '2cm x 1.5cm (ajustável)' },
+          { id: uuidv4(), name: 'Acabamento', value: 'Polido / Fosco / Texturizado' },
+          { id: uuidv4(), name: 'Pedras', value: 'Zircônia / Quartzo / Ágata' }
+        ],
+        style: {
+          backgroundColor: '#f5f5f5',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
       }
-    ],
-    createdAt: '2023-01-01T00:00:00.000Z',
-    updatedAt: '2023-01-01T00:00:00.000Z'
+    ]
+  },
+  
+  // TEMPLATE 3: Luxury Accessories
+  {
+    id: uuidv4(),
+    name: 'Acessórios de Luxo',
+    category: 'accessories',
+    thumbnail: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0',
+    blocks: [
+      // Hero Block
+      {
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        columns: 1,
+        visible: true,
+        heading: 'Acessórios de Luxo',
+        subheading: 'Sofisticação e elegância em cada detalhe',
+        buttonText: 'Descubra',
+        buttonUrl: '#discover',
+        backgroundImage: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0',
+        style: {
+          backgroundColor: '#000000',
+          headingColor: '#ffffff',
+          textColor: '#f0f0f0',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Text Block
+      {
+        id: uuidv4(),
+        type: 'text',
+        title: 'Descrição da Coleção',
+        columns: 1,
+        visible: true,
+        heading: 'Requinte em Cada Detalhe',
+        content: '<p>Nossa coleção de acessórios de luxo representa o ápice da sofisticação e artesanato. Cada peça é meticulosamente criada por mestres joalheiros, utilizando materiais preciosos e técnicas tradicionais transmitidas por gerações.</p><p>As peças combinam design contemporâneo com elementos clássicos, resultando em acessórios que são verdadeiras obras de arte que resistem ao teste do tempo.</p>',
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // Gallery Block
+      {
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Galeria de Produtos',
+        columns: 2,
+        visible: true,
+        images: [
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1576053139394-f0c3f4e1a85f',
+            alt: 'Relógio de luxo',
+            caption: 'Relógio Cronógrafo Série Platinum'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d',
+            alt: 'Pulseira em ouro',
+            caption: 'Pulseira Entrelaçada Ouro 18k'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e',
+            alt: 'Conjunto de anéis',
+            caption: 'Anéis Trilogy Diamantes'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401',
+            alt: 'Colar de pérolas',
+            caption: 'Colar Pérolas Akoya Genuínas'
+          }
+        ],
+        style: {
+          backgroundColor: '#f8f8f8',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md',
+          imageFit: 'cover'
+        }
+      },
+      // FAQ Block
+      {
+        id: uuidv4(),
+        type: 'faq',
+        title: 'Perguntas Frequentes',
+        columns: 1,
+        visible: true,
+        heading: 'Dúvidas Comuns',
+        questions: [
+          {
+            id: uuidv4(),
+            question: 'Como garantir a autenticidade dos produtos?',
+            answer: 'Todos os nossos produtos vêm com certificado de autenticidade numerado e verificável, além de gravação a laser exclusiva em cada peça.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Qual a política de devolução?',
+            answer: 'Oferecemos 30 dias para devolução ou troca, desde que o produto esteja em perfeito estado e com todas as embalagens originais.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Vocês oferecem serviço de personalização?',
+            answer: 'Sim, oferecemos serviço de gravação e personalização em peças selecionadas. Entre em contato com nossa equipe para mais detalhes.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Como cuidar adequadamente dos acessórios?',
+            answer: 'Recomendamos guardar as peças na embalagem original, evitar contato com produtos químicos e limpar regularmente com produtos específicos para o material de cada acessório.'
+          }
+        ],
+        style: {
+          backgroundColor: '#ffffff',
+          headingColor: '#000000',
+          textColor: '#333333',
+          padding: 'lg',
+          blockSpacing: 'md'
+        }
+      },
+      // CTA Block
+      {
+        id: uuidv4(),
+        type: 'cta',
+        title: 'Chamada para Ação',
+        columns: 1,
+        visible: true,
+        heading: 'Experimente o Luxo Autêntico',
+        content: 'Conheça nossa coleção exclusiva e descubra peças que combinam perfeitamente com seu estilo sofisticado.',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#buy',
+        style: {
+          backgroundColor: '#1a1a1a',
+          headingColor: '#ffffff',
+          textColor: '#cccccc',
+          padding: 'lg',
+          blockSpacing: 'none'
+        }
+      }
+    ]
   }
 ];
 
-// Apply fixTemplateProps to ensure all templates have the correct properties
-export const accessoriesTemplates: Template[] = accessoriesTemplatesRaw.map(fixTemplateProps);
-
-// Export the fixed templates
-export const fixedAccessoriesTemplates: Template[] = accessoriesTemplates;
+// For backward compatibility with existing code that might expect a single template
+export const accessoriesTemplate = accessoriesTemplates[0];

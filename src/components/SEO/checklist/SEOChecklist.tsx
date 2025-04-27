@@ -51,7 +51,7 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
                 </TabsList>
               </div>
               
-              <ScrollArea className="flex-1 p-4 h-[60vh]">
+              <ScrollArea className="flex-1 p-4">
                 <TabsContent value="checklist" className="mt-0 m-0 h-full">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <ScoreCard 
@@ -71,7 +71,7 @@ const SEOChecklist: React.FC<SEOChecklistProps> = ({ description }) => {
                     />
                   </div>
                   
-                  <div className="space-y-6 pb-10">
+                  <div className="space-y-6">
                     <CategoryChecks 
                       title="content"
                       checks={checklistData.contentChecks}

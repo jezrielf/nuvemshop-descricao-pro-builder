@@ -11,5 +11,3 @@ export * from './textImageBlock';
 export * from './faqBlock';
 export * from './ctaBlock';
 export * from './videoBlock';
-export * from './videoTextBlock';
-export * from './textVideoBlock';

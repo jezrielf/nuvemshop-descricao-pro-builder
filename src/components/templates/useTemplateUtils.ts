@@ -1,39 +1,54 @@
 
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ProductCategory } from '@/types/editor';
+import { advancedTemplates } from '@/utils/templates';
 
-export const useTemplateUtils = () => {
-  // Mapping for display names
-  const categoryNames = useMemo(() => {
-    const names: Record<string, string> = {
-      'Alimentos': 'Alimentos',
-      'Bebidas': 'Bebidas',
-      'Beleza': 'Beleza e Cuidados Pessoais',
-      'Casa': 'Casa',
-      'Decoração': 'Decoração',
-      'Eletrônicos': 'Eletrônicos',
-      'Esporte': 'Esporte e Fitness',
-      'Moda': 'Moda',
-      'Saúde': 'Saúde e Bem-estar',
-      // Legacy categories
-      'supplements': 'Suplementos',
-      'clothing': 'Roupas',
-      'accessories': 'Acessórios',
-      'shoes': 'Calçados',
-      'electronics': 'Eletrônicos',
-      'energy': 'Energia',
-      'Casa e decoração': 'Casa e Decoração',
-      'other': 'Outros',
-      'all': 'Todos'
-    };
-    return names;
-  }, []);
+interface CategoryNamesMap {
+  [key: string]: string;
+}
 
-  // Function to get display name for a category
-  const getCategoryName = (category: string): string => {
-    return categoryNames[category] || category;
+export default function useTemplateUtils() {
+  // Category mapping for display purposes
+  const categoryNames: CategoryNamesMap = useMemo(() => ({
+    'supplements': 'Suplementos',
+    'clothing': 'Vestuário',
+    'accessories': 'Acessórios',
+    'shoes': 'Calçados',
+    'electronics': 'Eletrônicos',
+    'energy': 'Energia',
+    'Casa e decoração': 'Casa e decoração',
+    'other': 'Outros'
+  }), []);
+
+  // Check if a template is from the advanced collection
+  const isAdvancedTemplate = (id: string): boolean => {
+    return advancedTemplates.some(template => template.id === id);
   };
 
-  return { getCategoryName, categoryNames };
-};
+  // Get a thumbnail for a template
+  const getTemplateThumbnail = (template: { category: ProductCategory, thumbnail?: string }): string => {
+    if (template.thumbnail && template.thumbnail !== '/placeholder.svg') {
+      return template.thumbnail;
+    }
+    
+    // Default thumbnails based on category
+    const categoryThumbnails: Record<ProductCategory, string> = {
+      'supplements': '/assets/thumbnails/supplements.jpg',
+      'clothing': '/assets/thumbnails/clothing.jpg',
+      'accessories': '/assets/thumbnails/accessories.jpg',
+      'shoes': '/assets/thumbnails/shoes.jpg',
+      'electronics': '/assets/thumbnails/electronics.jpg',
+      'energy': '/assets/thumbnails/energy.jpg',
+      'Casa e decoração': '/assets/thumbnails/home.jpg',
+      'other': '/assets/thumbnails/generic.jpg'
+    };
+    
+    return categoryThumbnails[template.category] || '/placeholder.svg';
+  };
 
+  return {
+    categoryNames,
+    isAdvancedTemplate,
+    getTemplateThumbnail
+  };
+}

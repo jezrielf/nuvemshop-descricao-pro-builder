@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Profile } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 import UserPanelHeader from './users/panels/UserPanelHeader';
 import UserPanelContent from './users/panels/UserPanelContent';
-import { userService } from '@/services/admin/userService';
+import { adminService } from '@/services/admin';
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -44,7 +43,7 @@ const UsersPanel: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const users = await userService.getUsers();
+      const users = await adminService.getUsers();
       setProfiles(users);
       setFilteredProfiles(users);
     } catch (error: any) {
@@ -70,17 +69,16 @@ const UsersPanel: React.FC = () => {
     });
   };
 
-  const filterUsers = (query: string) => {
-    setSearchTerm(query);
-  };
-
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <UserPanelHeader
-        filterUsers={filterUsers}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
         onRefresh={fetchProfiles}
         loading={loading}
-        onUserCreated={handleCreateUser}
+        isCreateUserSheetOpen={isCreateUserSheetOpen}
+        setIsCreateUserSheetOpen={setIsCreateUserSheetOpen}
+        handleCreateUser={handleCreateUser}
       />
       
       <UserPanelContent
@@ -89,6 +87,10 @@ const UsersPanel: React.FC = () => {
         profiles={filteredProfiles}
         onRefresh={fetchProfiles}
       />
+      
+      <div className="mt-4 text-sm text-gray-500">
+        Total de usuários: {profiles.length}
+      </div>
     </div>
   );
 };

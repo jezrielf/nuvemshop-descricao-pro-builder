@@ -2,49 +2,90 @@
 import React from 'react';
 import { BlockBase, BlockStyle } from '@/types/editor';
 import { Label } from '@/components/ui/label';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SpacingControlsProps {
   block: BlockBase;
-  updateStyle: (style: Partial<BlockStyle>) => void;
+  updateStyle: (updates: Partial<BlockStyle>) => void;
 }
 
 const SpacingControls: React.FC<SpacingControlsProps> = ({ block, updateStyle }) => {
-  const handleSpacingChange = (value: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl') => {
-    updateStyle({
-      blockSpacing: value
-    });
+  const handlePaddingChange = (value: string) => {
+    console.log('Changing padding to:', value);
+    updateStyle({ padding: value });
+  };
+
+  const handleMarginChange = (value: string) => {
+    console.log('Changing margin to:', value);
+    updateStyle({ margin: value });
+  };
+
+  const handleBlockSpacingChange = (value: string) => {
+    console.log('Changing block spacing to:', value);
+    updateStyle({ blockSpacing: value });
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <h5 className="text-sm font-medium">Espaçamento</h5>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <Label htmlFor="block-spacing" className="text-xs">Tamanho do Espaçamento</Label>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label htmlFor="padding">Padding</Label>
           <Select 
-            value={block.style?.blockSpacing || 'md'} 
-            onValueChange={(value) => handleSpacingChange(value as 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl')}
+            value={block.style?.padding || 'md'} 
+            onValueChange={handlePaddingChange}
           >
-            <SelectTrigger id="block-spacing" className="h-8">
-              <SelectValue placeholder="Selecionar" />
+            <SelectTrigger id="padding">
+              <SelectValue placeholder="Padding" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Nenhum</SelectItem>
-              <SelectItem value="xs">Extra Pequeno</SelectItem>
+              <SelectItem value="xs">Muito pequeno</SelectItem>
               <SelectItem value="sm">Pequeno</SelectItem>
               <SelectItem value="md">Médio</SelectItem>
               <SelectItem value="lg">Grande</SelectItem>
-              <SelectItem value="xl">Extra Grande</SelectItem>
+              <SelectItem value="xl">Muito grande</SelectItem>
             </SelectContent>
           </Select>
         </div>
+        <div>
+          <Label htmlFor="margin">Margem</Label>
+          <Select 
+            value={block.style?.margin || 'md'} 
+            onValueChange={handleMarginChange}
+          >
+            <SelectTrigger id="margin">
+              <SelectValue placeholder="Margem" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="xs">Muito pequena</SelectItem>
+              <SelectItem value="sm">Pequena</SelectItem>
+              <SelectItem value="md">Média</SelectItem>
+              <SelectItem value="lg">Grande</SelectItem>
+              <SelectItem value="xl">Muito grande</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      {/* Controle para espaçamento entre blocos */}
+      <div className="mt-3">
+        <Label htmlFor="blockSpacing">Espaçamento entre blocos</Label>
+        <Select 
+          value={block.style?.blockSpacing || 'md'} 
+          onValueChange={handleBlockSpacingChange}
+        >
+          <SelectTrigger id="blockSpacing">
+            <SelectValue placeholder="Espaçamento entre blocos" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Nenhum (conectados)</SelectItem>
+            <SelectItem value="xs">Muito pequeno</SelectItem>
+            <SelectItem value="sm">Pequeno</SelectItem>
+            <SelectItem value="md">Médio</SelectItem>
+            <SelectItem value="lg">Grande</SelectItem>
+            <SelectItem value="xl">Muito grande</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

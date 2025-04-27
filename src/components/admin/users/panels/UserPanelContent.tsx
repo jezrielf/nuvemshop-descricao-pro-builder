@@ -1,54 +1,65 @@
 
 import React from 'react';
 import { Profile } from '@/types/auth';
-import { Card } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
-import { LoaderCircle } from 'lucide-react';
-import UserTable from '../UserTable';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import UserTable from '../index';
+import { Button } from '@/components/ui/button';
 
 interface UserPanelContentProps {
-  profiles: Profile[];
   loading: boolean;
   error: string | null;
+  profiles: Profile[];
   onRefresh: () => void;
 }
 
 const UserPanelContent: React.FC<UserPanelContentProps> = ({
-  profiles,
   loading,
   error,
-  onRefresh
+  profiles,
+  onRefresh,
 }) => {
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
+      <Alert variant="destructive" className="mb-4">
+        <AlertTitle>Erro ao carregar usuários</AlertTitle>
         <AlertDescription>
-          {error}
+          <p>{error}</p>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onRefresh}
+            className="mt-2"
+          >
+            Tentar novamente
+          </Button>
         </AlertDescription>
       </Alert>
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center p-8">
-        <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (profiles.length === 0) {
-    return (
-      <Card className="p-6 text-center text-gray-500">
-        <p>Nenhum usuário encontrado.</p>
-      </Card>
-    );
-  }
-
   return (
-    <UserTable profiles={profiles} loading={loading} error={error} onRefresh={onRefresh} />
+    <div className="border rounded-lg overflow-hidden">
+      {loading ? (
+        <div className="p-6 space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <UserTable 
+          profiles={profiles} 
+          loading={loading}
+          onRefresh={onRefresh}
+        />
+      )}
+    </div>
   );
 };
 

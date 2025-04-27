@@ -4,12 +4,11 @@ import { Template } from '@/types/editor';
 import { useTemplateStore } from '@/store/templates';
 
 export function useTemplates() {
-  const { templates, loadTemplates, categories, selectedCategory, setSelectedCategory } = useTemplateStore();
+  const { templates, loadTemplates, searchTemplates, categories } = useTemplateStore();
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Load templates on mount
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -24,24 +23,7 @@ export function useTemplates() {
     loadData();
   }, [loadTemplates]);
 
-  // Filter templates when search query or category changes
-  useEffect(() => {
-    const filterTemplates = () => {
-      return templates.filter(template => {
-        // Filter by search query
-        const matchesQuery = !searchQuery || 
-          template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (template.description && template.description.toLowerCase().includes(searchQuery.toLowerCase()));
-        
-        // Filter by category
-        const matchesCategory = !selectedCategory || template.category === selectedCategory;
-        
-        return matchesQuery && matchesCategory;
-      });
-    };
-    
-    setFilteredTemplates(filterTemplates());
-  }, [templates, searchQuery, selectedCategory]);
+  const filteredTemplates = searchTemplates(searchQuery, selectedCategory);
 
   return {
     templates,

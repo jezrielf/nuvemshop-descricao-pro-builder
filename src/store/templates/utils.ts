@@ -1,44 +1,54 @@
 
+import { Block, ProductCategory } from '@/types/editor';
 import { Template } from '@/types/editor';
-import { v4 as uuidv4 } from 'uuid';
 
-// Generate an empty template with default structure
-export const createEmptyTemplate = (name: string, category: string): Template => {
-  return {
-    id: uuidv4(),
-    name,
-    description: '',
-    category: category as any,
-    blocks: [],
-    thumbnailUrl: '/templates/empty.jpg',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+interface SupabaseTemplate {
+  id: string;
+  name: string;
+  category: string;
+  blocks: any;
+  thumbnail?: string;
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string;
+}
+
+export const convertSupabaseToTemplate = (supaTemplate: SupabaseTemplate): Template | null => {
+  try {
+    let blocks = [];
+    
+    if (Array.isArray(supaTemplate.blocks)) {
+      blocks = supaTemplate.blocks;
+    } else if (typeof supaTemplate.blocks === 'object' && supaTemplate.blocks !== null) {
+      blocks = Object.values(supaTemplate.blocks);
+    }
+    
+    // Convert category to a valid ProductCategory
+    let category: ProductCategory = 'other';
+    
+    // Check if it's a valid ProductCategory
+    const validCategories: ProductCategory[] = [
+      'supplements', 'clothing', 'accessories', 'shoes', 
+      'electronics', 'energy', 'Casa e decoração', 'other'
+    ];
+    
+    if (supaTemplate.category && validCategories.includes(supaTemplate.category as ProductCategory)) {
+      category = supaTemplate.category as ProductCategory;
+    }
+    
+    return {
+      id: supaTemplate.id,
+      name: supaTemplate.name,
+      category: category,
+      blocks: blocks,
+      thumbnail: supaTemplate.thumbnail || '/placeholder.svg' // Default placeholder if no thumbnail
+    };
+  } catch (error) {
+    console.error('Error converting template:', error, supaTemplate);
+    return null;
+  }
 };
 
-// Default category options for templates
-export const defaultCategories = [
-  { value: 'all', label: 'Todas categorias' },
-  { value: 'supplements', label: 'Suplementos' },
-  { value: 'clothing', label: 'Roupas' },
-  { value: 'accessories', label: 'Acessórios' },
-  { value: 'shoes', label: 'Calçados' },
-  { value: 'Eletrônicos', label: 'Eletrônicos' },
-  { value: 'energy', label: 'Energia' },
-  { value: 'Casa e decoração', label: 'Casa e decoração' },
-  { value: 'other', label: 'Outros' },
-];
-
-// Default templates for new installations
-export const defaultTemplates: Template[] = [
-  {
-    id: uuidv4(),
-    name: 'Template Básico',
-    description: 'Um modelo básico para iniciar sua descrição de produto',
-    category: 'other' as any,
-    blocks: [],
-    thumbnailUrl: '/templates/default.jpg',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+export const serializeBlocks = (blocks: Block[]): any => {
+  return JSON.parse(JSON.stringify(blocks));
+};

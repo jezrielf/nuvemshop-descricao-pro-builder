@@ -1,15 +1,15 @@
+
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
-import { fixTemplateProps } from './fixTemplateProps';
 
 // Health Template Collection
-const healthTemplatesRaw = [
+export const healthTemplates: Template[] = [
   // TEMPLATE 1: General Health
   {
     id: uuidv4(),
     name: 'Saúde e Bem-estar',
     category: 'supplements',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1532980400857-4a0c0a9ee8e2',
+    thumbnail: 'https://images.unsplash.com/photo-1532980400857-4a0c0a9ee8e2',
     blocks: [
       // Hero Block
       {
@@ -161,7 +161,7 @@ const healthTemplatesRaw = [
     id: uuidv4(),
     name: 'Vitaminas e Minerais',
     category: 'supplements',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1577003833619-76bbd7f82948',
+    thumbnail: 'https://images.unsplash.com/photo-1577003833619-76bbd7f82948',
     blocks: [
       // Hero Block
       {
@@ -368,7 +368,7 @@ const healthTemplatesRaw = [
     id: uuidv4(),
     name: 'Sono e Relaxamento',
     category: 'supplements',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55',
+    thumbnail: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55',
     blocks: [
       // Hero Block
       {
@@ -595,9 +595,6 @@ const healthTemplatesRaw = [
     ]
   }
 ];
-
-// Apply fixTemplateProps to ensure all templates have the correct properties
-export const healthTemplates: Template[] = healthTemplatesRaw.map(fixTemplateProps);
 
 // For backward compatibility with existing code that might expect a single template
 export const healthTemplate = healthTemplates[0];

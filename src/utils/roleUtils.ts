@@ -1,65 +1,120 @@
+/**
+ * Utility functions for handling user roles
+ */
 
 /**
- * Utility function to convert various role formats to a unified array format
+ * Get user roles as an array from either the profiles table or user_roles table
+ * @param role string or string[] representing user roles from profiles table
+ * @returns array of roles
  */
 export const getRoles = (role: string | string[] | null): string[] => {
   if (!role) return ['user'];
   
-  if (typeof role === 'string') {
-    if (role.includes(',')) {
-      // Split by comma and remove duplicates
-      const roles = role.split(',').map(r => r.trim()).filter(Boolean);
-      return [...new Set(roles)]; // Remove duplicates
-    }
-    return [role];
+  // If it's already an array, return it directly
+  if (Array.isArray(role)) {
+    return role;
   }
   
-  // Remove duplicates if it's already an array
-  return [...new Set(role)];
-};
-
-/**
- * Converts role(s) to string format for database operations
- */
-export const rolesToString = (role: string | string[] | null): string => {
-  const roles = getRoles(role);
-  return roles.join(',');
-};
-
-/**
- * Checks if user has a specific role
- */
-export const hasRole = (userRole: string | string[] | null, roleToCheck: string): boolean => {
-  // Early return for direct match in string format
-  if (userRole === roleToCheck) return true;
+  // If it's a comma-separated string, split it
+  if (role?.includes(',')) {
+    return role.split(',').map(r => r.trim());
+  }
   
-  const roles = getRoles(userRole);
+  // If it's a single string value
+  return [role];
+};
+
+/**
+ * Check if a user has a specific role
+ * @param role string or string[] representing user roles
+ * @param roleToCheck the role to check for
+ * @returns boolean indicating if the user has the role
+ */
+export const hasRole = (role: string | string[] | null, roleToCheck: string): boolean => {
+  // Fast path: if role is null and checking for 'user'
+  if (!role && roleToCheck === 'user') return true;
+  
+  // Fast path: if role is the exact string we're checking
+  if (typeof role === 'string' && role === roleToCheck) return true;
+  
+  // Otherwise, get the full roles array and check
+  const roles = getRoles(role);
   return roles.includes(roleToCheck);
 };
 
 /**
- * Checks if user has admin role
+ * Check if a user has admin role
+ * @param role string or string[] representing user roles
+ * @returns boolean indicating if the user is an admin
  */
 export const isAdmin = (role: string | string[] | null): boolean => {
+  // Fast path check for exact match
+  if (typeof role === 'string' && role === 'admin') return true;
+  
   return hasRole(role, 'admin');
 };
 
 /**
- * Checks if user has premium role
+ * Check if a user has premium role
+ * @param role string or string[] representing user roles
+ * @returns boolean indicating if the user is premium
  */
 export const isPremium = (role: string | string[] | null): boolean => {
-  // Early return for direct match to avoid array processing
-  if (role === 'admin' || role === 'premium') return true;
+  // Fast path: direct match for premium
+  if (typeof role === 'string' && role === 'premium') return true;
   
+  // Fast path: admin is always premium
+  if (typeof role === 'string' && role === 'admin') return true;
+  
+  // Otherwise, check more thoroughly
   return hasRole(role, 'premium') || isAdmin(role);
 };
 
 /**
- * Checks if user has business role
+ * Check if a user has business role
+ * @param role string or string[] representing user roles
+ * @returns boolean indicating if the user is business
  */
 export const isBusiness = (role: string | string[] | null): boolean => {
-  // Early return for common direct matches
-  if (role === 'admin' || role === 'premium' || role === 'business') return true;
+  // Fast path: direct match for business
+  if (typeof role === 'string' && role === 'business') return true;
   
-  return hasRole(role, 'business') || isPremium(role) || isAdmin(role);
+  // Fast path: premium users should also have business privileges
+  if (typeof role === 'string' && (role === 'premium' || role === 'admin')) return true;
+  
+  // Otherwise, check more thoroughly
+  return hasRole(role, 'business') || isPremium(role);
+};
+
+/**
+ * Add a role to a user's roles
+ * @param currentRoles string or string[] representing current user roles
+ * @param roleToAdd the role to add
+ * @returns updated roles array
+ */
+export const addRole = (currentRoles: string | string[] | null, roleToAdd: string): string[] => {
+  const roles = getRoles(currentRoles);
+  if (!roles.includes(roleToAdd)) {
+    roles.push(roleToAdd);
+  }
+  return roles;
+};
+
+/**
+ * Remove a role from a user's roles
+ * @param currentRoles string or string[] representing current user roles
+ * @param roleToRemove the role to remove
+ * @returns updated roles array
+ */
+export const removeRole = (currentRoles: string | string[] | null, roleToRemove: string): string[] => {
+  const roles = getRoles(currentRoles);
+  return roles.filter(r => r !== roleToRemove);
+};
+
+/**
+ * Get available system roles
+ * @returns array of available system roles
+ */
+export const getAvailableRoles = (): string[] => {
+  return ['user', 'premium', 'business', 'admin'];
 };

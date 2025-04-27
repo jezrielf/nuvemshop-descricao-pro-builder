@@ -1,71 +1,59 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ListTodo, BadgeAlert, Trash2, RefreshCcw } from 'lucide-react';
+import { ListTodo, BadgeAlert, Trash2 } from 'lucide-react';
 import { useEditorStore } from '@/store/editor';
 import { ProductDescription } from '@/types/editor';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface SavedDescriptionsDialogProps {
-  isPremium: boolean;
+  isPremium: () => boolean;
   descriptionCount: number;
-  savedDescriptions: ProductDescription[] | undefined;
+  savedDescriptions: ProductDescription[];
 }
 
 const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({ 
   isPremium, 
   descriptionCount, 
-  savedDescriptions = []
+  savedDescriptions 
 }) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState<ProductDescription | null>(null);
   const { toast } = useToast();
-  const { loadSavedDescriptions, loadDescription } = useEditorStore();
-  
-  const handleRefresh = () => {
-    loadSavedDescriptions();
-    toast({
-      title: "Atualizando descrições",
-      description: "Buscando descrições salvas..."
-    });
-  };
   
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent triggering the parent click
     setSelectedDescription(desc);
     setDeleteDialogOpen(true);
   };
   
   const handleDeleteConfirm = () => {
-    if (selectedDescription && savedDescriptions) {
-      try {
-        const updatedDescriptions = savedDescriptions.filter(d => d.id !== selectedDescription.id);
-        localStorage.setItem('savedDescriptions', JSON.stringify(updatedDescriptions));
-        loadSavedDescriptions();
+    if (selectedDescription) {
+      // Obter a chave correta do localStorage baseada no usuário atual
+      const { user } = useEditorStore.getState();
+      const key = user ? `savedDescriptions_${user.id}` : 'savedDescriptions_anonymous';
+      
+      // Get current descriptions
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const descriptions = JSON.parse(saved) as ProductDescription[];
+        const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
+        localStorage.setItem(key, JSON.stringify(updatedDescriptions));
+        
+        // Update the store
+        useEditorStore.getState().loadSavedDescriptions();
         
         toast({
           title: "Descrição excluída",
           description: "A descrição foi removida com sucesso."
         });
-      } catch (error) {
-        console.error('Error deleting description:', error);
-        toast({
-          title: "Erro ao excluir descrição",
-          description: "Ocorreu um erro ao tentar excluir a descrição.",
-          variant: "destructive"
-        });
       }
     }
     setDeleteDialogOpen(false);
     setSelectedDescription(null);
-  };
-  
-  const handleLoadDescription = (desc: ProductDescription) => {
-    loadDescription(desc);
-    setOpen(false);
   };
   
   return (
@@ -74,20 +62,15 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
         <DialogTrigger asChild>
           <Button variant="outline" className="flex items-center">
             <ListTodo className="mr-2 h-4 w-4" />
-            Descrições Salvas ({savedDescriptions?.length || 0})
+            Descrições Salvas
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <div className="flex justify-between items-center">
-              <DialogTitle>Suas Descrições Salvas</DialogTitle>
-              <Button size="sm" variant="ghost" onClick={handleRefresh}>
-                <RefreshCcw className="h-4 w-4" />
-              </Button>
-            </div>
+            <DialogTitle>Suas Descrições Salvas</DialogTitle>
             <DialogDescription>
               Selecione uma descrição para continuar editando.
-              {!isPremium && (
+              {!isPremium() && (
                 <div className="mt-2 text-yellow-600 text-sm flex items-center">
                   <BadgeAlert className="mr-1 h-4 w-4" />
                   Você usou {descriptionCount}/3 descrições gratuitas.
@@ -96,16 +79,19 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            {savedDescriptions && savedDescriptions.length > 0 ? (
+            {savedDescriptions.length > 0 ? (
               <div className="space-y-2">
                 {savedDescriptions.map((desc) => (
                   <div 
                     key={desc.id} 
                     className="p-3 border rounded-md hover:bg-gray-50 cursor-pointer flex justify-between items-center group"
-                    onClick={() => handleLoadDescription(desc)}
+                    onClick={() => {
+                      useEditorStore.getState().loadDescription(desc);
+                      setOpen(false);
+                    }}
                   >
                     <div>
-                      <p className="font-medium">{desc.name || "Descrição sem nome"}</p>
+                      <p className="font-medium">{desc.name}</p>
                       <p className="text-xs text-gray-500">
                         Atualizado em: {new Date(desc.updatedAt).toLocaleDateString()}
                       </p>
@@ -140,7 +126,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir a descrição "{selectedDescription?.name || 'sem nome'}"? 
+              Tem certeza que deseja excluir a descrição "{selectedDescription?.name}"? 
               Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
