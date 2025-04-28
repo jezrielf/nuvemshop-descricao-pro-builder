@@ -37,6 +37,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
             <Button 
               onClick={onStartNewDescription}
               className="w-full"
+              variant="default"
             >
               <Plus className="h-4 w-4 mr-2" />
               Iniciar Nova Descrição

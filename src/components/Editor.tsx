@@ -1,8 +1,8 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useEditor } from './editor/hooks/useEditor';
 import EmptyState from './editor/EmptyState';
 import EditorContent from './editor/EditorContent';
+import AddBlock from './AddBlock';
 
 const Editor: React.FC = () => {
   const {
@@ -22,8 +22,8 @@ const Editor: React.FC = () => {
     console.log("Editor component - blocks count:", description?.blocks?.length || 0);
   }
 
-  // Show empty state if no blocks exist
-  if (!description?.blocks?.length) {
+  // Show empty state if no description exists
+  if (!description) {
     return (
       <EmptyState
         isPremiumUser={isPremiumUser}
@@ -33,6 +33,22 @@ const Editor: React.FC = () => {
     );
   }
 
+  // Description exists but has no blocks - show the AddBlock component directly
+  if (description && description.blocks.length === 0) {
+    return (
+      <div className="h-full flex flex-col p-4">
+        <div className="text-center my-6">
+          <h2 className="text-xl font-medium mb-2">Nova Descrição: {description.name}</h2>
+          <p className="text-gray-500 mb-6">
+            Adicione blocos para construir sua descrição de produto
+          </p>
+        </div>
+        <AddBlock />
+      </div>
+    );
+  }
+
+  // Otherwise show the full editor content
   return (
     <EditorContent
       description={description}

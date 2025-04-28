@@ -25,7 +25,6 @@ export const useEditor = () => {
     reorderBlocks(fromIndex, toIndex);
   };
   
-  // Fix the function to properly create a new description
   const handleStartNewDescription = () => {
     console.log('Starting new description...');
     
@@ -43,6 +42,11 @@ export const useEditor = () => {
         title: "Nova descrição criada",
         description: "Adicione blocos para construir sua descrição de produto",
       });
+      
+      // Force navigation to editor page to ensure UI updates
+      if (window.location.pathname !== '/editor') {
+        navigate('/editor');
+      }
     } catch (error) {
       console.error('Error creating new description:', error);
       toast({
