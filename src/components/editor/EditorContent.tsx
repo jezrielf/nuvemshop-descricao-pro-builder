@@ -31,13 +31,13 @@ const EditorContent: React.FC<EditorContentProps> = ({
   }, [description, isPremiumUser, isBusinessUser, onUpdateImage]);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-3 sm:p-4 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-2">
+    <div className="h-full flex flex-col text-[11px]">
+      <div className="p-2 sm:p-3 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-2">
         <TemplateSelector />
         {seoToolsComponent}
       </div>
       
-      <ScrollArea className="flex-1 p-3 sm:p-4 h-[calc(100%-60px)]">
+      <ScrollArea className="flex-1 p-2 sm:p-3 h-[calc(100%-60px)]">
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="blocks">
             {(provided) => (

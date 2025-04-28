@@ -13,8 +13,8 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({ block, className }) => {
   const blockTypeName = getBlockTypeDisplayName(block.type);
   
   return (
-    <div className={cn("block-header text-xs font-medium flex items-center gap-2", className)}>
-      <span className="px-2 py-1 rounded-sm bg-primary/10 text-primary">
+    <div className={cn("block-header text-[11px] font-medium flex items-center gap-2", className)}>
+      <span className="px-2 py-0.5 rounded-sm bg-primary/10 text-primary">
         {blockTypeName}
       </span>
       <span className="truncate max-w-[200px]">{block.title}</span>
