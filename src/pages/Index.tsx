@@ -168,7 +168,7 @@ const Index = () => {
             minSize={isMobile ? 30 : 30} 
             className="editor-area h-full max-h-full overflow-hidden"
           >
-            <Editor />
+            <Editor selectedProduct={selectedProduct} />
           </ResizablePanel>
           
           <ResizableHandle withHandle />

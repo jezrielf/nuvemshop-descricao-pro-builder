@@ -1,10 +1,16 @@
+
 import React, { useEffect } from 'react';
 import { useEditor } from './editor/hooks/useEditor';
 import EmptyState from './editor/EmptyState';
 import EditorContent from './editor/EditorContent';
 import AddBlock from './AddBlock';
+import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 
-const Editor: React.FC = () => {
+interface EditorProps {
+  selectedProduct?: any; // Add prop for selected product
+}
+
+const Editor: React.FC<EditorProps> = ({ selectedProduct }) => {
   const {
     description,
     isPremiumUser,
@@ -53,6 +59,7 @@ const Editor: React.FC = () => {
       isBusinessUser={isBusinessUser}
       onDragEnd={handleDragEnd}
       onUpdateImage={handleUpdateImage}
+      selectedProduct={selectedProduct}
     />
   );
 };

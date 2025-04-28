@@ -7,6 +7,8 @@ import AddBlock from '@/components/AddBlock';
 import TemplateSelector from '@/components/templates/TemplateSelector';
 import { SEOToolsMenu } from '@/components/SEO/menu/SEOToolsMenu';
 import { ProductDescription } from '@/types/editor';
+import SaveToNuvemshopButton from '@/components/Nuvemshop/components/SaveToNuvemshopButton';
+import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 
 interface EditorContentProps {
   description: ProductDescription;
@@ -14,6 +16,7 @@ interface EditorContentProps {
   isBusinessUser: boolean;
   onDragEnd: (result: any) => void;
   onUpdateImage: (blockId: string, imageType: string, newImageUrl: string) => void;
+  selectedProduct?: any; // Added prop for the selected Nuvemshop product
 }
 
 const EditorContent: React.FC<EditorContentProps> = ({
@@ -22,7 +25,10 @@ const EditorContent: React.FC<EditorContentProps> = ({
   isBusinessUser,
   onDragEnd,
   onUpdateImage,
+  selectedProduct,
 }) => {
+  const { success: isNuvemshopConnected } = useNuvemshopAuth();
+  
   const seoToolsComponent = React.useMemo(() => {
     if (description && (isPremiumUser || isBusinessUser)) {
       return <SEOToolsMenu description={description} onUpdateImage={onUpdateImage} />;
@@ -34,7 +40,12 @@ const EditorContent: React.FC<EditorContentProps> = ({
     <div className="h-full flex flex-col text-[10px]">
       <div className="p-1.5 sm:p-2 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-1">
         <TemplateSelector />
-        {seoToolsComponent}
+        <div className="flex items-center">
+          {isNuvemshopConnected && selectedProduct && (
+            <SaveToNuvemshopButton product={selectedProduct} />
+          )}
+          {seoToolsComponent}
+        </div>
       </div>
       
       <ScrollArea className="flex-1 h-[calc(100%-52px)]">
