@@ -15,6 +15,7 @@ import {
   PopoverTrigger
 } from '@/components/ui/popover';
 import { useEditorStore } from '@/store/editor';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import ColorPickers from './StyleControls/ColorPickers';
 import TypographyControls from './StyleControls/TypographyControls';
 import SpacingControls from './StyleControls/SpacingControls';
@@ -48,23 +49,25 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
                 <Palette className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-4">
-              <div className="space-y-4">
-                <div className="border-b pb-2">
-                  <h4 className="font-medium">Personalização do Bloco</h4>
-                  <p className="text-xs text-muted-foreground">Personalize as cores e estilos do seu bloco</p>
+            <PopoverContent className="w-72 p-2">
+              <ScrollArea className="h-[400px] pr-2">
+                <div className="space-y-3">
+                  <div className="border-b pb-2">
+                    <h4 className="text-[11px] font-medium">Personalização do Bloco</h4>
+                    <p className="text-[10px] text-muted-foreground">Personalize as cores e estilos do seu bloco</p>
+                  </div>
+                  
+                  <ColorPickers block={block} updateStyle={updateStyle} />
+                  <TypographyControls block={block} updateStyle={updateStyle} />
+                  <SpacingControls block={block} updateStyle={updateStyle} />
+                  <BorderShadowControls block={block} updateStyle={updateStyle} />
                 </div>
-                
-                <ColorPickers block={block} updateStyle={updateStyle} />
-                <TypographyControls block={block} updateStyle={updateStyle} />
-                <SpacingControls block={block} updateStyle={updateStyle} />
-                <BorderShadowControls block={block} updateStyle={updateStyle} />
-              </div>
+              </ScrollArea>
             </PopoverContent>
           </Popover>
         </TooltipTrigger>
         <TooltipContent>
-          Personalizar aparência
+          <span className="text-[10px]">Personalizar aparência</span>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
