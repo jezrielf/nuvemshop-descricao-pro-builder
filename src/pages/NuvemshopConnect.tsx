@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -29,6 +28,11 @@ const NuvemshopConnect: React.FC = () => {
     storeName,
     tryAutoAuthentication
   } = useNuvemshopAuth();
+
+  // Log store name for debugging
+  useEffect(() => {
+    console.log('NuvemshopConnect - Store name:', storeName);
+  }, [storeName]);
 
   const {
     products,
@@ -86,7 +90,6 @@ const NuvemshopConnect: React.FC = () => {
     attemptAutoAuth();
   }, []);
 
-  // Handlers
   const handleDisconnectClick = () => {
     handleDisconnect();
     resetProducts();

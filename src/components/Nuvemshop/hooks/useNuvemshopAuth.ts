@@ -32,7 +32,15 @@ export function useNuvemshopAuth() {
     if (isAuthenticated) {
       setAccessToken(storedToken);
       setUserId(storedUserId);
-      setStoreName(storedStoreName);
+      
+      // Ensure store name is properly set
+      if (storedStoreName && storedStoreName !== '[object Object]' && typeof storedStoreName === 'string') {
+        setStoreName(storedStoreName);
+      } else {
+        // Fallback to a default name if the store name is invalid
+        setStoreName('Loja Nuvemshop');
+      }
+      
       setSuccess(true);
       console.log("Autenticação restaurada do localStorage:", { storedToken, storedUserId, storedStoreName });
     } else {
@@ -66,18 +74,24 @@ export function useNuvemshopAuth() {
       console.log("Processando código de autorização:", authCode);
       const data = await exchangeCodeForToken(authCode);
       
+      // Validate and sanitize store name
+      let validStoreName = 'Loja Nuvemshop';
+      if (data.store_name && typeof data.store_name === 'string' && data.store_name !== '[object Object]') {
+        validStoreName = data.store_name;
+      }
+      
       // Store the access token, user ID, and store name
       setAccessToken(data.access_token);
       setUserId(data.user_id.toString());
-      setStoreName(data.store_name || 'Loja Nuvemshop');
+      setStoreName(validStoreName);
       setSuccess(true);
       
       // Store in localStorage for persistence
-      storeAuthData(data.access_token, data.user_id.toString(), data.store_name || 'Loja Nuvemshop');
+      storeAuthData(data.access_token, data.user_id.toString(), validStoreName);
       
       toast({
         title: 'Loja conectada com sucesso!',
-        description: `Sua loja ${data.store_name || 'Nuvemshop'} foi conectada com sucesso.`,
+        description: `Sua loja ${validStoreName} foi conectada com sucesso.`,
       });
       
       return true;

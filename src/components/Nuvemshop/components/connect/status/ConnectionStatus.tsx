@@ -19,7 +19,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
         <Badge variant="outline" className="bg-green-100 text-green-800">
           <CheckCircle2 className="h-4 w-4 mr-1" />
           {storeName 
-            ? `Conectado com a ${storeName}` 
+            ? `Conectado com ${storeName}` 
             : 'Conectado'}
         </Badge>
       ) : (

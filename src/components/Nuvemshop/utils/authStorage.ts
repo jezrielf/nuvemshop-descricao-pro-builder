@@ -7,7 +7,14 @@
 export const storeAuthData = (accessToken: string, userId: string, storeName: string | null) => {
   localStorage.setItem('nuvemshop_access_token', accessToken);
   localStorage.setItem('nuvemshop_user_id', userId);
-  localStorage.setItem('nuvemshop_store_name', storeName || 'Loja Nuvemshop');
+  
+  // Ensure we're not storing '[object Object]' as the store name
+  let validStoreName = storeName;
+  if (!validStoreName || validStoreName === '[object Object]' || typeof validStoreName !== 'string') {
+    validStoreName = 'Loja Nuvemshop';
+  }
+  
+  localStorage.setItem('nuvemshop_store_name', validStoreName);
 };
 
 // Retrieve authentication data from localStorage

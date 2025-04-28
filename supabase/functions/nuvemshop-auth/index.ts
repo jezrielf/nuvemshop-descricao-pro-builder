@@ -95,7 +95,13 @@ serve(async (req) => {
       let storeName = 'Loja Nuvemshop'; // Default store name
       if (storeInfoResponse.ok) {
         const storeInfo = await storeInfoResponse.json();
-        storeName = storeInfo.name || storeName;
+        console.log('Store info:', storeInfo);
+        // Extract name from store info and ensure it's a string
+        if (storeInfo && storeInfo.name && typeof storeInfo.name === 'string') {
+          storeName = storeInfo.name;
+        }
+      } else {
+        console.log('Failed to fetch store info, using default name');
       }
 
       // Append store name to the data
