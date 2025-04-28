@@ -46,28 +46,34 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="hover:bg-gray-100">
-                <Palette className="h-4 w-4" />
+                <Palette className="h-3 w-3" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 p-2">
+            <PopoverContent className="w-[520px] p-2">
               <ScrollArea className="h-[400px] pr-2">
-                <div className="space-y-3">
-                  <div className="border-b pb-2">
-                    <h4 className="text-[11px] font-medium">Personalização do Bloco</h4>
-                    <p className="text-[10px] text-muted-foreground">Personalize as cores e estilos do seu bloco</p>
+                <div>
+                  <div className="border-b pb-1 mb-2">
+                    <h4 className="text-[9px] font-medium">Personalização do Bloco</h4>
+                    <p className="text-[8px] text-muted-foreground">Personalize as cores e estilos do seu bloco</p>
                   </div>
                   
-                  <ColorPickers block={block} updateStyle={updateStyle} />
-                  <TypographyControls block={block} updateStyle={updateStyle} />
-                  <SpacingControls block={block} updateStyle={updateStyle} />
-                  <BorderShadowControls block={block} updateStyle={updateStyle} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <ColorPickers block={block} updateStyle={updateStyle} />
+                      <SpacingControls block={block} updateStyle={updateStyle} />
+                    </div>
+                    <div className="space-y-2">
+                      <TypographyControls block={block} updateStyle={updateStyle} />
+                      <BorderShadowControls block={block} updateStyle={updateStyle} />
+                    </div>
+                  </div>
                 </div>
               </ScrollArea>
             </PopoverContent>
           </Popover>
         </TooltipTrigger>
         <TooltipContent>
-          <span className="text-[10px]">Personalizar aparência</span>
+          <span className="text-[8px]">Personalizar aparência</span>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -75,3 +81,4 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
 };
 
 export default StyleControls;
+
