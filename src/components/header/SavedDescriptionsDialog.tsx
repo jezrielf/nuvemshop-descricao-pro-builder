@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ListTodo, BadgeAlert, Trash2 } from 'lucide-react';
@@ -23,6 +23,14 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState<ProductDescription | null>(null);
   const { toast } = useToast();
+  const { loadSavedDescriptions } = useEditorStore();
+  
+  // Load descriptions when the dialog opens
+  useEffect(() => {
+    if (open) {
+      loadSavedDescriptions();
+    }
+  }, [open, loadSavedDescriptions]);
   
   const handleDeleteClick = (desc: ProductDescription, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent click
@@ -32,7 +40,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
   
   const handleDeleteConfirm = () => {
     if (selectedDescription) {
-      // Obter a chave correta do localStorage baseada no usuário atual
+      // Get the correct key for localStorage based on the current user
       const { user } = useEditorStore.getState();
       const key = user ? `savedDescriptions_${user.id}` : 'savedDescriptions_anonymous';
       
@@ -79,7 +87,7 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            {savedDescriptions.length > 0 ? (
+            {savedDescriptions && savedDescriptions.length > 0 ? (
               <div className="space-y-2">
                 {savedDescriptions.map((desc) => (
                   <div 

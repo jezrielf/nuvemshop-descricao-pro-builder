@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
@@ -30,6 +31,8 @@ const Editor: React.FC = () => {
   if (process.env.NODE_ENV === 'development') {
     console.log("Editor component - isPremium:", isPremiumUser);
     console.log("Editor component - isBusiness:", isBusinessUser);
+    console.log("Editor component - has description:", !!description);
+    console.log("Editor component - blocks count:", description?.blocks?.length || 0);
   }
   
   const handleDragEnd = (result: any) => {

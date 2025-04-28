@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,9 +25,10 @@ const Header: React.FC = () => {
     descriptionCount, 
     canCreateMoreDescriptions, 
     subscriptionTier,
-    profile
+    profile,
+    user
   } = auth;
-  const isMobile = useIsMobile(); // Corrected hook call
+  const isMobile = useIsMobile();
   
   // Log para debug dos papéis e status
   useEffect(() => {
@@ -40,6 +42,11 @@ const Header: React.FC = () => {
     }
   }, [profile, isPremium, isBusiness, isSubscribed, subscriptionTier]);
   
+  // Log user info for debugging
+  useEffect(() => {
+    console.log('Current user:', user);
+  }, [user]);
+  
   // Verificar se há uma loja Nuvemshop conectada
   const isNuvemshopConnected = !!localStorage.getItem('nuvemshop_access_token');
   
@@ -52,12 +59,23 @@ const Header: React.FC = () => {
   // Set auth context in the store when component mounts or auth changes
   useEffect(() => {
     setAuthContext(auth);
+    console.log('Auth context set in store');
   }, [auth, setAuthContext]);
   
-  // Load saved descriptions when component mounts or subscription changes
+  // Load saved descriptions when component mounts or user changes
   useEffect(() => {
+    if (user) {
+      console.log('Loading saved descriptions for user:', user.id);
+    } else {
+      console.log('Loading saved descriptions for anonymous user');
+    }
     loadSavedDescriptions();
-  }, [loadSavedDescriptions, subscriptionTier]);
+  }, [loadSavedDescriptions, user, auth]);
+
+  // Debug saved descriptions count
+  useEffect(() => {
+    console.log('Current saved descriptions count:', savedDescriptions.length);
+  }, [savedDescriptions]);
 
   // Memoize the subscription badge to prevent unnecessary re-renders
   const subscriptionBadge = useMemo(() => {

@@ -82,25 +82,48 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
       try {
         // Check if auth context is available
         if (!authContext) {
-          console.warn('Auth context not available for loading descriptions');
+          console.log('Auth context not available for loading descriptions, using fallback');
+          // Fallback to load from anonymous storage or user ID from store
+          const { user } = get();
+          const userId = user?.id;
+          const fallbackKey = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
+          const fallbackSaved = localStorage.getItem(fallbackKey);
+          
+          if (fallbackSaved) {
+            try {
+              const parsedDescriptions = JSON.parse(fallbackSaved) as ProductDescription[];
+              set({ savedDescriptions: parsedDescriptions });
+              console.log(`Loaded ${parsedDescriptions.length} descriptions from fallback storage`);
+            } catch (e) {
+              console.error('Error parsing saved descriptions from fallback storage:', e);
+              set({ savedDescriptions: [] });
+            }
+          }
           return;
         }
         
-        // Only premium/business users can load saved descriptions
-        if (!authContext.isPremium()) {
-          set({ savedDescriptions: [] });
-          return;
-        }
-        
+        // Get all saved descriptions for the current user
         const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
         const saved = localStorage.getItem(storageKey);
         
+        console.log(`Loading descriptions from storage key: ${storageKey}`);
+        
         if (saved) {
-          const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
-          set({ savedDescriptions: parsedDescriptions });
+          try {
+            const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
+            console.log(`Found ${parsedDescriptions.length} saved descriptions`);
+            set({ savedDescriptions: parsedDescriptions });
+          } catch (e) {
+            console.error('Error parsing saved descriptions:', e);
+            set({ savedDescriptions: [] });
+          }
+        } else {
+          console.log('No saved descriptions found in storage');
+          set({ savedDescriptions: [] });
         }
       } catch (error) {
         console.error('Error loading saved descriptions:', error);
+        set({ savedDescriptions: [] });
       }
     },
     

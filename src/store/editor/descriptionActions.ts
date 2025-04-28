@@ -18,6 +18,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
   },
 
   loadDescription: (description: ProductDescription) => {
+    console.log('Loading description:', description.name, description.id);
     set({
       description,
       selectedBlockId: null,
@@ -26,6 +27,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
 
   loadTemplate: (template: Template) => {
     const currentDescription = get().description;
+    console.log('Loading template with current description:', currentDescription?.id);
     
     // If no description exists, create a temporary one
     if (!currentDescription) {
@@ -37,6 +39,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
         updatedAt: new Date().toISOString(),
       };
       set({ description: tempDescription });
+      console.log('Created temporary description:', tempDescription.id);
     }
     
     // Create a proper typed copy of each block
@@ -59,5 +62,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
         }
       };
     });
+    
+    console.log('Template loaded with blocks:', updatedBlocks.length);
   },
 });
