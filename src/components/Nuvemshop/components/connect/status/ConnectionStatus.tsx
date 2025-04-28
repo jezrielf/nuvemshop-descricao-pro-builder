@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface ConnectionStatusProps {
   success: boolean;
-  storeName?: string;
+  storeName?: string | null;
 }
 
 export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
