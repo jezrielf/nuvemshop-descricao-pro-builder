@@ -11,10 +11,10 @@ interface BlockTypeSelectorProps {
 
 const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({ onSelectType }) => {
   return (
-    <div className="space-y-2">
-      <h3 className="text-xs font-medium mb-2">Escolha um tipo de bloco</h3>
-      <ScrollArea className="h-[300px] pr-3">
-        <div className="grid grid-cols-3 gap-2">
+    <div className="space-y-1">
+      <h3 className="text-[10px] font-medium mb-1">Escolha um tipo de bloco</h3>
+      <ScrollArea className="h-[280px] pr-3">
+        <div className="grid grid-cols-3 gap-1">
           {Object.keys(blockTypeInfo).map((type) => {
             const blockType = type as BlockType;
             const info = blockTypeInfo[blockType];
@@ -22,11 +22,11 @@ const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({ onSelectType }) =
               <Button
                 key={type}
                 variant="outline"
-                className="flex flex-col items-center justify-center h-14 text-center p-1"
+                className="flex flex-col items-center justify-center h-12 text-center p-1"
                 onClick={() => onSelectType(blockType)}
               >
-                <div className="mb-0.5">{info.icon}</div>
-                <span className="text-[11px]">{info.name}</span>
+                <div className="mb-0.5 text-[10px]">{info.icon}</div>
+                <span className="text-[10px]">{info.name}</span>
               </Button>
             );
           })}

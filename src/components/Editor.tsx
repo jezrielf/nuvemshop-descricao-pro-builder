@@ -22,7 +22,6 @@ const Editor: React.FC = () => {
     console.log("Editor component - blocks count:", description?.blocks?.length || 0);
   }
 
-  // Show empty state if no description exists
   if (!description) {
     return (
       <EmptyState
@@ -33,13 +32,12 @@ const Editor: React.FC = () => {
     );
   }
 
-  // Description exists but has no blocks - show the AddBlock component directly
   if (description && description.blocks.length === 0) {
     return (
-      <div className="h-full flex flex-col p-4">
-        <div className="text-center my-4">
-          <h2 className="text-base font-medium mb-1">Nova Descrição: {description.name}</h2>
-          <p className="text-gray-500 text-xs mb-4">
+      <div className="h-full flex flex-col p-2">
+        <div className="text-center my-2">
+          <h2 className="text-xs font-medium mb-1">Nova Descrição: {description.name}</h2>
+          <p className="text-[10px] text-gray-500 mb-2">
             Adicione blocos para construir sua descrição de produto
           </p>
         </div>
@@ -48,7 +46,6 @@ const Editor: React.FC = () => {
     );
   }
 
-  // Otherwise show the full editor content
   return (
     <EditorContent
       description={description}
