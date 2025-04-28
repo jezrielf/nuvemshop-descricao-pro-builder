@@ -9,11 +9,9 @@ const Editor: React.FC = () => {
     description,
     isPremiumUser,
     isBusinessUser,
-    isAIGeneratorOpen,
-    setIsAIGeneratorOpen,
     handleDragEnd,
-    handleUpgradePlan,
     handleUpdateImage,
+    handleStartNewDescription
   } = useEditor();
   
   // Log in development environment
@@ -30,9 +28,7 @@ const Editor: React.FC = () => {
       <EmptyState
         isPremiumUser={isPremiumUser}
         isBusinessUser={isBusinessUser}
-        isAIGeneratorOpen={isAIGeneratorOpen}
-        setIsAIGeneratorOpen={setIsAIGeneratorOpen}
-        handleUpgradePlan={handleUpgradePlan}
+        onStartNewDescription={handleStartNewDescription}
       />
     );
   }

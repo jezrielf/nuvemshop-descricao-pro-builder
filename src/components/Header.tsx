@@ -1,17 +1,15 @@
-
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BadgeAlert, BadgeCheck, Crown, Plus, Save, Lock, ListTodo, Settings } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Save, Lock, Settings } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
 import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
-import AIGeneratorButton from './header/AIGeneratorButton';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -166,7 +164,6 @@ const Header: React.FC = () => {
             )}
             
             <div className="flex items-center gap-2">
-              <AIGeneratorButton />
               <TutorialManager />
               <UserButton />
             </div>

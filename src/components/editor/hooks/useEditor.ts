@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useEditor = () => {
-  const { description, reorderBlocks, updateBlock } = useEditorStore();
+  const { description, reorderBlocks, updateBlock, createNewDescription } = useEditorStore();
   const { isPremium, isBusiness } = useAuth();
-  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const navigate = useNavigate();
   
   const isPremiumUser = isPremium();
@@ -24,8 +24,8 @@ export const useEditor = () => {
     reorderBlocks(fromIndex, toIndex);
   };
   
-  const handleUpgradePlan = () => {
-    navigate('/plans');
+  const handleStartNewDescription = () => {
+    createNewDescription('Nova Descrição ' + new Date().toLocaleTimeString());
   };
   
   const handleUpdateImage = (blockId: string, imageType: string, newImageUrl: string) => {
@@ -44,10 +44,8 @@ export const useEditor = () => {
     description,
     isPremiumUser,
     isBusinessUser,
-    isAIGeneratorOpen,
-    setIsAIGeneratorOpen,
     handleDragEnd,
-    handleUpgradePlan,
     handleUpdateImage,
+    handleStartNewDescription,
   };
 };

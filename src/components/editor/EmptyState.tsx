@@ -1,25 +1,19 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Lock } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import TemplateSelector from '@/components/templates/TemplateSelector';
-import AIContentRecommender from '@/components/AIGenerator/AIContentRecommender';
 
 interface EmptyStateProps {
   isPremiumUser: boolean;
   isBusinessUser: boolean;
-  isAIGeneratorOpen: boolean;
-  setIsAIGeneratorOpen: (open: boolean) => void;
-  handleUpgradePlan: () => void;
+  onStartNewDescription: () => void;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({
   isPremiumUser,
   isBusinessUser,
-  isAIGeneratorOpen,
-  setIsAIGeneratorOpen,
-  handleUpgradePlan,
+  onStartNewDescription,
 }) => {
   return (
     <div className="flex flex-col items-center justify-center h-full p-4 sm:p-8">
@@ -36,36 +30,20 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         
         <div className="w-full bg-white border rounded-lg overflow-hidden">
           <div className="p-4 border-b">
-            <h3 className="font-medium">Ou crie uma descrição com IA</h3>
-            <p className="text-sm text-gray-500">Deixe nossa IA criar uma descrição completa para você</p>
+            <h3 className="font-medium">Ou crie uma descrição do zero</h3>
+            <p className="text-sm text-gray-500">Comece com uma descrição em branco e adicione seus blocos</p>
           </div>
           <div className="p-4 flex justify-center">
-            {isPremiumUser || isBusinessUser ? (
-              <Button 
-                onClick={() => setIsAIGeneratorOpen(true)}
-                className="border-yellow-400 bg-gradient-to-r from-yellow-50 to-white"
-              >
-                <Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
-                Gerar Descrição com IA
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleUpgradePlan}
-                variant="outline"
-              >
-                <Lock className="h-4 w-4 mr-2" />
-                Recurso do Plano Premium ou Empresarial
-              </Button>
-            )}
+            <Button 
+              onClick={onStartNewDescription}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Iniciar Nova Descrição
+            </Button>
           </div>
         </div>
       </div>
-      
-      <AIContentRecommender 
-        isOpen={isAIGeneratorOpen} 
-        onOpenChange={setIsAIGeneratorOpen} 
-        description={null}
-      />
     </div>
   );
 };
