@@ -65,7 +65,7 @@ const AddBlock: React.FC = () => {
             Adicionar Bloco
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80">
+        <PopoverContent className="w-[320px]">
           {!selectedType ? (
             <BlockTypeSelector onSelectType={setSelectedType} />
           ) : (
