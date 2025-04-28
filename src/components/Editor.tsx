@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import BlockRenderer from './blocks/BlockRenderer';
@@ -61,18 +60,11 @@ const Editor: React.FC = () => {
     }
     return null;
   }, [description, isPremiumUser, isBusinessUser]);
-  
-  if (!description) {
+
+  // Simplified empty state that focuses on template selection
+  if (!description?.blocks?.length) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-4 sm:p-8 overflow-auto">
-        <Alert className="max-w-md mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Nenhuma descrição selecionada</AlertTitle>
-          <AlertDescription>
-            Crie uma nova descrição ou selecione uma existente para começar a editar.
-          </AlertDescription>
-        </Alert>
-        
+      <div className="flex flex-col items-center justify-center h-full p-4 sm:p-8">
         <div className="flex flex-col items-center space-y-6 max-w-md w-full">
           <div className="w-full bg-white border rounded-lg overflow-hidden">
             <div className="p-4 border-b">
@@ -119,6 +111,7 @@ const Editor: React.FC = () => {
       </div>
     );
   }
+
   
   return (
     <div className="h-full flex flex-col">

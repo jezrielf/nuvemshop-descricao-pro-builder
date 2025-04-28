@@ -25,27 +25,35 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
   },
 
   loadTemplate: (template: Template) => {
-    if (!get().description) return;
+    const currentDescription = get().description;
+    
+    // If no description exists, create a temporary one
+    if (!currentDescription) {
+      const tempDescription = {
+        id: uuidv4(),
+        name: 'Nova Descrição',  // This will be required to be changed when saving
+        blocks: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      set({ description: tempDescription });
+    }
     
     // Create a proper typed copy of each block
     const updatedBlocks = template.blocks.map(templateBlock => {
-      // Create a deep copy with a new ID
       const blockCopy = JSON.parse(JSON.stringify(templateBlock));
       blockCopy.id = uuidv4();
-      
-      // Ensure the block is properly typed based on its type property
       return blockCopy;
     });
     
     // Update the state with properly typed blocks
     set((state: EditorState) => {
-      if (!state.description) return state;
-      
+      const description = state.description || {};
       return {
         ...state,
         selectedBlockId: null,
         description: {
-          ...state.description,
+          ...description,
           blocks: updatedBlocks,
           updatedAt: new Date().toISOString(),
         }
