@@ -7,6 +7,7 @@ import { ProductDescription } from '@/types/editor';
 import { AnalyzerDialogHeader } from './components/AnalyzerDialogHeader';
 import { AnalyzerDialogContent } from './components/AnalyzerDialogContent';
 import { useSEODialog } from './hooks/useSEODialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SEOAnalyzerProps {
   description: ProductDescription | null;
@@ -28,18 +29,20 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
       <DialogTrigger asChild>
         <span className="w-full">Ferramentas SEO</span>
       </DialogTrigger>
-      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-4">
+      <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-0">
         <AnalyzerDialogHeader />
-        <div className="flex-grow overflow-hidden">
-          <AnalyzerDialogContent
-            keyword={keyword}
-            setKeyword={setKeyword}
-            onAnalyze={handleAnalyze}
-            analyzing={analyzing}
-            results={results}
-            disabled={!description}
-          />
-        </div>
+        <ScrollArea className="flex-grow">
+          <div className="p-4">
+            <AnalyzerDialogContent
+              keyword={keyword}
+              setKeyword={setKeyword}
+              onAnalyze={handleAnalyze}
+              analyzing={analyzing}
+              results={results}
+              disabled={!description}
+            />
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

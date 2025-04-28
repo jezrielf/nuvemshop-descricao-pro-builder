@@ -16,6 +16,7 @@ import AIContentRecommender from '../../AIGenerator/AIContentRecommender';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { updateBlockImage } from '../utils/imageUtils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SEOToolsMenuProps {
   description: ProductDescription | null;
@@ -45,41 +46,43 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
       </PopoverTrigger>
       <PopoverContent 
         align="end" 
-        className="w-72 p-3 bg-white max-h-[80vh] overflow-y-auto"
+        className="w-72 p-0" // Remove padding here to add it in ScrollArea
         sideOffset={5}
       >
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium">Otimização de SEO</h4>
-          <div className="grid gap-1.5">
-            <SEOToolButton onClick={() => {}} label="Ferramentas SEO">
-              <SEOAnalyzer description={description} />
-            </SEOToolButton>
+        <ScrollArea className="max-h-[80vh]">
+          <div className="p-3 space-y-2">
+            <h4 className="text-[11px] font-medium">Otimização de SEO</h4>
+            <div className="grid gap-1.5">
+              <SEOToolButton onClick={() => {}} label="Ferramentas SEO">
+                <SEOAnalyzer description={description} />
+              </SEOToolButton>
+              
+              <SEOToolButton onClick={() => {}} label="Checklist SEO">
+                <SEOChecklist description={description} />
+              </SEOToolButton>
+              
+              <SEOToolButton onClick={() => {}} label="Meta Tags">
+                <MetaTagValidator description={description} />
+              </SEOToolButton>
+              
+              <SEOToolButton onClick={() => {}} label="Otimizar Imagens">
+                <ImageOptimizer 
+                  description={description} 
+                  onUpdateImage={handleUpdateImage}
+                />
+              </SEOToolButton>
+            </div>
             
-            <SEOToolButton onClick={() => {}} label="Checklist SEO">
-              <SEOChecklist description={description} />
-            </SEOToolButton>
+            <Separator className="my-2" />
             
-            <SEOToolButton onClick={() => {}} label="Meta Tags">
-              <MetaTagValidator description={description} />
-            </SEOToolButton>
-            
-            <SEOToolButton onClick={() => {}} label="Otimizar Imagens">
-              <ImageOptimizer 
-                description={description} 
-                onUpdateImage={handleUpdateImage}
-              />
-            </SEOToolButton>
+            <h4 className="text-[11px] font-medium">Recursos de IA</h4>
+            <div className="grid gap-1.5">
+              <SEOToolButton onClick={() => {}} label="Recomendações de IA">
+                <AIContentRecommender description={description} />
+              </SEOToolButton>
+            </div>
           </div>
-          
-          <Separator className="my-2" />
-          
-          <h4 className="text-sm font-medium">Recursos de IA</h4>
-          <div className="grid gap-1.5">
-            <SEOToolButton onClick={() => {}} label="Recomendações de IA">
-              <AIContentRecommender description={description} />
-            </SEOToolButton>
-          </div>
-        </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   );

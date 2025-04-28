@@ -49,9 +49,9 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
                 <Palette className="h-3 w-3" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[520px] p-2">
-              <ScrollArea className="h-[400px] pr-2">
-                <div>
+            <PopoverContent className="w-[520px] p-0">
+              <ScrollArea className="h-[400px]">
+                <div className="p-2">
                   <div className="border-b pb-1 mb-2">
                     <h4 className="text-[9px] font-medium">Personalização do Bloco</h4>
                     <p className="text-[8px] text-muted-foreground">Personalize as cores e estilos do seu bloco</p>
@@ -81,4 +81,3 @@ const StyleControls: React.FC<StyleControlsProps> = ({ block }) => {
 };
 
 export default StyleControls;
-

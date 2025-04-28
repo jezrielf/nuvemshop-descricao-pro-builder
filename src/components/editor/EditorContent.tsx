@@ -37,36 +37,38 @@ const EditorContent: React.FC<EditorContentProps> = ({
         {seoToolsComponent}
       </div>
       
-      <ScrollArea className="flex-1 p-1.5 sm:p-2 h-[calc(100%-52px)]">
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="blocks">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="min-h-[200px]"
-              >
-                {description.blocks.map((block, index) => (
-                  <Draggable key={block.id} draggableId={block.id} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className="mb-4"
-                      >
-                        <BlockRenderer block={block} />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-        
-        <AddBlock />
+      <ScrollArea className="flex-1 h-[calc(100%-52px)]">
+        <div className="p-1.5 sm:p-2">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="blocks">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="min-h-[200px]"
+                >
+                  {description.blocks.map((block, index) => (
+                    <Draggable key={block.id} draggableId={block.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="mb-4"
+                        >
+                          <BlockRenderer block={block} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+          
+          <AddBlock />
+        </div>
       </ScrollArea>
     </div>
   );
