@@ -1,20 +1,25 @@
-
 import { ProductDescription, Template } from '@/types/editor';
 import { EditorState } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const createDescriptionActions = (get: () => EditorState, set: any) => ({
   createNewDescription: (name: string) => {
+    // Log for debugging
+    console.log('Creating new description in store:', name);
+    
+    // Create a new description with proper initialization
     set({
       description: {
         id: uuidv4(),
         name,
-        blocks: [],
+        blocks: [], // Initialize with empty blocks array
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       selectedBlockId: null,
     });
+    
+    return true; // Return success value for error handling
   },
 
   loadDescription: (description: ProductDescription) => {

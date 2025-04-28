@@ -10,7 +10,11 @@ export const storeAuthData = (accessToken: string, userId: string, storeName: st
   
   // Ensure we're not storing '[object Object]' as the store name
   let validStoreName = storeName;
-  if (!validStoreName || validStoreName === '[object Object]' || typeof validStoreName !== 'string') {
+  if (!validStoreName || 
+      validStoreName === '[object Object]' || 
+      typeof validStoreName !== 'string' ||
+      validStoreName === 'undefined' ||
+      validStoreName === 'null') {
     validStoreName = 'Loja Nuvemshop';
   }
   

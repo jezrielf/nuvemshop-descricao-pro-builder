@@ -18,7 +18,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       {success ? (
         <Badge variant="outline" className="bg-green-100 text-green-800">
           <CheckCircle2 className="h-4 w-4 mr-1" />
-          {storeName 
+          {storeName && typeof storeName === 'string'
             ? `Conectado com ${storeName}` 
             : 'Conectado'}
         </Badge>
