@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SEOTechnicalDiagnosis, SEORecommendation } from '@/types/seoTechnical';
 import { ProductDescription } from '@/types/editor';
@@ -11,7 +12,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { analyzeSEOTechnically } from '../utils/technicalSEOAnalyzer';
 import { AlertTriangle, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { HeaderStructureAnalysis, KeywordAnalysis, ContentQualityAnalysis, SemanticAnalysis, ContentFreshnessAnalysis } from '@/types/seoTechnical';
 
 interface SEOTechnicalDiagnosticProps {
   description: ProductDescription;
@@ -183,7 +183,7 @@ interface RecommendationsTabProps {
 }
 
 const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ recommendations }) => {
-  // Grupo as recomendações por tipo
+  // Group recommendations by type
   const criticalRecs = recommendations.filter(r => r.type === 'critical');
   const importantRecs = recommendations.filter(r => r.type === 'important');
   const improvementRecs = recommendations.filter(r => r.type === 'improvement');
@@ -351,7 +351,7 @@ const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ recommendations
 };
 
 interface StructureTabProps {
-  headerAnalysis: HeaderStructureAnalysis;
+  headerAnalysis: SEOTechnicalDiagnosis['headerStructure'];
 }
 
 const StructureTab: React.FC<StructureTabProps> = ({ headerAnalysis }) => {
@@ -466,7 +466,7 @@ const StructureTab: React.FC<StructureTabProps> = ({ headerAnalysis }) => {
 };
 
 interface KeywordsTabProps {
-  keywordAnalysis: KeywordAnalysis;
+  keywordAnalysis: SEOTechnicalDiagnosis['keywordAnalysis'];
 }
 
 const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywordAnalysis }) => {
@@ -621,7 +621,7 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywordAnalysis }) => {
 };
 
 interface ContentTabProps {
-  contentAnalysis: ContentQualityAnalysis;
+  contentAnalysis: SEOTechnicalDiagnosis['contentQuality'];
 }
 
 const ContentTab: React.FC<ContentTabProps> = ({ contentAnalysis }) => {
@@ -762,8 +762,8 @@ const ContentTab: React.FC<ContentTabProps> = ({ contentAnalysis }) => {
 };
 
 interface TechnicalTabProps {
-  semanticAnalysis: SemanticAnalysis;
-  freshnessAnalysis: ContentFreshnessAnalysis;
+  semanticAnalysis: SEOTechnicalDiagnosis['semanticAnalysis'];
+  freshnessAnalysis: SEOTechnicalDiagnosis['contentFreshness'];
 }
 
 const TechnicalTab: React.FC<TechnicalTabProps> = ({ 
@@ -790,4 +790,114 @@ const TechnicalTab: React.FC<TechnicalTabProps> = ({
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>Análise Semânt
+          <CardTitle>Análise Semântica</CardTitle>
+          <CardDescription>
+            Relação entre título, conteúdo e palavras-chave
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Score Semântico</p>
+                <p className={`text-4xl font-bold ${getScoreColor(semanticAnalysis.score)}`}>
+                  {semanticAnalysis.score}
+                </p>
+                <p className="text-xs text-muted-foreground">/100 pontos</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <p className="text-sm font-medium">Correlação título-conteúdo</p>
+                  <p className={`text-sm font-medium ${semanticAnalysis.titleContentMatch >= 70 ? 'text-green-500' : semanticAnalysis.titleContentMatch >= 40 ? 'text-amber-500' : 'text-red-500'}`}>
+                    {semanticAnalysis.titleContentMatch.toFixed(0)}%
+                  </p>
+                </div>
+                <Progress 
+                  value={semanticAnalysis.titleContentMatch} 
+                  className="h-2"
+                  indicatorColor={semanticAnalysis.titleContentMatch >= 70 ? 'bg-green-500' : semanticAnalysis.titleContentMatch >= 40 ? 'bg-amber-500' : 'bg-red-500'}
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <p className="text-sm font-medium">Cobertura do tópico</p>
+                  <p className={`text-sm font-medium ${semanticAnalysis.topicCoverage >= 70 ? 'text-green-500' : semanticAnalysis.topicCoverage >= 40 ? 'text-amber-500' : 'text-red-500'}`}>
+                    {semanticAnalysis.topicCoverage.toFixed(0)}%
+                  </p>
+                </div>
+                <Progress 
+                  value={semanticAnalysis.topicCoverage} 
+                  className="h-2"
+                  indicatorColor={semanticAnalysis.topicCoverage >= 70 ? 'bg-green-500' : semanticAnalysis.topicCoverage >= 40 ? 'bg-amber-500' : 'bg-red-500'}
+                />
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-2">Termos relacionados utilizados:</p>
+              <div className="flex flex-wrap gap-2">
+                {semanticAnalysis.relatedTermsUsage.map((term, idx) => (
+                  <Badge key={idx} variant="secondary">{term}</Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Atualidade do Conteúdo</CardTitle>
+          <CardDescription>
+            Análise da frequência de atualizações
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Score de Atualidade</p>
+                <p className={`text-4xl font-bold ${getScoreColor(freshnessAnalysis.score)}`}>
+                  {freshnessAnalysis.score}
+                </p>
+                <p className="text-xs text-muted-foreground">/100 pontos</p>
+              </div>
+              
+              <div className="text-right">
+                <p className="text-sm font-medium">Última atualização</p>
+                <p className="text-lg font-medium">{formatDate(freshnessAnalysis.lastUpdated)}</p>
+                <p className={`text-xs ${freshnessAnalysis.daysSinceUpdate > 180 ? 'text-red-500' : freshnessAnalysis.daysSinceUpdate > 90 ? 'text-amber-500' : 'text-green-500'}`}>
+                  {freshnessAnalysis.daysSinceUpdate} dias atrás
+                </p>
+              </div>
+            </div>
+            
+            {freshnessAnalysis.updateFrequency > 0 && (
+              <div className="mt-4 p-4 bg-muted rounded-lg">
+                <p className="font-medium">Frequência média de atualizações</p>
+                <p className="text-2xl font-bold mt-1">
+                  {Math.round(freshnessAnalysis.updateFrequency)} dias
+                </p>
+                <p className="text-xs text-muted-foreground">entre cada atualização</p>
+              </div>
+            )}
+            
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-2">Recomendações de atualização:</p>
+              <ul className="space-y-2 list-disc list-inside text-sm">
+                <li>Atualize o conteúdo pelo menos a cada 3-6 meses</li>
+                <li>Adicione novas informações relevantes ao produto</li>
+                <li>Revise e atualize dados técnicos ou especificações</li>
+                <li>Inclua perguntas frequentes recentes dos clientes</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
