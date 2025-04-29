@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getCategoryName } from '../utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Code } from 'lucide-react';
+import { generateTemplatePreview } from '@/utils/htmlParsers/htmlPreviewGenerator';
 
 interface PreviewTemplateDialogProps {
   open: boolean;
@@ -25,16 +26,8 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
   const [activeTab, setActiveTab] = useState('preview');
   const [showHtml, setShowHtml] = useState(false);
   
-  // Generate HTML preview if needed - structure the EditorState properly for the function
-  const htmlPreview = showHtml ? generateCompleteHtml({
-    description: {
-      blocks: template.blocks,
-      id: template.id,
-      name: template.name,
-      createdAt: '',
-      updatedAt: ''
-    }
-  }, template.name) : '';
+  // Use the template-specific preview generator instead of EditorState-based function
+  const htmlPreview = showHtml ? generateTemplatePreview(template) : '';
   
   return (
     <Dialog open={open} onOpenChange={onClose}>
