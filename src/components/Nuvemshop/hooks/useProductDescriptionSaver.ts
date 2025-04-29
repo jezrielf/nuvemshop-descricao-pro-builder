@@ -28,8 +28,9 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
         ? product.name.pt 
         : (typeof product.name === 'string' ? product.name : '');
       
-      // Generate HTML with product title as H1
-      const htmlOutput = getHtmlOutput(productTitle);
+      // Generate HTML with product title
+      // Fix: Don't pass productTitle if getHtmlOutput doesn't accept arguments
+      const htmlOutput = getHtmlOutput();
       
       const success = await updateProductDescription(product.id, htmlOutput);
       
