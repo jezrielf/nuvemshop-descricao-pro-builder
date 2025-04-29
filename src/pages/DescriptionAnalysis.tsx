@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import SEODashboard from '@/components/admin/seo/SEODashboard';
 import ProductPerformance from '@/components/admin/seo/ProductPerformance';
-import SEOHistory from '@/components/admin/seo/SEOHistory';
 import SEOTechnicalDiagnostic from '@/components/SEO/diagnostics/SEOTechnicalDiagnostic';
 
 const DescriptionAnalysis: React.FC = () => {
@@ -37,7 +36,6 @@ const DescriptionAnalysis: React.FC = () => {
           <TabsTrigger value="diagnostic">Diagnóstico Técnico</TabsTrigger>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="history">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="diagnostic" className="mt-4">
@@ -55,12 +53,6 @@ const DescriptionAnalysis: React.FC = () => {
         <TabsContent value="performance" className="mt-4">
           <Card className="p-6">
             <ProductPerformance />
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="history" className="mt-4">
-          <Card className="p-6">
-            <SEOHistory />
           </Card>
         </TabsContent>
       </Tabs>
