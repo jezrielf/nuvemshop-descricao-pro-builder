@@ -16,26 +16,57 @@ export function useTemplateDialogs() {
   const { toast } = useToast();
   
   const openNewDialog = () => {
+    console.log('Opening new template dialog');
     closeAllDialogs();
     setIsNewDialogOpen(true);
   };
   
   const openPreviewDialog = (template: Template) => {
-    console.log('Opening preview dialog for template:', template.id);
+    if (!template) {
+      console.error('Cannot open preview dialog: No template provided');
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível abrir a visualização do template',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    console.log('Opening preview dialog for template:', template.id, template.name);
     closeAllDialogs();
     setPreviewTemplate(template);
     setIsPreviewDialogOpen(true);
   };
   
   const openEditDialog = (template: Template) => {
-    console.log('Opening edit dialog for template:', template.id);
+    if (!template) {
+      console.error('Cannot open edit dialog: No template provided');
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível abrir a edição do template',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    console.log('Opening edit dialog for template:', template.id, template.name);
     closeAllDialogs();
     setEditTemplate(template);
     setIsEditDialogOpen(true);
   };
   
   const openDeleteDialog = (template: Template, onDeleted?: () => void) => {
-    console.log('Opening delete dialog for template:', template.id);
+    if (!template) {
+      console.error('Cannot open delete dialog: No template provided');
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível abrir a confirmação de exclusão',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    console.log('Opening delete dialog for template:', template.id, template.name);
     closeAllDialogs();
     setDeleteTemplate(template);
     setDeleteCallback(() => onDeleted);
@@ -43,6 +74,7 @@ export function useTemplateDialogs() {
   };
   
   const closeAllDialogs = () => {
+    console.log('Closing all dialogs');
     setIsNewDialogOpen(false);
     setIsPreviewDialogOpen(false);
     setIsEditDialogOpen(false);

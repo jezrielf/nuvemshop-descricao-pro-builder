@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Template } from '@/types/editor';
@@ -8,6 +8,8 @@ import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { generateCompleteHtml } from '@/store/editor/outputActions/htmlOutputGenerator';
 import { Badge } from '@/components/ui/badge';
 import { getCategoryName } from '../utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Code } from 'lucide-react';
 
 interface PreviewTemplateDialogProps {
   open: boolean;
@@ -20,9 +22,19 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
   onClose,
   template,
 }) => {
+  const [activeTab, setActiveTab] = useState('preview');
+  const [showHtml, setShowHtml] = useState(false);
+  
+  // Generate HTML preview if needed
+  const htmlPreview = showHtml ? generateCompleteHtml({ 
+    blocks: template.blocks,
+    title: template.name,
+    options: { includeCss: true }
+  }) : '';
+  
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Visualizar Template</DialogTitle>
           <DialogDescription className="flex items-center gap-2">
@@ -31,15 +43,54 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        <ScrollArea className="h-[500px] border rounded-md p-4">
-          <div className="space-y-6">
-            {template.blocks.map((block) => (
-              <div key={block.id} className="border-b pb-6">
-                <BlockRenderer block={block} isPreview={true} />
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="preview">Visualização</TabsTrigger>
+            <TabsTrigger value="html">HTML</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="preview" className="mt-4">
+            <ScrollArea className="h-[500px] border rounded-md p-4">
+              {template.blocks && template.blocks.length > 0 ? (
+                <div className="space-y-6">
+                  {template.blocks.map((block) => (
+                    <div key={block.id} className="border-b pb-6">
+                      <BlockRenderer block={block} isPreview={true} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-center">
+                  <p className="text-muted-foreground">Este template não possui blocos para exibir.</p>
+                </div>
+              )}
+            </ScrollArea>
+          </TabsContent>
+          
+          <TabsContent value="html" className="mt-4">
+            <div className="flex justify-end mb-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowHtml(true)}
+                disabled={showHtml}
+              >
+                <Code className="h-4 w-4 mr-2" />
+                Gerar HTML
+              </Button>
+            </div>
+            
+            <ScrollArea className="h-[500px] border rounded-md">
+              {showHtml ? (
+                <pre className="p-4 text-xs bg-muted overflow-x-auto">{htmlPreview}</pre>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">Clique em "Gerar HTML" para ver o código HTML deste template.</p>
+                </div>
+              )}
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
         
         <DialogFooter>
           <Button onClick={onClose}>Fechar</Button>
