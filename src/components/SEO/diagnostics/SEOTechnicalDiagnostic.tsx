@@ -85,14 +85,15 @@ export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ 
   const overallScore = calculateOverallScore();
 
   // Handler for updating headings in the description
-  const { applyHeadingChanges } = useHeadingsUpdater();
+  const { applyHeadingChanges, isUpdating } = useHeadingsUpdater();
   
   const handleUpdateHeadings = async (suggestedHeadings: HeadingSuggestion[]): Promise<boolean> => {
-    if (!description || !productId) return false;
+    if (!description) return false;
     
     try {
       console.log("Atualizando estrutura de headings:", suggestedHeadings);
-      return await applyHeadingChanges(suggestedHeadings);
+      // Pass the product title to handle H1 correctly
+      return await applyHeadingChanges(suggestedHeadings, productTitle);
     } catch (error) {
       console.error("Erro ao atualizar headings:", error);
       return false;

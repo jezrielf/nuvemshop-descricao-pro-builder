@@ -1,17 +1,24 @@
 
-export interface HeadingSuggestion {
-  level: number; 
+import { ProductDescription } from '@/types/editor';
+
+export interface HeadingItem {
+  level: number;
   text: string;
-  original?: string;
 }
 
 export interface HeadingStructure {
-  headings: { level: number; text: string }[];
+  headings: HeadingItem[];
   hasValidH1: boolean;
   hasProperHierarchy: boolean;
   count: number;
   topKeywords: string[];
   structure: string;
+}
+
+export interface HeadingSuggestion {
+  level: number;
+  text: string;
+  original?: string;
 }
 
 export interface HeadingStructureTabProps {

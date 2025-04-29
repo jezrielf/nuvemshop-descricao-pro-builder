@@ -117,17 +117,15 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
                 </AlertDescription>
               </Alert>
               
-              {isNuvemshopConnected && productId && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full mt-2 flex items-center gap-2"
-                  onClick={handleGenerateHeadingSuggestions}
-                >
-                  <FileEdit className="h-4 w-4" />
-                  Otimizar Headings para SEO
-                </Button>
-              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full mt-2 flex items-center gap-2"
+                onClick={handleGenerateHeadingSuggestions}
+              >
+                <FileEdit className="h-4 w-4" />
+                Otimizar Headings para SEO
+              </Button>
             </CardContent>
           </Card>
 
@@ -164,6 +162,7 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
         suggestedHeadings={suggestedHeadings}
         isUpdating={isUpdating}
         onApply={handleApplyHeadingSuggestions}
+        currentProductTitle={currentProductTitle}
       />
     </>
   );

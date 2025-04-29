@@ -19,6 +19,10 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
       return blocks;
     }
 
+    // Separar H1 dos outros headings para tratamento especial
+    const h1Heading = headings.find(h => h.level === 1);
+    const otherHeadings = headings.filter(h => h.level !== 1);
+
     return blocks.map(block => {
       // Only process text-based blocks
       if (block.type !== 'text' || !block.content) {
@@ -27,20 +31,16 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
       
       let updatedContent = block.content;
       
-      // Replace heading tags based on our suggestions
-      // This is a simplified approach that works for basic HTML
-      headings.forEach(heading => {
+      // Replace non-H1 heading tags based on our suggestions
+      otherHeadings.forEach(heading => {
         if (heading.original) {
           // Replace existing heading with a new one
           const regex = new RegExp(`<h\\d[^>]*>(${escapeRegExp(heading.original)})<\\/h\\d>`, 'gi');
           updatedContent = updatedContent.replace(regex, `<h${heading.level}>${heading.text}</h${heading.level}>`);
-        } else {
-          // Check if this is a suggested new heading that matches the block title/heading
-          if (block.heading && block.heading === heading.text) {
-            // If the block title matches our new heading suggestion, add it as H1 at the beginning
-            if (heading.level === 1 && !/<h1[^>]*>/i.test(updatedContent)) {
-              updatedContent = `<h1>${heading.text}</h1>${updatedContent}`;
-            }
+        } else if (block.heading && block.heading === heading.text) {
+          // Se o título do bloco corresponde à nossa sugestão de heading, adicione como tag H
+          if (!new RegExp(`<h${heading.level}[^>]*>${escapeRegExp(heading.text)}<\\/h${heading.level}>`, 'i').test(updatedContent)) {
+            updatedContent = `<h${heading.level}>${heading.text}</h${heading.level}>${updatedContent}`;
           }
         }
       });
@@ -48,6 +48,9 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
       return {
         ...block,
         content: updatedContent,
+        // Se for o primeiro bloco e tiver uma sugestão de H1, atualize o título do bloco
+        // mas não adicione H1 no conteúdo HTML
+        heading: block === blocks[0] && h1Heading ? h1Heading.text : block.heading
       };
     });
   };
@@ -58,7 +61,7 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
   };
 
   // Function to apply heading updates and save the description
-  const applyHeadingChanges = async (headings: HeadingSuggestion[]) => {
+  const applyHeadingChanges = async (headings: HeadingSuggestion[], productTitle?: string) => {
     if (!description) {
       toast({
         variant: 'destructive',
@@ -70,6 +73,14 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
 
     try {
       setIsUpdating(true);
+      
+      // Se temos um título de produto e não há um H1 nas sugestões, adicionamos um
+      if (productTitle && !headings.some(h => h.level === 1)) {
+        headings.unshift({
+          level: 1,
+          text: productTitle,
+        });
+      }
       
       // Update headings in blocks
       const updatedBlocks = updateHeadingsInBlocks(description.blocks, headings);
