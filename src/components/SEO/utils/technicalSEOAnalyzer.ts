@@ -1,6 +1,6 @@
 
 import { ProductDescription, Block } from '@/types/editor';
-import { SEOTechnicalDiagnosis, SEORecommendation } from '@/types/seoTechnical';
+import { SEOTechnicalDiagnosis, SEORecommendation, HeaderStructureAnalysis, KeywordAnalysis, ContentQualityAnalysis, SemanticAnalysis, ContentFreshnessAnalysis } from '@/types/seoTechnical';
 import { getTextContentFromDescription } from './contentUtils';
 import { extractKeywords } from '@/utils/seoUtils';
 
@@ -382,6 +382,9 @@ function analyzeContentFreshness(description: ProductDescription): ContentFreshn
     }
     
     updateFrequency = intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
+  } else {
+    // If no history, just use a default frequency
+    updateFrequency = 0;
   }
   
   // Content freshness issues

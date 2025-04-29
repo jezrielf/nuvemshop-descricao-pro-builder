@@ -80,6 +80,9 @@ export interface SEOHistoricalComparison {
   };
 }
 
+// Import the SEOMetrics type from seo.ts
+import { SEOMetrics } from './seo';
+
 // Extended version of the existing SEOMetrics
 export interface ExtendedSEOMetrics extends SEOMetrics {
   technicalDiagnosis: SEOTechnicalDiagnosis;

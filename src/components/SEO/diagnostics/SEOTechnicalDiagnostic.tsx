@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SEOTechnicalDiagnosis, SEORecommendation } from '@/types/seoTechnical';
 import { ProductDescription } from '@/types/editor';
@@ -12,6 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { analyzeSEOTechnically } from '../utils/technicalSEOAnalyzer';
 import { AlertTriangle, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { HeaderStructureAnalysis, KeywordAnalysis, ContentQualityAnalysis, SemanticAnalysis, ContentFreshnessAnalysis } from '@/types/seoTechnical';
 
 interface SEOTechnicalDiagnosticProps {
   description: ProductDescription;
@@ -140,7 +140,7 @@ const OverallScoreCard: React.FC<OverallScoreCardProps> = ({ analysis }) => {
                 <Progress 
                   value={score} 
                   className="h-2"
-                  indicatorClassName={getScoreBackground(score)}
+                  indicatorColor={getScoreBackground(score)}
                 />
               </div>
             ))}
@@ -790,140 +790,4 @@ const TechnicalTab: React.FC<TechnicalTabProps> = ({
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle>Análise Semântica</CardTitle>
-          <CardDescription>
-            Relação semântica entre título, conteúdo e palavras-chave
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Score Semântico</p>
-              <p className={`text-4xl font-bold ${getScoreColor(semanticAnalysis.score)}`}>
-                {semanticAnalysis.score}
-              </p>
-              <p className="text-xs text-muted-foreground">/100 pontos</p>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <p className="text-sm font-medium">Correlação Título-Conteúdo</p>
-                <p className={`text-sm font-medium ${getScoreColor(semanticAnalysis.titleContentMatch)}`}>
-                  {semanticAnalysis.titleContentMatch.toFixed(0)}%
-                </p>
-              </div>
-              <Progress 
-                value={semanticAnalysis.titleContentMatch} 
-                className="h-2"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <p className="text-sm font-medium">Cobertura do Tópico</p>
-                <p className={`text-sm font-medium ${getScoreColor(semanticAnalysis.topicCoverage)}`}>
-                  {semanticAnalysis.topicCoverage.toFixed(0)}%
-                </p>
-              </div>
-              <Progress 
-                value={semanticAnalysis.topicCoverage} 
-                className="h-2"
-              />
-            </div>
-            
-            <div className="mt-6">
-              <p className="text-sm font-medium mb-2">Termos Relacionados Utilizados:</p>
-              <div className="flex flex-wrap gap-2">
-                {semanticAnalysis.relatedTermsUsage.length > 0 ? (
-                  semanticAnalysis.relatedTermsUsage.map((term, idx) => (
-                    <Badge key={idx} variant="outline">{term}</Badge>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">Nenhum termo relacionado detectado.</p>
-                )}
-              </div>
-            </div>
-            
-            <div className="space-y-2 mt-4">
-              {semanticAnalysis.issues.map((issue, idx) => (
-                <Alert key={idx} variant="default">
-                  <AlertDescription>{issue}</AlertDescription>
-                </Alert>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>Atualidade do Conteúdo</CardTitle>
-          <CardDescription>
-            Análise de quando o conteúdo foi atualizado pela última vez
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Score de Atualidade</p>
-              <p className={`text-4xl font-bold ${getScoreColor(freshnessAnalysis.score)}`}>
-                {freshnessAnalysis.score}
-              </p>
-              <p className="text-xs text-muted-foreground">/100 pontos</p>
-            </div>
-          </div>
-          
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 border rounded-md">
-                <p className="text-sm text-muted-foreground">Última Atualização</p>
-                <p className="text-xl font-medium mt-1">{formatDate(freshnessAnalysis.lastUpdated)}</p>
-              </div>
-              
-              <div className="p-4 border rounded-md">
-                <p className="text-sm text-muted-foreground">Dias desde Atualização</p>
-                <p className={`text-xl font-medium mt-1 ${
-                  freshnessAnalysis.daysSinceUpdate > 180 ? 'text-red-500' :
-                  freshnessAnalysis.daysSinceUpdate > 90 ? 'text-amber-500' :
-                  'text-green-500'
-                }`}>
-                  {freshnessAnalysis.daysSinceUpdate} dias
-                </p>
-              </div>
-            </div>
-            
-            {freshnessAnalysis.updateFrequency > 0 && (
-              <div className="p-4 border rounded-md">
-                <p className="text-sm text-muted-foreground">Frequência de Atualização</p>
-                <p className="text-xl font-medium mt-1">
-                  {Math.round(freshnessAnalysis.updateFrequency)} dias entre atualizações
-                </p>
-              </div>
-            )}
-            
-            <div className="space-y-2 mt-4">
-              {freshnessAnalysis.issues.map((issue, idx) => (
-                <Alert key={idx} variant="default">
-                  <AlertDescription>{issue}</AlertDescription>
-                </Alert>
-              ))}
-            </div>
-            
-            {freshnessAnalysis.issues.length === 0 && (
-              <Alert variant="default" className="border-green-500/50">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <AlertDescription className="text-green-600">
-                  Seu conteúdo está atualizado. Conteúdo recente é favorecido pelos mecanismos de busca.
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-export default SEOTechnicalDiagnostic;
+          <CardTitle>Análise Semânt
