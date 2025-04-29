@@ -1,5 +1,5 @@
 
-import { ProductDescription, Block } from '@/types/editor';
+import { ProductDescription, Block, ImageTextBlock, TextImageBlock } from '@/types/editor';
 
 /**
  * Updates an image in a block
@@ -8,7 +8,7 @@ export const updateBlockImage = (
   blockId: string, 
   imageType: string, 
   newImageUrl: string, 
-  updateBlock: (id: string, updatedBlock: Block) => void,
+  updateBlock: (id: string, updatedBlock: Partial<Block>) => void,
   description: ProductDescription | null
 ) => {
   if (!description || !blockId) return;
@@ -19,30 +19,31 @@ export const updateBlockImage = (
   if (block.type === 'image' && imageType === 'src') {
     // Update image block
     updateBlock(blockId, { 
-      ...block,
       src: newImageUrl 
     });
   } else if ((block.type === 'imageText' || block.type === 'textImage') && imageType === 'imageSrc') {
     // Update imageText or textImage block
+    const imageTextBlock = block as ImageTextBlock | TextImageBlock;
+    
     updateBlock(blockId, { 
-      ...block,
-      imageSrc: newImageUrl 
+      image: {
+        ...imageTextBlock.image,
+        src: newImageUrl 
+      }
     });
   } else if (block.type === 'hero' && imageType === 'backgroundImage') {
     // Update hero block background
     updateBlock(blockId, { 
-      ...block,
       backgroundImage: newImageUrl 
     });
   } else if (block.type === 'gallery') {
     // For gallery, we update the specific image in the images array
     const imageIndex = parseInt(imageType);
-    if (!isNaN(imageIndex) && block.images && block.images[imageIndex]) {
+    if (!isNaN(imageIndex) && block.type === 'gallery' && block.images && block.images[imageIndex]) {
       const updatedImages = [...block.images];
       updatedImages[imageIndex].src = newImageUrl;
       
       updateBlock(blockId, {
-        ...block,
         images: updatedImages
       });
     }
