@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSEOMetrics } from '@/hooks/seo/useSEOMetrics';
-import MetricsOverview from './MetricsOverview';
+import { MetricsOverview } from './MetricsOverview';
 import { KeywordAnalysis } from './KeywordAnalysis';
 import { ReadabilityScore } from './ReadabilityScore';
 import LoadingSpinner from '@/components/LoadingSpinner';

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Check, AlertTriangle, AlertCircle } from 'lucide-react';
 import { ChartContainer } from "@/components/ui/chart";
-import LineChart from "@/components/admin/seo/LineChart";
+import LineChart from "./LineChart";
 
 interface SEOMetrics {
   overallScore: number;

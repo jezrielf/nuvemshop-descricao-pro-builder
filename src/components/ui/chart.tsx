@@ -1,53 +1,30 @@
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import React, { createContext, useContext } from 'react';
+import { cn } from '@/lib/utils';
 
-export interface ChartConfig {
-  width?: number;
-  height?: number;
-  margin?: {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  };
-  score?: number | { label: string; theme: { light: string; dark: string } };
-  seo?: any;
-  conversao?: any;
-  ctr?: any;
-  [key: string]: any; // Allow for custom properties
+interface ChartConfig {
+  score?: number;
+  [key: string]: any; // Allow any additional properties
 }
 
-interface ChartContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  config?: ChartConfig;
+const ChartContext = createContext<ChartConfig>({});
+
+export function useChartConfig() {
+  return useContext(ChartContext);
 }
 
-const ChartContainer = React.forwardRef<
-  HTMLDivElement,
-  ChartContainerProps
->(({ children, className, config, ...props }, ref) => {
+interface ChartContainerProps {
+  config: ChartConfig;
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function ChartContainer({ config, children, className }: ChartContainerProps) {
   return (
-    <div
-      ref={ref}
-      className={cn("w-full h-full", className)}
-      {...props}
-    >
-      {children}
-    </div>
-  )
-})
-ChartContainer.displayName = "ChartContainer";
-
-const ChartTooltip = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <div
-      className={cn(
-        "rounded-lg border bg-background p-2 shadow-lg",
-        className
-      )}
-      {...props}
-    />
-  )
+    <ChartContext.Provider value={config}>
+      <div className={cn("relative", className)}>
+        {children}
+      </div>
+    </ChartContext.Provider>
+  );
 }
-
-export { ChartContainer, ChartTooltip }
