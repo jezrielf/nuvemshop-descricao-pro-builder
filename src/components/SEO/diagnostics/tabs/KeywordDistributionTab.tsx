@@ -236,7 +236,7 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
                         {keywords.slice(0, 5).map((k, kidx) => (
                           <td key={kidx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {section.keywordPresence[k.keyword] ? 
-                              <Badge variant="success" className="bg-green-100 text-green-800">Presente</Badge> : 
+                              <Badge variant="success">Presente</Badge> : 
                               <Badge variant="outline" className="bg-gray-100">Ausente</Badge>}
                           </td>
                         ))}
