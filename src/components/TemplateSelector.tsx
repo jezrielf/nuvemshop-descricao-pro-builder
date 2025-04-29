@@ -1,5 +1,3 @@
 
-import React from 'react';
-import { TemplateSelector } from './templateComponents';
-
+import TemplateSelector from './templates/TemplateSelector';
 export default TemplateSelector;

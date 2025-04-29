@@ -1,5 +1,6 @@
+
 import { v4 as uuidv4 } from 'uuid';
-import { Block, ColumnLayout, BenefitsBlock } from '@/types/editor/index';
+import { Block, ColumnLayout, BenefitsBlock } from '@/types/editor';
 
 export const createBenefitsBlock = (columns: ColumnLayout): BenefitsBlock => {
   return {
@@ -14,15 +15,15 @@ export const createBenefitsBlock = (columns: ColumnLayout): BenefitsBlock => {
         id: uuidv4(),
         title: 'Benefício 1',
         description: 'Descrição do benefício 1',
-        icon: '✓'
+        icon: '✓' // Ensure icon is always provided
       },
       {
         id: uuidv4(),
         title: 'Benefício 2',
         description: 'Descrição do benefício 2',
-        icon: '✓'
+        icon: '✓' // Ensure icon is always provided
       }
     ],
-    style: {}
+    style: {} // Explicitly include the style property
   };
 };

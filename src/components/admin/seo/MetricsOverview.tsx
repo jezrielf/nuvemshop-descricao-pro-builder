@@ -1,120 +1,102 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Check, AlertTriangle, AlertCircle } from 'lucide-react';
-import { ChartContainer } from "@/components/ui/chart";
-import LineChart from "./LineChart";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SEOMetrics } from '@/types/seo';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 
-interface SEOMetrics {
-  overallScore: number;
-  keywordUsage: number;
-  readability: number;
-  technicalSEO: number;
+interface MetricsOverviewProps {
+  metrics: SEOMetrics;
 }
 
-const getScoreColorClass = (score: number) => {
-  if (score > 80) return "bg-emerald-500";
-  if (score > 50) return "bg-amber-500";
-  return "bg-destructive";
-};
-
-export const MetricsOverview = ({ seoMetrics }: { seoMetrics: SEOMetrics }) => {
+export const MetricsOverview: React.FC<MetricsOverviewProps> = ({ metrics }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Keyword Usage</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total de Descrições</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold">{Math.round(seoMetrics.keywordUsage)}%</div>
-          <div className="mt-4">
-            <Progress
-              value={seoMetrics.keywordUsage}
-              className="h-2"
-              indicatorClassName={getScoreColorClass(seoMetrics.keywordUsage)}
-            />
-          </div>
-          <div className="mt-3 text-sm text-muted-foreground">
-            Target keywords are used effectively.
-          </div>
+          <div className="text-2xl font-bold">{metrics.totalDescriptions}</div>
+          <p className="text-xs text-muted-foreground">
+            +{metrics.newDescriptionsToday} hoje
+          </p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Readability</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Média de Palavras</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold">{Math.round(seoMetrics.readability)}%</div>
-          <div className="mt-4">
-            <Progress
-              value={seoMetrics.readability}
-              className="h-2"
-              indicatorClassName={getScoreColorClass(seoMetrics.readability)}
-            />
-          </div>
-          <div className="mt-3 text-sm text-muted-foreground">
-            Content is easy to read and understand.
-          </div>
+          <div className="text-2xl font-bold">{metrics.averageWordCount}</div>
+          <p className="text-xs text-muted-foreground">
+            por descrição
+          </p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Technical SEO</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Score SEO Médio</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold">{Math.round(seoMetrics.technicalSEO)}%</div>
-          <div className="mt-4">
-            <Progress
-              value={seoMetrics.technicalSEO}
-              className="h-2"
-              indicatorClassName={getScoreColorClass(seoMetrics.technicalSEO)}
-            />
-          </div>
-          <div className="mt-3 text-sm text-muted-foreground">
-            Technical aspects are well optimized.
-          </div>
+          <div className="text-2xl font-bold">{metrics.averageSEOScore}/100</div>
+          <p className="text-xs text-muted-foreground">
+            baseado em {metrics.totalDescriptions} descrições
+          </p>
         </CardContent>
       </Card>
-      
+
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">SEO Score</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Score de Legibilidade</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold flex items-center gap-2">
-            {seoMetrics.overallScore > 80 ? (
-              <Check className="h-6 w-6 text-emerald-500" />
-            ) : seoMetrics.overallScore > 50 ? (
-              <AlertTriangle className="h-6 w-6 text-amber-500" />
-            ) : (
-              <AlertCircle className="h-6 w-6 text-destructive" />
-            )}
-            {Math.round(seoMetrics.overallScore)}
-          </div>
-          <div className="mt-4">
-            <Progress
-              value={seoMetrics.overallScore}
-              className="h-2"
-              indicatorClassName={getScoreColorClass(seoMetrics.overallScore)}
-            />
-          </div>
-          <div className="mt-3">
-            <ChartContainer config={{ score: seoMetrics.overallScore }} className="h-[120px]">
-              <LineChart data={[
-                { date: '01/05', seoScore: 65 },
-                { date: '08/05', seoScore: 72 },
-                { date: '15/05', seoScore: 78 },
-                { date: '22/05', seoScore: Math.round(seoMetrics.overallScore) }
-              ]} />
-            </ChartContainer>
-          </div>
+          <div className="text-2xl font-bold">{metrics.averageReadabilityScore}/100</div>
+          <p className="text-xs text-muted-foreground">
+            média geral
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-full">
+        <CardHeader>
+          <CardTitle>Evolução dos Scores</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ChartContainer
+            className="h-[300px]"
+            config={{
+              score: {
+                label: "Score SEO",
+                theme: {
+                  light: "#0ea5e9",
+                  dark: "#0ea5e9",
+                },
+              },
+              readability: {
+                label: "Legibilidade",
+                theme: {
+                  light: "#84cc16",
+                  dark: "#84cc16",
+                },
+              },
+            }}
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={metrics.historicalData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="seoScore" name="Score SEO" fill="var(--color-score)" />
+                <Bar dataKey="readabilityScore" name="Legibilidade" fill="var(--color-readability)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         </CardContent>
       </Card>
     </div>
   );
 };
-
-export default MetricsOverview;

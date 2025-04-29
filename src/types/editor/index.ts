@@ -11,24 +11,5 @@ export type {
   BlockType
 } from './base';
 
-// Re-export from blocks directory
+// Re-export from blocks directory - this will be our canonical source for Block types
 export * from './blocks';
-
-// Re-export from products.ts
-export * from './products';
-
-// Explicitly re-export all block types
-export type {
-  VideoBlock,
-  HeroBlock,
-  TextBlock,
-  FeaturesBlock,
-  BenefitsBlock,
-  SpecificationsBlock,
-  ImageBlock,
-  GalleryBlock,
-  ImageTextBlock, 
-  TextImageBlock,
-  FAQBlock,
-  CTABlock,
-} from './blocks';
