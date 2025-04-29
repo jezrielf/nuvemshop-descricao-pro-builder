@@ -19,7 +19,7 @@ const getScoreColorClass = (score: number) => {
   return "bg-destructive";
 };
 
-const MetricsOverview = ({ seoMetrics }: { seoMetrics: SEOMetrics }) => {
+export const MetricsOverview = ({ seoMetrics }: { seoMetrics: SEOMetrics }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <Card>

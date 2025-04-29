@@ -1,4 +1,5 @@
 
+// Re-export components from this directory
 export { default as TemplatePreview } from './TemplatePreview';
 export { default as TemplateSelection } from './TemplateSelection';
 
