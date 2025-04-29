@@ -40,7 +40,7 @@ const DescriptionAnalysis: React.FC = () => {
 
         <TabsContent value="diagnostic" className="mt-4">
           <Card className="p-6">
-            <SEOTechnicalDiagnostic />
+            <SEOTechnicalDiagnostic description={description} />
           </Card>
         </TabsContent>
 

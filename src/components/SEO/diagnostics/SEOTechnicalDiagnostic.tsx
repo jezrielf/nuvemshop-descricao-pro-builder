@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,9 +16,16 @@ import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth'
 import { useProductDescriptionSaver } from '@/components/Nuvemshop/hooks/useProductDescriptionSaver';
 import { HeadingStructure, HeadingSuggestion } from './types/headingTypes';
 import { useHeadingsUpdater } from '@/components/Nuvemshop/hooks/useHeadingsUpdater';
+import { ProductDescription } from '@/types/editor';
 
-export const SEOTechnicalDiagnostic: React.FC = () => {
-  const { description } = useEditorStore();
+interface SEOTechnicalDiagnosticProps {
+  description?: ProductDescription;
+}
+
+export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ description: propDescription }) => {
+  const { description: storeDescription } = useEditorStore();
+  const description = propDescription || storeDescription;
+  
   const [activeTab, setActiveTab] = useState('structure');
   const { success: isNuvemshopConnected, userId, accessToken } = useNuvemshopAuth();
   const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);

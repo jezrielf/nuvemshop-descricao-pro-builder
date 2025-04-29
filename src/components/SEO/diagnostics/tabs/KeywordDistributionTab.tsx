@@ -8,18 +8,27 @@ import { ProductDescription } from '@/types/editor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info, AlertTriangle } from 'lucide-react';
+import { useEditorStore } from '@/store/editor';
 
 interface KeywordDistributionTabProps {
-  description: ProductDescription;
+  description?: ProductDescription;
 }
 
-export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ description }) => {
+export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ description: propDescription }) => {
   const [keywordMode, setKeywordMode] = useState<'density' | 'position' | 'distribution'>('density');
+  const { description: storeDescription } = useEditorStore();
+  
+  // Use the description from props if provided, otherwise use the one from the store
+  const activeDescription = propDescription || storeDescription;
   
   const { keywords, wordCount, sections } = useMemo(() => {
+    if (!activeDescription) {
+      return { keywords: [], wordCount: 0, sections: [] };
+    }
+    
     // Get only content from visible blocks for analysis
-    const visibleBlocks = description.blocks.filter(block => block.visible);
-    const visibleDescription = { ...description, blocks: visibleBlocks };
+    const visibleBlocks = activeDescription.blocks.filter(block => block.visible);
+    const visibleDescription = { ...activeDescription, blocks: visibleBlocks };
     const content = getTextContentFromDescription(visibleDescription);
     
     const words = content.toLowerCase()
@@ -80,7 +89,7 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       wordCount,
       sections
     };
-  }, [description]);
+  }, [activeDescription]);
   
   // Calculate optimal density thresholds
   const minDensity = 0.5;
@@ -107,6 +116,16 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
     // Score from 0-100 based on distribution
     return Math.min(100, avgDistribution * 2);
   }, [keywords, sections]);
+
+  if (!activeDescription) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">
+          Nenhuma descrição disponível para análise.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -277,3 +296,4 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
     </div>
   );
 };
+
