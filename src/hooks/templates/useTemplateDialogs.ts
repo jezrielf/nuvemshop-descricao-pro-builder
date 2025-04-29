@@ -11,6 +11,7 @@ export function useTemplateDialogs() {
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [editTemplate, setEditTemplate] = useState<Template | null>(null);
   const [deleteTemplate, setDeleteTemplate] = useState<Template | null>(null);
+  const [deleteCallback, setDeleteCallback] = useState<(() => void) | undefined>(undefined);
   
   const { toast } = useToast();
   
@@ -31,9 +32,10 @@ export function useTemplateDialogs() {
     setIsEditDialogOpen(true);
   };
   
-  const openDeleteDialog = (template: Template) => {
+  const openDeleteDialog = (template: Template, onDeleted?: () => void) => {
     closeAllDialogs();
     setDeleteTemplate(template);
+    setDeleteCallback(() => onDeleted);
     setIsDeleteDialogOpen(true);
   };
   
@@ -55,6 +57,7 @@ export function useTemplateDialogs() {
     previewTemplate,
     editTemplate,
     deleteTemplate,
+    deleteCallback,
     
     // Actions
     openNewDialog,
