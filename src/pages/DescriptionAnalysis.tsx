@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEditorStore } from '@/store/editor';
@@ -9,10 +9,21 @@ import { ArrowLeft } from 'lucide-react';
 import SEODashboard from '@/components/admin/seo/SEODashboard';
 import ProductPerformance from '@/components/admin/seo/ProductPerformance';
 import SEOTechnicalDiagnostic from '@/components/SEO/diagnostics/SEOTechnicalDiagnostic';
+import { ProductDescription } from '@/types/editor';
 
 const DescriptionAnalysis: React.FC = () => {
   const { description } = useEditorStore();
   const navigate = useNavigate();
+
+  // Filter to only include visible blocks for preview analysis
+  const visibleDescription = useMemo(() => {
+    if (!description) return undefined;
+    
+    return {
+      ...description,
+      blocks: description.blocks.filter(block => block.visible)
+    };
+  }, [description]);
 
   const handleBack = () => {
     navigate('/');
@@ -40,7 +51,7 @@ const DescriptionAnalysis: React.FC = () => {
 
         <TabsContent value="diagnostic" className="mt-4">
           <Card className="p-6">
-            <SEOTechnicalDiagnostic description={description} />
+            <SEOTechnicalDiagnostic description={visibleDescription} />
           </Card>
         </TabsContent>
 

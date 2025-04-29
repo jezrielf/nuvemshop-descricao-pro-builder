@@ -14,6 +14,12 @@ interface SEOAnalyzerProps {
 }
 
 const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
+  // Filter to only include visible blocks for preview analysis
+  const visibleDescription = description ? {
+    ...description,
+    blocks: description.blocks.filter(block => block.visible)
+  } : null;
+  
   const {
     open,
     setOpen,
@@ -22,7 +28,7 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
     analyzing,
     results,
     handleAnalyze
-  } = useSEODialog(description);
+  } = useSEODialog(visibleDescription);
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -39,7 +45,7 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
               onAnalyze={handleAnalyze}
               analyzing={analyzing}
               results={results}
-              disabled={!description}
+              disabled={!visibleDescription}
             />
           </div>
         </ScrollArea>

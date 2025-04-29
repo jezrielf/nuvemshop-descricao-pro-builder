@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -41,12 +41,6 @@ export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ 
     );
   }
 
-  // Filter to only include visible blocks for preview analysis
-  const visibleDescription = {
-    ...description,
-    blocks: description?.blocks?.filter(block => block.visible) || []
-  };
-
   // Extract product ID and title if the description name follows the pattern "Descrição: Product Name"
   const productTitle = description?.name?.startsWith('Descrição:') 
     ? description.name.substring(10).trim()
@@ -57,10 +51,10 @@ export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ 
     ? Number(description.metadata.productId)
     : undefined;
 
-  const content = getTextContentFromDescription(visibleDescription);
+  const content = getTextContentFromDescription(description);
   const readabilityMetrics = calculateReadabilityMetrics(content);
-  const headingStructure = extractHeaderStructure(visibleDescription) as HeadingStructure;
-  const contentStructure = analyzeContentStructure(visibleDescription);
+  const headingStructure = extractHeaderStructure(description) as HeadingStructure;
+  const contentStructure = analyzeContentStructure(description);
 
   // Calculate overall SEO score based on various factors
   const calculateOverallScore = () => {
@@ -153,15 +147,15 @@ export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ 
         </TabsContent>
 
         <TabsContent value="keywords" className="space-y-4">
-          <KeywordDistributionTab description={visibleDescription} />
+          <KeywordDistributionTab description={description} />
         </TabsContent>
 
         <TabsContent value="content" className="space-y-4">
-          <ContentQualityTab contentStructure={contentStructure} description={visibleDescription} />
+          <ContentQualityTab contentStructure={contentStructure} description={description} />
         </TabsContent>
 
         <TabsContent value="technical" className="space-y-4">
-          <TechnicalTab description={visibleDescription} />
+          <TechnicalTab description={description} />
         </TabsContent>
 
         <TabsContent value="readability" className="space-y-4">

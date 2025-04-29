@@ -86,7 +86,7 @@ export const useSEOAnalysis = (description: ProductDescription | null) => {
         });
       }
       
-      // Generate mock keyword suggestions
+      // Generate mock keyword suggestions based on visible content
       const keywords = [
         { word: keyword, count: keywordCount, relevance: 100 },
         { word: keyword + 's', count: Math.floor(keywordCount / 3), relevance: 85 },
