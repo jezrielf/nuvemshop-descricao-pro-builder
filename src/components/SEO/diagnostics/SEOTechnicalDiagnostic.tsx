@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SEOTechnicalDiagnosis, SEORecommendation } from '@/types/seoTechnical';
 import { ProductDescription } from '@/types/editor';
@@ -787,3 +788,133 @@ const TechnicalTab: React.FC<TechnicalTabProps> = ({
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Análise Semântica</CardTitle>
+          <CardDescription>
+            Avaliação da relevância e cobertura do tópico
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between mb-6">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">Score Semântico</p>
+              <p className={`text-4xl font-bold ${getScoreColor(semanticAnalysis.score)}`}>
+                {semanticAnalysis.score}
+              </p>
+              <p className="text-xs text-muted-foreground">/100 pontos</p>
+            </div>
+            
+            <div className="text-right">
+              <p className="text-sm font-medium">Cobertura do Tópico</p>
+              <p className={`text-2xl font-bold ${getScoreColor(semanticAnalysis.topicCoverage)}`}>
+                {semanticAnalysis.topicCoverage.toFixed(0)}%
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-3 mb-4">
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-sm font-medium">Correlação Título-Conteúdo</p>
+                <p className={`text-sm font-medium ${getScoreColor(semanticAnalysis.titleContentMatch)}`}>
+                  {semanticAnalysis.titleContentMatch.toFixed(0)}%
+                </p>
+              </div>
+              <Progress 
+                value={semanticAnalysis.titleContentMatch} 
+                className="h-2" 
+              />
+            </div>
+          </div>
+          
+          {semanticAnalysis.relatedTermsUsage.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Termos Relacionados Utilizados:</p>
+              <div className="flex flex-wrap gap-2">
+                {semanticAnalysis.relatedTermsUsage.map((term, idx) => (
+                  <Badge key={idx} variant="outline" className="bg-slate-100">
+                    {term}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Atualidade do Conteúdo</CardTitle>
+          <CardDescription>
+            Análise da frequência de atualização do conteúdo
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between mb-6">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">Score de Atualidade</p>
+              <p className={`text-4xl font-bold ${getScoreColor(freshnessAnalysis.score)}`}>
+                {freshnessAnalysis.score}
+              </p>
+              <p className="text-xs text-muted-foreground">/100 pontos</p>
+            </div>
+            
+            <div className="text-right">
+              <p className="text-sm font-medium">Última Atualização</p>
+              <p className="text-lg font-bold">
+                {formatDate(freshnessAnalysis.lastUpdated)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {freshnessAnalysis.daysSinceUpdate} dias atrás
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="p-3 border rounded-md">
+              <div className="flex justify-between items-center">
+                <p className="text-sm font-medium">Frequência de atualização</p>
+                <p className="text-sm font-bold">
+                  {freshnessAnalysis.updateFrequency > 0 
+                    ? `${Math.round(freshnessAnalysis.updateFrequency)} dias` 
+                    : 'N/A'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Problemas Detectados:</p>
+              <ScrollArea className="h-[150px]">
+                <div className="space-y-2">
+                  {freshnessAnalysis.issues.length > 0 ? (
+                    freshnessAnalysis.issues.map((issue, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <div className="mt-1 w-2 h-2 rounded-full bg-amber-500" />
+                        <p className="text-sm">{issue}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-green-500 text-sm">
+                      Nenhum problema detectado com a atualidade do conteúdo.
+                    </p>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+            
+            <Alert variant="default" className="bg-blue-50 border-blue-200">
+              <AlertTitle className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-blue-500" />
+                Lembrete
+              </AlertTitle>
+              <AlertDescription className="text-sm">
+                Manter o conteúdo atualizado é importante para o SEO. Atualize sua descrição pelo menos a cada 6 meses.
+              </AlertDescription>
+            </Alert>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
