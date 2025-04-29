@@ -25,8 +25,16 @@ export const PreviewTemplateDialog: React.FC<PreviewTemplateDialogProps> = ({
   const [activeTab, setActiveTab] = useState('preview');
   const [showHtml, setShowHtml] = useState(false);
   
-  // Generate HTML preview if needed - fix the parameter passing to match the expected type
-  const htmlPreview = showHtml ? generateCompleteHtml(template.blocks, template.name, { includeCss: true }) : '';
+  // Generate HTML preview if needed - structure the EditorState properly for the function
+  const htmlPreview = showHtml ? generateCompleteHtml({
+    description: {
+      blocks: template.blocks,
+      id: template.id,
+      name: template.name,
+      createdAt: '',
+      updatedAt: ''
+    }
+  }, template.name) : '';
   
   return (
     <Dialog open={open} onOpenChange={onClose}>
