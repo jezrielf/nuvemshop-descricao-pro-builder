@@ -26,7 +26,7 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
   // Generate HTML for each block with standard styling
   let blocksHtml = '';
   
-  // Add product title as primary H1 if provided
+  // SEMPRE adicione o título do produto como H1 principal se fornecido
   if (productTitle) {
     blocksHtml += `<h1 class="product-title" style="font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; color: #333;">${productTitle}</h1>\n`;
   }
@@ -38,10 +38,8 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
       // Generate block HTML with all inline styles
       let blockHtml = generateBlockHtml(block);
       
-      // Convert any H1 tags to H2 tags to maintain heading hierarchy
-      if (productTitle) {
-        blockHtml = blockHtml.replace(/<h1([^>]*)>/gi, '<h2$1>').replace(/<\/h1>/gi, '</h2>');
-      }
+      // SEMPRE converter qualquer H1 tags para H2 tags para manter a hierarquia de headings
+      blockHtml = blockHtml.replace(/<h1([^>]*)>/gi, '<h2$1>').replace(/<\/h1>/gi, '</h2>');
       
       // Determine spacing based on block style
       let marginBottom = '1.5rem';
@@ -114,11 +112,22 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
         max-width: 100%;
         height: auto;
       }
+      /* Estilo especial para o H1 do título do produto */
+      .nuvemshop-product-description h1.product-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #333;
+        line-height: 1.2;
+      }
       @media (max-width: 768px) {
         .nuvemshop-product-description [class*="-container"] > [class*="-item"] {
           width: 100% !important;
           margin-left: 0 !important;
           margin-right: 0 !important;
+        }
+        .nuvemshop-product-description h1.product-title {
+          font-size: 1.5rem;
         }
       }
     </style>

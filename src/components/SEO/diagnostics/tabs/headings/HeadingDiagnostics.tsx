@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { HeadingStructure } from '../../types/headingTypes';
 
 interface HeadingDiagnosticsProps {
@@ -30,10 +30,23 @@ export const HeadingDiagnostics: React.FC<HeadingDiagnosticsProps> = ({
           {headingStructure.hasValidH1 
             ? "A descrição possui um H1, essencial para definir o tópico principal da página." 
             : currentProductTitle
-              ? `A descrição não possui uma tag H1. Recomendamos usar o título do produto "${currentProductTitle}" como H1.`
+              ? `A descrição não possui uma tag H1. O título do produto "${currentProductTitle}" será usado automaticamente como H1.`
               : "A descrição não possui uma tag H1, fundamental para o SEO e para definir o assunto principal."}
         </AlertDescription>
       </Alert>
+      
+      {currentProductTitle && (
+        <Alert variant="success" className="bg-blue-50 border-blue-200">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-blue-500" />
+            <AlertTitle className="text-blue-800">Título do Produto Detectado</AlertTitle>
+          </div>
+          <AlertDescription className="text-xs text-blue-700">
+            <p>O título do produto <strong>"{currentProductTitle}"</strong> será sempre usado como H1 principal na descrição.</p>
+            <p className="mt-1">Isso ocorre automaticamente na exportação para Nuvemshop, garantindo a melhor prática de SEO.</p>
+          </AlertDescription>
+        </Alert>
+      )}
       
       <Alert variant={hasOnlyOneH1 ? "default" : "destructive"}>
         <div className="flex items-center gap-2">

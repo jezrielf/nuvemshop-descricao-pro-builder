@@ -31,6 +31,9 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
       
       let updatedContent = block.content;
       
+      // Remove any existing H1 tags from content
+      updatedContent = updatedContent.replace(/<h1[^>]*>.*?<\/h1>/gi, '');
+      
       // Replace non-H1 heading tags based on our suggestions
       otherHeadings.forEach(heading => {
         if (heading.original) {
@@ -74,12 +77,19 @@ export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
     try {
       setIsUpdating(true);
       
-      // Se temos um título de produto e não há um H1 nas sugestões, adicionamos um
-      if (productTitle && !headings.some(h => h.level === 1)) {
-        headings.unshift({
-          level: 1,
-          text: productTitle,
-        });
+      // Se temos um título de produto, garantimos que ele seja o H1
+      if (productTitle) {
+        // Remova qualquer H1 existente nas sugestões
+        const filteredHeadings = headings.filter(h => h.level !== 1);
+        
+        // Adicione o título do produto como H1
+        headings = [
+          {
+            level: 1,
+            text: productTitle,
+          },
+          ...filteredHeadings
+        ];
       }
       
       // Update headings in blocks

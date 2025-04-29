@@ -27,19 +27,29 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
   
   // Calculate scores and additional metrics
   const hasOnlyOneH1 = 
-    headingStructure.headings.filter(h => h.level === 1).length === 1;
+    headingStructure.headings.filter(h => h.level === 1).length <= 1; // <= 1 porque pode não ter nenhum
   
   const h1ContainsKeywords = 
     headingStructure.headings.some(h => 
       h.level === 1 && headingStructure.topKeywords.some(kw => h.text.toLowerCase().includes(kw))
-    );
+    ) || 
+    // Verifica também se o título do produto contém palavras-chave
+    (currentProductTitle && headingStructure.topKeywords.some(kw => 
+      currentProductTitle.toLowerCase().includes(kw)
+    ));
   
-  const isProperlyStructured = headingStructure.hasValidH1 && headingStructure.hasProperHierarchy;
+  // Se temos um título do produto, consideramos que teremos um H1 válido, mesmo que não esteja no HTML
+  const isProperlyStructured = 
+    (headingStructure.hasValidH1 || !!currentProductTitle) && 
+    headingStructure.hasProperHierarchy;
   
-  const structureScore = calculateHeadingScore(headingStructure);
+  const structureScore = calculateHeadingScore(
+    headingStructure,
+    !!currentProductTitle // Passa se tem título do produto como bônus
+  );
 
   // Identify improvement opportunities
-  const improvements = getImprovementSuggestions(headingStructure);
+  const improvements = getImprovementSuggestions(headingStructure, currentProductTitle);
 
   // Generate heading suggestions
   const handleGenerateHeadingSuggestions = () => {
@@ -61,7 +71,14 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
     setIsUpdating(true);
     
     try {
-      const success = await onUpdateHeadings(suggestedHeadings);
+      // Certifique-se de que estamos usando o título do produto como H1
+      const finalSuggestions = suggestedHeadings.filter(h => h.level !== 1);
+      
+      if (currentProductTitle) {
+        // O título do produto será aplicado automaticamente pelo useHeadingsUpdater
+      }
+      
+      const success = await onUpdateHeadings(finalSuggestions);
       
       if (success) {
         toast({
@@ -97,7 +114,7 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
               <div className="flex items-center justify-between">
                 <CardTitle>Estrutura de Cabeçalhos</CardTitle>
                 <Badge 
-                  variant={structureScore >= 80 ? "default" : structureScore >= 50 ? "secondary" : "destructive"}
+                  variant={structureScore >= 80 ? "success" : structureScore >= 50 ? "secondary" : "destructive"}
                   className="ml-2"
                 >
                   {structureScore}/100
@@ -106,6 +123,20 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
             </CardHeader>
             <CardContent className="space-y-4">
               <HeadingsList headingStructure={headingStructure} />
+              
+              {currentProductTitle && (
+                <Alert className="bg-blue-50 border-blue-200">
+                  <Info className="h-4 w-4 text-blue-500" />
+                  <AlertTitle className="text-blue-800">Título do Produto</AlertTitle>
+                  <AlertDescription className="text-xs text-blue-700">
+                    <div className="flex flex-col gap-1">
+                      <p>
+                        <strong>{currentProductTitle}</strong> (será usado como H1)
+                      </p>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
               
               <Alert>
                 <Info className="h-4 w-4" />

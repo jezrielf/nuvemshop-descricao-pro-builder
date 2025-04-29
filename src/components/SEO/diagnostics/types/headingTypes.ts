@@ -19,6 +19,7 @@ export interface HeadingSuggestion {
   level: number;
   text: string;
   original?: string;
+  locked?: boolean;
 }
 
 export interface HeadingStructureTabProps {
