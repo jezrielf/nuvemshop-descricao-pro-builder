@@ -21,18 +21,21 @@ export function useTemplateDialogs() {
   };
   
   const openPreviewDialog = (template: Template) => {
+    console.log('Opening preview dialog for template:', template.id);
     closeAllDialogs();
     setPreviewTemplate(template);
     setIsPreviewDialogOpen(true);
   };
   
   const openEditDialog = (template: Template) => {
+    console.log('Opening edit dialog for template:', template.id);
     closeAllDialogs();
     setEditTemplate(template);
     setIsEditDialogOpen(true);
   };
   
   const openDeleteDialog = (template: Template, onDeleted?: () => void) => {
+    console.log('Opening delete dialog for template:', template.id);
     closeAllDialogs();
     setDeleteTemplate(template);
     setDeleteCallback(() => onDeleted);

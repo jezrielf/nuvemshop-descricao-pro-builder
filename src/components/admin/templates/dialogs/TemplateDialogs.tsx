@@ -26,17 +26,22 @@ export const TemplateDialogs: React.FC = () => {
   const { toast } = useToast();
 
   const handleDeleteTemplate = async () => {
-    if (!deleteTemplate) return;
+    if (!deleteTemplate) {
+      console.error('No template selected for deletion');
+      return;
+    }
+    
+    console.log('Deleting template:', deleteTemplate.id);
     
     try {
-      // Deletar template diretamente do Supabase
+      // Delete template from Supabase
       const { error } = await supabase
         .from('templates')
         .delete()
         .eq('id', deleteTemplate.id);
       
       if (error) {
-        console.error('Erro ao deletar template:', error);
+        console.error('Error deleting template:', error);
         toast({
           title: 'Erro ao deletar',
           description: `Não foi possível deletar o template: ${error.message}`,
@@ -45,7 +50,7 @@ export const TemplateDialogs: React.FC = () => {
         return;
       }
       
-      // Também remove do estado local
+      // Update local state
       removeTemplate(deleteTemplate.id);
       
       toast({
@@ -53,19 +58,18 @@ export const TemplateDialogs: React.FC = () => {
         description: `O template "${deleteTemplate.name}" foi excluído com sucesso.`
       });
       
-      // Executar callback de deleção, se fornecido
+      // Execute callback if provided
       if (deleteCallback) {
+        console.log('Executing delete callback');
         deleteCallback();
       }
       
       closeAllDialogs();
       
-      // Atualizar a lista de templates através de um reload da página
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Refresh the page to update the templates list
+      window.location.reload();
     } catch (error) {
-      console.error('Erro ao deletar template:', error);
+      console.error('Error deleting template:', error);
       toast({
         title: 'Erro ao deletar',
         description: 'Ocorreu um erro ao tentar excluir o template',
