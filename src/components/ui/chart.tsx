@@ -11,6 +11,8 @@ export interface ChartConfig {
     bottom: number;
     left: number;
   };
+  score?: number; // Added for MetricsOverview.tsx
+  seo?: any;      // Added for PerformanceComparison.tsx
 }
 
 interface ChartContainerProps extends React.HTMLAttributes<HTMLDivElement> {

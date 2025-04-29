@@ -1,45 +1,42 @@
+import { Block, ProductDescription } from '@/types/editor';
 
-import { Block, BlockType } from '@/types/editor';
-import { createBlock } from '@/utils/blockCreators/createBlock';
-
+/**
+ * Ensures a block is properly typed
+ * This helps when blocks might not have the correct type information
+ */
 export function ensureBlockType(block: any): Block {
-  if (!block || typeof block !== 'object') {
-    console.warn('Invalid block provided:', block);
-    return createBlock('text');
+  // If the block already looks like a Block, return it
+  if (block && block.type && block.id && typeof block.visible === 'boolean') {
+    return block as Block;
   }
   
-  if (!block.type || !block.id) {
-    console.warn('Block missing required properties:', block);
-    return createBlock('text');
-  }
-  
-  // Ensure the block has all required base properties
-  const blockWithDefaults = {
-    visible: true,
-    columns: 'full',
-    title: block.title || getDefaultTitle(block.type as BlockType),
+  // Otherwise, try to convert it
+  console.warn('Block is not properly typed:', block);
+  return {
+    ...block,
+    id: block.id || 'unknown-id',
+    type: block.type || 'text',
+    visible: block.visible ?? true,
+    columns: block.columns || 'full',
     style: block.style || {},
-    ...block
-  };
-  
-  return blockWithDefaults as Block;
+  } as Block;
 }
 
-function getDefaultTitle(type: BlockType): string {
-  const titles: Record<BlockType, string> = {
-    hero: 'Banner Principal',
-    text: 'Texto',
-    features: 'Recursos',
-    benefits: 'Benefícios',
-    specifications: 'Especificações',
-    image: 'Imagem',
-    gallery: 'Galeria',
-    imageText: 'Imagem e Texto',
-    textImage: 'Texto e Imagem',
-    faq: 'Perguntas Frequentes',
-    cta: 'Chamada para Ação',
-    video: 'Vídeo'
-  };
+/**
+ * Ensures a product description is properly typed
+ */
+export function ensureProductDescription(description: any): ProductDescription {
+  if (!description) {
+    throw new Error('Description is null or undefined');
+  }
   
-  return titles[type] || 'Bloco';
+  return {
+    ...description,
+    id: description.id || 'unknown-id',
+    name: description.name || 'Untitled Description',
+    blocks: Array.isArray(description.blocks) ? description.blocks : [],
+    createdAt: description.createdAt || new Date().toISOString(),
+    updatedAt: description.updatedAt || new Date().toISOString(),
+    category: description.category || undefined,
+  };
 }
