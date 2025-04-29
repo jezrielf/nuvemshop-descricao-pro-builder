@@ -17,7 +17,11 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
   const [keywordMode, setKeywordMode] = useState<'density' | 'position' | 'distribution'>('density');
   
   const { keywords, wordCount, sections } = useMemo(() => {
-    const content = getTextContentFromDescription(description);
+    // Get only content from visible blocks for analysis
+    const visibleBlocks = description.blocks.filter(block => block.visible);
+    const visibleDescription = { ...description, blocks: visibleBlocks };
+    const content = getTextContentFromDescription(visibleDescription);
+    
     const words = content.toLowerCase()
       .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, '')
       .split(/\s+/)
@@ -47,8 +51,8 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
         isOptimal: (count / wordCount) * 100 >= 0.5 && (count / wordCount) * 100 <= 2.5
       }));
     
-    // Analyze keyword distribution across sections
-    const sections = description.blocks.map(block => {
+    // Analyze keyword distribution across sections (only visible sections)
+    const sections = visibleDescription.blocks.map(block => {
       let content = '';
       
       if ('content' in block && typeof block.content === 'string') {

@@ -28,10 +28,16 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
     );
   }
 
-  const content = getTextContentFromDescription(description);
+  // Filter to only include visible blocks for preview analysis
+  const visibleDescription = {
+    ...description,
+    blocks: description.blocks.filter(block => block.visible)
+  };
+
+  const content = getTextContentFromDescription(visibleDescription);
   const readabilityMetrics = calculateReadabilityMetrics(content);
-  const headingStructure = extractHeaderStructure(description);
-  const contentStructure = analyzeContentStructure(description);
+  const headingStructure = extractHeaderStructure(visibleDescription);
+  const contentStructure = analyzeContentStructure(visibleDescription);
 
   // Calculate overall SEO score based on various factors
   const calculateOverallScore = () => {
@@ -62,7 +68,7 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
   const overallScore = calculateOverallScore();
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Diagnóstico Técnico SEO</h2>
@@ -104,15 +110,15 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="keywords" className="space-y-4">
-          <KeywordDistributionTab description={description} />
+          <KeywordDistributionTab description={visibleDescription} />
         </TabsContent>
 
         <TabsContent value="content" className="space-y-4">
-          <ContentQualityTab contentStructure={contentStructure} description={description} />
+          <ContentQualityTab contentStructure={contentStructure} description={visibleDescription} />
         </TabsContent>
 
         <TabsContent value="technical" className="space-y-4">
-          <TechnicalTab description={description} />
+          <TechnicalTab description={visibleDescription} />
         </TabsContent>
 
         <TabsContent value="readability" className="space-y-4">
