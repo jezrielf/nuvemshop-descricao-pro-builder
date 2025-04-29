@@ -18,6 +18,11 @@ const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({ product }
   const { accessToken, userId } = useNuvemshopAuth();
   const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
   
+  // Extract product name for display purposes
+  const productName = product.name && typeof product.name === 'object' && product.name.pt 
+    ? product.name.pt 
+    : (typeof product.name === 'string' ? product.name : 'produto');
+  
   const handleSave = async () => {
     if (!description) {
       toast({
@@ -38,6 +43,7 @@ const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({ product }
       onClick={handleSave}
       disabled={isSaving || !description}
       className="ml-2"
+      title={`Salvar descrição para: ${productName}`}
     >
       <Save className="h-4 w-4 mr-2" />
       {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}

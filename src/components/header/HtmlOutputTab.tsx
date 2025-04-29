@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, Copy } from 'lucide-react';
+import { AlertCircle, Copy, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface HtmlOutputTabProps {
@@ -14,18 +14,27 @@ export const HtmlOutputTab: React.FC<HtmlOutputTabProps> = ({ htmlOutput }) => {
   const { toast } = useToast();
 
   const copyHtmlToClipboard = () => {
-    // Get only the HTML inside the nuvemshop-product-description div
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlOutput, 'text/html');
-    const descriptionDiv = doc.querySelector('.nuvemshop-product-description');
-    
-    // If the wrapper is found, only copy its content, otherwise copy all
-    const htmlToCopy = descriptionDiv ? descriptionDiv.innerHTML : htmlOutput;
-    
-    navigator.clipboard.writeText(htmlToCopy);
+    navigator.clipboard.writeText(htmlOutput);
     toast({
       title: "HTML copiado!",
       description: "O código HTML foi copiado para a área de transferência.",
+    });
+  };
+  
+  const downloadHtml = () => {
+    const blob = new Blob([htmlOutput], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'descricao-produto.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "HTML baixado!",
+      description: "O arquivo HTML foi baixado com sucesso.",
     });
   };
 
@@ -35,24 +44,34 @@ export const HtmlOutputTab: React.FC<HtmlOutputTabProps> = ({ htmlOutput }) => {
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
           Este HTML é 100% compatível com a Nuvemshop, usando apenas HTML e CSS inline (sem JavaScript).
-          Cole o código completo sem alterações ou recortes para evitar tags HTML não fechadas.
+          Ao salvar na Nuvemshop, o título do produto será automaticamente inserido como H1 principal.
         </AlertDescription>
       </Alert>
       
-      <div className="relative">
+      <div className="relative mt-4">
         <Textarea
           className="min-h-[300px] font-mono text-xs"
           readOnly
           value={htmlOutput}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          className="absolute right-2 top-2"
-          onClick={copyHtmlToClipboard}
-        >
-          <Copy className="h-4 w-4" />
-        </Button>
+        <div className="absolute right-2 top-2 flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={downloadHtml}
+            title="Baixar HTML"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyHtmlToClipboard}
+            title="Copiar HTML"
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </>
   );

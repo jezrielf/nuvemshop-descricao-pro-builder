@@ -23,7 +23,14 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
 
     try {
       setIsSaving(true);
-      const htmlOutput = getHtmlOutput();
+      // Get product title from the selected product
+      const productTitle = product.name && typeof product.name === 'object' && product.name.pt 
+        ? product.name.pt 
+        : (typeof product.name === 'string' ? product.name : '');
+      
+      // Generate HTML with product title as H1
+      const htmlOutput = getHtmlOutput(productTitle);
+      
       const success = await updateProductDescription(product.id, htmlOutput);
       
       if (success) {

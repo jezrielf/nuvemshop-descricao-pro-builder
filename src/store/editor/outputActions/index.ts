@@ -3,10 +3,10 @@ import { EditorState } from '../types';
 import { generateCompleteHtml } from './htmlOutputGenerator';
 
 export const createOutputActions = (get: () => EditorState) => ({
-  getHtmlOutput: () => {
+  getHtmlOutput: (productTitle?: string) => {
     try {
       // Use the new generator function to get properly formatted HTML
-      const htmlOutput = generateCompleteHtml(get());
+      const htmlOutput = generateCompleteHtml(get(), productTitle);
       
       // Log para debug
       console.log("HTML output length:", htmlOutput.length);
