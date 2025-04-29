@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Check, AlertTriangle, AlertCircle } from 'lucide-react';
 import { ChartContainer } from "@/components/ui/chart";
 import LineChart from "@/components/admin/seo/LineChart";
@@ -102,7 +103,12 @@ const MetricsOverview = ({ seoMetrics }: { seoMetrics: SEOMetrics }) => {
           </div>
           <div className="mt-3">
             <ChartContainer config={{ score: seoMetrics.overallScore }} className="h-[120px]">
-              <LineChart />
+              <LineChart data={[
+                { date: '01/05', seoScore: 65 },
+                { date: '08/05', seoScore: 72 },
+                { date: '15/05', seoScore: 78 },
+                { date: '22/05', seoScore: Math.round(seoMetrics.overallScore) }
+              ]} />
             </ChartContainer>
           </div>
         </CardContent>
