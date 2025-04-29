@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +13,8 @@ import { TechnicalTab } from './tabs/TechnicalTab';
 import { ReadabilityTab } from './tabs/ReadabilityTab';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useProductDescriptionSaver } from '@/components/Nuvemshop/hooks/useProductDescriptionSaver';
+import { HeadingStructure, HeadingSuggestion } from './types/headingTypes';
+import { useHeadingsUpdater } from '@/components/Nuvemshop/hooks/useHeadingsUpdater';
 
 export const SEOTechnicalDiagnostic: React.FC = () => {
   const { description } = useEditorStore();
@@ -35,22 +36,22 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
   // Filter to only include visible blocks for preview analysis
   const visibleDescription = {
     ...description,
-    blocks: description.blocks.filter(block => block.visible)
+    blocks: description?.blocks?.filter(block => block.visible) || []
   };
 
   // Extract product ID and title if the description name follows the pattern "Descrição: Product Name"
-  const productTitle = description.name?.startsWith('Descrição:') 
+  const productTitle = description?.name?.startsWith('Descrição:') 
     ? description.name.substring(10).trim()
     : undefined;
     
   // Safely access metadata properties
-  const productId = description.metadata?.productId 
+  const productId = description?.metadata?.productId 
     ? Number(description.metadata.productId)
     : undefined;
 
   const content = getTextContentFromDescription(visibleDescription);
   const readabilityMetrics = calculateReadabilityMetrics(content);
-  const headingStructure = extractHeaderStructure(visibleDescription);
+  const headingStructure = extractHeaderStructure(visibleDescription) as HeadingStructure;
   const contentStructure = analyzeContentStructure(visibleDescription);
 
   // Calculate overall SEO score based on various factors
@@ -82,20 +83,14 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
   const overallScore = calculateOverallScore();
 
   // Handler for updating headings in the description
-  const handleUpdateHeadings = async (suggestedHeadings: { level: number; text: string }[]) => {
+  const { applyHeadingChanges } = useHeadingsUpdater();
+  
+  const handleUpdateHeadings = async (suggestedHeadings: HeadingSuggestion[]): Promise<boolean> => {
     if (!description || !productId) return false;
     
     try {
       console.log("Atualizando estrutura de headings:", suggestedHeadings);
-      
-      // Create modified HTML with updated headings
-      // This is a simplified approach - in a real implementation, 
-      // you would need to carefully replace headings in the HTML content
-      
-      // For now, just update the store data and let the user save manually
-      // Or add a function to save to Nuvemshop here
-      
-      return true;
+      return await applyHeadingChanges(suggestedHeadings);
     } catch (error) {
       console.error("Erro ao atualizar headings:", error);
       return false;

@@ -3,12 +3,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 import { ProductDescription } from '@/types/editor';
-
-export interface HeadingSuggestion {
-  level: number;
-  text: string;
-  original?: string;
-}
+import { HeadingSuggestion } from '@/components/SEO/diagnostics/types/headingTypes';
 
 export const useHeadingsUpdater = (onSave?: () => Promise<boolean>) => {
   const [isUpdating, setIsUpdating] = useState(false);
