@@ -19,7 +19,7 @@ export const KeywordAnalysis: React.FC = () => {
           </p>
 
           <div className="space-y-4">
-            {metrics.keywordMetrics.map((keyword) => (
+            {metrics.keywordMetrics && metrics.keywordMetrics.map((keyword) => (
               <div key={keyword.keyword} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">{keyword.keyword}</span>
@@ -44,7 +44,7 @@ export const KeywordAnalysis: React.FC = () => {
             Com base na análise das suas descrições, aqui estão algumas sugestões para melhorar o SEO:
           </p>
           <ul className="space-y-2">
-            {metrics.keywordMetrics.length > 0 ? (
+            {metrics.keywordMetrics && metrics.keywordMetrics.length > 0 ? (
               metrics.keywordMetrics
                 .filter(k => k.relevance < 70)
                 .map(keyword => (

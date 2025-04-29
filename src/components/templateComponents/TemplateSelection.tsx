@@ -2,7 +2,7 @@
 import React from 'react';
 import { useTemplateStore } from '@/store/templates';
 import TemplatePreview from './TemplatePreview';
-import { Template } from '@/types/editor/index';
+import { Template } from '@/types/editor/base';
 
 interface TemplateSelectionProps {
   onSelectTemplate: (template: Template) => void;

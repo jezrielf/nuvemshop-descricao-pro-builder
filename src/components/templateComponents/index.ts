@@ -9,4 +9,4 @@ export { default as TemplateSelection } from './TemplateSelection';
 export * from './useTemplateUtils';
 
 // Re-export from editor to make type available
-export { Template } from '@/types/editor';
+export { Template } from '@/types/editor/base';

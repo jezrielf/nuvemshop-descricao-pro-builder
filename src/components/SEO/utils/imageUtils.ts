@@ -1,5 +1,18 @@
 
-import { ProductDescription, Block, ImageTextBlock, TextImageBlock } from '@/types/editor';
+import { ProductDescription, Block } from '@/types/editor';
+
+// Define interfaces needed for image-related blocks
+interface ImageData {
+  src: string;
+  alt?: string;
+}
+
+interface BlockWithImage extends Block {
+  image?: ImageData;
+  images?: ImageData[];
+  backgroundImage?: string;
+  src?: string;
+}
 
 /**
  * Updates an image in a block
@@ -13,7 +26,7 @@ export const updateBlockImage = (
 ) => {
   if (!description || !blockId) return;
   
-  const block = description.blocks.find(b => b.id === blockId);
+  const block = description.blocks.find(b => b.id === blockId) as BlockWithImage | undefined;
   if (!block) return;
   
   if (block.type === 'image' && imageType === 'src') {
@@ -23,11 +36,9 @@ export const updateBlockImage = (
     });
   } else if ((block.type === 'imageText' || block.type === 'textImage') && imageType === 'imageSrc') {
     // Update imageText or textImage block
-    const imageTextBlock = block as ImageTextBlock | TextImageBlock;
-    
     updateBlock(blockId, { 
       image: {
-        ...imageTextBlock.image,
+        ...(block.image || {}),
         src: newImageUrl 
       }
     });
@@ -41,7 +52,10 @@ export const updateBlockImage = (
     const imageIndex = parseInt(imageType);
     if (!isNaN(imageIndex) && block.type === 'gallery' && block.images && block.images[imageIndex]) {
       const updatedImages = [...block.images];
-      updatedImages[imageIndex].src = newImageUrl;
+      updatedImages[imageIndex] = {
+        ...updatedImages[imageIndex],
+        src: newImageUrl
+      };
       
       updateBlock(blockId, {
         images: updatedImages

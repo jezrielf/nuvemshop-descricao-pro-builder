@@ -7,6 +7,11 @@ interface SEOMetrics {
   keywordUsage: number;
   readability: number;
   technicalSEO: number;
+  keywordMetrics: {
+    keyword: string;
+    frequency: number;
+    relevance: number;
+  }[];
 }
 
 export const useSEOMetrics = () => {
@@ -15,10 +20,11 @@ export const useSEOMetrics = () => {
     overallScore: 0,
     keywordUsage: 0,
     readability: 0,
-    technicalSEO: 0
+    technicalSEO: 0,
+    keywordMetrics: []
   });
   
-  const { description, blocks } = useEditorStore();
+  const { description } = useEditorStore();
   
   useEffect(() => {
     // Simulate loading metrics
@@ -33,7 +39,7 @@ export const useSEOMetrics = () => {
         await new Promise(resolve => setTimeout(resolve, 800));
         
         // Generate some metrics based on the content
-        const hasContent = description?.length > 0 || (blocks && blocks.length > 0);
+        const hasContent = description && description.blocks && description.blocks.length > 0;
         
         if (hasContent) {
           // Generate somewhat random but realistic metrics
@@ -46,11 +52,21 @@ export const useSEOMetrics = () => {
             (keywordScore * 0.4) + (readabilityScore * 0.3) + (technicalScore * 0.3)
           );
           
+          // Generate sample keyword metrics
+          const keywordMetrics = [
+            { keyword: 'produto', frequency: 12, relevance: 85 },
+            { keyword: 'qualidade', frequency: 8, relevance: 72 },
+            { keyword: 'especificação', frequency: 5, relevance: 65 },
+            { keyword: 'premium', frequency: 7, relevance: 58 },
+            { keyword: 'desempenho', frequency: 4, relevance: 45 }
+          ];
+          
           setMetrics({
             overallScore: overall,
             keywordUsage: keywordScore,
             readability: readabilityScore,
-            technicalSEO: technicalScore
+            technicalSEO: technicalScore,
+            keywordMetrics
           });
         } else {
           // Default values if no content
@@ -58,7 +74,11 @@ export const useSEOMetrics = () => {
             overallScore: 45,
             keywordUsage: 30,
             readability: 60,
-            technicalSEO: 50
+            technicalSEO: 50,
+            keywordMetrics: [
+              { keyword: 'produto', frequency: 3, relevance: 40 },
+              { keyword: 'descrição', frequency: 2, relevance: 25 }
+            ]
           });
         }
       } catch (error) {
@@ -68,7 +88,8 @@ export const useSEOMetrics = () => {
           overallScore: 40,
           keywordUsage: 35,
           readability: 50,
-          technicalSEO: 40
+          technicalSEO: 40,
+          keywordMetrics: []
         });
       } finally {
         setLoading(false);
@@ -76,7 +97,7 @@ export const useSEOMetrics = () => {
     };
     
     loadMetrics();
-  }, [description, blocks]);
+  }, [description]);
   
   return { metrics, loading };
 };

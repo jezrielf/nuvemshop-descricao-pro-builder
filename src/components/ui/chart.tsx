@@ -14,12 +14,12 @@ export function useChartConfig() {
 }
 
 interface ChartContainerProps {
-  config: ChartConfig;
+  config?: ChartConfig; // Make config optional
   children: React.ReactNode;
   className?: string;
 }
 
-export function ChartContainer({ config, children, className }: ChartContainerProps) {
+export function ChartContainer({ config = {}, children, className }: ChartContainerProps) {
   return (
     <ChartContext.Provider value={config}>
       <div className={cn("relative", className)}>
@@ -27,4 +27,9 @@ export function ChartContainer({ config, children, className }: ChartContainerPr
       </div>
     </ChartContext.Provider>
   );
+}
+
+// Add ChartTooltip component
+export function ChartTooltip({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={cn("bg-background p-2 border rounded-md shadow-md", className)}>{children}</div>;
 }

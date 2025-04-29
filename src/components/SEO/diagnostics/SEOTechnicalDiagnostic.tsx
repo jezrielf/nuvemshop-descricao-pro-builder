@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SEOTechnicalDiagnosis, SEORecommendation } from '@/types/seoTechnical';
 import { ProductDescription } from '@/types/editor';
@@ -9,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend } from 'recharts';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+import { ChartContainer } from '@/components/ui/chart';
 import { analyzeSEOTechnically } from '../utils/technicalSEOAnalyzer';
 import { AlertTriangle, CheckCircle, AlertCircle, Info } from 'lucide-react';
 
@@ -156,7 +155,7 @@ const OverallScoreCard: React.FC<OverallScoreCardProps> = ({ analysis }) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[300px]">
-          <ChartContainer className="h-[300px]">
+          <ChartContainer className="h-[300px]" config={{ score: analysis.overallScore }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                 <PolarGrid />
@@ -399,7 +398,7 @@ const StructureTab: React.FC<StructureTabProps> = ({ headerAnalysis }) => {
           </div>
           
           <div className="h-[250px] mb-4">
-            <ChartContainer className="h-[250px]">
+            <ChartContainer className="h-[250px]" config={{ headerData }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={headerData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -539,7 +538,7 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywordAnalysis }) => {
           </div>
           
           <div className="h-[250px] mb-4">
-            <ChartContainer className="h-[250px]">
+            <ChartContainer className="h-[250px]" config={{ keywordAnalysis }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={distributionData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -668,7 +667,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ contentAnalysis }) => {
           </div>
           
           <div className="h-[250px] mb-4">
-            <ChartContainer className="h-[250px]">
+            <ChartContainer className="h-[250px]" config={{ contentAnalysis }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={contentData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -788,116 +787,3 @@ const TechnicalTab: React.FC<TechnicalTabProps> = ({
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>Análise Semântica</CardTitle>
-          <CardDescription>
-            Relação entre título, conteúdo e palavras-chave
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Score Semântico</p>
-                <p className={`text-4xl font-bold ${getScoreColor(semanticAnalysis.score)}`}>
-                  {semanticAnalysis.score}
-                </p>
-                <p className="text-xs text-muted-foreground">/100 pontos</p>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <p className="text-sm font-medium">Correlação título-conteúdo</p>
-                  <p className={`text-sm font-medium ${semanticAnalysis.titleContentMatch >= 70 ? 'text-green-500' : semanticAnalysis.titleContentMatch >= 40 ? 'text-amber-500' : 'text-red-500'}`}>
-                    {semanticAnalysis.titleContentMatch.toFixed(0)}%
-                  </p>
-                </div>
-                <Progress 
-                  value={semanticAnalysis.titleContentMatch} 
-                  className="h-2"
-                  indicatorColor={semanticAnalysis.titleContentMatch >= 70 ? 'bg-green-500' : semanticAnalysis.titleContentMatch >= 40 ? 'bg-amber-500' : 'bg-red-500'}
-                />
-              </div>
-              
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <p className="text-sm font-medium">Cobertura do tópico</p>
-                  <p className={`text-sm font-medium ${semanticAnalysis.topicCoverage >= 70 ? 'text-green-500' : semanticAnalysis.topicCoverage >= 40 ? 'text-amber-500' : 'text-red-500'}`}>
-                    {semanticAnalysis.topicCoverage.toFixed(0)}%
-                  </p>
-                </div>
-                <Progress 
-                  value={semanticAnalysis.topicCoverage} 
-                  className="h-2"
-                  indicatorColor={semanticAnalysis.topicCoverage >= 70 ? 'bg-green-500' : semanticAnalysis.topicCoverage >= 40 ? 'bg-amber-500' : 'bg-red-500'}
-                />
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <p className="text-sm font-medium mb-2">Termos relacionados utilizados:</p>
-              <div className="flex flex-wrap gap-2">
-                {semanticAnalysis.relatedTermsUsage.map((term, idx) => (
-                  <Badge key={idx} variant="secondary">{term}</Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>Atualidade do Conteúdo</CardTitle>
-          <CardDescription>
-            Análise da frequência de atualizações
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Score de Atualidade</p>
-                <p className={`text-4xl font-bold ${getScoreColor(freshnessAnalysis.score)}`}>
-                  {freshnessAnalysis.score}
-                </p>
-                <p className="text-xs text-muted-foreground">/100 pontos</p>
-              </div>
-              
-              <div className="text-right">
-                <p className="text-sm font-medium">Última atualização</p>
-                <p className="text-lg font-medium">{formatDate(freshnessAnalysis.lastUpdated)}</p>
-                <p className={`text-xs ${freshnessAnalysis.daysSinceUpdate > 180 ? 'text-red-500' : freshnessAnalysis.daysSinceUpdate > 90 ? 'text-amber-500' : 'text-green-500'}`}>
-                  {freshnessAnalysis.daysSinceUpdate} dias atrás
-                </p>
-              </div>
-            </div>
-            
-            {freshnessAnalysis.updateFrequency > 0 && (
-              <div className="mt-4 p-4 bg-muted rounded-lg">
-                <p className="font-medium">Frequência média de atualizações</p>
-                <p className="text-2xl font-bold mt-1">
-                  {Math.round(freshnessAnalysis.updateFrequency)} dias
-                </p>
-                <p className="text-xs text-muted-foreground">entre cada atualização</p>
-              </div>
-            )}
-            
-            <div className="mt-4">
-              <p className="text-sm font-medium mb-2">Recomendações de atualização:</p>
-              <ul className="space-y-2 list-disc list-inside text-sm">
-                <li>Atualize o conteúdo pelo menos a cada 3-6 meses</li>
-                <li>Adicione novas informações relevantes ao produto</li>
-                <li>Revise e atualize dados técnicos ou especificações</li>
-                <li>Inclua perguntas frequentes recentes dos clientes</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};

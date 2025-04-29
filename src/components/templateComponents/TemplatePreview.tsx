@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Template } from '@/types/editor';
+import { Template } from '@/types/editor/base';
 
 interface TemplatePreviewProps {
   template: Template;
