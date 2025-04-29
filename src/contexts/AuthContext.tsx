@@ -10,6 +10,7 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+// Create context with undefined as initial value
 export const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -123,6 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
+// Make sure this is exported and used correctly
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
