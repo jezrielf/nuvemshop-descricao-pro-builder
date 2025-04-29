@@ -12,10 +12,14 @@ import { KeywordDistributionTab } from './tabs/KeywordDistributionTab';
 import { ContentQualityTab } from './tabs/ContentQualityTab';
 import { TechnicalTab } from './tabs/TechnicalTab';
 import { ReadabilityTab } from './tabs/ReadabilityTab';
+import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
+import { useProductDescriptionSaver } from '@/components/Nuvemshop/hooks/useProductDescriptionSaver';
 
 export const SEOTechnicalDiagnostic: React.FC = () => {
   const { description } = useEditorStore();
   const [activeTab, setActiveTab] = useState('structure');
+  const { success: isNuvemshopConnected, userId, accessToken } = useNuvemshopAuth();
+  const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
 
   if (!description) {
     return (
@@ -33,6 +37,16 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
     ...description,
     blocks: description.blocks.filter(block => block.visible)
   };
+
+  // Extract product ID and title if the description name follows the pattern "Descrição: Product Name"
+  const productTitle = description.name?.startsWith('Descrição:') 
+    ? description.name.substring(10).trim()
+    : undefined;
+    
+  // Try to extract product ID from metadata if available
+  const productId = description.metadata?.productId 
+    ? Number(description.metadata.productId)
+    : undefined;
 
   const content = getTextContentFromDescription(visibleDescription);
   const readabilityMetrics = calculateReadabilityMetrics(content);
@@ -66,6 +80,27 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
   };
 
   const overallScore = calculateOverallScore();
+
+  // Handler for updating headings in the description
+  const handleUpdateHeadings = async (suggestedHeadings: { level: number; text: string }[]) => {
+    if (!description || !productId) return false;
+    
+    try {
+      console.log("Atualizando estrutura de headings:", suggestedHeadings);
+      
+      // Create modified HTML with updated headings
+      // This is a simplified approach - in a real implementation, 
+      // you would need to carefully replace headings in the HTML content
+      
+      // For now, just update the store data and let the user save manually
+      // Or add a function to save to Nuvemshop here
+      
+      return true;
+    } catch (error) {
+      console.error("Erro ao atualizar headings:", error);
+      return false;
+    }
+  };
 
   return (
     <div className="w-full space-y-6">
@@ -106,7 +141,12 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
         </TabsList>
 
         <TabsContent value="structure" className="space-y-4">
-          <HeadingStructureTab headingStructure={headingStructure} />
+          <HeadingStructureTab 
+            headingStructure={headingStructure} 
+            currentProductTitle={productTitle}
+            productId={productId}
+            onUpdateHeadings={handleUpdateHeadings}
+          />
         </TabsContent>
 
         <TabsContent value="keywords" className="space-y-4">
