@@ -15,9 +15,13 @@ import { getCategoryName } from './utils';
 
 interface TemplateListProps {
   templates: Template[];
+  onTemplateDeleted?: () => void;
 }
 
-export const TemplateList: React.FC<TemplateListProps> = ({ templates }) => {
+export const TemplateList: React.FC<TemplateListProps> = ({ 
+  templates,
+  onTemplateDeleted
+}) => {
   if (!templates.length) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -47,7 +51,10 @@ export const TemplateList: React.FC<TemplateListProps> = ({ templates }) => {
             </TableCell>
             <TableCell>{template.blocks.length}</TableCell>
             <TableCell className="text-right">
-              <TemplateActions template={template} />
+              <TemplateActions 
+                template={template} 
+                onTemplateDeleted={onTemplateDeleted}
+              />
             </TableCell>
           </TableRow>
         ))}

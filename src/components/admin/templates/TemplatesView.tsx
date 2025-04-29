@@ -62,6 +62,11 @@ export const TemplatesView = () => {
     loadData();
   };
   
+  // Function to handle template deletion
+  const handleTemplateDeleted = () => {
+    handleRefresh();
+  };
+  
   // Filter templates based on search query and selected category
   const filteredTemplates = searchTemplates(searchQuery, selectedCategory);
   
@@ -99,7 +104,10 @@ export const TemplatesView = () => {
       
       <ScrollArea className="h-[calc(100vh-220px)]">
         {templates.length > 0 ? (
-          <TemplateList templates={filteredTemplates} />
+          <TemplateList 
+            templates={filteredTemplates} 
+            onTemplateDeleted={handleTemplateDeleted}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-muted-foreground mb-4">
