@@ -71,6 +71,10 @@ export interface ProductDescription {
   productName?: string;
   category?: ProductCategory;
   blocks: any[];
+  metadata?: {
+    productId?: string;
+    [key: string]: any;
+  };
 }
 
 // Export ProductCategory using export type for TypeScript's isolatedModules

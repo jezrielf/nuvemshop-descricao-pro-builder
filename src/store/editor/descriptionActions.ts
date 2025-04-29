@@ -1,3 +1,4 @@
+
 import { ProductDescription, Template } from '@/types/editor';
 import { EditorState } from './types';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,6 +28,13 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
     set({
       description,
       selectedBlockId: null,
+    });
+  },
+
+  updateDescription: (updatedDescription: ProductDescription) => {
+    console.log('Updating description:', updatedDescription.id);
+    set({
+      description: updatedDescription,
     });
   },
 

@@ -32,4 +32,5 @@ export interface EditorState {
   loadSavedDescriptions: () => void;
   getSavedDescriptions: () => ProductDescription[];
   setAuthContext: (authContext: ReturnType<typeof useAuth>) => void;
+  updateDescription: (description: ProductDescription) => void;
 }

@@ -43,7 +43,7 @@ export const SEOTechnicalDiagnostic: React.FC = () => {
     ? description.name.substring(10).trim()
     : undefined;
     
-  // Try to extract product ID from metadata if available
+  // Safely access metadata properties
   const productId = description.metadata?.productId 
     ? Number(description.metadata.productId)
     : undefined;
