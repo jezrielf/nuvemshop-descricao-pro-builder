@@ -115,10 +115,15 @@ export function generateHeadingSuggestions(
     if (keyword) {
       suggestions.push({ 
         level: 2, 
-        text: `Principais características ${keyword ? `relacionadas a ${keyword}` : ''}` 
+        text: `Principais características ${keyword ? `relacionadas a ${keyword}` : ''}`,
+        original: '' // Added this property
       });
     } else {
-      suggestions.push({ level: 2, text: 'Características principais' });
+      suggestions.push({ 
+        level: 2, 
+        text: 'Características principais',
+        original: '' // Added this property
+      });
     }
   }
   
@@ -128,7 +133,8 @@ export function generateHeadingSuggestions(
     if (keyword) {
       suggestions.push({ 
         level: 3, 
-        text: `Benefícios ${keyword ? `do ${keyword}` : 'do produto'}` 
+        text: `Benefícios ${keyword ? `do ${keyword}` : 'do produto'}`,
+        original: '' // Added this property 
       });
     }
   }

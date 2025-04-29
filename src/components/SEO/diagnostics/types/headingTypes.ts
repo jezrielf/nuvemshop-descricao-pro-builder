@@ -18,7 +18,7 @@ export interface HeadingStructure {
 export interface HeadingSuggestion {
   level: number;
   text: string;
-  original?: string;
+  original?: string; // Made this optional
   locked?: boolean;
 }
 
