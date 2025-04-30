@@ -25,10 +25,10 @@ const App: React.FC = () => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <NimbusProvider>
-            <NexoProvider>
-              <Router>
+        <Router>
+          <AuthProvider>
+            <NimbusProvider>
+              <NexoProvider>
                 <Routes>
                   <Route path="/" element={<Landing />} />
                   <Route path="/editor" element={<Index />} />
@@ -43,10 +43,10 @@ const App: React.FC = () => {
                   <Route path="/success" element={<Success />} />
                   <Route path="/nimbus" element={<NimbusDemo />} />
                 </Routes>
-              </Router>
-            </NexoProvider>
-          </NimbusProvider>
-        </AuthProvider>
+              </NexoProvider>
+            </NimbusProvider>
+          </AuthProvider>
+        </Router>
       </QueryClientProvider>
     </React.StrictMode>
   );
