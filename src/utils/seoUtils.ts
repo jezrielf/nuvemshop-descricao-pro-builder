@@ -1,154 +1,84 @@
 
-import { ProductDescription, Block } from '@/types/editor';
-
 /**
- * Generates meta description based on product description content
+ * Extrai palavras-chave de uma descrição de produto
+ * @param description Descrição do produto
+ * @returns Array de palavras-chave
  */
-export const generateMetaDescription = (description: ProductDescription, productTitle?: string): string => {
-  // Start with the product title if available
-  let metaContent = productTitle ? `${productTitle}: ` : '';
-  
-  // Extract text content from blocks
-  const textBlocks = description.blocks.filter(block => 
-    block.type === 'text' || block.type === 'hero' || block.type === 'features' || 
-    block.type === 'benefits' || block.type === 'cta'
-  );
-  
-  for (const block of textBlocks) {
-    if (block.type === 'text' && 'content' in block) {
-      // Extract plain text from HTML content
-      const plainText = block.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      metaContent += plainText + ' ';
-    } else if (block.type === 'hero' && 'heading' in block) {
-      metaContent += block.heading + ' ';
-      if ('subheading' in block && block.subheading) {
-        metaContent += block.subheading + ' ';
+export function extractKeywords(description: any): string[] {
+  try {
+    if (!description || !description.blocks) {
+      return [];
+    }
+    
+    // Filtrar blocos visíveis
+    const visibleBlocks = description.blocks.filter((block: any) => block.visible);
+    
+    // Extrair texto de todos os blocos
+    let fullText = '';
+    
+    visibleBlocks.forEach((block: any) => {
+      // Extrair texto com base no tipo de bloco
+      if (block.content && typeof block.content === 'string') {
+        fullText += ' ' + block.content.replace(/<[^>]+>/g, ' ');
       }
-    } else if ((block.type === 'features' || block.type === 'benefits') && 'heading' in block) {
-      metaContent += block.heading + ' ';
-    } else if (block.type === 'cta' && 'heading' in block) {
-      metaContent += block.heading + ' ';
-      if ('content' in block && block.content) {
-        metaContent += block.content + ' ';
+      
+      if (block.heading && typeof block.heading === 'string') {
+        fullText += ' ' + block.heading;
       }
-    }
+      
+      if (block.title && typeof block.title === 'string') {
+        fullText += ' ' + block.title;
+      }
+      
+      // Processar tipos específicos de blocos
+      if (block.type === 'features' && block.items) {
+        block.items.forEach((item: any) => {
+          if (item.title) fullText += ' ' + item.title;
+          if (item.description) fullText += ' ' + item.description;
+        });
+      }
+      
+      if (block.type === 'faq' && block.items) {
+        block.items.forEach((item: any) => {
+          if (item.question) fullText += ' ' + item.question;
+          if (item.answer) fullText += ' ' + item.answer;
+        });
+      }
+    });
     
-    // Limit meta description to approximately 155 characters (standard SEO recommendation)
-    if (metaContent.length > 130) {
-      break;
-    }
-  }
-  
-  // Clean up and limit to 155 characters
-  metaContent = metaContent.trim();
-  if (metaContent.length > 155) {
-    metaContent = metaContent.substring(0, 152) + '...';
-  }
-  
-  return metaContent;
-};
-
-/**
- * Extracts potential keywords from description content
- */
-export const extractKeywords = (description: ProductDescription): string[] => {
-  // Get all text content
-  let allText = '';
-  
-  description.blocks.forEach(block => {
-    if (block.type === 'text' && 'content' in block) {
-      const plainText = block.content.replace(/<[^>]+>/g, ' ');
-      allText += plainText + ' ';
-    } else if ('heading' in block && block.heading) {
-      allText += block.heading + ' ';
-    }
+    // Limpar o texto
+    const cleanText = fullText.toLowerCase()
+      .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
     
-    if (block.type === 'features' && 'features' in block && Array.isArray(block.features)) {
-      block.features.forEach(feature => {
-        if (feature.title) allText += feature.title + ' ';
-        if (feature.description) allText += feature.description + ' ';
-      });
-    }
+    // Dividir em palavras e filtrar
+    const words = cleanText.split(' ');
     
-    if (block.type === 'benefits' && 'benefits' in block && Array.isArray(block.benefits)) {
-      block.benefits.forEach(benefit => {
-        if (benefit.title) allText += benefit.title + ' ';
-        if (benefit.description) allText += benefit.description + ' ';
-      });
-    }
-  });
-  
-  // Split text into words
-  const words = allText.toLowerCase()
-    .replace(/[^\w\sáàâãéèêíìîóòôõúùûç]/g, '')
-    .split(/\s+/)
-    .filter(Boolean);
-  
-  // Count word frequency
-  const wordCount: { [word: string]: number } = {};
-  const stopWords = new Set(['o', 'a', 'os', 'as', 'um', 'uma', 'e', 'é', 'de', 'do', 'da', 'dos', 'das', 'no', 'na', 'nos', 'nas', 'para', 'com', 'que', 'por', 'em']);
-  
-  words.forEach(word => {
-    if (word.length > 3 && !stopWords.has(word)) {
-      wordCount[word] = (wordCount[word] || 0) + 1;
-    }
-  });
-  
-  // Sort by frequency
-  const sortedWords = Object.keys(wordCount).sort((a, b) => wordCount[b] - wordCount[a]);
-  
-  // Return top 5 keywords
-  return sortedWords.slice(0, 5);
-};
-
-/**
- * Generates schema.org JSON-LD for products
- */
-export const generateProductSchema = (product: any, description?: ProductDescription): string => {
-  if (!product) return '';
-  
-  // Get product name
-  const name = product.name && typeof product.name === 'object' && product.name.pt 
-    ? product.name.pt 
-    : (typeof product.name === 'string' ? product.name : '');
-  
-  // Get product images if available
-  const images = product.images && Array.isArray(product.images) 
-    ? product.images.map((img: any) => img.src || img.url).filter(Boolean)
-    : [];
-  
-  // Get product description
-  let desc = '';
-  if (description) {
-    desc = generateMetaDescription(description, name);
+    // Remover palavras muito curtas e palavras comuns
+    const stopWords = new Set([
+      'para', 'como', 'mais', 'este', 'esta', 'isso', 'aquilo', 
+      'pelo', 'pela', 'pelos', 'pelas', 'seja', 'seus', 'suas',
+      'que', 'com', 'por', 'dos', 'das', 'uma', 'seu', 'sua'
+    ]);
+    
+    // Contar frequência
+    const wordCounts: {[key: string]: number} = {};
+    
+    words.forEach(word => {
+      if (word.length > 3 && !stopWords.has(word)) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
+      }
+    });
+    
+    // Ordenar por frequência e pegar as 10 mais comuns
+    return Object.entries(wordCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([word]) => word);
+    
+  } catch (error) {
+    console.error('Erro ao extrair palavras-chave:', error);
+    return [];
   }
-  
-  // Create schema object
-  const schema = {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": name,
-    "description": desc
-  };
-  
-  // Add images if available
-  if (images.length > 0) {
-    Object.assign(schema, { "image": images });
-  }
-  
-  // Add price if available
-  if (product.price) {
-    const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
-    if (!isNaN(price)) {
-      Object.assign(schema, {
-        "offers": {
-          "@type": "Offer",
-          "price": price.toFixed(2),
-          "priceCurrency": product.currency_code || "BRL"
-        }
-      });
-    }
-  }
-  
-  return JSON.stringify(schema, null, 2);
-};
+}

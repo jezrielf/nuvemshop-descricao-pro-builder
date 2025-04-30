@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -16,7 +15,7 @@ interface KeywordDistributionTabProps {
 
 export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ description: propDescription }) => {
   const [keywordMode, setKeywordMode] = useState<'density' | 'position' | 'distribution'>('density');
-  const { description: storeDescription } = useEditorStore();
+  const { description: storeDescription, getHtmlOutput } = useEditorStore();
   
   // Use the description from props if provided, otherwise use the one from the store
   const activeDescription = propDescription || storeDescription;
@@ -26,10 +25,25 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       return { keywords: [], wordCount: 0, sections: [] };
     }
     
-    // Get only content from visible blocks for analysis
-    const visibleBlocks = activeDescription.blocks.filter(block => block.visible);
-    const visibleDescription = { ...activeDescription, blocks: visibleBlocks };
-    const content = getTextContentFromDescription(visibleDescription);
+    // MODIFICAÇÃO PRINCIPAL: Usar o HTML gerado para extração de palavras-chave
+    // ao invés de usar o texto diretamente dos blocos
+    const htmlOutput = getHtmlOutput();
+    let content = '';
+    
+    if (htmlOutput) {
+      // Extrair texto do HTML gerado (removendo tags)
+      content = htmlOutput.replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      console.log('Analisando conteúdo do HTML gerado:', content.substring(0, 100) + '...');
+    } else {
+      // Fallback para o método anterior, caso o HTML não esteja disponível
+      const visibleBlocks = activeDescription.blocks.filter(block => block.visible);
+      const visibleDescription = { ...activeDescription, blocks: visibleBlocks };
+      content = getTextContentFromDescription(visibleDescription);
+      console.log('Fallback: Analisando conteúdo dos blocos:', content.substring(0, 100) + '...');
+    }
     
     const words = content.toLowerCase()
       .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, '')
@@ -61,18 +75,18 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       }));
     
     // Analyze keyword distribution across sections (only visible sections)
-    const sections = visibleDescription.blocks.map(block => {
-      let content = '';
+    const sections = activeDescription.blocks.filter(block => block.visible).map(block => {
+      let blockContent = '';
       
       if ('content' in block && typeof block.content === 'string') {
-        content = block.content.replace(/<[^>]+>/g, ' ');
+        blockContent = block.content.replace(/<[^>]+>/g, ' ');
       } else if ('heading' in block && typeof block.heading === 'string') {
-        content = block.heading;
+        blockContent = block.heading;
       }
       
       // Check for each keyword in this section
       const sectionKeywords = topKeywords.reduce((acc: Record<string, boolean>, { keyword }) => {
-        acc[keyword] = content.toLowerCase().includes(keyword);
+        acc[keyword] = blockContent.toLowerCase().includes(keyword);
         return acc;
       }, {});
       
@@ -89,7 +103,9 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       wordCount,
       sections
     };
-  }, [activeDescription]);
+  }, [activeDescription, getHtmlOutput]);
+  
+
   
   // Calculate optimal density thresholds
   const minDensity = 0.5;
@@ -128,6 +144,7 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
   }
 
   return (
+    
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -296,4 +313,3 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
     </div>
   );
 };
-
