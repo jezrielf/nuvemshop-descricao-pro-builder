@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { NuvemshopNimbus, ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Palette } from 'lucide-react';
 import { NimbusToggle } from '@/components/Nuvemshop/components/NimbusToggle';
 import { NimbusHeader } from '@/components/Nuvemshop/components/header/NimbusHeader';
 import { NimbusButton } from '@/components/Nuvemshop/NimbusProvider';
@@ -44,7 +44,7 @@ const NimbusNexoInfo: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <NuvemshopNimbus className="mr-2 h-6 w-6" />
+                  <Palette className="mr-2 h-6 w-6" />
                   Design System Nimbus
                 </CardTitle>
                 <CardDescription>
@@ -112,10 +112,7 @@ const NimbusNexoInfo: React.FC = () => {
                       </NimbusButton>
                       <NimbusButton 
                         variant="secondary" 
-                        as="a" 
-                        href="https://dev.nuvemshop.com.br/docs/developer-tools/nexo" 
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        onClick={() => window.open('https://dev.nuvemshop.com.br/docs/developer-tools/nexo', '_blank')}
                       >
                         Documentação <ExternalLink className="h-4 w-4 ml-1" />
                       </NimbusButton>
@@ -129,10 +126,7 @@ const NimbusNexoInfo: React.FC = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        as="a" 
-                        href="https://dev.nuvemshop.com.br/docs/developer-tools/nexo" 
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        onClick={() => window.open('https://dev.nuvemshop.com.br/docs/developer-tools/nexo', '_blank')}
                       >
                         Documentação <ExternalLink className="h-4 w-4 ml-1" />
                       </Button>
