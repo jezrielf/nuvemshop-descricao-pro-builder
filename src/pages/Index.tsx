@@ -10,11 +10,12 @@ import ProductSearch from '@/components/Nuvemshop/components/ProductSearch';
 import ProductEditorController from '@/components/Nuvemshop/components/ProductEditorController';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, LogOut } from 'lucide-react';
+import { CheckCircle2, LogOut, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
 import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -23,6 +24,7 @@ const Index = () => {
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<NuvemshopProduct | null>(null);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
+  const [hasDbError, setHasDbError] = useState(false);
   const { 
     success: storeConnected, 
     storeName, 
@@ -62,13 +64,24 @@ const Index = () => {
             variant: "destructive",
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Erro ao carregar templates:", error);
-        toast({
-          title: "Erro ao carregar templates",
-          description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
-          variant: "destructive",
-        });
+        
+        // Check for database recursion error
+        if (error.code === '42P17' && error.message?.includes('infinite recursion')) {
+          setHasDbError(true);
+          toast({
+            title: "Erro de permissões no banco de dados",
+            description: "Detectado erro de recursão infinita na tabela 'user_roles'. Algumas funcionalidades estarão limitadas.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Erro ao carregar templates",
+            description: "Não foi possível carregar os templates. Algumas funcionalidades podem estar indisponíveis.",
+            variant: "destructive",
+          });
+        }
       } finally {
         setIsLoadingTemplates(false);
       }
@@ -115,6 +128,16 @@ const Index = () => {
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       <Header />
+      
+      {hasDbError && (
+        <Alert variant="warning" className="mx-4 mt-2 bg-yellow-50 border-yellow-200">
+          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-700">
+            Detectado erro de recursão infinita na tabela "user_roles". Algumas funcionalidades estarão limitadas.
+            Contate o administrador do sistema para corrigir as políticas de segurança no banco de dados.
+          </AlertDescription>
+        </Alert>
+      )}
       
       <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
         <div className="flex-1">

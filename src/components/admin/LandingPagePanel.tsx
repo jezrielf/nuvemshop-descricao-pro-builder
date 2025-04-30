@@ -1,10 +1,9 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LandingPageImageManager from './LandingPageImageManager';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Info } from 'lucide-react';
+import { Loader2, Info, DatabaseOff } from 'lucide-react';
 import { useLandingPageContent } from '@/hooks/useLandingPageContent';
 
 // Import section components
@@ -60,7 +59,7 @@ const defaultContent = {
 };
 
 const LandingPagePanel: React.FC = () => {
-  const { content, loading, updateSection } = useLandingPageContent();
+  const { content, loading, updateSection, isLocalMode } = useLandingPageContent();
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [savingSections, setSavingSections] = useState<Record<string, boolean>>({});
 
@@ -123,6 +122,18 @@ const LandingPagePanel: React.FC = () => {
           Personalize o conteúdo da sua página inicial aqui.
         </p>
       </div>
+
+      {isLocalMode && (
+        <Alert variant="warning" className="bg-yellow-50 border-yellow-200">
+          <DatabaseOff className="h-4 w-4 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Modo Local Ativo</AlertTitle>
+          <AlertDescription className="text-yellow-700">
+            Devido a um erro no banco de dados, estamos operando em modo local.
+            As alterações serão salvas apenas na memória e serão perdidas ao recarregar a página.
+            Entre em contato com o suporte para resolver o problema de permissões na tabela "user_roles".
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Alert>
         <Info className="h-4 w-4" />
