@@ -4,10 +4,9 @@ import { useNexo } from '@/components/Nuvemshop/NexoProvider';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusButton, NimbusAlert } from '@/components/Nuvemshop/NimbusProvider';
 import { Spinner } from '@/components/ui/spinner';
-import { AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
+import { AlertCircle, RefreshCw, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 // Menu modules available in Nexo
@@ -19,7 +18,15 @@ const NEXO_MODULES = [
 ];
 
 const NexoAdmin: React.FC = () => {
-  const { nexo, isNexoLoaded, nexoError, isInitializing, retryLoading, isEmbedded } = useNexo();
+  const { 
+    nexo, 
+    isNexoLoaded, 
+    nexoError, 
+    isInitializing, 
+    retryLoading, 
+    isEmbedded,
+    hasCertificateError
+  } = useNexo();
   const { success: isAuthenticated, accessToken, userId, storeName } = useNuvemshopAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -107,6 +114,12 @@ const NexoAdmin: React.FC = () => {
     });
   };
 
+  // Open direct Nuvemshop admin URL
+  const handleOpenNuvemshopAdmin = () => {
+    if (!userId) return;
+    window.open(`https://www.nuvemshop.com.br/admin/${userId}`, '_blank');
+  };
+
   // In embedded mode, we don't show login requirements
   if (!isAuthenticated && !isEmbedded) {
     return (
@@ -120,7 +133,51 @@ const NexoAdmin: React.FC = () => {
     );
   }
 
-  if (nexoError) {
+  // Show special message for certificate errors
+  if (hasCertificateError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen p-6">
+        <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Problema de certificado SSL</h1>
+        <p className="text-gray-600 mb-2">
+          Não foi possível carregar o SDK da Nuvemshop devido a um problema com o certificado SSL.
+        </p>
+        <p className="text-gray-600 mb-6">
+          Este é um problema temporário com os servidores da Nuvemshop.
+        </p>
+        
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg mb-6 max-w-md">
+          <h3 className="font-semibold text-amber-800 mb-2">Alternativas:</h3>
+          <ul className="list-disc pl-5 text-amber-700">
+            <li className="mb-1">Acesse diretamente o admin da Nuvemshop pelo botão abaixo</li>
+            <li className="mb-1">Tente novamente mais tarde quando o certificado for atualizado</li>
+            <li>Entre em contato com o suporte da Nuvemshop se o problema persistir</li>
+          </ul>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-4">
+          <NimbusButton variant="primary" onClick={handleOpenNuvemshopAdmin}>
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Abrir admin da Nuvemshop
+          </NimbusButton>
+          
+          <NimbusButton variant="secondary" onClick={handleRetry}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar novamente
+          </NimbusButton>
+          
+          {!isEmbedded && (
+            <NimbusButton variant="tertiary" onClick={() => navigate('/editor')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar ao Editor
+            </NimbusButton>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (nexoError && !hasCertificateError) {
     return (
       <div className="flex flex-col items-center justify-center h-screen p-6">
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
@@ -134,6 +191,7 @@ const NexoAdmin: React.FC = () => {
           </NimbusButton>
           {!isEmbedded && (
             <NimbusButton variant="secondary" onClick={() => navigate('/editor')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar ao Editor
             </NimbusButton>
           )}

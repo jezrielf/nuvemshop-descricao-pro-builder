@@ -23,6 +23,7 @@ interface NexoContextType {
   isInitializing: boolean;
   retryLoading: () => void;
   isEmbedded: boolean;
+  hasCertificateError: boolean;
 }
 
 const NexoContext = createContext<NexoContextType>({
@@ -31,7 +32,8 @@ const NexoContext = createContext<NexoContextType>({
   nexoError: null,
   isInitializing: false,
   retryLoading: () => {},
-  isEmbedded: false
+  isEmbedded: false,
+  hasCertificateError: false
 });
 
 export const useNexo = () => useContext(NexoContext);
@@ -45,6 +47,7 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isEmbedded, setIsEmbedded] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [embeddedStoreId, setEmbeddedStoreId] = useState<string | null>(null);
+  const [hasCertificateError, setHasCertificateError] = useState(false);
   
   const { accessToken, userId } = useNuvemshopAuth();
   const { toast } = useToast();
@@ -71,6 +74,14 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // Function to detect certificate errors in error message
+  const isCertificateError = (error: any): boolean => {
+    const errorString = String(error);
+    return errorString.includes('ERR_CERT_DATE_INVALID') || 
+           errorString.includes('NET::ERR_CERT_AUTHORITY_INVALID') || 
+           errorString.includes('SSL_ERROR_BAD_CERT_DOMAIN');
+  };
+
   // Load Nexo SDK via script tag
   const loadNexoScript = () => {
     try {
@@ -92,6 +103,7 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setNexo(window.Nexo);
           setIsNexoLoaded(true);
           setNexoError(null);
+          setHasCertificateError(false);
           
           // Initialize Nexo with the appropriate authentication method
           if (isEmbedded && sessionToken) {
@@ -104,11 +116,27 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       script.onerror = (error) => {
         console.error('Failed to load Nexo SDK:', error);
-        setNexoError(new Error('Failed to load Nexo SDK'));
+        
+        // Check if this is a certificate error
+        const certError = isCertificateError(error);
+        setHasCertificateError(certError);
+        
+        if (certError) {
+          // Special handling for certificate errors
+          setNexoError(new Error('Erro de certificado SSL ao carregar o SDK da Nuvemshop. O certificado do servidor pode estar expirado ou inválido.'));
+          toast({
+            variant: 'destructive',
+            title: 'Erro de certificado SSL',
+            description: 'Não foi possível carregar o SDK da Nuvemshop devido a um problema com o certificado SSL do servidor.',
+          });
+        } else {
+          setNexoError(new Error('Failed to load Nexo SDK'));
+        }
+        
         setIsInitializing(false);
         
-        // Auto-retry logic with exponential backoff
-        if (retryCount < MAX_RETRIES) {
+        // Auto-retry logic with exponential backoff (only for non-certificate errors)
+        if (retryCount < MAX_RETRIES && !certError) {
           toast({
             title: 'Problemas ao carregar Nexo SDK',
             description: `Tentando novamente em ${RETRY_DELAY/1000} segundos...`,
@@ -203,6 +231,7 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const retryLoading = () => {
     setNexoError(null);
     setIsNexoLoaded(false);
+    setHasCertificateError(false);
     
     // Remove the existing script if any
     const existingScript = document.getElementById('nexo-sdk');
@@ -240,7 +269,8 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       nexoError, 
       isInitializing,
       retryLoading,
-      isEmbedded
+      isEmbedded,
+      hasCertificateError
     }}>
       {children}
     </NexoContext.Provider>
