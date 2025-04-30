@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { useNexo } from '@/components/Nuvemshop/NexoProvider';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -167,7 +166,7 @@ const NexoAdmin: React.FC = () => {
           </NimbusButton>
           
           {!isEmbedded && (
-            <NimbusButton variant="tertiary" onClick={() => navigate('/editor')}>
+            <NimbusButton variant="text" onClick={() => navigate('/editor')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar ao Editor
             </NimbusButton>
