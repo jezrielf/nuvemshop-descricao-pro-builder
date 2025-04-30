@@ -172,7 +172,7 @@ export const useLandingPageContent = () => {
         toast({
           title: "Erro no banco de dados",
           description: "Modo local ativado. As alterações serão salvas apenas na memória.",
-          variant: "warning"
+          variant: "destructive"
         });
         
         return true;

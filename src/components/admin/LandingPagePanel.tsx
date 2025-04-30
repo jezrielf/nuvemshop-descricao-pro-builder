@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LandingPageImageManager from './LandingPageImageManager';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Info, DatabaseOff } from 'lucide-react';
+import { Loader2, Info, Database } from 'lucide-react';
 import { useLandingPageContent } from '@/hooks/useLandingPageContent';
 
 // Import section components
@@ -125,7 +125,7 @@ const LandingPagePanel: React.FC = () => {
 
       {isLocalMode && (
         <Alert variant="warning" className="bg-yellow-50 border-yellow-200">
-          <DatabaseOff className="h-4 w-4 text-yellow-600" />
+          <Database className="h-4 w-4 text-yellow-600" />
           <AlertTitle className="text-yellow-800">Modo Local Ativo</AlertTitle>
           <AlertDescription className="text-yellow-700">
             Devido a um erro no banco de dados, estamos operando em modo local.
