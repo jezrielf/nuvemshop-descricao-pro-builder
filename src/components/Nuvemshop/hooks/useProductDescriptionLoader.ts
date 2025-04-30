@@ -32,14 +32,31 @@ export const useProductDescriptionLoader = () => {
           try {
             console.log('Analisando descrição HTML:', htmlDescription);
             
+            // Processar descrição HTML para remover problemas comuns
+            let cleanedHtml = htmlDescription
+              .replace(/check\s+/g, '') // Remove a palavra "check" seguida de espaço
+              .replace(/<check>/g, '') // Remove tags "check"
+              .replace(/<\/check>/g, ''); // Remove tags de fechamento "check"
+            
             let blocks = [];
             try {
-              blocks = parseHtmlToBlocks(htmlDescription);
+              blocks = parseHtmlToBlocks(cleanedHtml);
               blocks = blocks.map(block => {
                 if (block.type === 'text' && (!block.heading || block.heading === 'Título do Texto')) {
                   return {
                     ...block,
                     heading: productName
+                  };
+                }
+                // Para blocos de especificações, garantir que não há "check" nas especificações
+                if (block.type === 'specifications' && Array.isArray(block.specs)) {
+                  return {
+                    ...block,
+                    specs: block.specs.map(spec => ({
+                      ...spec,
+                      name: spec.name.replace(/^check\s*/, ''),
+                      value: spec.value.replace(/^check\s*/, '')
+                    }))
                   };
                 }
                 return block;
@@ -48,12 +65,12 @@ export const useProductDescriptionLoader = () => {
               console.log('Blocos analisados:', blocks);
             } catch (parseErr) {
               console.error('Erro interno ao analisar blocos:', parseErr);
-              const fallbackBlock = createBasicTextBlock(htmlDescription, productName);
+              const fallbackBlock = createBasicTextBlock(cleanedHtml, productName);
               blocks = [fallbackBlock];
             }
             
             if (blocks.length === 0) {
-              const fallbackBlock = createBasicTextBlock(htmlDescription, productName);
+              const fallbackBlock = createBasicTextBlock(cleanedHtml, productName);
               blocks = [fallbackBlock];
             }
             
@@ -121,16 +138,21 @@ export const useProductDescriptionLoader = () => {
     }
   };
 
-  const createBasicTextBlock = (content: string, title: string) => ({
-    id: uuidv4(),
-    type: 'text' as const,
-    title: 'Conteúdo Importado',
-    heading: title,
-    content: content.includes('<') ? content : `<p>${content}</p>`,
-    visible: true,
-    columns: 'full' as const,
-    style: {}
-  });
+  const createBasicTextBlock = (content: string, title: string) => {
+    // Limpa o conteúdo de possíveis problemas
+    const cleanContent = content.replace(/check\s+/g, '');
+    
+    return {
+      id: uuidv4(),
+      type: 'text' as const,
+      title: 'Conteúdo Importado',
+      heading: title,
+      content: cleanContent.includes('<') ? cleanContent : `<p>${cleanContent}</p>`,
+      visible: true,
+      columns: 'full' as const,
+      style: {}
+    };
+  };
 
   return {
     isImporting,

@@ -3,6 +3,7 @@ import { EditorState } from '../types';
 import { Block } from '@/types/editor';
 import { generateBlockHtml } from '@/utils/htmlGenerators';
 import { getStylesFromBlock } from '@/utils/styleConverter';
+import { getSpecificationsCss, getCoreStylesCss } from '@/utils/htmlGenerators/cssTemplates';
 
 /**
  * Generates the complete HTML output for the product description
@@ -102,9 +103,16 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
 
   console.log("HTML output gerado com " + visibleBlocks.length + " blocos visíveis");
   
+  // Combinar todos os estilos CSS necessários
+  const specificationsCSS = getSpecificationsCss();
+  const coreCSS = getCoreStylesCss();
+  
   // Add CSS reset and responsive styles to ensure consistent rendering
   const cssReset = `
     <style>
+      ${coreCSS}
+      ${specificationsCSS}
+      
       .nuvemshop-product-description * {
         box-sizing: border-box;
       }
@@ -136,6 +144,24 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
         margin-top: 1.5rem;
         margin-bottom: 0.6rem;
       }
+      
+      /* Fix para o problema de "check" na visualização */
+      .nuvemshop-product-description .check,
+      .nuvemshop-product-description .check-text {
+        display: none;
+      }
+      
+      /* Estilos para bloco de cuidados com ícone */
+      .nuvemshop-product-description .care-instruction-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .nuvemshop-product-description .care-instruction-icon {
+        color: #22c55e;
+      }
+      
       @media (max-width: 768px) {
         .nuvemshop-product-description [class*="-container"] > [class*="-item"] {
           width: 100% !important;
