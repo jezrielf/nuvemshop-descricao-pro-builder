@@ -18,7 +18,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NimbusProvider } from './components/Nuvemshop/NimbusProvider';
 import NexoProvider from './components/Nuvemshop/NexoProvider';
-import { isEmbeddedInNuvemshop } from './components/Nuvemshop/utils/embedUtils';
+import { 
+  isEmbeddedInNuvemshop, 
+  registerWithNuvemshopRouter, 
+  logEmbeddedEnvironmentInfo 
+} from './components/Nuvemshop/utils/embedUtils';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -26,13 +30,23 @@ const queryClient = new QueryClient();
 const App: React.FC = () => {
   const [isEmbedded, setIsEmbedded] = useState<boolean>(false);
   
-  // Check if app is embedded on mount
+  // Check if app is embedded on mount and register with Nuvemshop if needed
   useEffect(() => {
     const embedded = isEmbeddedInNuvemshop();
     setIsEmbedded(embedded);
     
     if (embedded) {
       console.log('[App] Running in embedded Nuvemshop mode');
+      logEmbeddedEnvironmentInfo();
+      registerWithNuvemshopRouter();
+      
+      // Add manifest link if not present
+      if (!document.querySelector('link[rel="manifest"]')) {
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = '/manifest.json';
+        document.head.appendChild(manifestLink);
+      }
     }
   }, []);
 
@@ -46,10 +60,11 @@ const App: React.FC = () => {
                 <Routes>
                   {/* Redirect to NexoAdmin directly when embedded in Nuvemshop */}
                   {isEmbedded && <Route path="/" element={<Navigate to="/nexo-admin" replace />} />}
+                  {isEmbedded && <Route path="/editor" element={<Navigate to="/nexo-admin" replace />} />}
                   
                   {/* Regular routes */}
                   {!isEmbedded && <Route path="/" element={<Landing />} />}
-                  <Route path="/editor" element={<Index />} />
+                  {!isEmbedded && <Route path="/editor" element={<Index />} />}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/description-analysis" element={<DescriptionAnalysis />} />
                   <Route path="/admin" element={<Admin />} />
