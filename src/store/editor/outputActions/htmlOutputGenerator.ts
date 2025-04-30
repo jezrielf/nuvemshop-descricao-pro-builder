@@ -120,6 +120,22 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
         color: #333;
         line-height: 1.2;
       }
+      /* Estilos para garantir a hierarquia visual dos headings */
+      .nuvemshop-product-description h2 {
+        font-size: 1.6rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+      }
+      .nuvemshop-product-description h3 {
+        font-size: 1.4rem;
+        margin-top: 1.8rem;
+        margin-bottom: 0.8rem;
+      }
+      .nuvemshop-product-description h4 {
+        font-size: 1.2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.6rem;
+      }
       @media (max-width: 768px) {
         .nuvemshop-product-description [class*="-container"] > [class*="-item"] {
           width: 100% !important;
@@ -128,6 +144,15 @@ export const generateCompleteHtml = (state: EditorState, productTitle?: string):
         }
         .nuvemshop-product-description h1.product-title {
           font-size: 1.5rem;
+        }
+        .nuvemshop-product-description h2 {
+          font-size: 1.4rem;
+        }
+        .nuvemshop-product-description h3 {
+          font-size: 1.3rem;
+        }
+        .nuvemshop-product-description h4 {
+          font-size: 1.1rem;
         }
       }
     </style>

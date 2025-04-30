@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { FileEdit, Info } from 'lucide-react';
+import { FileEdit, Info, Wand2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -11,8 +11,10 @@ import { HeadingsList } from './HeadingsList';
 import { ImprovementsList } from './ImprovementsList';
 import { HeadingDiagnostics } from './HeadingDiagnostics';
 import { HeadingSuggestionDialog } from './HeadingSuggestionDialog';
+import { AutoCorrectHeadingsDialog } from './AutoCorrectHeadingsDialog';
 import { HeadingStructureTabProps, HeadingSuggestion } from '../../types/headingTypes';
 import { calculateHeadingScore, getImprovementSuggestions, generateHeadingSuggestions } from '../../utils/headingUtils';
+import { useHeadingAutoCorrect } from '../../hooks/useHeadingAutoCorrect';
 
 export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({ 
   headingStructure, 
@@ -21,9 +23,14 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
   onUpdateHeadings
 }) => {
   const [isHeadingDialogOpen, setIsHeadingDialogOpen] = useState(false);
+  const [isAutoCorrectDialogOpen, setIsAutoCorrectDialogOpen] = useState(false);
   const [suggestedHeadings, setSuggestedHeadings] = useState<HeadingSuggestion[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const { success: isNuvemshopConnected } = useNuvemshopAuth();
+  const { 
+    isProcessingAutoCorrect, 
+    applyAutomaticCorrection 
+  } = useHeadingAutoCorrect(headingStructure, currentProductTitle, productId, onUpdateHeadings);
   
   // Calculate scores and additional metrics
   const hasOnlyOneH1 = 
@@ -104,6 +111,14 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
       setIsUpdating(false);
     }
   };
+
+  // Handler for auto-correction dialog
+  const handleAutoCorrection = async () => {
+    const success = await applyAutomaticCorrection();
+    if (success) {
+      setIsAutoCorrectDialogOpen(false);
+    }
+  };
   
   return (
     <>
@@ -148,15 +163,27 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
                 </AlertDescription>
               </Alert>
               
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full mt-2 flex items-center gap-2"
-                onClick={handleGenerateHeadingSuggestions}
-              >
-                <FileEdit className="h-4 w-4" />
-                Otimizar Headings para SEO
-              </Button>
+              <div className="flex flex-col gap-2 mt-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full flex items-center gap-2"
+                  onClick={handleGenerateHeadingSuggestions}
+                >
+                  <FileEdit className="h-4 w-4" />
+                  Otimizar Headings para SEO
+                </Button>
+                
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="w-full flex items-center gap-2"
+                  onClick={() => setIsAutoCorrectDialogOpen(true)}
+                >
+                  <Wand2 className="h-4 w-4" />
+                  Correção Automática de Estrutura
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -194,6 +221,14 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
         isUpdating={isUpdating}
         onApply={handleApplyHeadingSuggestions}
         currentProductTitle={currentProductTitle}
+      />
+      
+      <AutoCorrectHeadingsDialog 
+        isOpen={isAutoCorrectDialogOpen}
+        onOpenChange={setIsAutoCorrectDialogOpen}
+        headingStructure={headingStructure}
+        onApplyCorrection={handleAutoCorrection}
+        isProcessing={isProcessingAutoCorrect}
       />
     </>
   );
