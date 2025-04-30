@@ -24,7 +24,7 @@ export const processSpecificationsFromList = (element: Element, blocks: Block[])
   }
   
   // Extrair pares de especificação
-  const specs: Array<{name: string, value: string}> = [];
+  const specs: Array<{id: string, name: string, value: string}> = [];
   
   // Primeiro procura por uma lista explícita
   const listItems = element.querySelectorAll('li');
@@ -38,12 +38,14 @@ export const processSpecificationsFromList = (element: Element, blocks: Block[])
       const colonMatch = text.match(/^(.*?):\s*(.*)/);
       if (colonMatch && colonMatch[1] && colonMatch[2]) {
         specs.push({
+          id: uuidv4(),
           name: colonMatch[1].trim(),
           value: colonMatch[2].trim()
         });
       } else {
         // Se não tiver ":", trata como uma instrução simples
         specs.push({
+          id: uuidv4(),
           name: text,
           value: ''
         });
@@ -65,12 +67,14 @@ export const processSpecificationsFromList = (element: Element, blocks: Block[])
             const colonMatch = text.match(/^(.*?):\s*(.*)/);
             if (colonMatch && colonMatch[1] && colonMatch[2]) {
               specs.push({
+                id: uuidv4(),
                 name: colonMatch[1].trim(),
                 value: colonMatch[2].trim()
               });
             } else {
               // Sem dois pontos, tratamos como uma especificação simples
               specs.push({
+                id: uuidv4(),
                 name: text,
                 value: ''
               });
@@ -101,12 +105,14 @@ export const processSpecificationsFromList = (element: Element, blocks: Block[])
           const colonMatch = line.match(/^(.*?):\s*(.*)/);
           if (colonMatch && colonMatch[1] && colonMatch[2]) {
             specs.push({
+              id: uuidv4(),
               name: colonMatch[1].trim(),
               value: colonMatch[2].trim()
             });
           } else {
             // Sem dois pontos, tratamos como uma especificação simples
             specs.push({
+              id: uuidv4(),
               name: line,
               value: ''
             });
@@ -128,6 +134,7 @@ export const processSpecificationsFromList = (element: Element, blocks: Block[])
       columns: 'full',
       style: {},
       specs: specs.map(spec => ({
+        id: spec.id,
         name: spec.name.replace(/^check\s*/, ''), // Remove qualquer "check" restante
         value: spec.value
       }))
