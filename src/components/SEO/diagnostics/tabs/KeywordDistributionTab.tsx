@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -9,35 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Info, AlertTriangle } from 'lucide-react';
 import { useEditorStore } from '@/store/editor';
+import { extractTextFromHtml } from '@/components/SEO/utils/htmlUtils';
 
 interface KeywordDistributionTabProps {
   description?: ProductDescription;
 }
-
-// Helper function to extract text from HTML
-const extractTextFromHtml = (html: string): string => {
-  if (!html) return '';
-  
-  // Remove script tags and their contents
-  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
-  
-  // Remove style tags and their contents
-  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
-  
-  // Replace all other HTML tags with space
-  text = text.replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-  
-  // Normalize whitespace
-  text = text.replace(/\s+/g, ' ').trim();
-  
-  return text;
-};
 
 export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ description: propDescription }) => {
   const [keywordMode, setKeywordMode] = useState<'density' | 'position' | 'distribution'>('density');
@@ -53,15 +28,11 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
     
     console.log('Starting keyword analysis for description:', activeDescription.name);
     
-    // Extract product title for HTML generation
-    const productTitle = activeDescription?.name?.startsWith('Descrição:') 
-      ? activeDescription.name.substring(10).trim()
-      : undefined;
-    
     // IMPORTANT: Get the HTML output that will be sent to Nuvemshop
-    const htmlOutput = getHtmlOutput(productTitle);
+    // Fix: removed parameter that was causing the build error
+    const htmlOutput = getHtmlOutput();
     
-    // Extract text content from the HTML
+    // Extract text content from the HTML using the utility function
     const content = extractTextFromHtml(htmlOutput);
     console.log('Extracted text content from HTML (first 100 chars):', content.substring(0, 100) + '...');
     console.log('Text content length:', content.length);
@@ -144,7 +115,6 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
     };
   }, [activeDescription, getHtmlOutput]);
   
-  // Calculate optimal density thresholds
   const minDensity = 0.5;
   const optimalDensity = 1.5;
   const maxDensity = 2.5;

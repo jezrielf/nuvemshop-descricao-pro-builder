@@ -3,33 +3,8 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ProductDescription } from '@/types/editor';
 import { SEOResult } from '../types';
-import { getTextContentFromDescription } from '../../utils/contentUtils';
+import { extractTextFromHtml } from '@/components/SEO/utils/htmlUtils';
 import { useEditorStore } from '@/store/editor';
-
-// Helper function to extract text from HTML (same as in KeywordDistributionTab)
-const extractTextFromHtml = (html: string): string => {
-  if (!html) return '';
-  
-  // Remove script tags and their contents
-  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
-  
-  // Remove style tags and their contents
-  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
-  
-  // Replace all other HTML tags with space
-  text = text.replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-  
-  // Normalize whitespace
-  text = text.replace(/\s+/g, ' ').trim();
-  
-  return text;
-};
 
 export const useSEOAnalysis = (description: ProductDescription | null) => {
   const [keyword, setKeyword] = useState('');
@@ -69,8 +44,8 @@ export const useSEOAnalysis = (description: ProductDescription | null) => {
           ? description.name.substring(10).trim()
           : undefined;
         
-        // Generate HTML output that will be sent to Nuvemshop
-        const htmlOutput = getHtmlOutput(productTitle);
+        // Generate HTML output that will be sent to Nuvemshop - fix: remove parameter if function doesn't accept it
+        const htmlOutput = getHtmlOutput();
         
         // Extract text content from the HTML
         const textContent = extractTextFromHtml(htmlOutput);
