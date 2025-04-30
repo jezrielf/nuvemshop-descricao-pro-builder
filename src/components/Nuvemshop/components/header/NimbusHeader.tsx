@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { NimbusToggle } from '../NimbusToggle';
 import { useNuvemshopAuth } from '../../hooks/useNuvemshopAuth';
 import { NimbusBadge } from '../../NimbusProvider';
 import { CheckCircle2 } from 'lucide-react';
@@ -24,9 +23,6 @@ export const NimbusHeader: React.FC<NimbusHeaderProps> = ({
           {storeName}
         </NimbusBadge>
       )}
-      <div className="ml-auto">
-        <NimbusToggle />
-      </div>
     </div>
   );
 };

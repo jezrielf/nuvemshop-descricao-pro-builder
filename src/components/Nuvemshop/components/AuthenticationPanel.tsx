@@ -12,7 +12,6 @@ interface AuthenticationPanelProps {
   handleTestCode: () => void;
   authenticating: boolean;
   copyToClipboard: (text: string) => void;
-  useNimbusUI?: boolean;
 }
 
 export const AuthenticationPanel: React.FC<AuthenticationPanelProps> = (props) => {
@@ -22,7 +21,6 @@ export const AuthenticationPanel: React.FC<AuthenticationPanelProps> = (props) =
         redirectUrl={props.redirectUrl}
         setRedirectUrl={props.setRedirectUrl}
         extractCodeFromUrl={props.extractCodeFromUrl}
-        useNimbusUI={props.useNimbusUI}
       />
       
       <CodeTestSection 
@@ -31,7 +29,6 @@ export const AuthenticationPanel: React.FC<AuthenticationPanelProps> = (props) =
         handleTestCode={props.handleTestCode}
         authenticating={props.authenticating}
         copyToClipboard={props.copyToClipboard}
-        useNimbusUI={props.useNimbusUI}
       />
     </div>
   );

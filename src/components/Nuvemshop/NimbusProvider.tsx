@@ -1,34 +1,27 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 
 interface NimbusContextType {
+  // Mantemos a interface por compatibilidade, mas sempre retornamos true
   useNimbusUI: boolean;
   toggleNimbusUI: () => void;
 }
 
 const NimbusContext = createContext<NimbusContextType>({
-  useNimbusUI: false,
+  useNimbusUI: true,
   toggleNimbusUI: () => {}
 });
 
 export const useNimbusUI = () => useContext(NimbusContext);
 
 export const NimbusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Initialize state from localStorage or default to false
-  const [useNimbusUI, setUseNimbusUI] = useState(() => {
-    const savedPreference = localStorage.getItem('nimbus_ui_enabled');
-    return savedPreference === 'true';
-  });
+  // O Nimbus UI está sempre ativo, não precisa de estado
+  const useNimbusUI = true;
 
+  // Função mantida por compatibilidade, mas não faz nada
   const toggleNimbusUI = () => {
-    setUseNimbusUI(prev => !prev);
+    console.log('Nimbus UI está sempre ativo e não pode ser desativado.');
   };
-
-  // Save preference whenever it changes
-  useEffect(() => {
-    localStorage.setItem('nimbus_ui_enabled', useNimbusUI.toString());
-    console.log('Nimbus UI:', useNimbusUI ? 'ativado' : 'desativado');
-  }, [useNimbusUI]);
 
   return (
     <NimbusContext.Provider value={{ useNimbusUI, toggleNimbusUI }}>

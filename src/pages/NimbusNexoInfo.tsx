@@ -4,16 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ExternalLink, Palette } from 'lucide-react';
-import { NimbusToggle } from '@/components/Nuvemshop/components/NimbusToggle';
 import { NimbusHeader } from '@/components/Nuvemshop/components/header/NimbusHeader';
 import { NimbusButton } from '@/components/Nuvemshop/NimbusProvider';
-import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusNexoDocumentation } from '@/components/Nuvemshop/components/NimbusNexoDocumentation';
 import { logEmbeddedEnvironmentInfo, isEmbeddedInNuvemshop } from '@/components/Nuvemshop/utils/embedUtils';
 
 const NimbusNexoInfo: React.FC = () => {
   const navigate = useNavigate();
-  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   const isEmbedded = isEmbeddedInNuvemshop();
   
   React.useEffect(() => {
@@ -57,32 +54,17 @@ const NimbusNexoInfo: React.FC = () => {
                   sua aplicação tenha a aparência nativa do ecossistema Nuvemshop.
                 </p>
                 
-                <div className="flex items-center space-x-4">
-                  <p className="font-semibold">Ativar interface Nimbus:</p>
-                  <NimbusToggle />
-                </div>
-                
                 <p className="text-sm text-gray-600">
-                  As preferências de interface são salvas automaticamente no navegador
-                  do usuário para persistência entre sessões.
+                  O Nimbus UI está ativado para uma experiência integrada com o ecossistema Nuvemshop.
                 </p>
                 
                 <div className="mt-4 flex space-x-4">
-                  {isNimbusUIActive ? (
-                    <NimbusButton 
-                      variant="secondary" 
-                      onClick={() => navigate('/nuvemshop-connect')}
-                    >
-                      Conectar Nuvemshop
-                    </NimbusButton>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate('/nuvemshop-connect')}
-                    >
-                      Conectar Nuvemshop
-                    </Button>
-                  )}
+                  <NimbusButton 
+                    variant="secondary" 
+                    onClick={() => navigate('/nuvemshop-connect')}
+                  >
+                    Conectar Nuvemshop
+                  </NimbusButton>
                 </div>
               </CardContent>
             </Card>
@@ -102,36 +84,18 @@ const NimbusNexoInfo: React.FC = () => {
                 </p>
                 
                 <div className="mt-4 flex space-x-4">
-                  {isNimbusUIActive ? (
-                    <>
-                      <NimbusButton 
-                        variant="primary" 
-                        onClick={() => navigate('/nexo-admin')}
-                      >
-                        Abrir Admin Nexo
-                      </NimbusButton>
-                      <NimbusButton 
-                        variant="secondary" 
-                        onClick={() => window.open('https://dev.nuvemshop.com.br/docs/developer-tools/nexo', '_blank')}
-                      >
-                        Documentação <ExternalLink className="h-4 w-4 ml-1" />
-                      </NimbusButton>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        onClick={() => navigate('/nexo-admin')}
-                      >
-                        Abrir Admin Nexo
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => window.open('https://dev.nuvemshop.com.br/docs/developer-tools/nexo', '_blank')}
-                      >
-                        Documentação <ExternalLink className="h-4 w-4 ml-1" />
-                      </Button>
-                    </>
-                  )}
+                  <NimbusButton 
+                    variant="primary" 
+                    onClick={() => navigate('/nexo-admin')}
+                  >
+                    Abrir Admin Nexo
+                  </NimbusButton>
+                  <NimbusButton 
+                    variant="secondary" 
+                    onClick={() => window.open('https://dev.nuvemshop.com.br/docs/developer-tools/nexo', '_blank')}
+                  >
+                    Documentação <ExternalLink className="h-4 w-4 ml-1" />
+                  </NimbusButton>
                 </div>
               </CardContent>
             </Card>
@@ -151,20 +115,12 @@ const NimbusNexoInfo: React.FC = () => {
                   </p>
                   
                   <div className="mt-4">
-                    {isNimbusUIActive ? (
-                      <NimbusButton 
-                        variant="primary" 
-                        onClick={() => navigate('/nexo-admin')}
-                      >
-                        Acessar Funcionalidades do App
-                      </NimbusButton>
-                    ) : (
-                      <Button
-                        onClick={() => navigate('/nexo-admin')}
-                      >
-                        Acessar Funcionalidades do App
-                      </Button>
-                    )}
+                    <NimbusButton 
+                      variant="primary" 
+                      onClick={() => navigate('/nexo-admin')}
+                    >
+                      Acessar Funcionalidades do App
+                    </NimbusButton>
                   </div>
                 </CardContent>
               </Card>

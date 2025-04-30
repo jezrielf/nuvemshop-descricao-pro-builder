@@ -13,7 +13,6 @@ import NexoAdmin from './pages/NexoAdmin';
 import NimbusNexoInfo from './pages/NimbusNexoInfo';
 import Success from './pages/Success';
 import Landing from './pages/Landing';
-import NimbusDemo from './pages/NimbusDemo';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NimbusProvider } from './components/Nuvemshop/NimbusProvider';
@@ -75,7 +74,6 @@ const App: React.FC = () => {
                   <Route path="/nexo-admin" element={<NexoAdmin />} />
                   <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} />
                   <Route path="/success" element={<Success />} />
-                  <Route path="/nimbus" element={<NimbusDemo />} />
                 </Routes>
               </NexoProvider>
             </NimbusProvider>

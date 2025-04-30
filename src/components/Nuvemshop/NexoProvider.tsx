@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNuvemshopAuth } from './hooks/useNuvemshopAuth';
-import { useNimbusUI } from './NimbusProvider';
 import { useToast } from '@/hooks/use-toast';
 import { 
   isEmbeddedInNuvemshop, 
@@ -48,7 +47,6 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [embeddedStoreId, setEmbeddedStoreId] = useState<string | null>(null);
   
   const { accessToken, userId } = useNuvemshopAuth();
-  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   const { toast } = useToast();
   
   const MAX_RETRIES = 3;
@@ -138,11 +136,12 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsInitializing(true);
       
-      // Initialize Nexo with OAuth authentication information and theme preference
+      // Initialize Nexo with OAuth authentication information
+      // Sempre usando o tema 'nimbus'
       window.Nexo.init({
         token: accessToken,
         storeId: userId,
-        theme: isNimbusUIActive ? 'nimbus' : 'default'
+        theme: 'nimbus'
       });
       
       console.log('Nexo initialized with OAuth credentials');
@@ -173,11 +172,11 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsInitializing(true);
       
       // Initialize Nexo with session token for embedded mode
-      // According to Nuvemshop docs: https://dev.nuvemshop.com.br/docs/developer-tools/nexo#obter-o-token-de-sessão
+      // Sempre usando o tema 'nimbus'
       window.Nexo.init({
         sessionToken: sessionToken,
-        storeId: embeddedStoreId || userId, // Use embedded store ID if available, otherwise fall back to OAuth ID
-        theme: isNimbusUIActive ? 'nimbus' : 'default'
+        storeId: embeddedStoreId || userId,
+        theme: 'nimbus'
       });
       
       console.log('Nexo initialized with session token in embedded mode');
@@ -232,7 +231,7 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         initializeNexoWithOAuth();
       }
     }
-  }, [accessToken, userId, isNimbusUIActive, isNexoLoaded, isEmbedded, sessionToken]);
+  }, [accessToken, userId, isNexoLoaded, isEmbedded, sessionToken]);
 
   return (
     <NexoContext.Provider value={{ 

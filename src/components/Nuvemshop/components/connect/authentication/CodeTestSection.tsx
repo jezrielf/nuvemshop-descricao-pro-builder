@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Clipboard, RefreshCw } from 'lucide-react';
 import { NimbusButton } from '../../../NimbusProvider';
 
@@ -11,7 +10,6 @@ interface CodeTestSectionProps {
   handleTestCode: () => void;
   authenticating: boolean;
   copyToClipboard: (text: string) => void;
-  useNimbusUI?: boolean;
 }
 
 export const CodeTestSection: React.FC<CodeTestSectionProps> = ({
@@ -19,8 +17,7 @@ export const CodeTestSection: React.FC<CodeTestSectionProps> = ({
   setTestCode,
   handleTestCode,
   authenticating,
-  copyToClipboard,
-  useNimbusUI
+  copyToClipboard
 }) => {
   return (
     <div className="space-y-2">
@@ -33,56 +30,29 @@ export const CodeTestSection: React.FC<CodeTestSectionProps> = ({
           className="flex-1"
         />
         
-        {useNimbusUI ? (
-          <>
-            <NimbusButton
-              variant="text"
-              size="small"
-              onClick={() => copyToClipboard(testCode)}
-              disabled={!testCode}
-              className="sm:w-auto w-full"
-            >
-              <Clipboard className="h-4 w-4 mr-1" />
-              Copiar
-            </NimbusButton>
-            
-            <NimbusButton
-              variant="primary"
-              size="small"
-              onClick={handleTestCode}
-              disabled={!testCode || authenticating}
-              className="sm:w-auto w-full"
-            >
-              {authenticating ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : null}
-              {authenticating ? 'Autenticando...' : 'Testar código'}
-            </NimbusButton>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="outline" 
-              size="icon"
-              onClick={() => copyToClipboard(testCode)}
-              disabled={!testCode}
-              className="aspect-square h-10"
-            >
-              <Clipboard className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              onClick={handleTestCode}
-              disabled={!testCode || authenticating}
-              className="sm:w-auto w-full"
-            >
-              {authenticating ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : null}
-              {authenticating ? 'Autenticando...' : 'Testar código'}
-            </Button>
-          </>
-        )}
+        <NimbusButton
+          variant="text"
+          size="small"
+          onClick={() => copyToClipboard(testCode)}
+          disabled={!testCode}
+          className="sm:w-auto w-full"
+        >
+          <Clipboard className="h-4 w-4 mr-1" />
+          Copiar
+        </NimbusButton>
+        
+        <NimbusButton
+          variant="primary"
+          size="small"
+          onClick={handleTestCode}
+          disabled={!testCode || authenticating}
+          className="sm:w-auto w-full"
+        >
+          {authenticating ? (
+            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+          ) : null}
+          {authenticating ? 'Autenticando...' : 'Testar código'}
+        </NimbusButton>
       </div>
     </div>
   );

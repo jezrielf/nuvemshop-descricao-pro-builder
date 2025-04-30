@@ -112,10 +112,10 @@
   @apply p-4 border rounded-md;
 }
 
-.nimbus-ui-active .table-header {
-  @apply bg-blue-50;
+.nimbus-table {
+  @apply border border-blue-100;
 }
 
-.nimbus-ui-active .nimbus-table {
-  @apply border border-blue-100;
+.table-header {
+  @apply bg-blue-50;
 }
