@@ -46,14 +46,14 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
       </PopoverTrigger>
       <PopoverContent 
         align="end" 
-        className="w-72 p-0" // Remove padding here to add it in ScrollArea
+        className="w-72 p-0" 
         sideOffset={5}
       >
         <ScrollArea className="max-h-[80vh]">
           <div className="p-3 space-y-2">
             <h4 className="text-[11px] font-medium">Otimização de SEO</h4>
             <div className="grid gap-1.5">
-              <SEOToolButton onClick={() => {}} label="Ferramentas SEO">
+              <SEOToolButton onClick={() => {}} label="Analisador SEO">
                 <SEOAnalyzer description={description} />
               </SEOToolButton>
               
@@ -61,11 +61,11 @@ export const SEOToolsMenu: React.FC<SEOToolsMenuProps> = ({
                 <SEOChecklist description={description} />
               </SEOToolButton>
               
-              <SEOToolButton onClick={() => {}} label="Meta Tags">
+              <SEOToolButton onClick={() => {}} label="Validador de Meta Tags">
                 <MetaTagValidator description={description} />
               </SEOToolButton>
               
-              <SEOToolButton onClick={() => {}} label="Otimizar Imagens">
+              <SEOToolButton onClick={() => {}} label="Otimizador de Imagens">
                 <ImageOptimizer 
                   description={description} 
                   onUpdateImage={handleUpdateImage}

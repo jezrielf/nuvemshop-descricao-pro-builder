@@ -33,7 +33,7 @@ const SEOAnalyzer: React.FC<SEOAnalyzerProps> = ({ description }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <span className="w-full">Ferramentas SEO</span>
+        <span className="w-full">Analisador SEO</span>
       </DialogTrigger>
       <DialogContent className="max-w-xl max-h-[85vh] flex flex-col overflow-hidden p-0">
         <AnalyzerDialogHeader />

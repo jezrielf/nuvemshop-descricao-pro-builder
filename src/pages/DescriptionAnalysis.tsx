@@ -9,10 +9,11 @@ import { ArrowLeft } from 'lucide-react';
 import SEODashboard from '@/components/admin/seo/SEODashboard';
 import ProductPerformance from '@/components/admin/seo/ProductPerformance';
 import SEOTechnicalDiagnostic from '@/components/SEO/diagnostics/SEOTechnicalDiagnostic';
+import { SEOToolsMenu } from '@/components/SEO/menu/SEOToolsMenu';
 import { ProductDescription } from '@/types/editor';
 
 const DescriptionAnalysis: React.FC = () => {
-  const { description } = useEditorStore();
+  const { description, updateBlock } = useEditorStore();
   const navigate = useNavigate();
 
   // Filter to only include visible blocks for preview analysis
@@ -29,17 +30,29 @@ const DescriptionAnalysis: React.FC = () => {
     navigate('/');
   };
 
+  // Handle update image for the SEO tools
+  const handleUpdateImage = (blockId: string, imageType: string, newImageUrl: string) => {
+    if (!description) return;
+    
+    updateBlock(blockId, {
+      [imageType]: newImageUrl
+    });
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center gap-2 mb-6">
-        <Button variant="outline" size="sm" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Voltar ao Editor
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">Análise de Descrição</h1>
-          <p className="text-muted-foreground">Visualize métricas detalhadas e análise SEO da sua descrição</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao Editor
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Análise de Descrição</h1>
+            <p className="text-muted-foreground">Visualize métricas detalhadas e análise SEO da sua descrição</p>
+          </div>
         </div>
+        <SEOToolsMenu description={visibleDescription || null} onUpdateImage={handleUpdateImage} />
       </div>
 
       <Tabs defaultValue="diagnostic" className="space-y-4">
