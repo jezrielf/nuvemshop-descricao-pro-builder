@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -17,7 +16,6 @@ import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth'
 import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
 import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { NimbusToggle } from '@/components/Nuvemshop/components/NimbusToggle';
 import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusBadge, NimbusButton, NimbusAlert } from '@/components/Nuvemshop/NimbusProvider';
 import { Link } from 'react-router-dom';
@@ -159,7 +157,6 @@ const Index = () => {
           <div className="flex-1">
             <ProductSearch onProductSelect={setSelectedProduct} />
           </div>
-          <NimbusToggle className="ml-4" />
         </div>
         
         {storeConnected ? (

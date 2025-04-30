@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NimbusContextType {
   useNimbusUI: boolean;
@@ -14,12 +14,21 @@ const NimbusContext = createContext<NimbusContextType>({
 export const useNimbusUI = () => useContext(NimbusContext);
 
 export const NimbusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [useNimbusUI, setUseNimbusUI] = useState(false);
+  // Initialize state from localStorage or default to false
+  const [useNimbusUI, setUseNimbusUI] = useState(() => {
+    const savedPreference = localStorage.getItem('nimbus_ui_enabled');
+    return savedPreference === 'true';
+  });
 
   const toggleNimbusUI = () => {
     setUseNimbusUI(prev => !prev);
-    console.log('Nimbus UI:', !useNimbusUI ? 'ativado' : 'desativado');
   };
+
+  // Save preference whenever it changes
+  useEffect(() => {
+    localStorage.setItem('nimbus_ui_enabled', useNimbusUI.toString());
+    console.log('Nimbus UI:', useNimbusUI ? 'ativado' : 'desativado');
+  }, [useNimbusUI]);
 
   return (
     <NimbusContext.Provider value={{ useNimbusUI, toggleNimbusUI }}>
