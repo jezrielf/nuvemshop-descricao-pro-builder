@@ -21,7 +21,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const [hasCustomBlocks, setHasCustomBlocks] = useState(false);
   const { accessToken, userId } = useNuvemshopAuth();
   const { description } = useEditorStore();
-  const { useNimbusUI } = useNimbusUI();
+  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   
   const {
     isImporting,
@@ -59,7 +59,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   };
 
   // Add Nimbus UI styling based on toggle
-  const bgClass = useNimbusUI 
+  const bgClass = isNimbusUIActive 
     ? 'bg-blue-50 border-b border-blue-100' 
     : 'bg-green-50 border-b border-green-100';
 
@@ -69,7 +69,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
         productName={productName}
         hasCustomBlocks={hasCustomBlocks}
         conversionError={conversionError}
-        useNimbusUI={useNimbusUI}
+        useNimbusUI={isNimbusUIActive}
       />
       
       <ProductActionButtons
@@ -79,7 +79,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
         hasDescription={!!description}
         onRefresh={handleRefreshDescription}
         onSave={handleSave}
-        useNimbusUI={useNimbusUI}
+        useNimbusUI={isNimbusUIActive}
       />
     </div>
   );

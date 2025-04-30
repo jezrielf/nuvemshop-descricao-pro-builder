@@ -38,7 +38,7 @@ const Index = () => {
     handleTestCode
   } = useNuvemshopAuth();
   
-  const { useNimbusUI } = useNimbusUI();
+  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   
   useEffect(() => {
     // Verificar se há um código de autorização na URL
@@ -135,7 +135,7 @@ const Index = () => {
       <Header />
       
       {hasDbError && (
-        useNimbusUI ? (
+        isNimbusUIActive ? (
           <NimbusAlert variant="warning" className="mx-4 mt-2">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
             Detectado erro de recursão infinita na tabela "user_roles". Algumas funcionalidades estarão limitadas.
@@ -162,7 +162,7 @@ const Index = () => {
         
         {storeConnected ? (
           <div className="flex items-center gap-4">
-            {useNimbusUI ? (
+            {isNimbusUIActive ? (
               <>
                 <NimbusBadge variant="success" className="bg-green-100">
                   <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -193,7 +193,7 @@ const Index = () => {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            {useNimbusUI ? (
+            {isNimbusUIActive ? (
               <NimbusButton 
                 variant="secondary" 
                 size="small" 

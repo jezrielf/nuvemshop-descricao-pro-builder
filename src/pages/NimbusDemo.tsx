@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 
 const NimbusDemo: React.FC = () => {
-  const { useNimbusUI } = useNimbusUI();
+  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
 
   return (
     <div className="container mx-auto p-6">
@@ -21,7 +21,7 @@ const NimbusDemo: React.FC = () => {
         <section className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Botões</h2>
           <div className="flex flex-wrap gap-4">
-            {useNimbusUI ? (
+            {isNimbusUIActive ? (
               <>
                 <NimbusButton variant="primary">Botão Primário</NimbusButton>
                 <NimbusButton variant="secondary">Botão Secundário</NimbusButton>
@@ -44,7 +44,7 @@ const NimbusDemo: React.FC = () => {
         <section className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Badges</h2>
           <div className="flex flex-wrap gap-4">
-            {useNimbusUI ? (
+            {isNimbusUIActive ? (
               <>
                 <NimbusBadge variant="default">Badge Padrão</NimbusBadge>
                 <NimbusBadge variant="success">Sucesso</NimbusBadge>
@@ -67,7 +67,7 @@ const NimbusDemo: React.FC = () => {
         <section className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Alertas</h2>
           <div className="space-y-4">
-            {useNimbusUI ? (
+            {isNimbusUIActive ? (
               <>
                 <NimbusAlert variant="default" title="Alerta Padrão">
                   Este é um alerta padrão do Nimbus Design System.

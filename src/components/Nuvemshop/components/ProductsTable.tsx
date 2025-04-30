@@ -41,7 +41,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
 }) => {
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [editedDescription, setEditedDescription] = useState<string>("");
-  const { useNimbusUI } = useNimbusUI();
+  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   
   // Helper to safely display product name
   const renderProductName = (name: string | { pt?: string; [key: string]: string | undefined }) => {
@@ -83,8 +83,8 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
   };
 
   // Apply Nimbus styling based on the toggle
-  const tableClass = useNimbusUI ? "border border-gray-200 rounded-md overflow-hidden" : "";
-  const headingClass = useNimbusUI ? "bg-blue-50 text-blue-800" : "";
+  const tableClass = isNimbusUIActive ? "border border-gray-200 rounded-md overflow-hidden" : "";
+  const headingClass = isNimbusUIActive ? "bg-blue-50 text-blue-800" : "";
 
   return (
     <div>
@@ -114,7 +114,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
               ))
             ) : (
               products.map((product) => (
-                <TableRow key={product.id} className={useNimbusUI ? "hover:bg-blue-50" : ""}>
+                <TableRow key={product.id} className={isNimbusUIActive ? "hover:bg-blue-50" : ""}>
                   <TableCell>{product.id}</TableCell>
                   <TableCell>{renderProductName(product.name)}</TableCell>
                   <TableCell>{product.sku || 'N/A'}</TableCell>
@@ -126,7 +126,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                       <Textarea 
                         value={editedDescription}
                         onChange={(e) => setEditedDescription(e.target.value)}
-                        className={`min-h-[80px] ${useNimbusUI ? 'border-blue-200 focus:border-blue-400' : ''}`}
+                        className={`min-h-[80px] ${isNimbusUIActive ? 'border-blue-200 focus:border-blue-400' : ''}`}
                         placeholder="Digite a descrição do produto"
                       />
                     ) : (
@@ -138,7 +138,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                   <TableCell className="text-right">
                     {editingProductId === product.id ? (
                       <div className="flex justify-end space-x-2">
-                        {useNimbusUI ? (
+                        {isNimbusUIActive ? (
                           <>
                             <NimbusButton 
                               variant="secondary" 
@@ -180,7 +180,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                       </div>
                     ) : (
                       <>
-                        {useNimbusUI ? (
+                        {isNimbusUIActive ? (
                           <NimbusButton 
                             variant="text" 
                             size="small" 
@@ -209,7 +209,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
       
       {products.length > 0 && (
         <div className="flex items-center justify-between mt-4">
-          {useNimbusUI ? (
+          {isNimbusUIActive ? (
             <>
               <NimbusButton 
                 variant="secondary" 

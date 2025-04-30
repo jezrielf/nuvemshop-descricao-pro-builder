@@ -19,7 +19,7 @@ const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({ product }
   const { description } = useEditorStore();
   const { accessToken, userId } = useNuvemshopAuth();
   const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
-  const { useNimbusUI } = useNimbusUI();
+  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   
   // Extract product name for display purposes
   const productName = product.name && typeof product.name === 'object' && product.name.pt 
@@ -39,7 +39,7 @@ const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({ product }
     await handleSaveToNuvemshop(product);
   };
   
-  if (useNimbusUI) {
+  if (isNimbusUIActive) {
     return (
       <NimbusButton 
         variant="secondary" 

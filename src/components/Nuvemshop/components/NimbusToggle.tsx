@@ -8,20 +8,20 @@ interface NimbusToggleProps {
 }
 
 export const NimbusToggle: React.FC<NimbusToggleProps> = ({ className = '' }) => {
-  const { useNimbusUI, toggleNimbusUI } = useNimbusUI();
+  const { useNimbusUI: isNimbusUIActive, toggleNimbusUI } = useNimbusUI();
   
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <Switch 
         id="nimbus-ui-toggle"
-        checked={useNimbusUI} 
+        checked={isNimbusUIActive} 
         onCheckedChange={toggleNimbusUI} 
       />
       <label 
         htmlFor="nimbus-ui-toggle" 
         className="text-xs font-medium cursor-pointer"
       >
-        {useNimbusUI ? 'Nimbus UI Ativo' : 'Nimbus UI'}
+        {isNimbusUIActive ? 'Nimbus UI Ativo' : 'Nimbus UI'}
       </label>
     </div>
   );
