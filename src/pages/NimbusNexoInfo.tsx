@@ -1,169 +1,187 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
-import { NimbusButton } from '@/components/Nuvemshop/NimbusProvider';
-import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { NuvemshopNimbus, ArrowLeft, ExternalLink } from 'lucide-react';
 import { NimbusToggle } from '@/components/Nuvemshop/components/NimbusToggle';
+import { NimbusHeader } from '@/components/Nuvemshop/components/header/NimbusHeader';
+import { NimbusButton } from '@/components/Nuvemshop/NimbusProvider';
+import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusNexoDocumentation } from '@/components/Nuvemshop/components/NimbusNexoDocumentation';
-import { ArrowLeft, Globe, Home } from 'lucide-react';
+import { logEmbeddedEnvironmentInfo, isEmbeddedInNuvemshop } from '@/components/Nuvemshop/utils/embedUtils';
 
 const NimbusNexoInfo: React.FC = () => {
+  const navigate = useNavigate();
   const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
-  const { success: storeConnected } = useNuvemshopAuth();
+  const isEmbedded = isEmbeddedInNuvemshop();
+  
+  React.useEffect(() => {
+    // Log embedded environment information on component mount
+    if (isEmbedded) {
+      logEmbeddedEnvironmentInfo();
+    }
+  }, []);
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b shadow-sm p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <Home className="h-5 w-5 mr-2" />
-              <h1 className="text-xl font-bold">Descrição Pro</h1>
-            </Link>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <NimbusToggle />
-            
-            {isNimbusUIActive ? (
-              <NimbusButton 
-                variant="secondary" 
-                size="small" 
-                onClick={() => window.history.back()}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </NimbusButton>
-            ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => window.history.back()}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <NimbusHeader showStoreName />
       
-      <main className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6 flex items-center">
-            <Globe className="h-6 w-6 mr-2 text-blue-600" />
-            Documentação da Integração Nuvemshop
-          </h1>
-          
-          <div className="space-y-8">
-            {/* Main documentation component */}
-            <NimbusNexoDocumentation />
-            
-            {/* Additional info sections */}
-            <section className="bg-white p-6 rounded-lg shadow-sm border">
-              <h2 className="text-xl font-semibold mb-4">Visão Geral da Integração</h2>
-              <p className="text-gray-700 mb-4">
-                A integração com a Nuvemshop oferece dois componentes principais:
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="border rounded-lg p-4 bg-blue-50">
-                  <h3 className="font-medium text-lg mb-2">Nimbus UI</h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Sistema de design consistente com a interface da Nuvemshop, permitindo uma 
-                    experiência visual integrada entre seu aplicativo e a plataforma Nuvemshop.
-                  </p>
-                  <div className="flex justify-end">
-                    <NimbusToggle showIcon={false} />
-                  </div>
+      <div className="container mx-auto px-4 py-8 flex-1">
+        <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <NuvemshopNimbus className="mr-2 h-6 w-6" />
+                  Design System Nimbus
+                </CardTitle>
+                <CardDescription>
+                  Integração e compatibilidade com o design system da Nuvemshop
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p>
+                  O Nimbus é o sistema de design da Nuvemshop, permitindo que
+                  sua aplicação tenha a aparência nativa do ecossistema Nuvemshop.
+                </p>
+                
+                <div className="flex items-center space-x-4">
+                  <p className="font-semibold">Ativar interface Nimbus:</p>
+                  <NimbusToggle />
                 </div>
                 
-                <div className="border rounded-lg p-4 bg-green-50">
-                  <h3 className="font-medium text-lg mb-2">Nexo Admin</h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Interface administrativa completa da Nuvemshop integrada ao seu aplicativo,
-                    permitindo gerenciar produtos, pedidos e configurações sem sair do aplicativo.
+                <p className="text-sm text-gray-600">
+                  As preferências de interface são salvas automaticamente no navegador
+                  do usuário para persistência entre sessões.
+                </p>
+                
+                <div className="mt-4 flex space-x-4">
+                  {isNimbusUIActive ? (
+                    <NimbusButton 
+                      variant="secondary" 
+                      onClick={() => navigate('/nuvemshop-connect')}
+                    >
+                      Conectar Nuvemshop
+                    </NimbusButton>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate('/nuvemshop-connect')}
+                    >
+                      Conectar Nuvemshop
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Nexo SDK</CardTitle>
+                <CardDescription>
+                  Integração com o ambiente de administração da Nuvemshop
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p>
+                  O Nexo SDK permite que sua aplicação se integre perfeitamente ao
+                  ambiente de administração da Nuvemshop, oferecendo acesso a produtos,
+                  pedidos, clientes e configurações.
+                </p>
+                
+                <div className="mt-4 flex space-x-4">
+                  {isNimbusUIActive ? (
+                    <>
+                      <NimbusButton 
+                        variant="primary" 
+                        onClick={() => navigate('/nexo-admin')}
+                      >
+                        Abrir Admin Nexo
+                      </NimbusButton>
+                      <NimbusButton 
+                        variant="secondary" 
+                        as="a" 
+                        href="https://dev.nuvemshop.com.br/docs/developer-tools/nexo" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Documentação <ExternalLink className="h-4 w-4 ml-1" />
+                      </NimbusButton>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => navigate('/nexo-admin')}
+                      >
+                        Abrir Admin Nexo
+                      </Button>
+                      <Button
+                        variant="outline"
+                        as="a" 
+                        href="https://dev.nuvemshop.com.br/docs/developer-tools/nexo" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Documentação <ExternalLink className="h-4 w-4 ml-1" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {isEmbedded && (
+              <Card className="border-green-300 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="text-green-700">Modo Embarcado Detectado</CardTitle>
+                  <CardDescription>
+                    Este aplicativo está sendo executado dentro do admin da Nuvemshop
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-green-700">
+                    O aplicativo detectou que está sendo executado no ambiente embarcado da Nuvemshop.
+                    A autenticação via token de sessão será usada automaticamente.
                   </p>
-                  <div className="flex justify-end">
-                    {storeConnected ? (
-                      isNimbusUIActive ? (
-                        <Link to="/nexo-admin">
-                          <NimbusButton variant="secondary" size="small">
-                            Acessar Nexo Admin
-                          </NimbusButton>
-                        </Link>
-                      ) : (
-                        <Link to="/nexo-admin">
-                          <Button variant="outline" size="sm">
-                            Acessar Nexo Admin
-                          </Button>
-                        </Link>
-                      )
+                  
+                  <div className="mt-4">
+                    {isNimbusUIActive ? (
+                      <NimbusButton 
+                        variant="primary" 
+                        onClick={() => navigate('/nexo-admin')}
+                      >
+                        Acessar Funcionalidades do App
+                      </NimbusButton>
                     ) : (
-                      isNimbusUIActive ? (
-                        <Link to="/nuvemshop-connect">
-                          <NimbusButton variant="secondary" size="small">
-                            Conectar Loja
-                          </NimbusButton>
-                        </Link>
-                      ) : (
-                        <Link to="/nuvemshop-connect">
-                          <Button variant="outline" size="sm">
-                            Conectar Loja
-                          </Button>
-                        </Link>
-                      )
+                      <Button
+                        onClick={() => navigate('/nexo-admin')}
+                      >
+                        Acessar Funcionalidades do App
+                      </Button>
                     )}
                   </div>
-                </div>
-              </div>
-            </section>
-            
-            {/* Action buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/editor">
-                {isNimbusUIActive ? (
-                  <NimbusButton variant="primary" size="medium">
-                    Voltar ao Editor
-                  </NimbusButton>
-                ) : (
-                  <Button>
-                    Voltar ao Editor
-                  </Button>
-                )}
-              </Link>
-              
-              {storeConnected ? (
-                <Link to="/nexo-admin">
-                  {isNimbusUIActive ? (
-                    <NimbusButton variant="secondary" size="medium">
-                      Acessar Nexo Admin
-                    </NimbusButton>
-                  ) : (
-                    <Button variant="outline">
-                      Acessar Nexo Admin
-                    </Button>
-                  )}
-                </Link>
-              ) : (
-                <Link to="/nuvemshop-connect">
-                  {isNimbusUIActive ? (
-                    <NimbusButton variant="secondary" size="medium">
-                      Conectar Nuvemshop
-                    </NimbusButton>
-                  ) : (
-                    <Button variant="outline">
-                      Conectar Nuvemshop
-                    </Button>
-                  )}
-                </Link>
-              )}
-            </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+          
+          <div className="md:col-span-1">
+            <NimbusNexoDocumentation />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

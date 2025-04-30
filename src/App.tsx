@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import DescriptionAnalysis from './pages/DescriptionAnalysis';
@@ -18,11 +18,24 @@ import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NimbusProvider } from './components/Nuvemshop/NimbusProvider';
 import NexoProvider from './components/Nuvemshop/NexoProvider';
+import { isEmbeddedInNuvemshop } from './components/Nuvemshop/utils/embedUtils';
 
 // Create a client
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
+  const [isEmbedded, setIsEmbedded] = useState<boolean>(false);
+  
+  // Check if app is embedded on mount
+  useEffect(() => {
+    const embedded = isEmbeddedInNuvemshop();
+    setIsEmbedded(embedded);
+    
+    if (embedded) {
+      console.log('[App] Running in embedded Nuvemshop mode');
+    }
+  }, []);
+
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -31,7 +44,11 @@ const App: React.FC = () => {
             <NimbusProvider>
               <NexoProvider>
                 <Routes>
-                  <Route path="/" element={<Landing />} />
+                  {/* Redirect to NexoAdmin directly when embedded in Nuvemshop */}
+                  {isEmbedded && <Route path="/" element={<Navigate to="/nexo-admin" replace />} />}
+                  
+                  {/* Regular routes */}
+                  {!isEmbedded && <Route path="/" element={<Landing />} />}
                   <Route path="/editor" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/description-analysis" element={<DescriptionAnalysis />} />
