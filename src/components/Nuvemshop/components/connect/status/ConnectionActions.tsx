@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { RefreshCw, LogIn, LogOut } from 'lucide-react';
+import { NimbusButton } from '../../../NimbusProvider';
 
 interface ConnectionActionsProps {
   success: boolean;
@@ -11,6 +12,7 @@ interface ConnectionActionsProps {
   handleConnect: () => void;
   handleDisconnect: () => void;
   onFetchProducts: () => void;
+  useNimbusUI?: boolean;
 }
 
 export const ConnectionActions: React.FC<ConnectionActionsProps> = ({
@@ -20,30 +22,84 @@ export const ConnectionActions: React.FC<ConnectionActionsProps> = ({
   loadingProducts,
   handleConnect,
   handleDisconnect,
-  onFetchProducts
+  onFetchProducts,
+  useNimbusUI
 }) => {
+  if (useNimbusUI) {
+    return (
+      <div className="flex flex-wrap gap-2">
+        {!success ? (
+          <NimbusButton
+            variant="primary"
+            size="small"
+            onClick={handleConnect}
+            disabled={loading || authenticating}
+          >
+            {authenticating ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <LogIn className="h-4 w-4 mr-2" />
+            )}
+            Conectar Nuvemshop
+          </NimbusButton>
+        ) : (
+          <>
+            <NimbusButton
+              variant="primary"
+              size="small"
+              onClick={onFetchProducts}
+              disabled={loadingProducts}
+            >
+              {loadingProducts && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+              {loadingProducts ? 'Carregando produtos...' : 'Listar produtos'}
+            </NimbusButton>
+            
+            <NimbusButton
+              variant="danger"
+              size="small"
+              onClick={handleDisconnect}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Desconectar
+            </NimbusButton>
+          </>
+        )}
+      </div>
+    );
+  }
+  
   return (
-    <div className="pt-4">
+    <div className="flex flex-wrap gap-2">
       {!success ? (
-        <Button onClick={handleConnect} disabled={loading || authenticating}>
-          {(loading || authenticating) && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Button
+          onClick={handleConnect}
+          disabled={loading || authenticating}
+        >
+          {authenticating ? (
+            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <LogIn className="h-4 w-4 mr-2" />
           )}
-          Conectar Loja
+          Conectar Nuvemshop
         </Button>
       ) : (
-        <div className="flex space-x-4">
-          <Button variant="outline" onClick={handleDisconnect}>
-            Desconectar Loja
+        <>
+          <Button
+            onClick={onFetchProducts}
+            disabled={loadingProducts}
+          >
+            {loadingProducts && <RefreshCw className="h-4 w-4 mr-2 animate-spin" />}
+            {loadingProducts ? 'Carregando produtos...' : 'Listar produtos'}
           </Button>
-          <Button onClick={onFetchProducts} disabled={loadingProducts}>
-            {loadingProducts ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              'Carregar Produtos'
-            )}
+          
+          <Button
+            variant="destructive"
+            onClick={handleDisconnect}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Desconectar
           </Button>
-        </div>
+        </>
       )}
     </div>
   );

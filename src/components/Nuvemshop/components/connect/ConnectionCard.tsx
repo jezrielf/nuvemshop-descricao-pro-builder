@@ -2,8 +2,9 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AuthStatus } from '../AuthStatus';
-import { Button } from '@/components/ui/button';
 import { AuthenticationPanel } from '../AuthenticationPanel';
+import { useNimbusUI } from '../../NimbusProvider';
+import { NimbusAlert } from '../../NimbusProvider';
 
 interface ConnectionCardProps {
   success: boolean;
@@ -11,11 +12,11 @@ interface ConnectionCardProps {
   loading: boolean;
   authenticating: boolean;
   userId: string | null;
+  storeName?: string;
   handleConnect: () => void;
   handleDisconnect: () => void;
   onFetchProducts: () => void;
   loadingProducts: boolean;
-  storeName: string | null;
   testCode: string;
   setTestCode: (code: string) => void;
   redirectUrl: string;
@@ -26,88 +27,61 @@ interface ConnectionCardProps {
   handleClearCache: (e?: React.MouseEvent) => void;
 }
 
-export const ConnectionCard: React.FC<ConnectionCardProps> = ({
-  success,
-  error,
-  loading,
-  authenticating,
-  userId,
-  handleConnect,
-  handleDisconnect,
-  onFetchProducts,
-  loadingProducts,
-  storeName,
-  testCode,
-  setTestCode,
-  redirectUrl,
-  setRedirectUrl,
-  extractCodeFromUrl,
-  handleTestCode,
-  copyToClipboard,
-  handleClearCache
-}) => {
+export const ConnectionCard: React.FC<ConnectionCardProps> = (props) => {
+  const { useNimbusUI } = useNimbusUI();
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Status da Conexão</CardTitle>
+        <CardTitle>Conectar Nuvemshop</CardTitle>
         <CardDescription>
-          Conecte sua loja Nuvemshop para importar produtos
+          Configure a conexão com sua loja Nuvemshop
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <AuthStatus
-            success={success}
-            error={error}
-            loading={loading}
-            authenticating={authenticating}
-            userId={userId}
-            handleConnect={handleConnect}
-            handleDisconnect={handleDisconnect}
-            onFetchProducts={onFetchProducts}
-            loadingProducts={loadingProducts}
-            storeName={storeName}
-          />
-          
-          {!success && (
-            <div className="mt-2">
-              <Button 
-                variant="outline"
-                onClick={handleClearCache}
-                className="text-yellow-600 border-yellow-300 bg-yellow-50 hover:bg-yellow-100 mb-4"
-              >
-                Limpar Cache de Conexão
-              </Button>
-              
-              <div className="space-y-2">
-                <Button
-                  variant="default"
-                  onClick={handleConnect}
-                  className="bg-green-600 hover:bg-green-700 w-full"
-                >
-                  Conectar Loja Nuvemshop
-                </Button>
-                <p className="text-xs text-gray-500">
-                  Clique para conectar sua loja Nuvemshop automaticamente. Você será redirecionado para autorizar o acesso.
+      <CardContent className="space-y-6">
+        <AuthStatus
+          success={props.success}
+          error={props.error}
+          loading={props.loading}
+          authenticating={props.authenticating}
+          userId={props.userId}
+          storeName={props.storeName}
+          handleConnect={props.handleConnect}
+          handleDisconnect={props.handleDisconnect}
+          onFetchProducts={props.onFetchProducts}
+          loadingProducts={props.loadingProducts}
+          useNimbusUI={useNimbusUI}
+        />
+        
+        {!props.success && (
+          <>
+            <div className="border-t my-4"></div>
+            
+            {useNimbusUI ? (
+              <NimbusAlert variant="info">
+                Caso o botão "Conectar Nuvemshop" não funcione, você pode gerar um código manualmente seguindo os passos abaixo.
+              </NimbusAlert>
+            ) : (
+              <div className="bg-blue-50 p-4 rounded-md text-blue-700 text-sm">
+                <p>
+                  Caso o botão "Conectar Nuvemshop" não funcione, você pode gerar um código manualmente seguindo os passos abaixo.
                 </p>
               </div>
-              
-              <div className="mt-8 pt-4 border-t border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Modo avançado (se o automático falhar)</h3>
-                <AuthenticationPanel
-                  redirectUrl={redirectUrl}
-                  setRedirectUrl={setRedirectUrl}
-                  extractCodeFromUrl={extractCodeFromUrl}
-                  testCode={testCode}
-                  setTestCode={setTestCode}
-                  handleTestCode={handleTestCode}
-                  authenticating={authenticating}
-                  copyToClipboard={copyToClipboard}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+            )}
+            
+            <AuthenticationPanel
+              redirectUrl={props.redirectUrl}
+              setRedirectUrl={props.setRedirectUrl}
+              extractCodeFromUrl={props.extractCodeFromUrl}
+              testCode={props.testCode}
+              setTestCode={props.setTestCode}
+              handleTestCode={props.handleTestCode}
+              authenticating={props.authenticating}
+              copyToClipboard={props.copyToClipboard}
+              useNimbusUI={useNimbusUI}
+            />
+          </>
+        )}
       </CardContent>
     </Card>
   );

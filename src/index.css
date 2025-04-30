@@ -27,6 +27,16 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
+    
+    /* Nimbus UI colors */
+    --nimbus-primary: 213 94% 48%;
+    --nimbus-primary-hover: 214 95% 42%;
+    --nimbus-secondary: 0 0% 100%;
+    --nimbus-secondary-hover: 0 0% 95%;
+    --nimbus-danger: 0 72% 51%;
+    --nimbus-danger-hover: 0 72% 45%;
+    --nimbus-text: 0 0% 20%;
+    --nimbus-bg: 0 0% 98%;
   }
 
   .dark {
@@ -49,6 +59,16 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+    
+    /* Nimbus UI dark theme colors */
+    --nimbus-primary: 213 94% 58%;
+    --nimbus-primary-hover: 214 95% 52%;
+    --nimbus-secondary: 240 3.7% 18%;
+    --nimbus-secondary-hover: 240 3.7% 22%;
+    --nimbus-danger: 0 72% 61%;
+    --nimbus-danger-hover: 0 72% 55%;
+    --nimbus-text: 0 0% 95%;
+    --nimbus-bg: 240 10% 4%;
   }
 }
 
@@ -61,4 +81,41 @@
     font-family: 'Inter', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Nimbus Design System specific styles */
+.nimbus-ui {
+  font-family: 'Inter', sans-serif;
+}
+
+.nimbus-ui button.nimbus-btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.nimbus-ui button.nimbus-btn-secondary {
+  @apply bg-white border border-gray-300 hover:bg-gray-50 text-gray-700;
+}
+
+.nimbus-ui button.nimbus-btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white;
+}
+
+.nimbus-ui button.nimbus-btn-text {
+  @apply bg-transparent hover:bg-gray-100 text-blue-600;
+}
+
+.nimbus-ui .nimbus-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border;
+}
+
+.nimbus-ui .nimbus-alert {
+  @apply p-4 border rounded-md;
+}
+
+.nimbus-ui-active .table-header {
+  @apply bg-blue-50;
+}
+
+.nimbus-ui-active .nimbus-table {
+  @apply border border-blue-100;
 }

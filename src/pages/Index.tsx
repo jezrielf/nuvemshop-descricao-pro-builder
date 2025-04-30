@@ -16,6 +16,9 @@ import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth'
 import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
 import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { NimbusToggle } from '@/components/Nuvemshop/components/NimbusToggle';
+import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
+import { NimbusBadge, NimbusButton, NimbusAlert } from '@/components/Nuvemshop/NimbusProvider';
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -34,6 +37,8 @@ const Index = () => {
     tryAutoAuthentication,
     handleTestCode
   } = useNuvemshopAuth();
+  
+  const { useNimbusUI } = useNimbusUI();
   
   useEffect(() => {
     // Verificar se há um código de autorização na URL
@@ -130,49 +135,85 @@ const Index = () => {
       <Header />
       
       {hasDbError && (
-        <Alert variant="warning" className="mx-4 mt-2 bg-yellow-50 border-yellow-200">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <AlertDescription className="text-yellow-700">
+        useNimbusUI ? (
+          <NimbusAlert variant="warning" className="mx-4 mt-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
             Detectado erro de recursão infinita na tabela "user_roles". Algumas funcionalidades estarão limitadas.
             Contate o administrador do sistema para corrigir as políticas de segurança no banco de dados.
-          </AlertDescription>
-        </Alert>
+          </NimbusAlert>
+        ) : (
+          <Alert variant="warning" className="mx-4 mt-2 bg-yellow-50 border-yellow-200">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-700">
+              Detectado erro de recursão infinita na tabela "user_roles". Algumas funcionalidades estarão limitadas.
+              Contate o administrador do sistema para corrigir as políticas de segurança no banco de dados.
+            </AlertDescription>
+          </Alert>
+        )
       )}
       
       <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b">
-        <div className="flex-1">
-          <ProductSearch onProductSelect={setSelectedProduct} />
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <ProductSearch onProductSelect={setSelectedProduct} />
+          </div>
+          <NimbusToggle className="ml-4" />
         </div>
         
         {storeConnected ? (
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className="bg-green-100 text-green-800">
-              <CheckCircle2 className="h-4 w-4 mr-1" />
-              {renderStoreInfo()}
-            </Badge>
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={handleNuvemshopDisconnect}
-              className="flex items-center"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Desconectar
-            </Button>
+            {useNimbusUI ? (
+              <>
+                <NimbusBadge variant="success" className="bg-green-100">
+                  <CheckCircle2 className="h-4 w-4 mr-1" />
+                  {renderStoreInfo()}
+                </NimbusBadge>
+                <NimbusButton variant="danger" size="small" onClick={handleNuvemshopDisconnect}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Desconectar
+                </NimbusButton>
+              </>
+            ) : (
+              <>
+                <Badge variant="outline" className="bg-green-100 text-green-800">
+                  <CheckCircle2 className="h-4 w-4 mr-1" />
+                  {renderStoreInfo()}
+                </Badge>
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={handleNuvemshopDisconnect}
+                  className="flex items-center"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Desconectar
+                </Button>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={(e) => {
-                e.preventDefault();
-                handleConnectNuvemshop();
-              }}
-              className="text-green-600 border-green-300 hover:bg-green-50 h-8"
-            >
-              Conectar Nuvemshop
-            </Button>
+            {useNimbusUI ? (
+              <NimbusButton 
+                variant="secondary" 
+                size="small" 
+                onClick={() => handleConnectNuvemshop()}
+              >
+                Conectar Nuvemshop
+              </NimbusButton>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleConnectNuvemshop();
+                }}
+                className="text-green-600 border-green-300 hover:bg-green-50 h-8"
+              >
+                Conectar Nuvemshop
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -206,7 +247,6 @@ const Index = () => {
         </ResizablePanelGroup>
       </div>
       
-      {/* Tutorial de primeiro acesso */}
       <FirstAccessTutorial />
     </div>
   );

@@ -14,6 +14,7 @@ interface AuthStatusProps {
   handleDisconnect: () => void;
   onFetchProducts: () => void;
   loadingProducts: boolean;
+  useNimbusUI?: boolean;
 }
 
 export const AuthStatus: React.FC<AuthStatusProps> = (props) => {
@@ -22,6 +23,7 @@ export const AuthStatus: React.FC<AuthStatusProps> = (props) => {
       <ConnectionStatus 
         success={props.success} 
         storeName={props.storeName} 
+        useNimbusUI={props.useNimbusUI}
       />
       
       {props.userId && (
@@ -44,6 +46,7 @@ export const AuthStatus: React.FC<AuthStatusProps> = (props) => {
         handleConnect={props.handleConnect}
         handleDisconnect={props.handleDisconnect}
         onFetchProducts={props.onFetchProducts}
+        useNimbusUI={props.useNimbusUI}
       />
     </div>
   );

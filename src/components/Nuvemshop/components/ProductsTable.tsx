@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ChevronLeft, ChevronRight, Edit, Save, X } from 'lucide-react';
 import { NuvemshopProduct } from '../types';
+import { useNimbusUI } from '../NimbusProvider';
+import { NimbusButton } from '../NimbusProvider';
 
 interface ProductsTableProps {
   products: NuvemshopProduct[];
@@ -39,6 +41,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
 }) => {
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [editedDescription, setEditedDescription] = useState<string>("");
+  const { useNimbusUI } = useNimbusUI();
   
   // Helper to safely display product name
   const renderProductName = (name: string | { pt?: string; [key: string]: string | undefined }) => {
@@ -79,11 +82,15 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
     }
   };
 
+  // Apply Nimbus styling based on the toggle
+  const tableClass = useNimbusUI ? "border border-gray-200 rounded-md overflow-hidden" : "";
+  const headingClass = useNimbusUI ? "bg-blue-50 text-blue-800" : "";
+
   return (
     <div>
-      <div className="max-h-96 overflow-y-auto">
+      <div className={`max-h-96 overflow-y-auto ${tableClass}`}>
         <Table>
-          <TableHeader>
+          <TableHeader className={headingClass}>
             <TableRow>
               <TableHead className="w-16">ID</TableHead>
               <TableHead className="w-1/4">Nome</TableHead>
@@ -107,7 +114,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
               ))
             ) : (
               products.map((product) => (
-                <TableRow key={product.id}>
+                <TableRow key={product.id} className={useNimbusUI ? "hover:bg-blue-50" : ""}>
                   <TableCell>{product.id}</TableCell>
                   <TableCell>{renderProductName(product.name)}</TableCell>
                   <TableCell>{product.sku || 'N/A'}</TableCell>
@@ -119,7 +126,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                       <Textarea 
                         value={editedDescription}
                         onChange={(e) => setEditedDescription(e.target.value)}
-                        className="min-h-[80px]"
+                        className={`min-h-[80px] ${useNimbusUI ? 'border-blue-200 focus:border-blue-400' : ''}`}
                         placeholder="Digite a descrição do produto"
                       />
                     ) : (
@@ -131,31 +138,66 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                   <TableCell className="text-right">
                     {editingProductId === product.id ? (
                       <div className="flex justify-end space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={handleCancelEdit}
-                          disabled={updatingProduct}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="default" 
-                          size="sm" 
-                          onClick={() => handleSaveDescription(product.id)}
-                          disabled={updatingProduct}
-                        >
-                          <Save className="h-4 w-4" />
-                        </Button>
+                        {useNimbusUI ? (
+                          <>
+                            <NimbusButton 
+                              variant="secondary" 
+                              size="small" 
+                              onClick={handleCancelEdit}
+                              disabled={updatingProduct}
+                            >
+                              <X className="h-4 w-4" />
+                            </NimbusButton>
+                            <NimbusButton 
+                              variant="primary" 
+                              size="small" 
+                              onClick={() => handleSaveDescription(product.id)}
+                              disabled={updatingProduct}
+                            >
+                              <Save className="h-4 w-4" />
+                            </NimbusButton>
+                          </>
+                        ) : (
+                          <>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={handleCancelEdit}
+                              disabled={updatingProduct}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="default" 
+                              size="sm" 
+                              onClick={() => handleSaveDescription(product.id)}
+                              disabled={updatingProduct}
+                            >
+                              <Save className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     ) : (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleEditStart(product)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <>
+                        {useNimbusUI ? (
+                          <NimbusButton 
+                            variant="text" 
+                            size="small" 
+                            onClick={() => handleEditStart(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </NimbusButton>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleEditStart(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </>
                     )}
                   </TableCell>
                 </TableRow>
@@ -167,27 +209,55 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
       
       {products.length > 0 && (
         <div className="flex items-center justify-between mt-4">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onPrevPage} 
-            disabled={currentPage <= 1 || loadingProducts}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Anterior
-          </Button>
-          <span className="text-sm text-gray-500">
-            Página {currentPage} de {totalPages}
-          </span>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onNextPage} 
-            disabled={currentPage >= totalPages || loadingProducts}
-          >
-            Próxima
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
+          {useNimbusUI ? (
+            <>
+              <NimbusButton 
+                variant="secondary" 
+                size="small" 
+                onClick={onPrevPage} 
+                disabled={currentPage <= 1 || loadingProducts}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Anterior
+              </NimbusButton>
+              <span className="text-sm text-gray-500">
+                Página {currentPage} de {totalPages}
+              </span>
+              <NimbusButton 
+                variant="secondary" 
+                size="small" 
+                onClick={onNextPage} 
+                disabled={currentPage >= totalPages || loadingProducts}
+              >
+                Próxima
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </NimbusButton>
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onPrevPage} 
+                disabled={currentPage <= 1 || loadingProducts}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Anterior
+              </Button>
+              <span className="text-sm text-gray-500">
+                Página {currentPage} de {totalPages}
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onNextPage} 
+                disabled={currentPage >= totalPages || loadingProducts}
+              >
+                Próxima
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </>
+          )}
         </div>
       )}
     </div>
