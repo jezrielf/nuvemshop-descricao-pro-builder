@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { FileEdit, Info, Wand2 } from 'lucide-react';
+import { FileEdit, Info, Wand2, Brain } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -12,9 +12,12 @@ import { ImprovementsList } from './ImprovementsList';
 import { HeadingDiagnostics } from './HeadingDiagnostics';
 import { HeadingSuggestionDialog } from './HeadingSuggestionDialog';
 import { AutoCorrectHeadingsDialog } from './AutoCorrectHeadingsDialog';
+import { AIHeadingAnalysisDialog } from './AIHeadingAnalysisDialog';
 import { HeadingStructureTabProps, HeadingSuggestion } from '../../types/headingTypes';
 import { calculateHeadingScore, getImprovementSuggestions, generateHeadingSuggestions } from '../../utils/headingUtils';
 import { useHeadingAutoCorrect } from '../../hooks/useHeadingAutoCorrect';
+import { useAIHeadingAnalysis } from '../../hooks/useAIHeadingAnalysis';
+import { useEditorStore } from '@/store/editor';
 
 export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({ 
   headingStructure, 
@@ -24,13 +27,24 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
 }) => {
   const [isHeadingDialogOpen, setIsHeadingDialogOpen] = useState(false);
   const [isAutoCorrectDialogOpen, setIsAutoCorrectDialogOpen] = useState(false);
+  const [isAIAnalysisDialogOpen, setIsAIAnalysisDialogOpen] = useState(false);
   const [suggestedHeadings, setSuggestedHeadings] = useState<HeadingSuggestion[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const { success: isNuvemshopConnected } = useNuvemshopAuth();
+  const { description } = useEditorStore();
+  
+  // Hook for auto-correct
   const { 
     isProcessingAutoCorrect, 
     applyAutomaticCorrection 
   } = useHeadingAutoCorrect(headingStructure, currentProductTitle, productId, onUpdateHeadings);
+  
+  // Hook for AI-powered analysis
+  const { 
+    analysis: aiAnalysis, 
+    isAnalyzing,
+    analyzeHeadings
+  } = useAIHeadingAnalysis();
   
   // Calculate scores and additional metrics
   const hasOnlyOneH1 = 
@@ -63,6 +77,101 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
     const suggestions = generateHeadingSuggestions(headingStructure, currentProductTitle);
     setSuggestedHeadings(suggestions);
     setIsHeadingDialogOpen(true);
+  };
+
+  // Handle AI Analysis
+  const handleRunAIAnalysis = async () => {
+    await analyzeHeadings(headingStructure, currentProductTitle, description);
+    setIsAIAnalysisDialogOpen(true);
+  };
+
+  const handleApplyAISuggestions = async () => {
+    if (!onUpdateHeadings || !aiAnalysis) {
+      toast({
+        title: "Não foi possível atualizar",
+        description: "Análise de IA não disponível ou função de atualização não disponível.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsUpdating(true);
+    
+    try {
+      const success = await onUpdateHeadings(aiAnalysis.suggestions);
+      
+      if (success) {
+        toast({
+          title: "Headings atualizados",
+          description: "As tags de cabeçalho foram atualizadas com sucesso usando as sugestões da IA.",
+        });
+        setIsAIAnalysisDialogOpen(false);
+      } else {
+        toast({
+          title: "Erro ao atualizar",
+          description: "Não foi possível atualizar os headings.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar headings:", error);
+      toast({
+        title: "Erro ao atualizar",
+        description: "Ocorreu um erro ao atualizar os headings.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleApplyAIAutoCorrection = async () => {
+    if (!onUpdateHeadings || !aiAnalysis) {
+      toast({
+        title: "Não foi possível aplicar correções",
+        description: "Análise de IA não disponível ou função de atualização não disponível.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsUpdating(true);
+    
+    try {
+      // Extract only the corrections that are adding or modifying
+      const correctionsToApply = aiAnalysis.autoCorrect
+        .filter(item => ['add', 'modify'].includes(item.action))
+        .map(item => ({
+          level: item.level,
+          text: item.text,
+          original: item.original || ''
+        }));
+        
+      const success = await onUpdateHeadings(correctionsToApply);
+      
+      if (success) {
+        toast({
+          title: "Correções aplicadas",
+          description: "As correções automáticas foram aplicadas com sucesso.",
+        });
+        setIsAIAnalysisDialogOpen(false);
+      } else {
+        toast({
+          title: "Erro ao aplicar correções",
+          description: "Não foi possível aplicar as correções automáticas.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao aplicar correções:", error);
+      toast({
+        title: "Erro ao aplicar correções",
+        description: "Ocorreu um erro ao aplicar as correções automáticas.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleApplyHeadingSuggestions = async () => {
@@ -183,6 +292,16 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
                   <Wand2 className="h-4 w-4" />
                   Correção Automática de Estrutura
                 </Button>
+                
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="w-full flex items-center gap-2"
+                  onClick={handleRunAIAnalysis}
+                >
+                  <Brain className="h-4 w-4" />
+                  Análise Avançada com IA
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -229,6 +348,18 @@ export const HeadingStructureTab: React.FC<HeadingStructureTabProps> = ({
         headingStructure={headingStructure}
         onApplyCorrection={handleAutoCorrection}
         isProcessing={isProcessingAutoCorrect}
+      />
+      
+      <AIHeadingAnalysisDialog
+        isOpen={isAIAnalysisDialogOpen}
+        onOpenChange={setIsAIAnalysisDialogOpen}
+        isAnalyzing={isAnalyzing}
+        analysis={aiAnalysis}
+        onAnalyze={handleRunAIAnalysis}
+        onApplySuggestions={handleApplyAISuggestions}
+        onApplyAutoCorrection={handleApplyAIAutoCorrection}
+        headingStructure={headingStructure}
+        currentProductTitle={currentProductTitle}
       />
     </>
   );
