@@ -4,12 +4,39 @@ import { useToast } from '@/hooks/use-toast';
 import { ProductDescription } from '@/types/editor';
 import { SEOResult } from '../types';
 import { getTextContentFromDescription } from '../../utils/contentUtils';
+import { useEditorStore } from '@/store/editor';
+
+// Helper function to extract text from HTML (same as in KeywordDistributionTab)
+const extractTextFromHtml = (html: string): string => {
+  if (!html) return '';
+  
+  // Remove script tags and their contents
+  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
+  
+  // Remove style tags and their contents
+  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
+  
+  // Replace all other HTML tags with space
+  text = text.replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  
+  // Normalize whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  
+  return text;
+};
 
 export const useSEOAnalysis = (description: ProductDescription | null) => {
   const [keyword, setKeyword] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [results, setResults] = useState<SEOResult | null>(null);
   const { toast } = useToast();
+  const { getHtmlOutput } = useEditorStore();
 
   const handleAnalyze = () => {
     if (!description) {
@@ -35,11 +62,25 @@ export const useSEOAnalysis = (description: ProductDescription | null) => {
     // Simulate SEO analysis locally without triggering database queries
     setTimeout(() => {
       try {
-        // Generate results based on the description's content only
-        const textContent = getTextContentFromDescription(description);
+        console.log('Analisando descrição para a palavra-chave:', keyword);
+        
+        // Extract product title for HTML generation
+        const productTitle = description?.name?.startsWith('Descrição:') 
+          ? description.name.substring(10).trim()
+          : undefined;
+        
+        // Generate HTML output that will be sent to Nuvemshop
+        const htmlOutput = getHtmlOutput(productTitle);
+        
+        // Extract text content from the HTML
+        const textContent = extractTextFromHtml(htmlOutput);
+        console.log('Extracted text content (first 100 chars):', textContent.substring(0, 100) + '...');
+        
         const wordCount = textContent.split(/\s+/).filter(Boolean).length;
         const keywordCount = (textContent.toLowerCase().match(new RegExp(keyword.toLowerCase(), 'g')) || []).length;
         const keywordDensity = wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
+        
+        console.log(`Análise de palavra-chave "${keyword}": ${keywordCount} ocorrências em ${wordCount} palavras (${keywordDensity.toFixed(1)}%)`);
         
         // Calculate a score based only on local content
         let score = 65;
@@ -87,7 +128,7 @@ export const useSEOAnalysis = (description: ProductDescription | null) => {
           });
         }
         
-        // Generate keyword suggestions based on visible content
+        // Generate keyword suggestions based on content
         const keywords = [
           { word: keyword, count: keywordCount, relevance: 100 },
           { word: keyword + 's', count: Math.floor(keywordCount / 3) || 1, relevance: 85 },

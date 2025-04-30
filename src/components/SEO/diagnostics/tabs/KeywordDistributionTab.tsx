@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -13,6 +14,31 @@ interface KeywordDistributionTabProps {
   description?: ProductDescription;
 }
 
+// Helper function to extract text from HTML
+const extractTextFromHtml = (html: string): string => {
+  if (!html) return '';
+  
+  // Remove script tags and their contents
+  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
+  
+  // Remove style tags and their contents
+  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
+  
+  // Replace all other HTML tags with space
+  text = text.replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  
+  // Normalize whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  
+  return text;
+};
+
 export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ description: propDescription }) => {
   const [keywordMode, setKeywordMode] = useState<'density' | 'position' | 'distribution'>('density');
   const { description: storeDescription, getHtmlOutput } = useEditorStore();
@@ -25,36 +51,41 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       return { keywords: [], wordCount: 0, sections: [] };
     }
     
-    // MODIFICAÇÃO PRINCIPAL: Usar o HTML gerado para extração de palavras-chave
-    // ao invés de usar o texto diretamente dos blocos
-    const htmlOutput = getHtmlOutput();
-    let content = '';
+    console.log('Starting keyword analysis for description:', activeDescription.name);
     
-    if (htmlOutput) {
-      // Extrair texto do HTML gerado (removendo tags)
-      content = htmlOutput.replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      
-      console.log('Analisando conteúdo do HTML gerado:', content.substring(0, 100) + '...');
-    } else {
-      // Fallback para o método anterior, caso o HTML não esteja disponível
-      const visibleBlocks = activeDescription.blocks.filter(block => block.visible);
-      const visibleDescription = { ...activeDescription, blocks: visibleBlocks };
-      content = getTextContentFromDescription(visibleDescription);
-      console.log('Fallback: Analisando conteúdo dos blocos:', content.substring(0, 100) + '...');
-    }
+    // Extract product title for HTML generation
+    const productTitle = activeDescription?.name?.startsWith('Descrição:') 
+      ? activeDescription.name.substring(10).trim()
+      : undefined;
     
+    // IMPORTANT: Get the HTML output that will be sent to Nuvemshop
+    const htmlOutput = getHtmlOutput(productTitle);
+    
+    // Extract text content from the HTML
+    const content = extractTextFromHtml(htmlOutput);
+    console.log('Extracted text content from HTML (first 100 chars):', content.substring(0, 100) + '...');
+    console.log('Text content length:', content.length);
+    
+    // Get all words, filter out short words
     const words = content.toLowerCase()
       .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, '')
       .split(/\s+/)
       .filter(w => w.length > 3);
       
     const wordCount = words.length;
+    console.log('Total word count:', wordCount);
     
     // Count keyword frequency
     const keywordCounts: Record<string, number> = {};
-    const stopWords = new Set(['para', 'como', 'mais', 'este', 'esta', 'isso', 'aquilo', 'pelo', 'pela', 'pelos', 'pelas', 'seja', 'seus', 'suas']);
+    const stopWords = new Set([
+      'para', 'como', 'mais', 'este', 'esta', 'isso', 'aquilo', 'pelo', 'pela',
+      'pelos', 'pelas', 'seja', 'seus', 'suas', 'que', 'com', 'por', 'dos', 
+      'das', 'uma', 'seu', 'sua', 'este', 'esta', 'neste', 'nesta', 'deste', 
+      'desta', 'aquele', 'aquela', 'naquele', 'naquela', 'todos', 'todas', 
+      'outro', 'outra', 'outros', 'outras', 'mesmo', 'mesma', 'mesmos', 'mesmas',
+      'estes', 'estas', 'esses', 'essas', 'nesse', 'nessa', 'desse', 'dessa',
+      'qual', 'quais', 'quando', 'onde', 'quem', 'cujo', 'cuja', 'cujos', 'cujas'
+    ]);
 
     // Get keywords and their frequency
     words.forEach(word => {
@@ -62,6 +93,8 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
         keywordCounts[word] = (keywordCounts[word] || 0) + 1;
       }
     });
+
+    console.log('Found unique keywords:', Object.keys(keywordCounts).length);
 
     // Sort by frequency and take top 10
     const topKeywords = Object.entries(keywordCounts)
@@ -74,14 +107,19 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
         isOptimal: (count / wordCount) * 100 >= 0.5 && (count / wordCount) * 100 <= 2.5
       }));
     
+    console.log('Top keywords identified:', topKeywords.map(k => k.keyword).join(', '));
+    
     // Analyze keyword distribution across sections (only visible sections)
     const sections = activeDescription.blocks.filter(block => block.visible).map(block => {
       let blockContent = '';
       
+      // Extract text from the block based on its type
       if ('content' in block && typeof block.content === 'string') {
         blockContent = block.content.replace(/<[^>]+>/g, ' ');
       } else if ('heading' in block && typeof block.heading === 'string') {
         blockContent = block.heading;
+      } else if ('title' in block && typeof block.title === 'string') {
+        blockContent = block.title;
       }
       
       // Check for each keyword in this section
@@ -93,7 +131,8 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       return {
         blockId: block.id,
         type: block.type,
-        title: 'title' in block ? block.title : block.type,
+        title: 'title' in block && block.title ? block.title : 
+               'heading' in block && block.heading ? block.heading : block.type,
         keywordPresence: sectionKeywords
       };
     });
@@ -104,8 +143,6 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
       sections
     };
   }, [activeDescription, getHtmlOutput]);
-  
-
   
   // Calculate optimal density thresholds
   const minDensity = 0.5;
@@ -144,7 +181,6 @@ export const KeywordDistributionTab: React.FC<KeywordDistributionTabProps> = ({ 
   }
 
   return (
-    
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>

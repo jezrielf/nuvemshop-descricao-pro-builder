@@ -1,4 +1,6 @@
 
+import { extractTextFromHtml, getPortugueseStopwords, analyzeKeywordDensity } from '@/components/SEO/utils/htmlUtils';
+
 /**
  * Extrai palavras-chave de uma descrição de produto
  * @param description Descrição do produto
@@ -56,11 +58,7 @@ export function extractKeywords(description: any): string[] {
     const words = cleanText.split(' ');
     
     // Remover palavras muito curtas e palavras comuns
-    const stopWords = new Set([
-      'para', 'como', 'mais', 'este', 'esta', 'isso', 'aquilo', 
-      'pelo', 'pela', 'pelos', 'pelas', 'seja', 'seus', 'suas',
-      'que', 'com', 'por', 'dos', 'das', 'uma', 'seu', 'sua'
-    ]);
+    const stopWords = getPortugueseStopwords();
     
     // Contar frequência
     const wordCounts: {[key: string]: number} = {};
