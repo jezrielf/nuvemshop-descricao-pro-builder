@@ -4,7 +4,7 @@ import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BadgeAlert, BadgeCheck, Crown, Save, Lock, Settings } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Save, Lock, Settings, LayoutDashboard } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
@@ -13,6 +13,9 @@ import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNuvemshopAuth } from './Nuvemshop/hooks/useNuvemshopAuth';
+import { useNimbusUI } from './Nuvemshop/NimbusProvider';
+import { NimbusButton } from './Nuvemshop/NimbusProvider';
 
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
@@ -28,6 +31,8 @@ const Header: React.FC = () => {
     user
   } = auth;
   const isMobile = useIsMobile();
+  const { success: isNuvemshopConnected } = useNuvemshopAuth();
+  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   
   // Log para debug dos papéis e status
   useEffect(() => {
@@ -45,9 +50,6 @@ const Header: React.FC = () => {
   useEffect(() => {
     console.log('Current user:', user);
   }, [user]);
-  
-  // Verificar se há uma loja Nuvemshop conectada
-  const isNuvemshopConnected = !!localStorage.getItem('nuvemshop_access_token');
   
   // Calculate these values once
   const isPremiumUser = isPremium();
@@ -128,6 +130,24 @@ const Header: React.FC = () => {
             <Link to="/plans" className="text-xs sm:text-sm text-blue-500 hover:text-blue-700 underline">
               Ver planos
             </Link>
+          )}
+          
+          {isNuvemshopConnected && (
+            isNimbusUIActive ? (
+              <Link to="/nexo-admin">
+                <NimbusButton variant="secondary" size="small" className="ml-2">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Admin Nuvemshop
+                </NimbusButton>
+              </Link>
+            ) : (
+              <Link to="/nexo-admin">
+                <Button variant="outline" size="sm" className="flex items-center ml-2">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Admin Nuvemshop
+                </Button>
+              </Link>
+            )
           )}
         </div>
         
