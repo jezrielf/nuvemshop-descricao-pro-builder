@@ -32,16 +32,16 @@ export const useSEOAnalysis = (description: ProductDescription | null) => {
     
     setAnalyzing(true);
     
-    // Simulate SEO analysis
+    // Simulate SEO analysis locally without triggering database queries
     setTimeout(() => {
       try {
-        // Generate mock results based on the description
+        // Generate results based on the description's content only
         const textContent = getTextContentFromDescription(description);
         const wordCount = textContent.split(/\s+/).filter(Boolean).length;
         const keywordCount = (textContent.toLowerCase().match(new RegExp(keyword.toLowerCase(), 'g')) || []).length;
-        const keywordDensity = (keywordCount / wordCount) * 100;
+        const keywordDensity = wordCount > 0 ? (keywordCount / wordCount) * 100 : 0;
         
-        // Calculate a mock score
+        // Calculate a score based only on local content
         let score = 65;
         if (wordCount > 300) score += 10;
         if (keywordDensity > 0.5 && keywordDensity < 2.5) score += 15;
@@ -87,13 +87,13 @@ export const useSEOAnalysis = (description: ProductDescription | null) => {
           });
         }
         
-        // Generate mock keyword suggestions based on visible content
+        // Generate keyword suggestions based on visible content
         const keywords = [
           { word: keyword, count: keywordCount, relevance: 100 },
-          { word: keyword + 's', count: Math.floor(keywordCount / 3), relevance: 85 },
-          { word: 'melhor ' + keyword, count: Math.floor(keywordCount / 4), relevance: 75 },
-          { word: keyword + ' premium', count: Math.floor(keywordCount / 5), relevance: 65 },
-          { word: 'comprar ' + keyword, count: Math.floor(keywordCount / 6), relevance: 60 },
+          { word: keyword + 's', count: Math.floor(keywordCount / 3) || 1, relevance: 85 },
+          { word: 'melhor ' + keyword, count: Math.floor(keywordCount / 4) || 1, relevance: 75 },
+          { word: keyword + ' premium', count: Math.floor(keywordCount / 5) || 1, relevance: 65 },
+          { word: 'comprar ' + keyword, count: Math.floor(keywordCount / 6) || 1, relevance: 60 },
         ];
         
         setResults({
