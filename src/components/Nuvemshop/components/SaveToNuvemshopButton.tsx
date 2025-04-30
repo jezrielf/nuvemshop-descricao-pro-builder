@@ -64,7 +64,7 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
     if (isNimbusUIActive) {
       return (
         <NimbusButton 
-          variant="success" 
+          variant="primary" 
           size="small" 
           className="ml-2 bg-green-600 text-white"
           disabled={true}
