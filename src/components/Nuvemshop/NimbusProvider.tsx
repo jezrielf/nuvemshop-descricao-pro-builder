@@ -4,27 +4,20 @@ import React, { createContext, useContext } from 'react';
 interface NimbusContextType {
   // Mantemos a interface por compatibilidade, mas sempre retornamos true
   useNimbusUI: boolean;
-  toggleNimbusUI: () => void;
 }
 
 const NimbusContext = createContext<NimbusContextType>({
-  useNimbusUI: true,
-  toggleNimbusUI: () => {}
+  useNimbusUI: true
 });
 
 export const useNimbusUI = () => useContext(NimbusContext);
 
 export const NimbusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // O Nimbus UI está sempre ativo, não precisa de estado
+  // O Nimbus UI está sempre ativo
   const useNimbusUI = true;
 
-  // Função mantida por compatibilidade, mas não faz nada
-  const toggleNimbusUI = () => {
-    console.log('Nimbus UI está sempre ativo e não pode ser desativado.');
-  };
-
   return (
-    <NimbusContext.Provider value={{ useNimbusUI, toggleNimbusUI }}>
+    <NimbusContext.Provider value={{ useNimbusUI }}>
       {children}
     </NimbusContext.Provider>
   );

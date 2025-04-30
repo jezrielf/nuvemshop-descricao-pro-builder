@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusButton, NimbusAlert } from '@/components/Nuvemshop/NimbusProvider';
 import { Spinner } from '@/components/ui/spinner';
-import { NimbusToggle } from '@/components/Nuvemshop/components/NimbusToggle';
 import { AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,7 +23,6 @@ const NexoAdmin: React.FC = () => {
   const { success: isAuthenticated, accessToken, userId, storeName } = useNuvemshopAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   const [activeModule, setActiveModule] = useState<string>('products');
   const [isMounting, setIsMounting] = useState(false);
   const { toast } = useToast();
@@ -43,7 +41,7 @@ const NexoAdmin: React.FC = () => {
           target: containerRef.current,
           module: moduleId,
           config: {
-            theme: isNimbusUIActive ? 'nimbus' : 'default'
+            theme: 'nimbus'
           }
         });
         
@@ -80,7 +78,7 @@ const NexoAdmin: React.FC = () => {
           target: containerRef.current,
           module: activeModule,
           config: {
-            theme: isNimbusUIActive ? 'nimbus' : 'default'
+            theme: 'nimbus'
           }
         });
         
@@ -98,7 +96,7 @@ const NexoAdmin: React.FC = () => {
         setIsMounting(false);
       }
     }
-  }, [isNexoLoaded, isAuthenticated, nexo, isNimbusUIActive, isEmbedded]);
+  }, [isNexoLoaded, isAuthenticated, nexo, isEmbedded]);
 
   // Retry handler for manual retry
   const handleRetry = () => {
@@ -115,15 +113,9 @@ const NexoAdmin: React.FC = () => {
       <div className="flex flex-col items-center justify-center h-screen p-6">
         <h1 className="text-2xl font-bold mb-4">Conexão com Nuvemshop necessária</h1>
         <p className="text-gray-600 mb-6">Para acessar o ambiente de administração, conecte sua loja Nuvemshop.</p>
-        {isNimbusUIActive ? (
-          <NimbusButton onClick={() => navigate('/nuvemshop-connect')}>
-            Conectar Nuvemshop
-          </NimbusButton>
-        ) : (
-          <Button onClick={() => navigate('/nuvemshop-connect')}>
-            Conectar Nuvemshop
-          </Button>
-        )}
+        <NimbusButton onClick={() => navigate('/nuvemshop-connect')}>
+          Conectar Nuvemshop
+        </NimbusButton>
       </div>
     );
   }
@@ -136,30 +128,14 @@ const NexoAdmin: React.FC = () => {
         <p className="text-gray-600 mb-6">{nexoError.message}</p>
         
         <div className="flex gap-4">
-          {isNimbusUIActive ? (
-            <>
-              <NimbusButton variant="primary" onClick={handleRetry}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Tentar novamente
-              </NimbusButton>
-              {!isEmbedded && (
-                <NimbusButton variant="secondary" onClick={() => navigate('/editor')}>
-                  Voltar ao Editor
-                </NimbusButton>
-              )}
-            </>
-          ) : (
-            <>
-              <Button onClick={handleRetry}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Tentar novamente
-              </Button>
-              {!isEmbedded && (
-                <Button variant="outline" onClick={() => navigate('/editor')}>
-                  Voltar ao Editor
-                </Button>
-              )}
-            </>
+          <NimbusButton variant="primary" onClick={handleRetry}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar novamente
+          </NimbusButton>
+          {!isEmbedded && (
+            <NimbusButton variant="secondary" onClick={() => navigate('/editor')}>
+              Voltar ao Editor
+            </NimbusButton>
           )}
         </div>
       </div>
@@ -187,8 +163,6 @@ const NexoAdmin: React.FC = () => {
             <h1 className="text-lg font-medium mr-2">
               DescriçãoPro
             </h1>
-            
-            <NimbusToggle className="ml-2" />
           </div>
           
           <div className="flex overflow-x-auto space-x-2 pb-1">
@@ -198,9 +172,7 @@ const NexoAdmin: React.FC = () => {
                 onClick={() => handleModuleChange(module.id)}
                 className={`px-3 py-1 rounded-md whitespace-nowrap transition-colors ${
                   activeModule === module.id
-                    ? isNimbusUIActive
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-200 text-gray-800'
+                    ? 'bg-blue-100 text-blue-700'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -229,22 +201,13 @@ const NexoAdmin: React.FC = () => {
           <h1 className="text-xl font-bold mr-4">
             {storeName || 'Nuvemshop Admin'}
           </h1>
-          
-          <NimbusToggle className="ml-2" />
         </div>
         
         <div className="flex items-center space-x-2">
-          {isNimbusUIActive ? (
-            <NimbusButton variant="secondary" size="small" onClick={() => navigate('/editor')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao Editor
-            </NimbusButton>
-          ) : (
-            <Button variant="outline" onClick={() => navigate('/editor')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao Editor
-            </Button>
-          )}
+          <NimbusButton variant="secondary" size="small" onClick={() => navigate('/editor')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao Editor
+          </NimbusButton>
         </div>
       </div>
       
@@ -257,9 +220,7 @@ const NexoAdmin: React.FC = () => {
               onClick={() => handleModuleChange(module.id)}
               className={`px-4 py-2 rounded-md whitespace-nowrap transition-colors ${
                 activeModule === module.id
-                  ? isNimbusUIActive
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-200 text-gray-800'
+                  ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >

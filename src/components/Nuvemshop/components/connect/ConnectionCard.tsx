@@ -28,8 +28,6 @@ interface ConnectionCardProps {
 }
 
 export const ConnectionCard: React.FC<ConnectionCardProps> = (props) => {
-  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
-
   return (
     <Card>
       <CardHeader>
@@ -50,24 +48,15 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = (props) => {
           handleDisconnect={props.handleDisconnect}
           onFetchProducts={props.onFetchProducts}
           loadingProducts={props.loadingProducts}
-          useNimbusUI={isNimbusUIActive}
         />
         
         {!props.success && (
           <>
             <div className="border-t my-4"></div>
             
-            {isNimbusUIActive ? (
-              <NimbusAlert variant="info">
-                Caso o botão "Conectar Nuvemshop" não funcione, você pode gerar um código manualmente seguindo os passos abaixo.
-              </NimbusAlert>
-            ) : (
-              <div className="bg-blue-50 p-4 rounded-md text-blue-700 text-sm">
-                <p>
-                  Caso o botão "Conectar Nuvemshop" não funcione, você pode gerar um código manualmente seguindo os passos abaixo.
-                </p>
-              </div>
-            )}
+            <NimbusAlert variant="info">
+              Caso o botão "Conectar Nuvemshop" não funcione, você pode gerar um código manualmente seguindo os passos abaixo.
+            </NimbusAlert>
             
             <AuthenticationPanel
               redirectUrl={props.redirectUrl}
@@ -78,7 +67,6 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = (props) => {
               handleTestCode={props.handleTestCode}
               authenticating={props.authenticating}
               copyToClipboard={props.copyToClipboard}
-              useNimbusUI={isNimbusUIActive}
             />
           </>
         )}

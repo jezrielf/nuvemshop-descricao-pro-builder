@@ -16,7 +16,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useNuvemshopAuth } from './Nuvemshop/hooks/useNuvemshopAuth';
 import { useNimbusUI } from './Nuvemshop/NimbusProvider';
 import { NimbusButton } from './Nuvemshop/NimbusProvider';
-import { NimbusToggle } from './Nuvemshop/components/NimbusToggle';
 
 const Header: React.FC = () => {
   const { description, loadSavedDescriptions, savedDescriptions, setAuthContext } = useEditorStore();
@@ -33,7 +32,6 @@ const Header: React.FC = () => {
   } = auth;
   const isMobile = useIsMobile();
   const { success: isNuvemshopConnected } = useNuvemshopAuth();
-  const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   
   // Log para debug dos papéis e status
   useEffect(() => {
@@ -133,42 +131,20 @@ const Header: React.FC = () => {
             </Link>
           )}
           
-          {/* Centralized Nimbus Toggle */}
-          <NimbusToggle className="ml-2" />
-          
           {isNuvemshopConnected && (
             <>
-              {isNimbusUIActive ? (
-                <>
-                  <Link to="/nexo-admin">
-                    <NimbusButton variant="secondary" size="small" className="ml-2">
-                      <LayoutDashboard className="h-4 w-4 mr-2" />
-                      Admin Nuvemshop
-                    </NimbusButton>
-                  </Link>
-                  <Link to="/nimbus-nexo-info">
-                    <NimbusButton variant="text" size="small" className="ml-2">
-                      <HelpCircle className="h-4 w-4 mr-2" />
-                      Ajuda
-                    </NimbusButton>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link to="/nexo-admin">
-                    <Button variant="outline" size="sm" className="flex items-center ml-2">
-                      <LayoutDashboard className="h-4 w-4 mr-2" />
-                      Admin Nuvemshop
-                    </Button>
-                  </Link>
-                  <Link to="/nimbus-nexo-info">
-                    <Button variant="ghost" size="sm" className="flex items-center ml-2">
-                      <HelpCircle className="h-4 w-4 mr-2" />
-                      Ajuda
-                    </Button>
-                  </Link>
-                </>
-              )}
+              <Link to="/nexo-admin">
+                <NimbusButton variant="secondary" size="small" className="ml-2">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Admin Nuvemshop
+                </NimbusButton>
+              </Link>
+              <Link to="/nimbus-nexo-info">
+                <NimbusButton variant="text" size="small" className="ml-2">
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Ajuda
+                </NimbusButton>
+              </Link>
             </>
           )}
         </div>
