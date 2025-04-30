@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Editor from '@/components/Editor';
@@ -10,7 +11,7 @@ import ProductSearch from '@/components/Nuvemshop/components/ProductSearch';
 import ProductEditorController from '@/components/Nuvemshop/components/ProductEditorController';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, LogOut, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import { CheckCircle2, LogOut, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import FirstAccessTutorial from '@/components/tutorial/FirstAccessTutorial';
@@ -18,7 +19,6 @@ import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/uti
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useNimbusUI } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusBadge, NimbusButton, NimbusAlert } from '@/components/Nuvemshop/NimbusProvider';
-import { Link } from 'react-router-dom';
 
 const Index = () => {
   console.log("Index page renderizada");
@@ -167,12 +167,6 @@ const Index = () => {
                   <CheckCircle2 className="h-4 w-4 mr-1" />
                   {renderStoreInfo()}
                 </NimbusBadge>
-                <Link to="/nexo-admin">
-                  <NimbusButton variant="secondary" size="small" className="mr-2">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Admin Nuvemshop
-                  </NimbusButton>
-                </Link>
                 <NimbusButton variant="danger" size="small" onClick={handleNuvemshopDisconnect}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Desconectar
@@ -184,12 +178,6 @@ const Index = () => {
                   <CheckCircle2 className="h-4 w-4 mr-1" />
                   {renderStoreInfo()}
                 </Badge>
-                <Link to="/nexo-admin">
-                  <Button variant="outline" size="sm" className="flex items-center mr-2">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Admin Nuvemshop
-                  </Button>
-                </Link>
                 <Button 
                   variant="destructive" 
                   size="sm" 

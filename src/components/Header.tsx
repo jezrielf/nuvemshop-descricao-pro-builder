@@ -4,7 +4,7 @@ import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BadgeAlert, BadgeCheck, Crown, Save, Lock, Settings, LayoutDashboard, HelpCircle } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Crown, Save, Lock, Settings, HelpCircle } from 'lucide-react';
 import UserButton from './UserButton';
 import NewDescriptionDialog from './header/NewDescriptionDialog';
 import SaveDescriptionButton from './header/SaveDescriptionButton';
@@ -133,12 +133,6 @@ const Header: React.FC = () => {
           
           {isNuvemshopConnected && (
             <>
-              <Link to="/nexo-admin">
-                <NimbusButton variant="secondary" size="small" className="ml-2">
-                  <LayoutDashboard className="h-4 w-4 mr-2" />
-                  Admin Nuvemshop
-                </NimbusButton>
-              </Link>
               <Link to="/nimbus-nexo-info">
                 <NimbusButton variant="text" size="small" className="ml-2">
                   <HelpCircle className="h-4 w-4 mr-2" />
