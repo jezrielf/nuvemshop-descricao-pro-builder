@@ -11,6 +11,7 @@ import ProductPerformance from '@/components/admin/seo/ProductPerformance';
 import SEOTechnicalDiagnostic from '@/components/SEO/diagnostics/SEOTechnicalDiagnostic';
 import { SEOToolsMenu } from '@/components/SEO/menu/SEOToolsMenu';
 import { ProductDescription } from '@/types/editor';
+import StoreProductsList from '@/components/SEO/products/StoreProductsList';
 
 const DescriptionAnalysis: React.FC = () => {
   const { description, updateBlock } = useEditorStore();
@@ -60,6 +61,7 @@ const DescriptionAnalysis: React.FC = () => {
           <TabsTrigger value="diagnostic">Diagnóstico Técnico</TabsTrigger>
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="products">Produtos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="diagnostic" className="mt-4">
@@ -77,6 +79,12 @@ const DescriptionAnalysis: React.FC = () => {
         <TabsContent value="performance" className="mt-4">
           <Card className="p-6">
             <ProductPerformance />
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="products" className="mt-4">
+          <Card className="p-6">
+            <StoreProductsList />
           </Card>
         </TabsContent>
       </Tabs>
