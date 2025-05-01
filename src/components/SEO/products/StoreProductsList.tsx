@@ -55,9 +55,13 @@ const StoreProductsList: React.FC = () => {
   // Handle edit product
   const handleEditProduct = (product: any) => {
     // Create a simple placeholder description to edit
+    const productName = typeof product.name === 'string' 
+      ? product.name 
+      : (product.name?.pt || 'Produto');
+      
     const newDescription = {
       id: `product-${product.id}`,
-      name: `${product.name.pt}`,
+      name: productName,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       blocks: [
@@ -65,7 +69,9 @@ const StoreProductsList: React.FC = () => {
           id: "content-block",
           type: "text",
           title: "Conteúdo",
-          content: product.description?.pt || "",
+          content: typeof product.description === 'string' 
+            ? product.description 
+            : (product.description?.pt || ""),
           visible: true
         }
       ]
@@ -151,85 +157,92 @@ const StoreProductsList: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.name.pt}</TableCell>
-                      <TableCell>
-                        {product.isAnalyzing ? (
-                          <div className="flex items-center">
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            <span>Analisando...</span>
+                  sortedProducts.map((product) => {
+                    // Safely extract the product name
+                    const productName = typeof product.name === 'string' 
+                      ? product.name 
+                      : (product.name?.pt || 'Produto');
+                      
+                    return (
+                      <TableRow key={product.id}>
+                        <TableCell className="font-medium">{productName}</TableCell>
+                        <TableCell>
+                          {product.isAnalyzing ? (
+                            <div className="flex items-center">
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              <span>Analisando...</span>
+                            </div>
+                          ) : product.seoAnalysis ? (
+                            <Badge variant={
+                              product.seoAnalysis.score >= 80 ? "default" : 
+                              product.seoAnalysis.score >= 60 ? "outline" :
+                              "secondary"
+                            }>
+                              {product.seoAnalysis.score}/100
+                            </Badge>
+                          ) : (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => analyzeProduct(product)}
+                            >
+                              Analisar
+                            </Button>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {product.seoAnalysis ? (
+                            <div className="flex flex-wrap gap-1">
+                              {product.seoAnalysis.keywords.slice(0, 2).map((keyword, idx) => (
+                                <Badge key={idx} variant="outline">
+                                  {keyword.keyword}
+                                </Badge>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {product.seoAnalysis ? (
+                            product.seoAnalysis.wordCount
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {product.seoAnalysis ? (
+                            formatDistanceToNow(new Date(), {
+                              addSuffix: true,
+                              locale: ptBR
+                            })
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditProduct(product)}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewAnalysis(product)}
+                            >
+                              <LineChart className="h-4 w-4 mr-2" />
+                              Analisar
+                            </Button>
                           </div>
-                        ) : product.seoAnalysis ? (
-                          <Badge variant={
-                            product.seoAnalysis.score >= 80 ? "default" : 
-                            product.seoAnalysis.score >= 60 ? "outline" :
-                            "secondary"
-                          }>
-                            {product.seoAnalysis.score}/100
-                          </Badge>
-                        ) : (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => analyzeProduct(product)}
-                          >
-                            Analisar
-                          </Button>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {product.seoAnalysis ? (
-                          <div className="flex flex-wrap gap-1">
-                            {product.seoAnalysis.keywords.slice(0, 2).map((keyword, idx) => (
-                              <Badge key={idx} variant="outline">
-                                {keyword.keyword}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {product.seoAnalysis ? (
-                          product.seoAnalysis.wordCount
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        {product.seoAnalysis ? (
-                          formatDistanceToNow(new Date(), {
-                            addSuffix: true,
-                            locale: ptBR
-                          })
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditProduct(product)}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewAnalysis(product)}
-                          >
-                            <LineChart className="h-4 w-4 mr-2" />
-                            Analisar
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

@@ -19,6 +19,11 @@ export const ProductAnalysisDialog: React.FC<ProductAnalysisDialogProps> = ({
 }) => {
   const { seoAnalysis, isAnalyzing } = product;
   
+  // Safely extract the product name
+  const productName = typeof product.name === 'string' 
+    ? product.name 
+    : (product.name?.pt || 'Produto');
+  
   if (isAnalyzing) {
     return (
       <DialogContent className="max-w-4xl">
@@ -49,7 +54,7 @@ export const ProductAnalysisDialog: React.FC<ProductAnalysisDialogProps> = ({
   return (
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Análise SEO - {product.name.pt}</DialogTitle>
+        <DialogTitle>Análise SEO - {productName}</DialogTitle>
       </DialogHeader>
       
       <Tabs defaultValue="summary" className="mt-4">
@@ -235,7 +240,9 @@ export const ProductAnalysisDialog: React.FC<ProductAnalysisDialogProps> = ({
                   <h4 className="font-medium mb-2">Prévia do conteúdo</h4>
                   <div className="bg-muted p-4 rounded-md max-h-64 overflow-auto text-sm">
                     <div dangerouslySetInnerHTML={{ 
-                      __html: product.description?.pt?.substring(0, 500) + '...' || 'Sem conteúdo' 
+                      __html: typeof product.description === 'string' 
+                        ? product.description.substring(0, 500) + '...' 
+                        : (product.description?.pt?.substring(0, 500) + '...' || 'Sem conteúdo')
                     }} />
                   </div>
                 </div>

@@ -26,8 +26,12 @@ export interface ProductSEOResult {
  */
 export const analyzeProductSEO = (product: NuvemshopProduct): ProductSEOResult => {
   try {
-    // Get HTML content
-    const htmlContent = product.description?.pt || '';
+    // Get HTML content - safely handle different description formats
+    const description = product.description || '';
+    const htmlContent = typeof description === 'string' 
+      ? description 
+      : (description.pt || '');
+      
     const textContent = extractTextFromHtml(htmlContent);
     
     // Calculate word count
