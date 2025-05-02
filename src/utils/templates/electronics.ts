@@ -2,10 +2,10 @@ import { Template } from '@/types/editor';
 
 export const electronicsTemplates: Template[] = [
   {
-    id: 'electronics-premium-1',
-    name: 'Eletrônicos de Alta Performance',
+    id: 'electronic-product-1',
+    name: 'Eletrônico Moderno',
     category: 'electronics',
-    thumbnail: '/placeholder.svg',
+    thumbnail: '/templates/electronics/electronic-product-1.png',
     blocks: [
       {
         id: 'hero-1',
@@ -14,261 +14,389 @@ export const electronicsTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#121212',
-          padding: '80px 20px',
-          borderRadius: '0',
+          backgroundColor: '#007bff',
+          color: '#fff',
+          padding: '60px 20px',
           textAlign: 'center',
-          color: '#ffffff'
+          borderRadius: '0'
         },
-        heading: 'Inovação Tecnológica em Suas Mãos',
-        subheading: 'Design futurista, desempenho incomparável e tecnologia de última geração',
-        buttonText: 'Explorar Tecnologia',
+        heading: 'Descubra a Inovação',
+        subheading: 'A mais recente tecnologia ao seu alcance',
+        buttonText: 'Ver Mais',
         buttonUrl: '#'
       },
       {
         id: 'text-1',
         type: 'text',
-        title: 'Sobre o Produto',
+        title: 'Descrição do Produto',
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0',
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        content: '<p>Explore os recursos avançados e o design elegante do nosso mais recente produto eletrônico. Projetado para oferecer desempenho superior e facilidade de uso.</p>'
+      },
+      {
+        id: 'image-1',
+        type: 'image',
+        title: 'Imagem do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '20px',
+          backgroundColor: '#fff',
           textAlign: 'center'
         },
-        content: '<h2 style="font-size: 36px; font-weight: 600; color: #121212; margin-bottom: 24px;">Redefinindo o Futuro da Tecnologia</h2><p style="font-size: 18px; line-height: 1.8; color: #333; max-width: 800px; margin: 0 auto;">Desenvolvido por uma equipe de engenheiros visionários, nosso dispositivo de última geração combina performance excepcional, design minimalista e funcionalidades inovadoras que transformarão sua experiência digital. Cada componente foi meticulosamente selecionado e testado para garantir máxima eficiência e durabilidade.</p>'
+        src: '/templates/electronics/electronic-product-1-image.png',
+        alt: 'Produto eletrônico',
+        caption: 'Imagem do produto em destaque'
       },
       {
         id: 'features-1',
         type: 'features',
         title: 'Recursos Avançados',
         visible: true,
-        columns: '3',
-        layout: 'vertical',
+        columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#f5f5f7',
-          margin: '0'
+          padding: '40px 20px',
+          backgroundColor: '#fff'
         },
-        heading: 'Recursos Revolucionários',
+        heading: 'Recursos Principais',
         features: [
           {
-            icon: '⚡',
-            title: 'Processador Quantum',
-            description: 'Desempenho até 3x mais rápido que a geração anterior'
+            id: 'feature-1',
+            title: 'Desempenho Superior',
+            description: 'Processamento rápido e eficiente para todas as suas necessidades.',
+            icon: '🚀'
           },
           {
-            icon: '🔋',
-            title: 'Bateria Infinita',
-            description: 'Até 24 horas de uso contínuo com uma única carga'
+            id: 'feature-2',
+            title: 'Design Inovador',
+            description: 'Estética moderna e ergonômica para uma experiência de usuário aprimorada.',
+            icon: '💡'
           },
           {
-            icon: '🔒',
-            title: 'Segurança Avançada',
-            description: 'Sistema biométrico múltiplo para proteção total'
-          },
-          {
-            icon: '💧',
-            title: 'Resistência Total',
-            description: 'Proteção IP68 contra água e poeira'
-          },
-          {
-            icon: '🌐',
-            title: 'Conectividade Suprema',
-            description: 'Suporte a Wi-Fi 6E e Bluetooth 5.3 para transferências ultrarrápidas'
-          },
-          {
-            icon: '🎮',
-            title: 'Experiência Imersiva',
-            description: 'Engine gráfico avançado para conteúdo visual impressionante'
+            id: 'feature-3',
+            title: 'Conectividade Total',
+            description: 'Compatível com todos os seus dispositivos e plataformas favoritas.',
+            icon: '🔗'
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    id: 'electronic-gadget-2',
+    name: 'Gadget Tecnológico',
+    category: 'electronics',
+    thumbnail: '/templates/electronics/electronic-gadget-2.png',
+    blocks: [
       {
-        id: 'gallery-1',
-        type: 'gallery',
-        title: 'Galeria do Produto',
+        id: 'hero-2',
+        type: 'hero',
+        title: 'Novo Gadget',
         visible: true,
-        columns: '3',
+        columns: 'full',
         style: {
+          backgroundColor: '#28a745',
+          color: '#fff',
           padding: '60px 20px',
-          backgroundColor: '#ffffff'
+          textAlign: 'center',
+          borderRadius: '0'
         },
-        heading: '',
-        images: [
-          {
-            src: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece',
-            alt: 'Vista frontal do dispositivo',
-            caption: 'Design minimalista com tela edge-to-edge'
-          },
-          {
-            src: 'https://images.unsplash.com/photo-1601944179066-29786cb9d32a',
-            alt: 'Vista traseira do dispositivo',
-            caption: 'Acabamento premium em alumínio aeroespacial'
-          },
-          {
-            src: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0',
-            alt: 'Dispositivo em uso',
-            caption: 'Interface intuitiva para máxima produtividade'
-          }
-        ]
+        heading: 'A Tecnologia do Futuro',
+        subheading: 'Um gadget que vai revolucionar o seu dia a dia',
+        buttonText: 'Compre Já',
+        buttonUrl: '#'
       },
       {
-        id: 'specifications-1',
+        id: 'image-2',
+        type: 'image',
+        title: 'Imagem do Gadget',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '20px',
+          backgroundColor: '#fff',
+          textAlign: 'center'
+        },
+        src: '/templates/electronics/electronic-gadget-2-image.png',
+        alt: 'Gadget tecnológico',
+        caption: 'Conheça o novo gadget'
+      },
+      {
+        id: 'text-2',
+        type: 'text',
+        title: 'Descrição Detalhada',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        content: '<p>Descubra como este gadget pode transformar a sua rotina. Com funcionalidades inovadoras e design compacto, ele é perfeito para quem busca praticidade e eficiência.</p>'
+      },
+      {
+        id: 'benefits-2',
+        type: 'benefits',
+        title: 'Benefícios Exclusivos',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#fff'
+        },
+        heading: 'Por que escolher este gadget?',
+        benefits: [
+          {
+            id: 'benefit-1',
+            title: 'Praticidade',
+            description: 'Facilidade de uso e portabilidade para o seu dia a dia.',
+            icon: '👍'
+          },
+          {
+            id: 'benefit-2',
+            title: 'Inovação',
+            description: 'Tecnologia de ponta para uma experiência única.',
+            icon: '✨'
+          },
+          {
+            id: 'benefit-3',
+            title: 'Eficiência',
+            description: 'Otimize suas tarefas e ganhe tempo com este gadget.',
+            icon: '⏱️'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'smart-home-device-3',
+    name: 'Dispositivo para Casa Inteligente',
+    category: 'electronics',
+    thumbnail: '/templates/electronics/smart-home-device-3.png',
+    blocks: [
+      {
+        id: 'hero-3',
+        type: 'hero',
+        title: 'Casa Inteligente',
+        visible: true,
+        columns: 'full',
+        style: {
+          backgroundColor: '#dc3545',
+          color: '#fff',
+          padding: '60px 20px',
+          textAlign: 'center',
+          borderRadius: '0'
+        },
+        heading: 'Transforme sua Casa',
+        subheading: 'Controle total ao alcance da sua mão',
+        buttonText: 'Saiba Mais',
+        buttonUrl: '#'
+      },
+      {
+        id: 'image-3',
+        type: 'image',
+        title: 'Imagem do Dispositivo',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '20px',
+          backgroundColor: '#fff',
+          textAlign: 'center'
+        },
+        src: '/templates/electronics/smart-home-device-3-image.png',
+        alt: 'Dispositivo para casa inteligente',
+        caption: 'Controle sua casa com facilidade'
+      },
+      {
+        id: 'text-3',
+        type: 'text',
+        title: 'Descrição do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        content: '<p>Automatize sua casa com este dispositivo inteligente. Controle a iluminação, temperatura e segurança com apenas alguns toques no seu smartphone.</p>'
+      },
+      {
+        id: 'specifications-3',
         type: 'specifications',
         title: 'Especificações Técnicas',
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#f5f5f7',
-          margin: '0'
+          padding: '40px 20px',
+          backgroundColor: '#fff'
         },
-        heading: 'Especificações Técnicas Detalhadas',
+        heading: 'Detalhes do Produto',
         specs: [
-          { name: 'Processador', value: 'Quantum Core X9, 12 núcleos, 5.2GHz' },
-          { name: 'Memória', value: '16GB LPDDR5X' },
-          { name: 'Armazenamento', value: 'SSD NVMe 1TB' },
-          { name: 'Tela', value: 'AMOLED 6.7", 120Hz, HDR10+, 1500 nits' },
-          { name: 'Câmera Principal', value: 'Tripla 50MP + 48MP + 12MP com estabilização óptica' },
-          { name: 'Câmera Frontal', value: '32MP com sensor ToF' },
-          { name: 'Bateria', value: '5000mAh com carregamento rápido 100W' },
-          { name: 'Sistema Operacional', value: 'TechOS 5.0 com 4 anos de atualizações garantidas' },
-          { name: 'Segurança', value: 'Leitor de impressões digitais ultrassônico, reconhecimento facial 3D' },
-          { name: 'Conectividade', value: '5G, Wi-Fi 6E, Bluetooth 5.3, NFC, GPS de alta precisão' },
-          { name: 'Dimensões', value: '158.2 x 75.6 x 7.8mm' },
-          { name: 'Peso', value: '189g' }
-        ]
-      },
-      {
-        id: 'benefits-1',
-        type: 'benefits',
-        title: 'Benefícios Exclusivos',
-        visible: true,
-        columns: '3',
-        style: {
-          padding: '60px 20px',
-          backgroundColor: '#121212',
-          color: '#ffffff',
-          margin: '0'
-        },
-        heading: 'Experiência Superior',
-        benefits: [
           {
-            icon: '⚙️',
-            title: 'Automação Inteligente',
-            description: 'IA adaptativa que aprende seus hábitos e otimiza a performance'
+            id: 'spec-1',
+            name: 'Conectividade',
+            value: 'Wi-Fi, Bluetooth'
           },
           {
-            icon: '🌙',
-            title: 'Modo Noturno Avançado',
-            description: 'Proteção ocular com tecnologia de redução de luz azul certificada'
+            id: 'spec-2',
+            name: 'Compatibilidade',
+            value: 'iOS, Android'
           },
           {
-            icon: '🔥',
-            title: 'Sistema de Refrigeração',
-            description: 'Tecnologia de dissipação térmica para performance constante sem superaquecimento'
+            id: 'spec-3',
+            name: 'Alimentação',
+            value: 'Bivolt'
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    id: 'high-end-audio-4',
+    name: 'Áudio de Alta Qualidade',
+    category: 'electronics',
+    thumbnail: '/templates/electronics/high-end-audio-4.png',
+    blocks: [
       {
-        id: 'imageText-1',
-        type: 'imageText',
-        title: 'Tecnologia de Câmera',
+        id: 'hero-4',
+        type: 'hero',
+        title: 'Áudio Premium',
         visible: true,
         columns: 'full',
         style: {
-          padding: '80px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0'
-        },
-        heading: 'Fotografia Computacional de Última Geração',
-        content: '<p style="font-size: 16px; line-height: 1.8; color: #333;">Nosso sistema de câmera revolucionário combina hardware de ponta com algoritmos avançados de inteligência artificial para produzir imagens de qualidade profissional em qualquer condição de iluminação. A lente principal de 50MP utiliza tecnologia de pixel binning para capturar mais luz, enquanto o sensor ultrawide de 48MP oferece perspectivas impressionantes com mínima distorção.</p><p style="font-size: 16px; line-height: 1.8; color: #333; margin-top: 20px;">O processamento de imagem neural analisa cada foto em tempo real, aplicando otimizações específicas para cada cenário e garantindo resultados perfeitos mesmo nas condições mais desafiadoras.</p>',
-        image: {
-          src: 'https://images.unsplash.com/photo-1551419762-4a3d998f6292',
-          alt: 'Sistema de câmera avançada',
-        }
-      },
-      {
-        id: 'textImage-1',
-        type: 'textImage',
-        title: 'Inteligência Artificial',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '80px 20px',
-          backgroundColor: '#f5f5f7',
-          margin: '0'
-        },
-        heading: 'IA Adaptativa para Uma Experiência Personalizada',
-        content: '<p style="font-size: 16px; line-height: 1.8; color: #333;">O coração de nosso dispositivo é um sistema de inteligência artificial avançado que se adapta continuamente às suas necessidades e preferências. Através de aprendizado de máquina sofisticado, ele otimiza o uso de energia, prioriza aplicativos relevantes e sugere ações contextuais para maximizar sua produtividade.</p><p style="font-size: 16px; line-height: 1.8; color: #333; margin-top: 20px;">Com processamento local para dados sensíveis e criptografia de ponta a ponta, garantimos que sua privacidade nunca seja comprometida, mesmo enquanto você desfruta dos benefícios da automação inteligente.</p>',
-        image: {
-          src: 'https://images.unsplash.com/photo-1535378917042-10a22c95931a',
-          alt: 'Visualização da interface de IA',
-        }
-      },
-      {
-        id: 'video-1',
-        type: 'video',
-        title: 'Demonstração em Vídeo',
-        visible: true,
-        columns: 'full',
-        style: {
+          backgroundColor: '#343a40',
+          color: '#fff',
           padding: '60px 20px',
-          backgroundColor: '#121212',
-          margin: '0'
+          textAlign: 'center',
+          borderRadius: '0'
         },
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        aspectRatio: '16:9',
-        description: 'Demonstração completa das funcionalidades revolucionárias',
-        autoplay: false,
-        muteAudio: true
+        heading: 'Qualidade Sonora Impecável',
+        subheading: 'Experimente a música como nunca antes',
+        buttonText: 'Descubra',
+        buttonUrl: '#'
       },
       {
-        id: 'faq-1',
-        type: 'faq',
-        title: 'Perguntas Frequentes',
+        id: 'image-4',
+        type: 'image',
+        title: 'Imagem do Produto',
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0'
-        },
-        heading: 'Dúvidas Comuns',
-        questions: [
-          {
-            question: 'Qual é o período de garantia?',
-            answer: 'Oferecemos garantia premium de 2 anos que cobre defeitos de hardware e suporte técnico prioritário 24/7. Além disso, você pode estender a garantia por até 5 anos com nosso programa de proteção adicional.'
-          },
-          {
-            question: 'O dispositivo é compatível com acessórios de gerações anteriores?',
-            answer: 'Sim, mantivemos a compatibilidade com a maioria dos acessórios da geração anterior. Todos os cabos, carregadores e docks com conexão USB-C são totalmente compatíveis, assim como acessórios via Bluetooth e NFC.'
-          },
-          {
-            question: 'A bateria é substituível?',
-            answer: 'Como parte de nosso compromisso com a sustentabilidade, projetamos o dispositivo com uma bateria que pode ser substituída por técnicos autorizados, prolongando significativamente a vida útil do produto. Oferecemos também programa de troca com desconto após 2 anos de uso.'
-          }
-        ]
-      },
-      {
-        id: 'cta-1',
-        type: 'cta',
-        title: 'Chamada Final',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '80px 20px',
-          backgroundImage: 'linear-gradient(135deg, #121212 0%, #2d3436 100%)',
-          color: '#ffffff',
-          margin: '0',
+          padding: '20px',
+          backgroundColor: '#fff',
           textAlign: 'center'
         },
-        heading: 'O Futuro da Tecnologia Está Aqui',
-        content: 'Seja um dos primeiros a experimentar a próxima geração de dispositivos inteligentes',
-        buttonText: 'Reservar Agora',
+        src: '/templates/electronics/high-end-audio-4-image.png',
+        alt: 'Equipamento de áudio de alta qualidade',
+        caption: 'Som perfeito em cada detalhe'
+      },
+      {
+        id: 'text-4',
+        type: 'text',
+        title: 'Descrição do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        content: '<p>Mergulhe em um mundo de áudio cristalino com este equipamento de alta qualidade. Desfrute de cada nota e nuance com precisão e clareza incomparáveis.</p>'
+      },
+      {
+        id: 'gallery-4',
+        type: 'gallery',
+        title: 'Galeria de Imagens',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#fff'
+        },
+        heading: 'Detalhes do Produto',
+        images: [
+          {
+            id: 'gallery-image-1',
+            src: '/templates/electronics/high-end-audio-4-gallery-1.png',
+            alt: 'Detalhe do áudio',
+            caption: 'Design elegante'
+          },
+          {
+            id: 'gallery-image-2',
+            src: '/templates/electronics/high-end-audio-4-gallery-2.png',
+            alt: 'Componentes internos',
+            caption: 'Tecnologia avançada'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'gaming-laptop-5',
+    name: 'Laptop Gamer de Última Geração',
+    category: 'electronics',
+    thumbnail: '/templates/electronics/gaming-laptop-5.png',
+    blocks: [
+      {
+        id: 'hero-5',
+        type: 'hero',
+        title: 'Laptop Gamer',
+        visible: true,
+        columns: 'full',
+        style: {
+          backgroundColor: '#6c757d',
+          color: '#fff',
+          padding: '60px 20px',
+          textAlign: 'center',
+          borderRadius: '0'
+        },
+        heading: 'Domine o Jogo',
+        subheading: 'Desempenho extremo para gamers exigentes',
+        buttonText: 'Ver Especificações',
         buttonUrl: '#'
+      },
+      {
+        id: 'image-5',
+        type: 'image',
+        title: 'Imagem do Laptop',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '20px',
+          backgroundColor: '#fff',
+          textAlign: 'center'
+        },
+        src: '/templates/electronics/gaming-laptop-5-image.png',
+        alt: 'Laptop gamer de última geração',
+        caption: 'Prepare-se para a ação'
+      },
+      {
+        id: 'text-5',
+        type: 'text',
+        title: 'Descrição do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        content: '<p>Experimente o poder e a velocidade deste laptop gamer de última geração. Com gráficos avançados e processamento ultrarrápido, você estará pronto para qualquer desafio.</p>'
+      },
+      {
+        id: 'video-5',
+        type: 'video',
+        title: 'Vídeo do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#fff'
+        },
+        videoUrl: 'https://www.youtube.com/watch?v=your_youtube_video_id',
+        aspectRatio: '16:9',
+        autoplay: false,
+        muteAudio: true
       }
     ]
   }
