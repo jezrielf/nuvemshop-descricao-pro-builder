@@ -1,243 +1,281 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { ibblFilterTemplate } from './products/ibbl-filter-template';
 
+// Casa e decoração templates collection
 export const casaDecoracaoTemplates: Template[] = [
+  // Template 1: Air Purifier
   {
-    id: 'decor-moderno-1',
-    name: 'Decoração Moderna',
+    id: uuidv4(),
+    name: 'Purificador de Ar Premium',
     category: 'casa-decoracao',
-    thumbnail: '/template-thumbnails/casa-decoracao/decor-moderno-1.jpg',
     blocks: [
       {
-        id: 'hero-1',
+        id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
+        heading: 'Ar Puro e Revigorante',
+        subheading: 'Desfrute de um ambiente mais saudável com nosso purificador de ar de alta performance.',
+        backgroundImage: '/assets/templates/casa-decoracao/air-purifier-hero.jpg',
+        buttonText: 'Compre Agora',
+        buttonUrl: '#',
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#f8f9fa',
-          padding: '60px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
+          backgroundColor: '#f0f4f8',
+          textColor: '#333',
+          textAlign: 'center',
+          padding: '40px',
         },
-        heading: 'Transforme sua casa com estilo moderno',
-        subheading: 'Encontre os melhores itens de decoração para um ambiente contemporâneo e elegante.',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#'
       },
       {
-        id: 'text-1',
+        id: uuidv4(),
         type: 'text',
-        title: 'Descrição da Coleção',
+        title: 'Descrição do Produto',
+        heading: 'Por que escolher nosso purificador de ar?',
+        content: 'Nosso purificador de ar utiliza tecnologia de ponta para eliminar poeira, alérgenos e odores, proporcionando um ar mais limpo e saudável para você e sua família.',
         visible: true,
         columns: 'full',
         style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        content: '<p>Descubra nossa seleção de itens de decoração moderna, cuidadosamente escolhidos para adicionar um toque de sofisticação e design ao seu lar. De móveis minimalistas a acessórios de arte, encontre tudo o que você precisa para criar um espaço único e inspirador.</p>'
-      },
-      {
-        id: 'gallery-1',
-        type: 'gallery',
-        title: 'Galeria de Produtos',
-        visible: true,
-        columns: 'full',
-        style: {
+          backgroundColor: '#fff',
           padding: '20px',
-          backgroundColor: '#ffffff'
+          textAlign: 'left',
         },
-        images: [
-          {
-            id: 'img-1',
-            src: '/template-thumbnails/casa-decoracao/gallery/modern-decor-1.jpg',
-            alt: 'Decoração moderna',
-            caption: 'Detalhes que inspiram'
-          },
-          {
-            id: 'img-2',
-            src: '/template-thumbnails/casa-decoracao/gallery/modern-decor-2.jpg',
-            alt: 'Design minimalista',
-            caption: 'Elegância em cada linha'
-          },
-          {
-            id: 'img-3',
-            src: '/template-thumbnails/casa-decoracao/gallery/modern-decor-3.jpg',
-            alt: 'Ambientes sofisticados',
-            caption: 'Conforto e beleza'
-          }
-        ]
       },
       {
-        id: 'cta-1',
+        id: uuidv4(),
+        type: 'features',
+        title: 'Recursos Avançados',
+        heading: 'Conheça os recursos que fazem a diferença',
+        layout: 'horizontal',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Filtro HEPA',
+            description: 'Remove até 99,97% das partículas no ar.',
+            icon: 'shield',
+          },
+          {
+            id: uuidv4(),
+            title: 'Ionizador',
+            description: 'Neutraliza poluentes e melhora a qualidade do ar.',
+            icon: 'zap',
+          },
+          {
+            id: uuidv4(),
+            title: 'Design Moderno',
+            description: 'Integra-se perfeitamente a qualquer ambiente.',
+            icon: 'layout',
+          },
+        ],
+        visible: true,
+        columns: 'full',
+        style: {
+          backgroundColor: '#f9f9f9',
+          padding: '20px',
+        },
+      },
+      {
+        id: uuidv4(),
         type: 'cta',
         title: 'Chamada para Ação',
+        heading: 'Transforme seu ambiente agora!',
+        content: 'Adquira já o seu purificador de ar e respire um ar mais puro e saudável.',
+        buttonText: 'Compre Agora',
+        buttonUrl: '#',
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#f8f9fa',
-          padding: '40px 20px',
-          textAlign: 'center'
+          backgroundColor: '#4a90e2',
+          textColor: '#fff',
+          textAlign: 'center',
+          padding: '30px',
         },
-        heading: 'Está pronto para transformar sua casa?',
-        content: 'Não perca tempo! Renove seu espaço com nossos itens exclusivos e crie um ambiente que reflita sua personalidade.',
-        buttonText: 'Comece Agora',
-        buttonUrl: '#'
-      }
-    ]
+      },
+    ],
+    thumbnail: '/assets/templates/casa-decoracao/air-purifier-thumbnail.jpg',
   },
+  
+  // Template 2: Smart Home Kit
   {
-    id: 'decor-rustico-2',
-    name: 'Decoração Rústica',
+    id: uuidv4(),
+    name: 'Kit Casa Inteligente',
     category: 'casa-decoracao',
-    thumbnail: '/template-thumbnails/casa-decoracao/decor-rustico-2.jpg',
     blocks: [
       {
-        id: 'hero-2',
+        id: uuidv4(),
         type: 'hero',
-        title: 'Banner Rústico',
+        title: 'Banner Principal',
+        heading: 'Controle sua Casa na Palma da Mão',
+        subheading: 'Simplifique sua vida com nosso kit casa inteligente completo.',
+        backgroundImage: '/assets/templates/casa-decoracao/smart-home-hero.jpg',
+        buttonText: 'Saiba Mais',
+        buttonUrl: '#',
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#e9ecef',
-          padding: '60px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
+          backgroundColor: '#28a745',
+          textColor: '#fff',
+          textAlign: 'center',
+          padding: '40px',
         },
-        heading: 'Aconchego e charme com toque rústico',
-        subheading: 'Descubra peças únicas que trazem a beleza do campo para dentro da sua casa.',
-        buttonText: 'Explore a Coleção',
-        buttonUrl: '#'
       },
       {
-        id: 'text-2',
+        id: uuidv4(),
         type: 'text',
-        title: 'Descrição da Coleção Rústica',
+        title: 'Descrição do Produto',
+        heading: 'O que você pode fazer com nosso kit?',
+        content: 'Com nosso kit casa inteligente, você pode controlar a iluminação, segurança e eletrodomésticos de qualquer lugar, proporcionando conforto e segurança para sua família.',
         visible: true,
         columns: 'full',
         style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        content: '<p>Nossa coleção de decoração rústica é perfeita para quem busca um ambiente acolhedor e cheio de personalidade. Com móveis de madeira maciça, tecidos naturais e detalhes artesanais, cada peça conta uma história e transforma sua casa em um refúgio de paz e tranquilidade.</p>'
-      },
-      {
-        id: 'image-text-1',
-        type: 'imageText',
-        title: 'Detalhes Rústicos',
-        visible: true,
-        columns: 'full',
-        style: {
+          backgroundColor: '#fff',
           padding: '20px',
-          backgroundColor: '#ffffff'
+          textAlign: 'left',
         },
-        image: {
-          src: '/template-thumbnails/casa-decoracao/image-text/rustic-decor-1.jpg',
-          alt: 'Detalhes rústicos'
-        },
-        heading: 'Artesanato e tradição',
-        content: '<p>Valorizamos o trabalho manual e a riqueza dos materiais naturais. Cada item é feito com cuidado e atenção aos detalhes, garantindo a autenticidade e o charme da decoração rústica.</p>'
       },
       {
-        id: 'cta-2',
-        type: 'cta',
-        title: 'Transforme seu Lar',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#e9ecef',
-          padding: '40px 20px',
-          textAlign: 'center'
-        },
-        heading: 'Crie um ambiente acolhedor e autêntico',
-        content: 'Deixe-se inspirar pela beleza da decoração rústica e transforme sua casa em um espaço único e cheio de vida.',
-        buttonText: 'Encontre Seu Estilo',
-        buttonUrl: '#'
-      }
-    ]
-  },
-  {
-    id: 'decor-minimalista-3',
-    name: 'Decoração Minimalista',
-    category: 'casa-decoracao',
-    thumbnail: '/template-thumbnails/casa-decoracao/decor-minimalista-3.jpg',
-    blocks: [
-      {
-        id: 'hero-3',
-        type: 'hero',
-        title: 'Banner Minimalista',
+        id: uuidv4(),
+        type: 'features',
+        title: 'Componentes do Kit',
+        heading: 'Descubra os componentes essenciais',
+        layout: 'vertical',
+        features: [
+          {
+            id: uuidv4(),
+            title: 'Central de Controle',
+            description: 'Conecte e controle todos os dispositivos.',
+            icon: 'home',
+          },
+          {
+            id: uuidv4(),
+            title: 'Sensores de Presença',
+            description: 'Detecte movimentos e acione alarmes.',
+            icon: 'eye',
+          },
+          {
+            id: uuidv4(),
+            title: 'Lâmpadas Inteligentes',
+            description: 'Ajuste a intensidade e cor da luz.',
+            icon: 'sun',
+          },
+        ],
         visible: true,
         columns: 'full',
         style: {
           backgroundColor: '#f9f9f9',
-          padding: '60px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
-        },
-        heading: 'Menos é mais: simplicidade e elegância',
-        subheading: 'Descubra a beleza do design minimalista e crie ambientes clean e sofisticados.',
-        buttonText: 'Descubra o Minimalismo',
-        buttonUrl: '#'
-      },
-      {
-        id: 'text-3',
-        type: 'text',
-        title: 'Descrição Minimalista',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        content: '<p>A decoração minimalista valoriza a funcionalidade, a organização e a ausência de excessos. Com linhas retas, cores neutras e poucos objetos, é possível criar espaços amplos, luminosos e cheios de personalidade.</p>'
-      },
-      {
-        id: 'image-text-2',
-        type: 'textImage',
-        title: 'Design Clean',
-        visible: true,
-        columns: 'full',
-        style: {
           padding: '20px',
-          backgroundColor: '#ffffff'
         },
-        image: {
-          src: '/template-thumbnails/casa-decoracao/text-image/minimalist-decor-1.jpg',
-          alt: 'Design clean'
-        },
-        heading: 'A arte de simplificar',
-        content: '<p>Cada detalhe é pensado para transmitir calma e bem-estar. Invista em móveis multifuncionais, iluminação natural e poucos acessórios para criar um ambiente equilibrado e inspirador.</p>'
       },
       {
-        id: 'cta-3',
+        id: uuidv4(),
         type: 'cta',
-        title: 'Crie Seu Espaço',
+        title: 'Chamada para Ação',
+        heading: 'Comece a viver no futuro hoje!',
+        content: 'Adquira já o seu kit casa inteligente e transforme sua casa em um ambiente conectado e seguro.',
+        buttonText: 'Compre Agora',
+        buttonUrl: '#',
+        visible: true,
+        columns: 'full',
+        style: {
+          backgroundColor: '#28a745',
+          textColor: '#fff',
+          textAlign: 'center',
+          padding: '30px',
+        },
+      },
+    ],
+    thumbnail: '/assets/templates/casa-decoracao/smart-home-thumbnail.jpg',
+  },
+  
+  // Template 3: Decorative Lighting
+  {
+    id: uuidv4(),
+    name: 'Iluminação Decorativa',
+    category: 'casa-decoracao',
+    blocks: [
+      {
+        id: uuidv4(),
+        type: 'hero',
+        title: 'Banner Principal',
+        heading: 'Transforme Seus Espaços com Luz',
+        subheading: 'Descubra nossa coleção exclusiva de iluminação decorativa.',
+        backgroundImage: '/assets/templates/casa-decoracao/decorative-lighting-hero.jpg',
+        buttonText: 'Veja a Coleção',
+        buttonUrl: '#',
+        visible: true,
+        columns: 'full',
+        style: {
+          backgroundColor: '#ffc107',
+          textColor: '#333',
+          textAlign: 'center',
+          padding: '40px',
+        },
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        title: 'Descrição do Produto',
+        heading: 'Por que a iluminação faz toda a diferença?',
+        content: 'A iluminação decorativa certa pode transformar qualquer ambiente, criando atmosferas acolhedoras e realçando a beleza de seus espaços.',
+        visible: true,
+        columns: 'full',
+        style: {
+          backgroundColor: '#fff',
+          padding: '20px',
+          textAlign: 'left',
+        },
+      },
+      {
+        id: uuidv4(),
+        type: 'gallery',
+        title: 'Galeria de Produtos',
+        heading: 'Inspire-se com nossas opções',
+        images: [
+          {
+            id: uuidv4(),
+            src: '/assets/templates/casa-decoracao/lighting-1.jpg',
+            alt: 'Luminária Pendente',
+          },
+          {
+            id: uuidv4(),
+            src: '/assets/templates/casa-decoracao/lighting-2.jpg',
+            alt: 'Abajur Moderno',
+          },
+          {
+            id: uuidv4(),
+            src: '/assets/templates/casa-decoracao/lighting-3.jpg',
+            alt: 'Arandela Elegante',
+          },
+        ],
         visible: true,
         columns: 'full',
         style: {
           backgroundColor: '#f9f9f9',
-          padding: '40px 20px',
-          textAlign: 'center'
+          padding: '20px',
         },
-        heading: 'Transforme sua casa em um refúgio de paz',
-        content: 'Aposte na decoração minimalista e descubra como a simplicidade pode transformar sua vida.',
-        buttonText: 'Comece a Simplificar',
-        buttonUrl: '#'
       },
       {
-        id: 'video-1',
-        type: 'video',
-        title: 'Vídeo Inspirador',
+        id: uuidv4(),
+        type: 'cta',
+        title: 'Chamada para Ação',
+        heading: 'Ilumine seus sonhos!',
+        content: 'Explore nossa coleção de iluminação decorativa e encontre as peças perfeitas para seus espaços.',
+        buttonText: 'Compre Agora',
+        buttonUrl: '#',
         visible: true,
         columns: 'full',
         style: {
-          padding: '20px',
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffc107',
+          textColor: '#333',
+          textAlign: 'center',
+          padding: '30px',
         },
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        aspectRatio: '16:9',
-        autoplay: false,
-        muteAudio: true
-      }
-    ]
-  }
+      },
+    ],
+    thumbnail: '/assets/templates/casa-decoracao/decorative-lighting-thumbnail.jpg',
+  },
+  
+  // Add the IBBL filter template to the collection
+  ibblFilterTemplate,
 ];

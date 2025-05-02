@@ -1,93 +1,68 @@
 
-import { VideoBlock } from "@/types/editor";
-import { getStylesFromBlock } from "../styleConverter";
+import { VideoBlock } from '@/types/editor/blocks';
 
-// Function to extract YouTube video ID from various URL formats
-function getYoutubeVideoId(url: string): string | null {
-  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[7].length === 11) ? match[7] : null;
-}
-
-// Function to determine if a URL is a YouTube URL
-function isYoutubeUrl(url: string): boolean {
-  return url.includes('youtube.com') || url.includes('youtu.be');
-}
-
-// Function to extract Vimeo video ID from various URL formats
-function getVimeoVideoId(url: string): string | null {
-  const regExp = /vimeo\.com\/(?:video\/)?([0-9]+)/;
-  const match = url.match(regExp);
-  return match ? match[1] : null;
-}
-
-// Function to determine if a URL is a Vimeo URL
-function isVimeoUrl(url: string): boolean {
-  return url.includes('vimeo.com');
-}
-
-// Main function to generate HTML for a video block
-export function generateVideoBlockHtml(block: VideoBlock): string {
-  const { videoUrl, aspectRatio = '16:9', title, description } = block;
-  const autoplay = block.autoplay ?? false;
-  const muteAudio = block.muteAudio ?? true;
+export const generateVideoBlockHtml = (block: VideoBlock): string => {
+  const { videoUrl, aspectRatio = '16:9', description, autoplay = false, muteAudio = true } = block;
   
-  // Set aspect ratio CSS
-  let aspectRatioStyle = 'padding-bottom: 56.25%;'; // Default 16:9
-  switch (aspectRatio) {
-    case '16:9':
-      aspectRatioStyle = 'padding-bottom: 56.25%;'; // 9/16 * 100%
-      break;
-    case '4:3':
-      aspectRatioStyle = 'padding-bottom: 75%;'; // 3/4 * 100%
-      break;
-    case '1:1':
-      aspectRatioStyle = 'padding-bottom: 100%;';
-      break;
+  if (!videoUrl) {
+    return '<div class="video-container empty"><p>Vídeo não disponível</p></div>';
   }
   
-  // Generate container styles
-  const containerStyle = getStylesFromBlock(block);
-  const blockId = `video-${block.id}`;
-  
-  // Default embed code (fallback for non-YouTube/Vimeo URLs)
-  let embedCode = `<video controls src="${videoUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" ${autoplay ? 'autoplay' : ''} ${muteAudio ? 'muted' : ''}></video>`;
-  
-  // Process YouTube videos
-  if (isYoutubeUrl(videoUrl)) {
-    const videoId = getYoutubeVideoId(videoUrl);
-    if (videoId) {
-      embedCode = `<iframe 
-        src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? '1' : '0'}&mute=${muteAudio ? '1' : '0'}&rel=0" 
-        frameborder="0" 
-        allowfullscreen 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
-      ></iframe>`;
+  // Extract video ID if it's a YouTube URL
+  const getYoutubeEmbedUrl = (url: string) => {
+    if (!url) return '';
+    
+    // Match YouTube URL patterns
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/;
+    const match = url.match(youtubeRegex);
+    
+    if (match && match[1]) {
+      // Format parameters for embed URL
+      const autoplayParam = autoplay ? 'autoplay=1&' : '';
+      const muteParam = muteAudio ? 'mute=1&' : '';
+      
+      return `https://www.youtube.com/embed/${match[1]}?${autoplayParam}${muteParam}rel=0`;
     }
-  } 
-  // Process Vimeo videos
-  else if (isVimeoUrl(videoUrl)) {
-    const videoId = getVimeoVideoId(videoUrl);
-    if (videoId) {
-      embedCode = `<iframe 
-        src="https://player.vimeo.com/video/${videoId}?autoplay=${autoplay ? '1' : '0'}&muted=${muteAudio ? '1' : '0'}" 
-        frameborder="0" 
-        allowfullscreen 
-        allow="autoplay; fullscreen; picture-in-picture" 
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
-      ></iframe>`;
-    }
+    
+    // Return original URL if not a YouTube link
+    return url;
+  };
+  
+  const embedUrl = getYoutubeEmbedUrl(videoUrl);
+  
+  // Determine aspect ratio class for the container
+  let aspectRatioStyle = 'padding-top: 56.25%;'; // Default 16:9 ratio
+  if (aspectRatio === '4:3') {
+    aspectRatioStyle = 'padding-top: 75%;';
+  } else if (aspectRatio === '1:1') {
+    aspectRatioStyle = 'padding-top: 100%;';
   }
   
-  // Generate complete HTML with title and description (if provided)
+  // Generate inline styles from block.style
+  const inlineStyles = Object.entries(block.style || {})
+    .map(([key, value]) => {
+      if (!value) return '';
+      // Convert camelCase to kebab-case
+      const kebabKey = key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+      return `${kebabKey}: ${value};`;
+    })
+    .filter(Boolean)
+    .join(' ');
+    
+  const containerStyle = inlineStyles ? `style="${inlineStyles}"` : '';
+  
   return `
-    <div id="${blockId}" style="${containerStyle || ''}">
-      ${title ? `<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">${title}</h3>` : ''}
-      ${description ? `<p style="margin-bottom: 1rem; color: #666;">${description}</p>` : ''}
-      <div style="position: relative; overflow: hidden; width: 100%; ${aspectRatioStyle}">
-        ${embedCode}
+    <div class="video-block" ${containerStyle}>
+      <div class="video-container" style="position: relative; width: 100%; ${aspectRatioStyle}">
+        <iframe 
+          src="${embedUrl}" 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+          title="Video" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen
+        ></iframe>
       </div>
+      ${description ? `<p class="video-description">${description}</p>` : ''}
     </div>
   `;
-}
+};
