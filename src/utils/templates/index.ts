@@ -4,30 +4,26 @@ import { basicTemplates } from './basic';
 import { supplementsTemplates } from './supplements';
 import { shoesTemplates } from './shoes';
 import { electronicsTemplates } from './electronics';
-import { fashionTemplates } from './fashion';
+import { fashionTemplates } from './clothing';
 import { accessoriesTemplates } from './accessories';
-import { hauteCoutureTemplates } from './hauteCouture';
-import { waterFilterTemplate } from './products/water-filter';
-import { waterFilterPremiumTemplate } from './products/water-filter-premium';
+import { casaDecoracaoTemplates } from './casa-decoracao';
 
 // Combining all templates with proper categorization
-export const advancedTemplates: Template[] = [
-  waterFilterTemplate,
-  waterFilterPremiumTemplate,
+export const allTemplates: Template[] = [
   ...supplementsTemplates,
   ...shoesTemplates,
   ...electronicsTemplates,
   ...fashionTemplates,
   ...accessoriesTemplates,
-  ...hauteCoutureTemplates
+  ...casaDecoracaoTemplates,
+  ...basicTemplates
 ];
 
 // Enhanced getAllTemplates function with error handling
 export const getAllTemplates = (): Template[] => {
   try {
-    const templates = [...basicTemplates, ...advancedTemplates];
-    console.log(`Successfully loaded ${templates.length} templates`);
-    return templates;
+    console.log(`Successfully loaded ${allTemplates.length} templates`);
+    return allTemplates;
   } catch (error) {
     console.error('Error loading templates:', error);
     // Return at least basic templates as fallback
@@ -40,8 +36,6 @@ export * from './basic';
 export * from './supplements';
 export * from './shoes';
 export * from './electronics';
-export * from './fashion';
+export * from './clothing';
 export * from './accessories';
-export * from './hauteCouture';
-export * from './products/water-filter';
-export * from './products/water-filter-premium';
+export * from './casa-decoracao';

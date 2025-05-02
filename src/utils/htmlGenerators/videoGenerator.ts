@@ -1,5 +1,5 @@
 
-import { VideoBlock } from "@/types/editor/blocks/video";
+import { VideoBlock } from "@/types/editor";
 import { getStylesFromBlock } from "../styleConverter";
 
 // Function to extract YouTube video ID from various URL formats
@@ -29,30 +29,29 @@ function isVimeoUrl(url: string): boolean {
 // Main function to generate HTML for a video block
 export function generateVideoBlockHtml(block: VideoBlock): string {
   const { videoUrl, aspectRatio = '16:9', title, description } = block;
-  const autoplay = block.autoplay ?? true;
-  const muteAudio = block.muteAudio ?? false;
+  const autoplay = block.autoplay ?? false;
+  const muteAudio = block.muteAudio ?? true;
   
-  // Set aspect ratio CSS class
-  let aspectRatioClass = '';
+  // Set aspect ratio CSS
+  let aspectRatioStyle = 'padding-bottom: 56.25%;'; // Default 16:9
   switch (aspectRatio) {
     case '16:9':
-      aspectRatioClass = 'pb-[56.25%]'; // 9/16 * 100%
+      aspectRatioStyle = 'padding-bottom: 56.25%;'; // 9/16 * 100%
       break;
     case '4:3':
-      aspectRatioClass = 'pb-[75%]'; // 3/4 * 100%
+      aspectRatioStyle = 'padding-bottom: 75%;'; // 3/4 * 100%
       break;
     case '1:1':
-      aspectRatioClass = 'pb-[100%]';
+      aspectRatioStyle = 'padding-bottom: 100%;';
       break;
-    default:
-      aspectRatioClass = 'pb-[56.25%]'; // Default to 16:9
   }
   
   // Generate container styles
   const containerStyle = getStylesFromBlock(block);
+  const blockId = `video-${block.id}`;
   
   // Default embed code (fallback for non-YouTube/Vimeo URLs)
-  let embedCode = `<video controls src="${videoUrl}" class="absolute top-0 left-0 w-full h-full" ${autoplay ? 'autoplay' : ''} ${muteAudio ? 'muted' : ''}></video>`;
+  let embedCode = `<video controls src="${videoUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" ${autoplay ? 'autoplay' : ''} ${muteAudio ? 'muted' : ''}></video>`;
   
   // Process YouTube videos
   if (isYoutubeUrl(videoUrl)) {
@@ -63,7 +62,7 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
         frameborder="0" 
         allowfullscreen 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-        class="absolute top-0 left-0 w-full h-full"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
       ></iframe>`;
     }
   } 
@@ -76,19 +75,19 @@ export function generateVideoBlockHtml(block: VideoBlock): string {
         frameborder="0" 
         allowfullscreen 
         allow="autoplay; fullscreen; picture-in-picture" 
-        class="absolute top-0 left-0 w-full h-full"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
       ></iframe>`;
     }
   }
   
-  // Construct the full HTML for the video block including title and description
+  // Generate complete HTML with title and description (if provided)
   return `
-    <div class="video-block my-6" style="${containerStyle}">
-      ${title ? `<h3 class="text-xl font-semibold mb-3" style="color: ${block.style?.headingColor || 'inherit'}">${title}</h3>` : ''}
-      <div class="video-container relative ${aspectRatioClass}">
+    <div id="${blockId}" style="${containerStyle || ''}">
+      ${title ? `<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">${title}</h3>` : ''}
+      ${description ? `<p style="margin-bottom: 1rem; color: #666;">${description}</p>` : ''}
+      <div style="position: relative; overflow: hidden; width: 100%; ${aspectRatioStyle}">
         ${embedCode}
       </div>
-      ${description ? `<p class="text-sm mt-2 text-gray-600" style="color: ${block.style?.textColor || 'inherit'}">${description}</p>` : ''}
     </div>
   `;
 }

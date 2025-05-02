@@ -1,423 +1,257 @@
 
 import { Template } from '@/types/editor';
-import { v4 as uuidv4 } from 'uuid';
 
-// Accessories Template Collection
 export const accessoriesTemplates: Template[] = [
-  // TEMPLATE 1: Premium Accessories
   {
-    id: uuidv4(),
+    id: 'accessories-premium-1',
     name: 'Acessórios Premium',
     category: 'accessories',
-    thumbnail: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30',
+    thumbnail: '/placeholder.svg',
     blocks: [
-      // Hero Block
       {
-        id: uuidv4(),
+        id: 'hero-1',
         type: 'hero',
         title: 'Banner Principal',
-        columns: 1,
         visible: true,
-        heading: 'Acessórios que complementam seu estilo',
-        subheading: 'Detalhes que fazem toda a diferença na composição do seu visual',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30',
-        style: {
-          backgroundColor: '#f8f8f8',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Benefits Block
-      {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Diferenciais dos Acessórios',
-        columns: 3,
-        visible: true,
-        heading: 'Por que nossos acessórios são especiais',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Artesanato Premium',
-            description: 'Cada peça é desenvolvida por artesãos experientes com técnicas tradicionais e modernas.',
-            icon: '🔷'
-          },
-          {
-            id: uuidv4(),
-            title: 'Materiais Exclusivos',
-            description: 'Utilizamos apenas matérias-primas de alta qualidade, incluindo metais nobres e pedras naturais.',
-            icon: '💎'
-          },
-          {
-            id: uuidv4(),
-            title: 'Design Atemporal',
-            description: 'Peças que transcendem tendências e permanecem relevantes ao longo do tempo.',
-            icon: '⏱️'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Galeria da Coleção',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f',
-            alt: 'Colar artesanal',
-            caption: 'Colar Ágata Azul'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1635767798638-3685bcb2b4b3',
-            alt: 'Pulseira de couro',
-            caption: 'Pulseira Toscana'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1608042314453-ae338d80c427',
-            alt: 'Conjunto de anéis',
-            caption: 'Anéis Minimalistas'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // CTA Block
-      {
-        id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
-        visible: true,
-        heading: 'Eleve seu estilo com nossos acessórios exclusivos',
-        content: 'Peças atemporais que transformam qualquer visual. Garantia de 1 ano em todas as peças.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#',
-        style: {
-          backgroundColor: '#212121',
-          headingColor: '#ffffff',
-          textColor: '#ffffff',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 2: Accessories Collection
-  {
-    id: uuidv4(),
-    name: 'Coleção de Acessórios',
-    category: 'accessories',
-    thumbnail: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Coleção Exclusiva de Acessórios',
-        subheading: 'Peças únicas para completar seu look com elegância',
-        buttonText: 'Explorar',
-        buttonUrl: '#explore',
-        backgroundImage: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a',
+        columns: 'full',
         style: {
           backgroundColor: '#f0f0f0',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Image Block
-      {
-        id: uuidv4(),
-        type: 'image',
-        title: 'Imagem Destaque',
-        columns: 1,
-        visible: true,
-        src: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed',
-        alt: 'Acessório Destaque da Coleção',
-        caption: 'Brincos Cristal - Edição Limitada',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'md',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Features Block
-      {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Características do Produto',
-        columns: 3,
-        visible: true,
-        heading: 'Características e Vantagens',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Hipoalergênico',
-            description: 'Materiais testados e seguros para todos os tipos de pele',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Feito à Mão',
-            description: 'Produção artesanal com atenção aos detalhes',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Resistente à Água',
-            description: 'Peças com tratamento especial para maior durabilidade',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Certificado de Autenticidade',
-            description: 'Cada peça acompanha certificado de originalidade',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Embalagem Exclusiva',
-            description: 'Apresentação premium para presente ou uso pessoal',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Garantia Estendida',
-            description: 'Garantia de 2 anos contra defeitos de fabricação',
-            icon: '✓'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // ImageText Block
-      {
-        id: uuidv4(),
-        type: 'imageText',
-        title: 'Sobre a Coleção',
-        columns: 1,
-        visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1631965004544-1762fc696476',
-          alt: 'Criação de acessórios'
+          padding: '60px 20px',
+          borderRadius: '0',
+          textAlign: 'center'
         },
-        heading: 'Inspiração e Processo Criativo',
-        content: 'Nossa nova coleção é inspirada em elementos geométricos e formas orgânicas da natureza. Cada peça é cuidadosamente desenhada e produzida por artesãos especializados, garantindo a mais alta qualidade e atenção aos detalhes. Utilizamos apenas materiais sustentáveis e éticos em nossa produção.',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
+        heading: 'Acessórios que Definem Estilo',
+        subheading: 'Detalhes precisos, materiais nobres e design contemporâneo para complementar seu visual',
+        buttonText: 'Explore a Coleção',
+        buttonUrl: '#'
       },
-      // Specifications Block
       {
-        id: uuidv4(),
-        type: 'specifications',
-        title: 'Especificações',
-        columns: 1,
-        visible: true,
-        heading: 'Especificações do Produto',
-        specs: [
-          { id: uuidv4(), name: 'Material', value: 'Prata 925 / Ouro 18k' },
-          { id: uuidv4(), name: 'Peso', value: '3.5g - 8.2g (dependendo do modelo)' },
-          { id: uuidv4(), name: 'Dimensões', value: '2cm x 1.5cm (ajustável)' },
-          { id: uuidv4(), name: 'Acabamento', value: 'Polido / Fosco / Texturizado' },
-          { id: uuidv4(), name: 'Pedras', value: 'Zircônia / Quartzo / Ágata' }
-        ],
-        style: {
-          backgroundColor: '#f5f5f5',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 3: Luxury Accessories
-  {
-    id: uuidv4(),
-    name: 'Acessórios de Luxo',
-    category: 'accessories',
-    thumbnail: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Acessórios de Luxo',
-        subheading: 'Sofisticação e elegância em cada detalhe',
-        buttonText: 'Descubra',
-        buttonUrl: '#discover',
-        backgroundImage: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0',
-        style: {
-          backgroundColor: '#000000',
-          headingColor: '#ffffff',
-          textColor: '#f0f0f0',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Text Block
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Descrição da Coleção',
-        columns: 1,
-        visible: true,
-        heading: 'Requinte em Cada Detalhe',
-        content: '<p>Nossa coleção de acessórios de luxo representa o ápice da sofisticação e artesanato. Cada peça é meticulosamente criada por mestres joalheiros, utilizando materiais preciosos e técnicas tradicionais transmitidas por gerações.</p><p>As peças combinam design contemporâneo com elementos clássicos, resultando em acessórios que são verdadeiras obras de arte que resistem ao teste do tempo.</p>',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
+        id: 'gallery-1',
         type: 'gallery',
         title: 'Galeria de Produtos',
-        columns: 2,
         visible: true,
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: '',
         images: [
           {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1576053139394-f0c3f4e1a85f',
-            alt: 'Relógio de luxo',
-            caption: 'Relógio Cronógrafo Série Platinum'
+            src: 'https://images.unsplash.com/photo-1631485055112-c9b2aec772a1',
+            alt: 'Relógio premium em fundo neutro',
+            caption: 'Relógio Cronógrafo Serie Premium'
           },
           {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d',
-            alt: 'Pulseira em ouro',
-            caption: 'Pulseira Entrelaçada Ouro 18k'
+            src: 'https://images.unsplash.com/photo-1509112756314-34a0badb29d4',
+            alt: 'Bolsa de couro genuíno',
+            caption: 'Bolsa Artesanal em Couro Italiano'
           },
           {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e',
-            alt: 'Conjunto de anéis',
-            caption: 'Anéis Trilogy Diamantes'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401',
-            alt: 'Colar de pérolas',
-            caption: 'Colar Pérolas Akoya Genuínas'
+            src: 'https://images.unsplash.com/photo-1601740982034-56bc36106e82',
+            alt: 'Joias finas',
+            caption: 'Coleção Exclusiva de Joias'
           }
-        ],
+        ]
+      },
+      {
+        id: 'text-1',
+        type: 'text',
+        title: 'Sobre a Coleção',
+        visible: true,
+        columns: 'full',
         style: {
-          backgroundColor: '#f8f8f8',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
+          padding: '60px 20px',
+          backgroundColor: '#ffffff',
+          margin: '0',
+          textAlign: 'center'
+        },
+        content: '<h2 style="font-size: 28px; font-weight: 400; color: #333; margin-bottom: 24px;">Elevando o Conceito de Luxo</h2><p style="font-size: 16px; line-height: 1.8; color: #555; max-width: 800px; margin: 0 auto;">Nossa coleção de acessórios premium redefine o significado de elegância através de peças meticulosamente elaboradas que combinam design contemporâneo com técnicas artesanais tradicionais. Cada item é criado para ser não apenas um complemento ao seu visual, mas uma declaração de estilo e sofisticação.</p>'
+      },
+      {
+        id: 'benefits-1',
+        type: 'benefits',
+        title: 'Vantagens da Nossa Linha',
+        visible: true,
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f7f7f7',
+          margin: '0'
+        },
+        heading: 'Por Que Escolher Nossos Acessórios',
+        benefits: [
+          {
+            icon: '💎',
+            title: 'Qualidade Superior',
+            description: 'Materiais premium selecionados das melhores fontes globais'
+          },
+          {
+            icon: '🔄',
+            title: 'Durabilidade',
+            description: 'Peças projetadas para durar e manter sua beleza por anos'
+          },
+          {
+            icon: '✨',
+            title: 'Design Exclusivo',
+            description: 'Criações únicas desenvolvidas por designers renomados'
+          }
+        ]
+      },
+      {
+        id: 'imageText-1',
+        type: 'imageText',
+        title: 'Artesanato de Precisão',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff',
+          margin: '0'
+        },
+        heading: 'Artesanato de Excelência',
+        content: '<p style="font-size: 16px; line-height: 1.8; color: #555;">Cada peça da nossa coleção passa por um rigoroso processo de fabricação onde artesãos especializados utilizam técnicas refinadas ao longo de décadas de experiência. A atenção aos mínimos detalhes é o que diferencia nossos acessórios, desde o corte preciso do couro até o polimento final das peças metálicas.</p><p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 20px;">Este compromisso com a excelência resulta em acessórios que não apenas complementam seu visual, mas também contam uma história de tradição e qualidade.</p>',
+        image: {
+          src: 'https://images.unsplash.com/photo-1533758488827-caf6f782e87d',
+          alt: 'Artesão trabalhando em acessório de couro',
         }
       },
-      // FAQ Block
       {
-        id: uuidv4(),
+        id: 'features-1',
+        type: 'features',
+        title: 'Diferenciais dos Produtos',
+        visible: true,
+        columns: '2',
+        layout: 'vertical',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f7f7f7',
+          margin: '0'
+        },
+        heading: 'Características Exclusivas',
+        features: [
+          {
+            icon: '🔧',
+            title: 'Hardware Premium',
+            description: 'Componentes metálicos banhados a ouro e resistentes à corrosão'
+          },
+          {
+            icon: '🧵',
+            title: 'Costuras Precisas',
+            description: 'Cada ponto é meticulosamente aplicado para garantir durabilidade'
+          },
+          {
+            icon: '🛡️',
+            title: 'Proteção Garantida',
+            description: 'Tratamentos especiais para resistência à água e manchas'
+          },
+          {
+            icon: '🔒',
+            title: 'Segurança Integrada',
+            description: 'Sistemas anti-roubo discretos em bolsas e carteiras'
+          }
+        ]
+      },
+      {
+        id: 'image-1',
+        type: 'image',
+        title: 'Detalhe do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '20px',
+          backgroundColor: '#ffffff',
+          margin: '0',
+          textAlign: 'center'
+        },
+        src: 'https://images.unsplash.com/photo-1604695442099-4f78f3bf9623',
+        alt: 'Detalhe de costura em acessório de couro',
+        caption: 'Detalhe da costura artesanal em couro italiano de primeira qualidade'
+      },
+      {
+        id: 'specifications-1',
+        type: 'specifications',
+        title: 'Especificações Técnicas',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f7f7f7',
+          margin: '0'
+        },
+        heading: 'Especificações Detalhadas',
+        specs: [
+          { name: 'Material Principal', value: 'Couro Italiano Full Grain' },
+          { name: 'Forro', value: 'Suede Premium' },
+          { name: 'Hardware', value: 'Metal Hipoalergênico Banhado a Ouro 18k' },
+          { name: 'Dimensões', value: '25cm x 18cm x 10cm' },
+          { name: 'Peso', value: '0.8kg' },
+          { name: 'Garantia', value: '5 anos contra defeitos de fabricação' }
+        ]
+      },
+      {
+        id: 'textImage-1',
+        type: 'textImage',
+        title: 'Cuidados com o Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff',
+          margin: '0'
+        },
+        heading: 'Como Preservar seu Acessório',
+        content: '<p style="font-size: 16px; line-height: 1.8; color: #555;">Para garantir que seu acessório premium mantenha sua beleza e durabilidade por muitos anos, recomendamos seguir nossas diretrizes de cuidado. Produtos em couro devem ser mantidos longe de umidade excessiva e luz solar direta. Aplique condicionador de couro específico periodicamente para manter a maciez e evitar ressecamento.</p><p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 20px;">Para peças metálicas, evite contato com perfumes, loções e outros produtos químicos que podem causar oxidação. Limpe regularmente com um pano macio e seco.</p>',
+        image: {
+          src: 'https://images.unsplash.com/photo-1606222074634-eb45interactionpdf10dc3b',
+          alt: 'Kit de manutenção para acessórios premium',
+        }
+      },
+      {
+        id: 'faq-1',
         type: 'faq',
         title: 'Perguntas Frequentes',
-        columns: 1,
         visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f7f7f7',
+          margin: '0'
+        },
         heading: 'Dúvidas Comuns',
         questions: [
           {
-            id: uuidv4(),
-            question: 'Como garantir a autenticidade dos produtos?',
-            answer: 'Todos os nossos produtos vêm com certificado de autenticidade numerado e verificável, além de gravação a laser exclusiva em cada peça.'
+            question: 'Como identificar um produto autêntico da marca?',
+            answer: 'Todos os nossos produtos vêm com cartão de autenticidade holográfico, número de série único e detalhes de acabamento exclusivos que podem ser verificados em nosso site oficial.'
           },
           {
-            id: uuidv4(),
-            question: 'Qual a política de devolução?',
-            answer: 'Oferecemos 30 dias para devolução ou troca, desde que o produto esteja em perfeito estado e com todas as embalagens originais.'
+            question: 'Vocês oferecem serviços de reparo?',
+            answer: 'Sim, oferecemos serviços de manutenção e reparo vitalícios para todos os nossos acessórios premium. Entre em contato com nosso atendimento ao cliente para mais detalhes.'
           },
           {
-            id: uuidv4(),
-            question: 'Vocês oferecem serviço de personalização?',
-            answer: 'Sim, oferecemos serviço de gravação e personalização em peças selecionadas. Entre em contato com nossa equipe para mais detalhes.'
-          },
-          {
-            id: uuidv4(),
-            question: 'Como cuidar adequadamente dos acessórios?',
-            answer: 'Recomendamos guardar as peças na embalagem original, evitar contato com produtos químicos e limpar regularmente com produtos específicos para o material de cada acessório.'
+            question: 'Como é a política de devolução?',
+            answer: 'Aceitamos devoluções em até 30 dias após a compra, desde que o produto esteja em perfeito estado, com todas as etiquetas originais e embalagem intacta.'
           }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+        ]
       },
-      // CTA Block
       {
-        id: uuidv4(),
+        id: 'cta-1',
         type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
+        title: 'Chamada Final',
         visible: true,
-        heading: 'Experimente o Luxo Autêntico',
-        content: 'Conheça nossa coleção exclusiva e descubra peças que combinam perfeitamente com seu estilo sofisticado.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#buy',
+        columns: 'full',
         style: {
-          backgroundColor: '#1a1a1a',
-          headingColor: '#ffffff',
-          textColor: '#cccccc',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
+          padding: '80px 20px',
+          backgroundColor: '#333333',
+          color: '#ffffff',
+          margin: '0',
+          textAlign: 'center'
+        },
+        heading: 'Eleve seu Estilo com Nossa Coleção Exclusiva',
+        content: 'Adquira agora um acessório premium e receba um kit de manutenção especial como cortesia',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#'
       }
     ]
   }
 ];
-
-// For backward compatibility with existing code that might expect a single template
-export const accessoriesTemplate = accessoriesTemplates[0];

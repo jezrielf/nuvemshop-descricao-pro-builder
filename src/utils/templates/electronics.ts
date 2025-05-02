@@ -1,497 +1,277 @@
 
 import { Template } from '@/types/editor';
-import { v4 as uuidv4 } from 'uuid';
 
-// Electronics Template Collection
 export const electronicsTemplates: Template[] = [
-  // TEMPLATE 1: Modern Electronics
   {
-    id: uuidv4(),
-    name: 'Eletrônicos Modernos',
+    id: 'electronics-premium-1',
+    name: 'Eletrônicos de Alta Performance',
     category: 'electronics',
-    thumbnail: 'https://images.unsplash.com/photo-1498049794561-7780e7231661',
+    thumbnail: '/placeholder.svg',
     blocks: [
-      // Hero Block
       {
-        id: uuidv4(),
+        id: 'hero-1',
         type: 'hero',
         title: 'Banner Principal',
-        columns: 1,
         visible: true,
-        heading: 'Descubra a Última Geração de Eletrônicos',
-        subheading: 'Inovação e Tecnologia ao Seu Alcance',
-        buttonText: 'Ver Produtos',
-        buttonUrl: '#produtos',
-        backgroundImage: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8',
+        columns: 'full',
         style: {
-          backgroundColor: '#f0f0f0',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+          backgroundColor: '#121212',
+          padding: '80px 20px',
+          borderRadius: '0',
+          textAlign: 'center',
+          color: '#ffffff'
+        },
+        heading: 'Inovação Tecnológica em Suas Mãos',
+        subheading: 'Design futurista, desempenho incomparável e tecnologia de última geração',
+        buttonText: 'Explorar Tecnologia',
+        buttonUrl: '#'
       },
-      // Text Block
       {
-        id: uuidv4(),
+        id: 'text-1',
         type: 'text',
-        title: 'Descrição Geral',
-        columns: 1,
+        title: 'Sobre o Produto',
         visible: true,
-        heading: 'Por que Escolher Nossos Eletrônicos?',
-        content: 'Nossos produtos são cuidadosamente selecionados para oferecer o melhor em tecnologia, durabilidade e custo-benefício. Encontre desde smartphones de última geração até acessórios inovadores que facilitam o seu dia a dia.',
+        columns: 'full',
         style: {
+          padding: '60px 20px',
           backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+          margin: '0',
+          textAlign: 'center'
+        },
+        content: '<h2 style="font-size: 36px; font-weight: 600; color: #121212; margin-bottom: 24px;">Redefinindo o Futuro da Tecnologia</h2><p style="font-size: 18px; line-height: 1.8; color: #333; max-width: 800px; margin: 0 auto;">Desenvolvido por uma equipe de engenheiros visionários, nosso dispositivo de última geração combina performance excepcional, design minimalista e funcionalidades inovadoras que transformarão sua experiência digital. Cada componente foi meticulosamente selecionado e testado para garantir máxima eficiência e durabilidade.</p>'
       },
-      // Benefits Block
       {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Benefícios',
-        columns: 2,
-        visible: true,
-        heading: 'Características Principais',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Alta Durabilidade',
-            description: 'Construído com materiais de alta qualidade para durar anos',
-            icon: '⭐'
-          },
-          {
-            id: uuidv4(),
-            title: 'Tecnologia Avançada',
-            description: 'Utiliza os componentes mais recentes do mercado',
-            icon: '💻'
-          },
-          {
-            id: uuidv4(),
-            title: 'Baixo Consumo',
-            description: 'Design eficiente que economiza energia',
-            icon: '🔋'
-          },
-          {
-            id: uuidv4(),
-            title: 'Garantia Estendida',
-            description: 'Garantia de 2 anos em todos os produtos',
-            icon: '✅'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Specifications Block
-      {
-        id: uuidv4(),
-        type: 'specifications',
-        title: 'Especificações',
-        columns: 1,
-        visible: true,
-        heading: 'Especificações Técnicas',
-        specs: [
-          { id: uuidv4(), name: 'Processador', value: 'Octa-Core 2.8GHz' },
-          { id: uuidv4(), name: 'Memória RAM', value: '8GB' },
-          { id: uuidv4(), name: 'Armazenamento', value: '256GB SSD' },
-          { id: uuidv4(), name: 'Tela', value: 'AMOLED 6.5 polegadas' },
-          { id: uuidv4(), name: 'Bateria', value: '5000mAh' },
-          { id: uuidv4(), name: 'Sistema Operacional', value: 'Android 12' }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // CTA Block
-      {
-        id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
-        visible: true,
-        heading: 'Não Perca Tempo!',
-        content: 'Aproveite nossas ofertas exclusivas e garanta já o seu eletrônico de última geração.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#comprar',
-        style: {
-          backgroundColor: '#007bff',
-          headingColor: '#ffffff',
-          textColor: '#ffffff',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 2: Smart Home
-  {
-    id: uuidv4(),
-    name: 'Casa Inteligente',
-    category: 'electronics',
-    thumbnail: 'https://images.unsplash.com/photo-1558002038-1055908f0ba7',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Transforme sua Casa com Tecnologia Inteligente',
-        subheading: 'Conforto, segurança e economia em um só lugar',
-        buttonText: 'Conheça as Soluções',
-        buttonUrl: '#smart-home',
-        backgroundImage: 'https://images.unsplash.com/photo-1558002038-1055908f0ba7',
-        style: {
-          backgroundColor: '#2c3e50',
-          headingColor: '#ffffff',
-          textColor: '#ecf0f1',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Produtos Smart Home',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1534135954997-e58fbd6dbbfc',
-            alt: 'Smart Speaker',
-            caption: 'Assistente Virtual Inteligente'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1588971450627-eb9de8828f9d',
-            alt: 'Smart Lighting',
-            caption: 'Iluminação Inteligente'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1610641564207-18114eb5412a',
-            alt: 'Smart Security Camera',
-            caption: 'Câmera de Segurança Inteligente'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Features Block
-      {
-        id: uuidv4(),
+        id: 'features-1',
         type: 'features',
-        title: 'Recursos da Casa Inteligente',
-        columns: 2,
+        title: 'Recursos Avançados',
         visible: true,
-        heading: 'Funcionalidades Principais',
+        columns: '3',
+        layout: 'vertical',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f5f5f7',
+          margin: '0'
+        },
+        heading: 'Recursos Revolucionários',
         features: [
           {
-            id: uuidv4(),
-            title: 'Controle por Voz',
-            description: 'Controle todos os dispositivos usando apenas comandos de voz',
-            icon: '✓'
+            icon: '⚡',
+            title: 'Processador Quantum',
+            description: 'Desempenho até 3x mais rápido que a geração anterior'
           },
           {
-            id: uuidv4(),
-            title: 'Automação Programável',
-            description: 'Crie rotinas personalizadas para automatizar tarefas diárias',
-            icon: '✓'
+            icon: '🔋',
+            title: 'Bateria Infinita',
+            description: 'Até 24 horas de uso contínuo com uma única carga'
           },
           {
-            id: uuidv4(),
-            title: 'Controle Remoto',
-            description: 'Acesse e controle sua casa de qualquer lugar através do smartphone',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Economia de Energia',
-            description: 'Reduza o consumo de energia com dispositivos inteligentes',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Integração Total',
-            description: 'Todos os dispositivos podem ser integrados em um único sistema',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
+            icon: '🔒',
             title: 'Segurança Avançada',
-            description: 'Monitoramento 24/7 e alertas em tempo real',
-            icon: '✓'
+            description: 'Sistema biométrico múltiplo para proteção total'
+          },
+          {
+            icon: '💧',
+            title: 'Resistência Total',
+            description: 'Proteção IP68 contra água e poeira'
+          },
+          {
+            icon: '🌐',
+            title: 'Conectividade Suprema',
+            description: 'Suporte a Wi-Fi 6E e Bluetooth 5.3 para transferências ultrarrápidas'
+          },
+          {
+            icon: '🎮',
+            title: 'Experiência Imersiva',
+            description: 'Engine gráfico avançado para conteúdo visual impressionante'
           }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+        ]
       },
-      // Image Text Block
       {
-        id: uuidv4(),
-        type: 'imageText',
-        title: 'Instalação Fácil',
-        columns: 1,
+        id: 'gallery-1',
+        type: 'gallery',
+        title: 'Galeria do Produto',
         visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232',
-          alt: 'Instalação de dispositivo smart home'
-        },
-        heading: 'Instalação Simples e Rápida',
-        content: 'Nossos dispositivos smart home são projetados para fácil instalação e configuração. A maioria não requer ferramentas especiais ou conhecimentos técnicos avançados. Em poucos minutos, você terá sua casa inteligente funcionando perfeitamente.',
+        columns: '3',
         style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: '',
+        images: [
+          {
+            src: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece',
+            alt: 'Vista frontal do dispositivo',
+            caption: 'Design minimalista com tela edge-to-edge'
+          },
+          {
+            src: 'https://images.unsplash.com/photo-1601944179066-29786cb9d32a',
+            alt: 'Vista traseira do dispositivo',
+            caption: 'Acabamento premium em alumínio aeroespacial'
+          },
+          {
+            src: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0',
+            alt: 'Dispositivo em uso',
+            caption: 'Interface intuitiva para máxima produtividade'
+          }
+        ]
+      },
+      {
+        id: 'specifications-1',
+        type: 'specifications',
+        title: 'Especificações Técnicas',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f5f5f7',
+          margin: '0'
+        },
+        heading: 'Especificações Técnicas Detalhadas',
+        specs: [
+          { name: 'Processador', value: 'Quantum Core X9, 12 núcleos, 5.2GHz' },
+          { name: 'Memória', value: '16GB LPDDR5X' },
+          { name: 'Armazenamento', value: 'SSD NVMe 1TB' },
+          { name: 'Tela', value: 'AMOLED 6.7", 120Hz, HDR10+, 1500 nits' },
+          { name: 'Câmera Principal', value: 'Tripla 50MP + 48MP + 12MP com estabilização óptica' },
+          { name: 'Câmera Frontal', value: '32MP com sensor ToF' },
+          { name: 'Bateria', value: '5000mAh com carregamento rápido 100W' },
+          { name: 'Sistema Operacional', value: 'TechOS 5.0 com 4 anos de atualizações garantidas' },
+          { name: 'Segurança', value: 'Leitor de impressões digitais ultrassônico, reconhecimento facial 3D' },
+          { name: 'Conectividade', value: '5G, Wi-Fi 6E, Bluetooth 5.3, NFC, GPS de alta precisão' },
+          { name: 'Dimensões', value: '158.2 x 75.6 x 7.8mm' },
+          { name: 'Peso', value: '189g' }
+        ]
+      },
+      {
+        id: 'benefits-1',
+        type: 'benefits',
+        title: 'Benefícios Exclusivos',
+        visible: true,
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#121212',
+          color: '#ffffff',
+          margin: '0'
+        },
+        heading: 'Experiência Superior',
+        benefits: [
+          {
+            icon: '⚙️',
+            title: 'Automação Inteligente',
+            description: 'IA adaptativa que aprende seus hábitos e otimiza a performance'
+          },
+          {
+            icon: '🌙',
+            title: 'Modo Noturno Avançado',
+            description: 'Proteção ocular com tecnologia de redução de luz azul certificada'
+          },
+          {
+            icon: '🔥',
+            title: 'Sistema de Refrigeração',
+            description: 'Tecnologia de dissipação térmica para performance constante sem superaquecimento'
+          }
+        ]
+      },
+      {
+        id: 'imageText-1',
+        type: 'imageText',
+        title: 'Tecnologia de Câmera',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '80px 20px',
           backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
+          margin: '0'
+        },
+        heading: 'Fotografia Computacional de Última Geração',
+        content: '<p style="font-size: 16px; line-height: 1.8; color: #333;">Nosso sistema de câmera revolucionário combina hardware de ponta com algoritmos avançados de inteligência artificial para produzir imagens de qualidade profissional em qualquer condição de iluminação. A lente principal de 50MP utiliza tecnologia de pixel binning para capturar mais luz, enquanto o sensor ultrawide de 48MP oferece perspectivas impressionantes com mínima distorção.</p><p style="font-size: 16px; line-height: 1.8; color: #333; margin-top: 20px;">O processamento de imagem neural analisa cada foto em tempo real, aplicando otimizações específicas para cada cenário e garantindo resultados perfeitos mesmo nas condições mais desafiadoras.</p>',
+        image: {
+          src: 'https://images.unsplash.com/photo-1551419762-4a3d998f6292',
+          alt: 'Sistema de câmera avançada',
         }
       },
-      // FAQ Block
       {
-        id: uuidv4(),
+        id: 'textImage-1',
+        type: 'textImage',
+        title: 'Inteligência Artificial',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '80px 20px',
+          backgroundColor: '#f5f5f7',
+          margin: '0'
+        },
+        heading: 'IA Adaptativa para Uma Experiência Personalizada',
+        content: '<p style="font-size: 16px; line-height: 1.8; color: #333;">O coração de nosso dispositivo é um sistema de inteligência artificial avançado que se adapta continuamente às suas necessidades e preferências. Através de aprendizado de máquina sofisticado, ele otimiza o uso de energia, prioriza aplicativos relevantes e sugere ações contextuais para maximizar sua produtividade.</p><p style="font-size: 16px; line-height: 1.8; color: #333; margin-top: 20px;">Com processamento local para dados sensíveis e criptografia de ponta a ponta, garantimos que sua privacidade nunca seja comprometida, mesmo enquanto você desfruta dos benefícios da automação inteligente.</p>',
+        image: {
+          src: 'https://images.unsplash.com/photo-1535378917042-10a22c95931a',
+          alt: 'Visualização da interface de IA',
+        }
+      },
+      {
+        id: 'video-1',
+        type: 'video',
+        title: 'Demonstração em Vídeo',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#121212',
+          margin: '0'
+        },
+        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        aspectRatio: '16:9',
+        title: 'Veja a Tecnologia em Ação',
+        description: 'Demonstração completa das funcionalidades revolucionárias',
+        autoplay: false,
+        muteAudio: true
+      },
+      {
+        id: 'faq-1',
         type: 'faq',
         title: 'Perguntas Frequentes',
-        columns: 1,
         visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff',
+          margin: '0'
+        },
         heading: 'Dúvidas Comuns',
         questions: [
           {
-            id: uuidv4(),
-            question: 'É necessário ter internet para os dispositivos funcionarem?',
-            answer: 'A maioria dos dispositivos requer conexão wi-fi para funcionalidades completas, mas muitos mantêm funções básicas mesmo sem internet.'
+            question: 'Qual é o período de garantia?',
+            answer: 'Oferecemos garantia premium de 2 anos que cobre defeitos de hardware e suporte técnico prioritário 24/7. Além disso, você pode estender a garantia por até 5 anos com nosso programa de proteção adicional.'
           },
           {
-            id: uuidv4(),
-            question: 'Os dispositivos são compatíveis entre si?',
-            answer: 'Sim, trabalhamos com padrões abertos que garantem compatibilidade entre diferentes marcas e modelos.'
+            question: 'O dispositivo é compatível com acessórios de gerações anteriores?',
+            answer: 'Sim, mantivemos a compatibilidade com a maioria dos acessórios da geração anterior. Todos os cabos, carregadores e docks com conexão USB-C são totalmente compatíveis, assim como acessórios via Bluetooth e NFC.'
           },
           {
-            id: uuidv4(),
-            question: 'Posso controlar os dispositivos quando estou fora de casa?',
-            answer: 'Sim, através do aplicativo móvel você pode controlar todos os dispositivos remotamente de qualquer lugar.'
+            question: 'A bateria é substituível?',
+            answer: 'Como parte de nosso compromisso com a sustentabilidade, projetamos o dispositivo com uma bateria que pode ser substituída por técnicos autorizados, prolongando significativamente a vida útil do produto. Oferecemos também programa de troca com desconto após 2 anos de uso.'
           }
-        ],
-        style: {
-          backgroundColor: '#f5f5f5',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 3: Gaming Electronics
-  {
-    id: uuidv4(),
-    name: 'Eletrônicos para Gamers',
-    category: 'electronics',
-    thumbnail: 'https://images.unsplash.com/photo-1542751371-adc38448a05e',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Equipamentos Premium para Gamers',
-        subheading: 'Eleve sua experiência de jogo ao próximo nível',
-        buttonText: 'Explorar Produtos',
-        buttonUrl: '#gaming',
-        backgroundImage: 'https://images.unsplash.com/photo-1542751371-adc38448a05e',
-        style: {
-          backgroundColor: '#1a1a1a',
-          headingColor: '#ffffff',
-          textColor: '#cccccc',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+        ]
       },
-      // Benefits Block
       {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Vantagens Gaming',
-        columns: 3,
-        visible: true,
-        heading: 'Por que escolher nossos produtos Gaming',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Desempenho Máximo',
-            description: 'Hardware de última geração para rodar os jogos mais exigentes',
-            icon: '🎮'
-          },
-          {
-            id: uuidv4(),
-            title: 'Iluminação RGB',
-            description: 'Personalize a iluminação do seu setup de acordo com seu estilo',
-            icon: '🌈'
-          },
-          {
-            id: uuidv4(),
-            title: 'Ergonomia Avançada',
-            description: 'Design focado no conforto para longas sessões de jogo',
-            icon: '👍'
-          },
-          {
-            id: uuidv4(),
-            title: 'Conectividade Ultra-rápida',
-            description: 'Conexões de alta velocidade para jogos online sem lag',
-            icon: '⚡'
-          },
-          {
-            id: uuidv4(),
-            title: 'Software Intuitivo',
-            description: 'Aplicativos fáceis de usar para configurar e personalizar seu equipamento',
-            icon: '💻'
-          },
-          {
-            id: uuidv4(),
-            title: 'Garantia Gamer',
-            description: 'Garantia estendida especial para gamers intensivos',
-            icon: '🛡️'
-          }
-        ],
-        style: {
-          backgroundColor: '#232323',
-          headingColor: '#ffffff',
-          textColor: '#cccccc',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Produtos Gaming',
-        columns: 3,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1547394765-185e1e68f34e',
-            alt: 'Teclado Mecânico Gaming',
-            caption: 'Teclado Mecânico RGB'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2',
-            alt: 'Mouse Gaming',
-            caption: 'Mouse Gamer 16000 DPI'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1591370874773-6702e8f12fd8',
-            alt: 'Headset Gaming',
-            caption: 'Headset 7.1 Surround'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1624705002806-5d72df19c3ad',
-            alt: 'Cadeira Gamer',
-            caption: 'Cadeira Ergonômica Pro Gamer'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1600861194942-f883de0dfe96',
-            alt: 'Monitor Gaming',
-            caption: 'Monitor 240Hz 1ms'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1626242118385-38288c0f8c16',
-            alt: 'Controle Gaming',
-            caption: 'Controle Pro Wireless'
-          }
-        ],
-        style: {
-          backgroundColor: '#151515',
-          headingColor: '#ffffff',
-          textColor: '#cccccc',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // Specifications Block
-      {
-        id: uuidv4(),
-        type: 'specifications',
-        title: 'Especificações',
-        columns: 1,
-        visible: true,
-        heading: 'Especificações Técnicas',
-        specs: [
-          { id: uuidv4(), name: 'Processador Recomendado', value: 'Intel Core i7 ou AMD Ryzen 7' },
-          { id: uuidv4(), name: 'Placa de Vídeo', value: 'NVIDIA RTX 3070 ou AMD RX 6800' },
-          { id: uuidv4(), name: 'Memória RAM', value: '16GB DDR4 3200MHz' },
-          { id: uuidv4(), name: 'Armazenamento', value: 'SSD NVMe 1TB' },
-          { id: uuidv4(), name: 'Refrigeração', value: 'Watercooler 240mm' },
-          { id: uuidv4(), name: 'Fonte', value: '750W 80+ Gold' }
-        ],
-        style: {
-          backgroundColor: '#232323',
-          headingColor: '#ffffff',
-          textColor: '#cccccc',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // CTA Block
-      {
-        id: uuidv4(),
+        id: 'cta-1',
         type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
+        title: 'Chamada Final',
         visible: true,
-        heading: 'Prepare-se para Vencer',
-        content: 'Equipamentos de alta performance para garantir sua vantagem competitiva nos jogos.',
-        buttonText: 'Equipar Agora',
-        buttonUrl: '#buy',
+        columns: 'full',
         style: {
-          backgroundColor: '#7611f7',
-          headingColor: '#ffffff',
-          textColor: '#ffffff',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
+          padding: '80px 20px',
+          backgroundImage: 'linear-gradient(135deg, #121212 0%, #2d3436 100%)',
+          color: '#ffffff',
+          margin: '0',
+          textAlign: 'center'
+        },
+        heading: 'O Futuro da Tecnologia Está Aqui',
+        content: 'Seja um dos primeiros a experimentar a próxima geração de dispositivos inteligentes',
+        buttonText: 'Reservar Agora',
+        buttonUrl: '#'
       }
     ]
   }
 ];
-
-// For backward compatibility with existing code that might expect a single template
-export const electronicsTemplate = electronicsTemplates[0];
