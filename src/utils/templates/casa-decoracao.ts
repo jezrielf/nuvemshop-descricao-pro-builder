@@ -1,8 +1,9 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
 import { ibblFilterTemplate } from './products/ibbl-filter-template';
 import { gemBlendTemplate } from './products/gem-blend';
+import { waterFilterTemplate } from './products/water-filter';
+import { waterFilterPremiumTemplate } from './products/water-filter-premium';
 
 // Casa e decoração templates collection
 export const casaDecoracaoTemplates: Template[] = [
@@ -18,7 +19,7 @@ export const casaDecoracaoTemplates: Template[] = [
         title: 'Banner Principal',
         heading: 'Ar Puro e Revigorante',
         subheading: 'Desfrute de um ambiente mais saudável com nosso purificador de ar de alta performance.',
-        backgroundImage: '/assets/templates/casa-decoracao/air-purifier-hero.jpg',
+        backgroundImage: '/lovable-uploads/871ee81c-828a-4474-9a93-77f13d2d9601.png',
         buttonText: 'Compre Agora',
         buttonUrl: '#',
         visible: true,
@@ -95,7 +96,7 @@ export const casaDecoracaoTemplates: Template[] = [
         },
       },
     ],
-    thumbnail: '/assets/templates/casa-decoracao/air-purifier-thumbnail.jpg',
+    thumbnail: '/lovable-uploads/871ee81c-828a-4474-9a93-77f13d2d9601.png',
   },
   
   // Template 2: Smart Home Kit
@@ -110,7 +111,7 @@ export const casaDecoracaoTemplates: Template[] = [
         title: 'Banner Principal',
         heading: 'Controle sua Casa na Palma da Mão',
         subheading: 'Simplifique sua vida com nosso kit casa inteligente completo.',
-        backgroundImage: '/assets/templates/casa-decoracao/smart-home-hero.jpg',
+        backgroundImage: '/lovable-uploads/ea72f039-790b-455c-b2ea-0c2a7981d2d2.png',
         buttonText: 'Saiba Mais',
         buttonUrl: '#',
         visible: true,
@@ -187,7 +188,7 @@ export const casaDecoracaoTemplates: Template[] = [
         },
       },
     ],
-    thumbnail: '/assets/templates/casa-decoracao/smart-home-thumbnail.jpg',
+    thumbnail: '/lovable-uploads/ea72f039-790b-455c-b2ea-0c2a7981d2d2.png',
   },
   
   // Template 3: Decorative Lighting
@@ -202,7 +203,7 @@ export const casaDecoracaoTemplates: Template[] = [
         title: 'Banner Principal',
         heading: 'Transforme Seus Espaços com Luz',
         subheading: 'Descubra nossa coleção exclusiva de iluminação decorativa.',
-        backgroundImage: '/assets/templates/casa-decoracao/decorative-lighting-hero.jpg',
+        backgroundImage: '/lovable-uploads/e93193b7-175d-4c24-b5a9-e86626675f3b.png',
         buttonText: 'Veja a Coleção',
         buttonUrl: '#',
         visible: true,
@@ -275,12 +276,12 @@ export const casaDecoracaoTemplates: Template[] = [
         },
       },
     ],
-    thumbnail: '/assets/templates/casa-decoracao/decorative-lighting-thumbnail.jpg',
+    thumbnail: '/lovable-uploads/e93193b7-175d-4c24-b5a9-e86626675f3b.png',
   },
   
-  // Add the IBBL filter template to the collection
+  // Add our updated templates to the collection
+  waterFilterTemplate,
+  waterFilterPremiumTemplate,
   ibblFilterTemplate,
-  
-  // Add the Gem Blend template to the collection
   gemBlendTemplate,
 ];
