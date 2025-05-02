@@ -26,6 +26,23 @@ export interface ProductSEOResult {
     }>;
     hasStructuredData: boolean;
     structuredDataValidity: boolean;
+    mobileCompatibility?: {
+      isMobileCompatible: boolean;
+      viewportDefined: boolean;
+      textReadable: boolean;
+    };
+    pagespeedMetrics?: {
+      loadTime?: number;
+      pageSize?: number;
+      resourceCount?: number;
+    };
+    httpHeaders?: Record<string, string>;
+    canonicalUrl?: string;
+    robotsDirectives?: string[];
+    hreflangTags?: Array<{
+      lang: string;
+      url: string;
+    }>;
   };
 }
 
@@ -126,7 +143,7 @@ export const analyzeProductSEO = (product: NuvemshopProduct): ProductSEOResult =
     }
     
     // Generate Google View analysis
-    const googleView = simulateGoogleView(htmlContent);
+    const googleView = simulateGoogleView(htmlContent, product);
     
     return {
       score: Math.min(100, score),
@@ -208,11 +225,12 @@ export const calculateReadabilityScore = (text: string): number => {
 };
 
 /**
- * Simulates how Google would view the page content
+ * Simulates how Google would view the page content with more realistic crawler behavior
  * @param htmlContent Original HTML content
- * @returns Google view analysis results
+ * @param product Nuvemshop product data
+ * @returns Google view analysis results with enhanced crawler insights
  */
-export const simulateGoogleView = (htmlContent: string) => {
+export const simulateGoogleView = (htmlContent: string, product: NuvemshopProduct) => {
   try {
     // Simplify HTML as Google would see it
     const simplifiedHtml = simplifyHtml(htmlContent);
@@ -221,14 +239,25 @@ export const simulateGoogleView = (htmlContent: string) => {
     const structuredDataResult = extractStructuredData(htmlContent);
     
     // Analyze crawlability and identify technical issues
-    const crawlabilityResult = analyzeCrawlability(htmlContent);
+    const crawlabilityResult = analyzeCrawlability(htmlContent, product);
     
+    // Analyze mobile compatibility
+    const mobileCompatibility = analyzeMobileCompatibility(htmlContent);
+    
+    // Build a comprehensive Google view analysis
     return {
       simplifiedHtml,
       crawlabilityScore: crawlabilityResult.score,
       technicalIssues: crawlabilityResult.issues,
       hasStructuredData: structuredDataResult.hasStructuredData,
-      structuredDataValidity: structuredDataResult.isValid
+      structuredDataValidity: structuredDataResult.isValid,
+      mobileCompatibility,
+      // We'll simulate these metrics since we can't directly measure them
+      pagespeedMetrics: simulatePagespeedMetrics(htmlContent),
+      // Extract canonical URL and robots directives
+      canonicalUrl: extractCanonicalUrl(htmlContent),
+      robotsDirectives: extractRobotsDirectives(htmlContent),
+      hreflangTags: extractHreflangTags(htmlContent)
     };
   } catch (error) {
     console.error('Error simulating Google view:', error);
@@ -247,7 +276,7 @@ export const simulateGoogleView = (htmlContent: string) => {
 };
 
 /**
- * Simplifies HTML content to simulate Google's view
+ * Simplifies HTML content to simulate Google's view with more accurate rendering
  * @param html Original HTML content
  * @returns Simplified HTML string
  */
@@ -326,11 +355,12 @@ const extractStructuredData = (html: string) => {
 };
 
 /**
- * Analyzes crawlability issues in HTML content
+ * Analyzes crawlability issues in HTML content with more detailed checks
  * @param html HTML content
+ * @param product Nuvemshop product data
  * @returns Crawlability analysis
  */
-const analyzeCrawlability = (html: string) => {
+const analyzeCrawlability = (html: string, product: NuvemshopProduct) => {
   const issues: Array<{
     issue: string;
     severity: 'high' | 'medium' | 'low';
@@ -349,6 +379,27 @@ const analyzeCrawlability = (html: string) => {
     score -= 20;
   }
   
+  // Check title length
+  const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+  if (titleMatch && titleMatch[1]) {
+    const titleLength = titleMatch[1].length;
+    if (titleLength < 10) {
+      issues.push({
+        issue: 'Título muito curto',
+        severity: 'medium',
+        details: 'O título da página tem menos de 10 caracteres, o que é muito curto para SEO.'
+      });
+      score -= 10;
+    } else if (titleLength > 60) {
+      issues.push({
+        issue: 'Título muito longo',
+        severity: 'low',
+        details: 'O título da página excede 60 caracteres, podendo ser truncado nos resultados de busca.'
+      });
+      score -= 5;
+    }
+  }
+  
   // Check missing meta description
   if (!/<meta\s+[^>]*name=["']description["'][^>]*>/i.test(html)) {
     issues.push({
@@ -357,6 +408,27 @@ const analyzeCrawlability = (html: string) => {
       details: 'A meta description ajuda os mecanismos de busca a entender o conteúdo da página.'
     });
     score -= 10;
+  }
+  
+  // Check for meta description length
+  const metaDescMatch = html.match(/<meta\s+[^>]*name=["']description["'][^>]*content=["'](.*?)["']/i);
+  if (metaDescMatch && metaDescMatch[1]) {
+    const descLength = metaDescMatch[1].length;
+    if (descLength < 50) {
+      issues.push({
+        issue: 'Meta description muito curta',
+        severity: 'medium',
+        details: 'A meta description tem menos de 50 caracteres, o que é muito curto para SEO.'
+      });
+      score -= 7;
+    } else if (descLength > 160) {
+      issues.push({
+        issue: 'Meta description muito longa',
+        severity: 'low',
+        details: 'A meta description excede 160 caracteres, podendo ser truncada nos resultados de busca.'
+      });
+      score -= 3;
+    }
   }
   
   // Check for noindex, nofollow
@@ -407,6 +479,19 @@ const analyzeCrawlability = (html: string) => {
     score -= 5;
   }
   
+  // Check for heading hierarchy
+  const h2Count = (html.match(/<h2[^>]*>/gi) || []).length;
+  const h3Count = (html.match(/<h3[^>]*>/gi) || []).length;
+  
+  if (h1Count >= 1 && h2Count === 0 && h3Count > 0) {
+    issues.push({
+      issue: 'Hierarquia de cabeçalhos incorreta',
+      severity: 'medium',
+      details: 'A página tem H1 e H3, mas está faltando H2. A hierarquia de cabeçalhos deve ser sequencial.'
+    });
+    score -= 5;
+  }
+  
   // Check for empty links
   const emptyLinks = (html.match(/<a[^>]*>\s*<\/a>/gi) || []).length;
   
@@ -429,8 +514,129 @@ const analyzeCrawlability = (html: string) => {
     score -= 5;
   }
   
+  // Check schema markup for product
+  if (!html.includes('Product') || !html.includes('schema.org')) {
+    issues.push({
+      issue: 'Schema markup de produto não encontrado',
+      severity: 'medium',
+      details: 'Schema.org markup para produtos ajuda o Google a entender e exibir informações detalhadas do produto nos resultados de busca.'
+    });
+    score -= 10;
+  }
+  
+  // Calculate text-to-HTML ratio
+  const textContent = extractTextFromHtml(html);
+  const textLength = textContent.length;
+  const htmlLength = html.length;
+  const textToHtmlRatio = textLength / htmlLength;
+  
+  if (textToHtmlRatio < 0.1) {
+    issues.push({
+      issue: 'Baixa proporção texto/HTML',
+      severity: 'medium',
+      details: 'A página tem pouco texto em relação ao tamanho do HTML, o que pode indicar baixa densidade de conteúdo.'
+    });
+    score -= 10;
+  }
+  
   return {
     score: Math.max(0, Math.min(100, Math.round(score))),
     issues: issues
   };
+};
+
+/**
+ * Analyzes mobile compatibility of the HTML content
+ * @param html HTML content
+ * @returns Mobile compatibility analysis
+ */
+const analyzeMobileCompatibility = (html: string) => {
+  const hasViewport = /<meta\s+[^>]*name=["']viewport["'][^>]*>/i.test(html);
+  const hasTinyText = /<font\s+[^>]*size=["']1["'][^>]*>/i.test(html) || 
+                       /<span\s+[^>]*style=["'][^"']*font-size:\s*[0-8]px[^"']*["'][^>]*>/i.test(html);
+  
+  return {
+    isMobileCompatible: hasViewport && !hasTinyText,
+    viewportDefined: hasViewport,
+    textReadable: !hasTinyText
+  };
+};
+
+/**
+ * Simulates pagespeed metrics based on HTML content
+ * @param html HTML content
+ * @returns Simulated pagespeed metrics
+ */
+const simulatePagespeedMetrics = (html: string) => {
+  // Calculate approximate page size in KB
+  const pageSize = Math.round(html.length / 1024);
+  
+  // Count resources (images, scripts, stylesheets)
+  const imgCount = (html.match(/<img[^>]+>/g) || []).length;
+  const scriptCount = (html.match(/<script[^>]*>/g) || []).length;
+  const cssCount = (html.match(/<link[^>]*stylesheet[^>]*>/g) || []).length;
+  const resourceCount = imgCount + scriptCount + cssCount;
+  
+  // Simulate load time based on page size and resource count
+  // This is a very rough approximation
+  const loadTime = Math.round((pageSize * 0.02 + resourceCount * 0.1) * 10) / 10;
+  
+  return {
+    loadTime,
+    pageSize,
+    resourceCount
+  };
+};
+
+/**
+ * Extracts canonical URL from HTML
+ * @param html HTML content
+ * @returns Canonical URL or undefined
+ */
+const extractCanonicalUrl = (html: string): string | undefined => {
+  const match = html.match(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["'](.*?)["'][^>]*>/i);
+  return match ? match[1] : undefined;
+};
+
+/**
+ * Extracts robots directives from HTML
+ * @param html HTML content
+ * @returns Array of robots directives
+ */
+const extractRobotsDirectives = (html: string): string[] => {
+  const directives: string[] = [];
+  
+  // Check meta robots
+  const robotsMatch = html.match(/<meta\s+[^>]*name=["']robots["'][^>]*content=["'](.*?)["'][^>]*>/i);
+  if (robotsMatch && robotsMatch[1]) {
+    directives.push(...robotsMatch[1].split(',').map(d => d.trim()));
+  }
+  
+  // Check X-Robots-Tag in headers if available
+  // In a real implementation, this would come from actual HTTP headers
+  
+  return directives;
+};
+
+/**
+ * Extracts hreflang tags from HTML
+ * @param html HTML content
+ * @returns Array of hreflang tags with language and URL
+ */
+const extractHreflangTags = (html: string): Array<{ lang: string, url: string }> => {
+  const hreflangTags: Array<{ lang: string, url: string }> = [];
+  
+  // Match all hreflang link elements
+  const hreflangMatches = html.matchAll(/<link\s+[^>]*rel=["']alternate["'][^>]*hreflang=["'](.*?)["'][^>]*href=["'](.*?)["'][^>]*>/gi);
+  
+  for (const match of hreflangMatches) {
+    if (match[1] && match[2]) {
+      hreflangTags.push({
+        lang: match[1],
+        url: match[2]
+      });
+    }
+  }
+  
+  return hreflangTags;
 };
