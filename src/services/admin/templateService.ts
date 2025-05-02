@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
@@ -30,8 +29,6 @@ export const templateService = {
         console.log(`Carregados ${localTemplates.length} templates locais como fallback`);
         return localTemplates;
       }
-      
-      console.log('Templates carregados do banco:', data);
       
       // Convert database response to Template format with proper type handling
       const templates: Template[] = (data || []).map((template) => {
@@ -93,21 +90,11 @@ export const templateService = {
   
   createTemplate: async (templateData: Omit<Template, 'id'>): Promise<Template> => {
     try {
-      console.log('createTemplate service called with data:', templateData);
-      
-      // Check for authentication
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-      
       // Generate UUID for new template
       const id = crypto.randomUUID();
       
       // Ensure blocks is serialized properly for storage
       const blockData = templateData.blocks || [];
-      
-      console.log('Creating template with ID:', id);
       
       const { data, error } = await supabase
         .from('templates')
@@ -115,18 +102,12 @@ export const templateService = {
           id,
           name: templateData.name,
           category: templateData.category,
-          blocks: blockData,
-          user_id: user.id
+          blocks: blockData
         })
         .select()
         .single();
       
-      if (error) {
-        console.error('Error in Supabase insert:', error);
-        throw error;
-      }
-      
-      console.log('Template created in database:', data);
+      if (error) throw error;
       
       // Ensure blocks is always an array
       let blocks: any[] = [];
@@ -155,14 +136,6 @@ export const templateService = {
   
   updateTemplate: async (templateId: string, templateData: Partial<Template>): Promise<Template> => {
     try {
-      console.log('updateTemplate service called for ID:', templateId, 'with data:', templateData);
-      
-      // Check for authentication
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-      
       // Prepare update data
       const updateData: any = {};
       
@@ -171,9 +144,6 @@ export const templateService = {
       if (templateData.blocks) updateData.blocks = templateData.blocks;
       
       updateData.updated_at = new Date().toISOString();
-      updateData.user_id = user.id;
-      
-      console.log('Sending update with data:', updateData);
       
       const { data, error } = await supabase
         .from('templates')
@@ -182,12 +152,7 @@ export const templateService = {
         .select()
         .single();
       
-      if (error) {
-        console.error('Error in Supabase update:', error);
-        throw error;
-      }
-      
-      console.log('Template updated in database:', data);
+      if (error) throw error;
       
       // Ensure blocks is always an array
       let blocks: any[] = [];
@@ -216,25 +181,12 @@ export const templateService = {
   
   deleteTemplate: async (templateId: string): Promise<void> => {
     try {
-      console.log('deleteTemplate service called for ID:', templateId);
-      
-      // Check for authentication
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-      
       const { error } = await supabase
         .from('templates')
         .delete()
         .eq('id', templateId);
       
-      if (error) {
-        console.error('Error in Supabase delete:', error);
-        throw error;
-      }
-      
-      console.log('Template deleted from database successfully');
+      if (error) throw error;
     } catch (error) {
       console.error('Error in deleteTemplate:', error);
       throw error;

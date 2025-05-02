@@ -8,7 +8,16 @@ export const createCategorySlice: StateCreator<
   [],
   TemplateCategorySlice
 > = (set, get) => ({
-  categories: ['supplements', 'clothing', 'accessories', 'shoes', 'electronics', 'energy', 'Casa e decoração', 'other'],
+  categories: [
+    'supplements',
+    'clothing',
+    'accessories',
+    'shoes',
+    'electronics',
+    'energy',
+    'Casa e decoração',
+    'other'
+  ],
   selectedCategory: null,
   customCategories: [],
   
@@ -23,7 +32,6 @@ export const createCategorySlice: StateCreator<
   },
   
   setSelectedCategory: (category) => {
-    console.log('Setting selected category:', category);
     set({ selectedCategory: category });
-  },
+  }
 });

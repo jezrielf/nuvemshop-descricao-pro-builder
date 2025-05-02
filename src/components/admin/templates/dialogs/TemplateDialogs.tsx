@@ -1,17 +1,17 @@
 
 import React, { useState } from 'react';
 import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
-import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
+import { useTemplateStore } from '@/store/templates';
 import { NewTemplateDialog } from './NewTemplateDialog';
 import { EditTemplateDialog } from './EditTemplateDialog';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';
 import { PreviewTemplateDialog } from './PreviewTemplateDialog';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 export const TemplateDialogs: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   
   const {
     previewTemplate,
@@ -25,75 +25,8 @@ export const TemplateDialogs: React.FC = () => {
     closeAllDialogs
   } = useTemplateDialogs();
   
-  const { 
-    deleteTemplate: removeTemplate,
-    createTemplate,
-    updateTemplate
-  } = useTemplateStore();
-  
+  const { deleteTemplate: removeTemplate } = useTemplateStore();
   const { toast } = useToast();
-
-  const handleCreateTemplate = async (templateData: any) => {
-    setIsProcessing(true);
-    try {
-      console.log('Starting creation process for new template', templateData);
-      
-      const result = await createTemplate(templateData);
-      
-      console.log('Template created successfully:', result);
-      
-      toast({
-        title: 'Template criado',
-        description: `O template "${result.name}" foi criado com sucesso.`
-      });
-      
-      closeAllDialogs();
-      
-    } catch (error: any) {
-      console.error('Error creating template:', error);
-      
-      toast({
-        title: 'Erro ao criar template',
-        description: `Ocorreu um erro ao criar o template: ${error.message || 'Erro desconhecido'}`,
-        variant: 'destructive'
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
-  const handleUpdateTemplate = async (id: string, templateData: any) => {
-    setIsProcessing(true);
-    try {
-      console.log('Starting update process for template:', id, templateData);
-      
-      const result = await updateTemplate(id, templateData);
-      
-      if (!result) {
-        throw new Error('Falha ao atualizar o template');
-      }
-      
-      console.log('Template updated successfully:', result);
-      
-      toast({
-        title: 'Template atualizado',
-        description: `O template "${result.name}" foi atualizado com sucesso.`
-      });
-      
-      closeAllDialogs();
-      
-    } catch (error: any) {
-      console.error('Error updating template:', error);
-      
-      toast({
-        title: 'Erro ao atualizar template',
-        description: `Ocorreu um erro ao atualizar o template: ${error.message || 'Erro desconhecido'}`,
-        variant: 'destructive'
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const handleDeleteTemplate = async () => {
     if (!deleteTemplate) {
@@ -110,13 +43,31 @@ export const TemplateDialogs: React.FC = () => {
     console.log('Starting deletion process for template:', deleteTemplate.id);
     
     try {
-      const success = await removeTemplate(deleteTemplate.id);
+      // Direct Supabase deletion
+      console.log('Executing DELETE operation on Supabase for template:', deleteTemplate.id);
+      const { error, count } = await supabase
+        .from('templates')
+        .delete()
+        .eq('id', deleteTemplate.id)
+        .select('count');
       
-      if (!success) {
-        throw new Error('Falha ao excluir o template');
+      if (error) {
+        console.error('Error deleting template from Supabase:', error);
+        toast({
+          title: 'Erro ao deletar',
+          description: `Não foi possível deletar o template: ${error.message}`,
+          variant: 'destructive'
+        });
+        setIsDeleting(false);
+        return;
       }
       
-      console.log('Template deleted successfully');
+      // Verify deletion succeeded
+      console.log('Supabase deletion operation completed, verifying...');
+      
+      // Update local state
+      console.log('Updating local state to remove template:', deleteTemplate.id);
+      removeTemplate(deleteTemplate.id);
       
       toast({
         title: 'Template excluído',
@@ -132,11 +83,18 @@ export const TemplateDialogs: React.FC = () => {
       // Close the dialog
       closeAllDialogs();
       
-    } catch (error: any) {
+      // Refresh page after a short delay
+      console.log('Scheduling page refresh');
+      setTimeout(() => {
+        console.log('Refreshing page to update template list');
+        window.location.reload();
+      }, 500);
+      
+    } catch (error) {
       console.error('Exception during template deletion:', error);
       toast({
         title: 'Erro ao deletar',
-        description: `Não foi possível deletar o template: ${error.message || 'Erro desconhecido'}`,
+        description: 'Ocorreu um erro inesperado ao tentar excluir o template',
         variant: 'destructive'
       });
     } finally {
@@ -149,9 +107,7 @@ export const TemplateDialogs: React.FC = () => {
       {isNewDialogOpen && (
         <NewTemplateDialog 
           open={isNewDialogOpen} 
-          onClose={closeAllDialogs}
-          onCreateTemplate={handleCreateTemplate}
-          isProcessing={isProcessing}
+          onClose={closeAllDialogs} 
         />
       )}
       
@@ -168,8 +124,6 @@ export const TemplateDialogs: React.FC = () => {
           open={isEditDialogOpen}
           onClose={closeAllDialogs}
           template={editTemplate}
-          onUpdateTemplate={handleUpdateTemplate}
-          isProcessing={isProcessing}
         />
       )}
       

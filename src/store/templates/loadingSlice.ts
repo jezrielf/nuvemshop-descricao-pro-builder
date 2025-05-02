@@ -1,9 +1,8 @@
-
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import { adminService } from '@/services/admin';
-import { supabase } from '@/integrations/supabase/client';
+import { templateService } from '@/services/admin/templateService';
+import { getAllTemplates } from '@/utils/templates';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -12,43 +11,63 @@ export const createLoadingSlice: StateCreator<
   TemplateLoadingSlice
 > = (set, get) => ({
   loadTemplates: async () => {
-    console.log('Loading templates from service');
-    
     try {
-      // Check for authentication
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log('Current authenticated user:', user?.id || 'Not authenticated');
+      console.log('Tentando carregar templates do serviço...');
       
-      const templates = await adminService.getTemplates();
-      console.log(`Loaded ${templates.length} templates`);
+      // Always have a fallback of local templates
+      const localTemplates = getAllTemplates();
       
-      // Update state with loaded templates
+      // Ensure we have templates available immediately
+      if (get().templates.length === 0) {
+        console.log('Definindo templates locais para uso imediato enquanto carregamos do servidor');
+        set({ templates: localTemplates });
+      }
+      
+      // Try to load from server
+      let templates = await templateService.getTemplates();
+      
+      // Ensure we always have templates available
+      if (!templates || templates.length === 0) {
+        console.log('Nenhum template retornado pelo serviço, usando templates locais');
+        templates = localTemplates;
+      }
+      
+      console.log(`Carregados ${templates.length} templates com sucesso`);
       set({ templates });
-      
       return templates;
     } catch (error) {
-      console.error('Error in loadTemplates:', error);
-      throw error;
+      console.error('Erro ao carregar templates:', error);
+      // Fallback to local templates in case of error
+      const localTemplates = getAllTemplates();
+      set({ templates: localTemplates });
+      console.log(`Fallback para ${localTemplates.length} templates locais`);
+      return localTemplates;
     }
   },
   
-  searchTemplates: (query, categoryFilter) => {
+  searchTemplates: (query, category) => {
     const { templates } = get();
     
-    if (!query && !categoryFilter) {
-      return templates;
+    // Se não há templates, verificamos se precisamos carregar
+    if (!templates || templates.length === 0) {
+      console.warn('Tentando buscar templates, mas nenhum está carregado');
+      // Retornamos um array vazio, mas o componente deve tratar este caso
+      return [];
     }
     
     return templates.filter(template => {
-      // Match by category if filter is applied
-      const categoryMatch = !categoryFilter || template.category === categoryFilter;
+      // Filter by category if selected
+      if (category && template.category !== category) {
+        return false;
+      }
       
-      // Match by search query if provided
-      const searchMatch = !query || 
-        template.name.toLowerCase().includes(query.toLowerCase()) ||
-        template.category.toLowerCase().includes(query.toLowerCase());
-        
-      return categoryMatch && searchMatch;
+      // Filter by search query if provided
+      if (query && query.trim() !== '') {
+        const normalizedQuery = query.toLowerCase().trim();
+        return template.name.toLowerCase().includes(normalizedQuery);
+      }
+      
+      return true;
     });
-  },
+  }
 });

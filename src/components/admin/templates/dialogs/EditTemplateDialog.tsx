@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Template, Block, BlockType, ProductCategory } from '@/types/editor';
 import { useToast } from '@/hooks/use-toast';
+import { useTemplateStore } from '@/store/templates';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, Trash2, ArrowUp, ArrowDown, Eye, Loader2 } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown, Eye } from 'lucide-react';
 import { createBlock } from '@/utils/blockCreators/createBlock';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { convertBlocks } from '@/utils/blockConverter';
@@ -18,30 +19,26 @@ interface EditTemplateDialogProps {
   open: boolean;
   onClose: () => void;
   template: Template | null;
-  onUpdateTemplate: (id: string, data: Partial<Template>) => Promise<void>;
-  isProcessing?: boolean;
 }
 
 export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
   open,
   onClose,
   template,
-  onUpdateTemplate,
-  isProcessing = false
 }) => {
   const [editedName, setEditedName] = useState('');
   const [editedCategory, setEditedCategory] = useState<ProductCategory>('other');
   const [editedBlocks, setEditedBlocks] = useState<Block[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
   const [previewBlockId, setPreviewBlockId] = useState<string | null>(null);
+  const { updateTemplate } = useTemplateStore();
   const { toast } = useToast();
 
   useEffect(() => {
     if (template) {
       setEditedName(template.name);
       setEditedCategory(template.category);
-      setEditedBlocks(Array.isArray(template.blocks) ? template.blocks : []);
-      console.log('Loaded template data for editing:', template);
+      setEditedBlocks(template.blocks);
     }
   }, [template]);
 
@@ -119,22 +116,23 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
     }
 
     try {
-      console.log('Submitting template update:', {
-        id: template.id,
-        name: editedName,
-        category: editedCategory,
-        blocks: editedBlocks
-      });
-      
-      await onUpdateTemplate(template.id, {
+      await updateTemplate(template.id, {
         name: editedName,
         category: editedCategory,
         blocks: editedBlocks,
       });
-      
-      // onClose is called by the parent after successful update
+      toast({
+        title: "Template atualizado",
+        description: "O template foi atualizado com sucesso.",
+      });
+      onClose();
     } catch (error) {
-      console.error("Error submitting template update:", error);
+      console.error("Error updating template:", error);
+      toast({
+        title: "Erro ao atualizar template",
+        description: "Ocorreu um erro ao atualizar o template. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -213,7 +211,6 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
             
               </div>
             </TabsContent>
-            
             
             <TabsContent value="blocks" className="h-[400px] py-4">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
@@ -313,7 +310,7 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="import" className="py-4">
               <ImportHtmlSection 
                 onTemplateGenerated={handleTemplateFromHtml}
@@ -323,18 +320,11 @@ export const EditTemplateDialog: React.FC<EditTemplateDialogProps> = ({
           </Tabs>
           
           <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isProcessing}>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={isProcessing}>
-              {isProcessing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                'Salvar Template'
-              )}
+            <Button type="submit">
+              Salvar Template
             </Button>
           </DialogFooter>
         </form>
