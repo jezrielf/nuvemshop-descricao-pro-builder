@@ -1,77 +1,63 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Star, User } from 'lucide-react';
+import { User, Crown, Star } from 'lucide-react';
+import { getRoles } from '@/utils/roleUtils';
 
 interface UserRoleBadgeProps {
   role: string | string[] | null;
 }
 
 const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
-  // Handle different role formats
-  const roles = React.useMemo(() => {
-    if (!role) return ['user'];
-    if (typeof role === 'string') {
-      // If it's a comma-separated string, split it
-      if (role.includes(',')) {
-        return role.split(',').map(r => r.trim());
-      }
-      return [role];
-    }
-    return role;
-  }, [role]);
+  // If this is a single role string
+  if (typeof role === 'string' && !role.includes(',')) {
+    return <SingleRoleBadge role={role} />;
+  }
   
-  // Check if user has the specific role
-  const hasRole = (roleType: string) => roles.includes(roleType);
-  
-  // Get the primary badge (highest priority role)
-  const getPrimaryBadge = () => {
-    if (hasRole('admin')) {
-      return (
-        <Badge variant="default" className="flex items-center gap-1 bg-red-500 text-white">
-          <Crown className="w-3 h-3" />
-          Admin
-        </Badge>
-      );
-    }
-    
-    if (hasRole('premium')) {
-      return (
-        <Badge variant="secondary" className="flex items-center gap-1 bg-purple-500 text-white">
-          <Star className="w-3 h-3" />
-          Premium
-        </Badge>
-      );
-    }
-    
-    return (
-      <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
-        <User className="w-3 h-3" />
-        Usuário
-      </Badge>
-    );
-  };
-  
-  // Show additional role badges if there are multiple roles
-  const getAdditionalBadges = () => {
-    if (roles.length <= 1) return null;
-    
-    return (
-      <div className="flex gap-1 mt-1">
-        {roles.length > 1 && (
-          <Badge variant="outline" className="text-xs bg-gray-50">
-            {roles.length} papéis
-          </Badge>
-        )}
-      </div>
-    );
-  };
+  // For arrays or comma-separated strings, display each role
+  const roleArray = getRoles(role);
   
   return (
-    <div>
-      {getPrimaryBadge()}
-      {getAdditionalBadges()}
-    </div>
+    <>
+      {roleArray.map(r => (
+        <SingleRoleBadge key={r} role={r} />
+      ))}
+    </>
+  );
+};
+
+interface SingleRoleBadgeProps {
+  role: string;
+}
+
+const SingleRoleBadge: React.FC<SingleRoleBadgeProps> = ({ role }) => {
+  // Define styling based on role
+  let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
+  let icon = null;
+  let label = role;
+  
+  switch (role.toLowerCase()) {
+    case 'admin':
+      variant = "destructive";
+      icon = <Crown className="w-3 h-3 mr-1" />;
+      break;
+    case 'premium':
+      variant = "default";
+      icon = <Star className="w-3 h-3 mr-1" />;
+      break;
+    case 'user':
+      variant = "secondary";
+      icon = <User className="w-3 h-3 mr-1" />;
+      break;
+    default:
+      variant = "outline";
+  }
+  
+  return (
+    <Badge variant={variant} className="inline-flex items-center mr-1">
+      {icon}
+      {label}
+    </Badge>
   );
 };
 

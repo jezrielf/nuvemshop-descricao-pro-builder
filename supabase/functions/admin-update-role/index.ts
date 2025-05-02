@@ -27,14 +27,35 @@ serve(async (req) => {
     // Create a Supabase client with the service role key for admin operations
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     );
 
-    // Update the user's role - IMPORTANT: Don't use .single() here
+    // Standardize role format - always store as string
+    let roleValue: string;
+    if (Array.isArray(role)) {
+      roleValue = role.join(',');
+    } else {
+      roleValue = String(role);
+    }
+    
+    // Ensure 'user' role is always included
+    if (!roleValue.includes('user')) {
+      roleValue = `user,${roleValue}`;
+    }
+    
+    console.log('Standardized role value:', roleValue);
+
+    // Update the user's role and last updated timestamp
     const { data, error: updateError } = await supabaseAdmin
       .from('profiles')
       .update({ 
-        role,
+        role: roleValue,
         atualizado_em: new Date().toISOString() 
       })
       .eq('id', userId);
@@ -77,6 +98,7 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify({
+        data: null,
         error: error.message || 'Error updating user role'
       }),
       { 

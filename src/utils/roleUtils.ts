@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for handling user roles
  */
@@ -15,9 +16,9 @@ export const getRoles = (role: string | string[] | null): string[] => {
     return role;
   }
   
-  // If it's a comma-separated string, split it
-  if (role?.includes(',')) {
-    return role.split(',').map(r => r.trim());
+  // If it's a comma-separated string, split it and trim
+  if (typeof role === 'string' && role.includes(',')) {
+    return role.split(',').map(r => r.trim()).filter(r => r.length > 0);
   }
   
   // If it's a single string value
@@ -108,7 +109,38 @@ export const addRole = (currentRoles: string | string[] | null, roleToAdd: strin
  */
 export const removeRole = (currentRoles: string | string[] | null, roleToRemove: string): string[] => {
   const roles = getRoles(currentRoles);
-  return roles.filter(r => r !== roleToRemove);
+  
+  // Don't remove the 'user' role if it would leave no roles
+  if (roleToRemove === 'user' && roles.length === 1) {
+    return roles;
+  }
+  
+  const filteredRoles = roles.filter(r => r !== roleToRemove);
+  
+  // Make sure user always has at least the 'user' role
+  if (filteredRoles.length === 0) {
+    return ['user'];
+  }
+  
+  return filteredRoles;
+};
+
+/**
+ * Format roles for storage in the database
+ * @param roles Array of roles
+ * @returns string representation for database storage
+ */
+export const formatRolesForStorage = (roles: string[]): string => {
+  // Ensure the user role is always included
+  if (!roles.includes('user')) {
+    roles = ['user', ...roles];
+  }
+  
+  // Remove any duplicates
+  const uniqueRoles = [...new Set(roles)];
+  
+  // Join as comma-separated string
+  return uniqueRoles.join(',');
 };
 
 /**

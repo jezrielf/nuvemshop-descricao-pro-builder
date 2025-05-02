@@ -29,15 +29,30 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Delete the user
+    // First, delete the profile data to avoid foreign key issues
+    console.log('Attempting to delete profile data for user:', userId);
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .delete()
+      .eq('id', userId);
+    
+    if (profileError) {
+      console.error('Error deleting user profile:', profileError);
+      // We'll still proceed to delete the user in auth
+    } else {
+      console.log('User profile data deleted successfully for:', userId);
+    }
+
+    // Delete the user from auth
+    console.log('Attempting to delete user from auth service:', userId);
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
     
     if (deleteError) {
-      console.error('Error deleting user:', deleteError);
+      console.error('Error deleting user from auth service:', deleteError);
       throw deleteError;
     }
 
-    console.log('User deleted successfully:', userId);
+    console.log('User deleted successfully from auth service:', userId);
 
     return new Response(
       JSON.stringify({ 

@@ -27,3 +27,15 @@ uri = "http://localhost:54328"
 
 [functions.googlebot-analyzer]
 verify_jwt = true
+
+[functions.admin-list-users]
+verify_jwt = true
+
+[functions.admin-create-user]
+verify_jwt = true
+
+[functions.admin-update-role]
+verify_jwt = true
+
+[functions.admin-delete-user]
+verify_jwt = true

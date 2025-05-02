@@ -15,6 +15,7 @@ import { UserTableProps, UserFormValues } from './types';
 import UserTableRow from './table/UserTableRow';
 import UserEditSheet from './edit/UserEditSheet';
 import { adminService } from '@/services/admin';
+import { Spinner } from '@/components/ui/spinner';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
   const { toast } = useToast();
@@ -33,26 +34,32 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     try {
       setUpdatingUser(editingUser.id);
       
-      // Update profile data
+      console.log('Updating profile with values:', values);
+      
+      // Update profile basic data
       await adminService.updateUserProfile(editingUser.id, {
         nome: values.nome
       });
       
-      // Update user role
-      await adminService.updateUserRole(editingUser.id, values.role);
+      // Update user role if provided
+      if (values.role) {
+        await adminService.updateUserRole(editingUser.id, values.role);
+      }
       
       toast({
         title: 'Perfil atualizado',
         description: 'Os dados do usuário foram atualizados com sucesso.',
       });
       
+      // Close modal and refresh data
       setIsSheetOpen(false);
       setEditingUser(null);
       onRefresh();
     } catch (error: any) {
+      console.error('Complete error object:', error);
       toast({
         title: 'Erro ao atualizar perfil',
-        description: error.message,
+        description: error.message || "Ocorreu um erro ao atualizar o perfil",
         variant: 'destructive',
       });
     } finally {
@@ -79,7 +86,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
       console.error('Erro completo:', error);
       toast({
         title: 'Erro ao atualizar papel',
-        description: error.message,
+        description: error.message || "Ocorreu um erro ao atualizar o papel",
         variant: 'destructive',
       });
     } finally {
@@ -106,7 +113,7 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     } catch (error: any) {
       toast({
         title: 'Erro ao excluir usuário',
-        description: error.message,
+        description: error.message || "Ocorreu um erro ao excluir o usuário",
         variant: 'destructive',
       });
     } finally {
@@ -115,7 +122,12 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
   };
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Spinner /> 
+        <span className="ml-2">Carregando usuários...</span>
+      </div>
+    );
   }
 
   return (

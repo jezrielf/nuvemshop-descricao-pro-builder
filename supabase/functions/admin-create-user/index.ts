@@ -30,6 +30,7 @@ serve(async (req) => {
     );
 
     // Create the user
+    console.log('Attempting to create new user:', email);
     const { data: { user }, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -50,21 +51,43 @@ serve(async (req) => {
 
     console.log('User created successfully with ID:', user.id);
     
-    // Update profile with additional data if provided
-    if (userData) {
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .update({
-          nome: userData.nome,
-          role: userData.role || 'user',
-          atualizado_em: new Date().toISOString()
-        })
-        .eq('id', user.id);
-      
-      if (profileError) {
-        console.error('Error updating user profile:', profileError);
-        // Not throwing here as the user was created, just log the error
+    // Standardize role format - always use comma-separated string
+    let userRole = 'user';
+    if (userData?.role) {
+      // If role is an array, join it to string
+      if (Array.isArray(userData.role)) {
+        userRole = userData.role.join(',');
+      } else {
+        userRole = userData.role;
       }
+    }
+    
+    // Ensure 'user' role is always included
+    if (!userRole.includes('user')) {
+      userRole = userRole ? `user,${userRole}` : 'user';
+    }
+    
+    console.log('Setting user role to:', userRole);
+    
+    // Update profile with additional data if provided
+    const profileData = {
+      nome: userData?.nome || user.email?.split('@')[0] || 'New User',
+      role: userRole,
+      atualizado_em: new Date().toISOString()
+    };
+    
+    console.log('Updating profile with data:', profileData);
+    
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .update(profileData)
+      .eq('id', user.id);
+    
+    if (profileError) {
+      console.error('Error updating user profile:', profileError);
+      // Not throwing here as the user was created, just log the error
+    } else {
+      console.log('User profile updated successfully for:', user.id);
     }
 
     return new Response(
