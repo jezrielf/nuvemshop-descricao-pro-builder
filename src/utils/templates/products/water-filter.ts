@@ -207,4 +207,3 @@ export const waterFilterTemplate: Template = {
     }
   ]
 };
-

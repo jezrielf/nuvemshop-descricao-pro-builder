@@ -27,7 +27,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Blend like a pro section
+    // Misture Como um Profissional section
     {
       id: uuidv4(),
       type: 'textImage',
@@ -65,19 +65,19 @@ export const gemBlendTemplate: Template = {
           id: uuidv4(),
           title: '1200W de Potência',
           description: 'Motor potente para as misturas mais difíceis',
-          icon: 'blend',
+          icon: 'zap',
         },
         {
           id: uuidv4(),
           title: 'Fácil de Limpar',
           description: 'Componentes removíveis para limpeza fácil',
-          icon: 'user-friendly',
+          icon: 'trash',
         },
         {
           id: uuidv4(),
           title: 'Múltiplas Velocidades',
           description: 'Controle preciso para diferentes texturas',
-          icon: 'chef-hat',
+          icon: 'settings',
         },
       ],
       visible: true,
@@ -88,7 +88,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // 4 Stainless Sharp Blades section
+    // 4 Lâminas Afiadas section
     {
       id: uuidv4(),
       type: 'imageText',
@@ -108,7 +108,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Blend like a pro with CTA
+    // Misture Como um Profissional - CTA
     {
       id: uuidv4(),
       type: 'imageText',
@@ -147,7 +147,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Believe in the power section
+    // Acredite no Poder section
     {
       id: uuidv4(),
       type: 'textImage',
@@ -167,7 +167,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Transform your kitchen experience
+    // Transforme sua Experiência na Cozinha
     {
       id: uuidv4(),
       type: 'text',
@@ -184,7 +184,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Kitchen Features
+    // Recursos da Cozinha
     {
       id: uuidv4(),
       type: 'features',
@@ -196,25 +196,25 @@ export const gemBlendTemplate: Template = {
           id: uuidv4(),
           title: 'Preparo Rápido',
           description: 'Economize tempo com nosso motor de alta performance',
-          icon: 'timer',
+          icon: 'clock',
         },
         {
           id: uuidv4(),
           title: 'Mistura Perfeita',
           description: 'Resultados consistentes em cada uso',
-          icon: 'blend',
+          icon: 'check-circle',
         },
         {
           id: uuidv4(),
           title: 'Processamento Preciso',
           description: 'Controle fino sobre a consistência dos alimentos',
-          icon: 'chef-hat',
+          icon: 'sliders',
         },
         {
           id: uuidv4(),
           title: 'Uso Simples',
           description: 'Interface intuitiva para todos os tipos de receitas',
-          icon: 'user-friendly',
+          icon: 'thumbs-up',
         },
       ],
       visible: true,
@@ -225,7 +225,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Loved by others
+    // Amado por Outros
     {
       id: uuidv4(),
       type: 'textImage',
@@ -245,7 +245,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // We don't stress about competition
+    // Comparação com Concorrência
     {
       id: uuidv4(),
       type: 'text',
@@ -262,7 +262,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Buy it today section
+    // Compre Hoje section
     {
       id: uuidv4(),
       type: 'imageText',
@@ -282,7 +282,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Footer logo
+    // Rodapé
     {
       id: uuidv4(),
       type: 'text',

@@ -11,7 +11,7 @@ import { createCTABlock } from '@/utils/blockCreators/blocks/ctaBlock';
 
 export const ibblFilterTemplate: Template = {
   id: uuidv4(),
-  name: 'IBBL CZ+7 Original Filter',
+  name: 'Refil IBBL CZ+7 Original',
   category: 'Casa e decoração',
   thumbnail: '/lovable-uploads/24f4b3e3-7009-42e7-99fb-53afdb90554c.png',
   blocks: [
@@ -236,7 +236,7 @@ export const ibblFilterTemplate: Template = {
         {
           id: uuidv4(),
           question: 'Como fazer a troca do refil?',
-          answer: 'Sim. A troca é simples: feche o registro de entrada de água, gire o refil antigo no sentido anti-horário para remover, insira o novo refil e gire no sentido horário até travar. Abra o registro e deixe a água correr por 5 minutos antes do primeiro uso.',
+          answer: 'A troca é simples: feche o registro de entrada de água, gire o refil antigo no sentido anti-horário para remover, insira o novo refil e gire no sentido horário até travar. Abra o registro e deixe a água correr por 5 minutos antes do primeiro uso.',
         },
         {
           id: uuidv4(),
@@ -289,7 +289,7 @@ export const ibblFilterTemplate: Template = {
       id: uuidv4(),
       title: 'CTA Final',
       heading: 'Garanta Água Pura e Saudável para Sua Família',
-      content: 'Adquira agora o Refil Original IBBL CZ+7 e garante água pura e saudável para toda sua família.',
+      content: 'Adquira agora o Refil Original IBBL CZ+7 e garanta água pura e saudável para toda sua família.',
       buttonText: 'COMPRAR AGORA',
       buttonUrl: '#',
       style: {
