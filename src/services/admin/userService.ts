@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
 import { formatRolesForStorage } from '@/utils/roleUtils';
@@ -58,9 +59,16 @@ export const userService = {
       delete updateData.role;
       updateData.atualizado_em = new Date().toISOString();
       
+      // Ensure we're only passing fields that are expected by the profiles table
+      const profileUpdateData = {
+        nome: updateData.nome,
+        avatar_url: updateData.avatar_url,
+        atualizado_em: updateData.atualizado_em
+      };
+      
       const { data: updatedProfile, error } = await supabase
         .from('profiles')
-        .update(updateData)
+        .update(profileUpdateData)
         .eq('id', userId)
         .select()
         .maybeSingle();
