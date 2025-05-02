@@ -7,25 +7,47 @@
 export const extractTextFromHtml = (html: string): string => {
   if (!html) return '';
   
-  // Remove script tags and their contents
-  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
-  
-  // Remove style tags and their contents
-  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
-  
-  // Replace all other HTML tags with space
-  text = text.replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-  
-  // Normalize whitespace
-  text = text.replace(/\s+/g, ' ').trim();
-  
-  return text;
+  try {
+    // Use DOMParser to properly handle HTML entities
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Remove script and style elements
+    const scripts = doc.querySelectorAll('script, style');
+    scripts.forEach(el => el.remove());
+    
+    // Get the text content, which automatically decodes HTML entities
+    let text = doc.body.textContent || '';
+    
+    // Normalize whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    return text;
+  } catch (e) {
+    console.error('Error parsing HTML with DOMParser, falling back to regex:', e);
+    
+    // Fallback method using regex
+    // Remove script tags and their contents
+    let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ');
+    
+    // Remove style tags and their contents
+    text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ');
+    
+    // Create a temporary element to decode HTML entities
+    const tempElement = document.createElement('div');
+    
+    // Replace all HTML tags with space
+    text = text.replace(/<[^>]+>/g, ' ');
+    
+    // Decode HTML entities by setting innerHTML and reading textContent
+    tempElement.innerHTML = text;
+    text = tempElement.textContent || tempElement.innerText || '';
+    
+    // Normalize whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    return text;
+  }
 };
 
 /**
@@ -69,16 +91,33 @@ export const analyzeKeywordDensity = (
 ): Record<string, number> => {
   if (!text) return {};
   
-  const words = text.toLowerCase()
+  // Clean and normalize the text before analysis
+  const cleanText = text.toLowerCase();
+  
+  // Split into words and filter by length
+  const words = cleanText
     .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, '')
     .split(/\s+/)
     .filter(w => w.length >= minWordLength);
+  
+  // Filter HTML entity patterns that might have survived
+  const filteredWords = words.filter(word => 
+    !word.match(/^[a-z]+;$/) && // Avoid things like "eacute;"
+    !word.match(/^[a-z]+[0-9]+$/) && // Avoid things like "nbsp160"
+    !word.includes('&') && // Avoid partial entities with ampersand
+    word !== 'nbsp' && // Common entity name
+    word !== 'eacute' && // Common entity name
+    word !== 'ccedil' && // Common entity name
+    word !== 'atilde' && // Common entity name
+    word !== 'otilde' && // Common entity name
+    word !== 'aacute' // Common entity name
+  );
     
   const stopWords = getPortugueseStopwords();
   const keywordCounts: Record<string, number> = {};
   
   // Count keywords while filtering stopwords
-  words.forEach(word => {
+  filteredWords.forEach(word => {
     if (!stopWords.has(word)) {
       keywordCounts[word] = (keywordCounts[word] || 0) + 1;
     }

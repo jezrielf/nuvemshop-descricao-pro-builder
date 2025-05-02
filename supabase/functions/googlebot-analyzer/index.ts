@@ -86,15 +86,15 @@ function analyzeHtml(html: string, headers: Record<string, string>) {
   // Check basic SEO elements
   const hasTitle = /<title>.*?<\/title>/i.test(html);
   const titleMatch = html.match(/<title>(.*?)<\/title>/i);
-  const title = titleMatch ? titleMatch[1] : null;
+  const title = titleMatch ? decodeHtmlEntities(titleMatch[1]) : null;
 
   const hasMeta = /<meta\s+[^>]*name=["']description["'][^>]*>/i.test(html);
   const metaMatch = html.match(/<meta\s+[^>]*name=["']description["'][^>]*content=["'](.*?)["']/i);
-  const metaDescription = metaMatch ? metaMatch[1] : null;
+  const metaDescription = metaMatch ? decodeHtmlEntities(metaMatch[1]) : null;
 
   const hasH1 = /<h1.*?>.*?<\/h1>/i.test(html);
   const h1Match = html.match(/<h1.*?>(.*?)<\/h1>/i);
-  const h1Content = h1Match ? h1Match[1] : null;
+  const h1Content = h1Match ? decodeHtmlEntities(h1Match[1]) : null;
 
   // Check robots directives
   const robotsMatch = html.match(/<meta\s+[^>]*name=["']robots["'][^>]*content=["'](.*?)["']/i);
@@ -140,13 +140,13 @@ function analyzeHtml(html: string, headers: Record<string, string>) {
     }
   });
 
-  // Check images
+  // Check images - extract and decode alt text
   const images = (html.match(/<img[^>]+>/g) || []).map(img => {
     const srcMatch = img.match(/src=["'](.*?)["']/i);
     const altMatch = img.match(/alt=["'](.*?)["']/i);
     return {
       src: srcMatch ? srcMatch[1] : null,
-      alt: altMatch ? altMatch[1] : null,
+      alt: altMatch ? decodeHtmlEntities(altMatch[1]) : null,
       hasAlt: altMatch !== null
     };
   });
@@ -162,6 +162,12 @@ function analyzeHtml(html: string, headers: Record<string, string>) {
   // Check performance indicators (rough estimates)
   const htmlSize = html.length;
   const loadTimeEstimate = Math.round((htmlSize / 1024) * 0.05 * 10) / 10; // Very rough estimate
+
+  // Extract clean text content for keyword analysis
+  const textContent = extractTextContent(html);
+  
+  // Extract keywords
+  const keywords = analyzeKeywords(textContent);
 
   return {
     title: {
@@ -203,6 +209,114 @@ function analyzeHtml(html: string, headers: Record<string, string>) {
     performance: {
       htmlSize: htmlSize,
       estimatedLoadTime: loadTimeEstimate
-    }
+    },
+    keywords: keywords
   };
+}
+
+/**
+ * Extracts text content from HTML
+ */
+function extractTextContent(html: string): string {
+  // Create a clean version of HTML for text extraction
+  let cleanHtml = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+                      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+                      .replace(/<[^>]+>/g, ' ');
+  
+  // Decode HTML entities
+  cleanHtml = decodeHtmlEntities(cleanHtml);
+  
+  // Normalize whitespace
+  return cleanHtml.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Decodes HTML entities in a string
+ */
+function decodeHtmlEntities(text: string): string {
+  if (!text) return '';
+  
+  // Common HTML entities map
+  const htmlEntities: Record<string, string> = {
+    '&nbsp;': ' ',
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&aacute;': 'á',
+    '&eacute;': 'é',
+    '&iacute;': 'í',
+    '&oacute;': 'ó',
+    '&uacute;': 'ú',
+    '&ccedil;': 'ç',
+    '&atilde;': 'ã',
+    '&otilde;': 'õ',
+    '&ntilde;': 'ñ',
+    '&acirc;': 'â',
+    '&ecirc;': 'ê',
+    '&ocirc;': 'ô'
+  };
+
+  // Replace known entities
+  let decoded = text;
+  Object.entries(htmlEntities).forEach(([entity, char]) => {
+    decoded = decoded.replace(new RegExp(entity, 'g'), char);
+  });
+  
+  // Handle numeric HTML entities
+  decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
+    return String.fromCharCode(parseInt(dec, 10));
+  });
+  
+  return decoded;
+}
+
+/**
+ * Analyzes keywords from text content
+ */
+function analyzeKeywords(text: string) {
+  // Portuguese stopwords
+  const stopwords = new Set([
+    'a', 'ao', 'aos', 'aquela', 'aquelas', 'aquele', 'aqueles', 'aquilo', 'as', 'até',
+    'com', 'como', 'da', 'das', 'de', 'dela', 'delas', 'dele', 'deles', 'depois',
+    'do', 'dos', 'e', 'ela', 'elas', 'ele', 'eles', 'em', 'entre', 'era',
+    'eram', 'éramos', 'essa', 'essas', 'esse', 'esses', 'esta', 'estas', 'este', 'estes',
+    'eu', 'foi', 'fomos', 'for', 'foram', 'forem', 'formos', 'fosse', 'fossem', 'fôssemos',
+    'há', 'haja', 'hajam', 'hajamos', 'hão', 'havemos', 'haver', 'hei', 'houve', 'houvemos',
+    'houver', 'houverá', 'houverão', 'houverem', 'houveremos', 'houveria', 'houveriam', 'houveríamos', 'houvermos', 'houvesse',
+    'houvessem', 'houvéssemos', 'isso', 'isto', 'já', 'lhe', 'lhes', 'mais', 'mas', 'me',
+    'mesmo', 'meu', 'meus', 'minha', 'minhas', 'muito', 'na', 'não', 'nas', 'nem',
+    'no', 'nos', 'nós', 'nossa', 'nossas', 'nosso', 'nossos', 'num', 'numa', 'o',
+    'os', 'ou', 'para', 'pela', 'pelas', 'pelo', 'pelos', 'por', 'qual', 'quando',
+    'que', 'quem', 'se', 'seja', 'sejam', 'sejamos', 'sem', 'será', 'serão', 'serei',
+    'seremos', 'seria', 'seriam', 'seríamos', 'seu', 'seus', 'só', 'somos', 'são', 'sua',
+    'suas', 'também', 'te', 'tem', 'têm', 'temos', 'tenha', 'tenham', 'tenhamos', 'tenho',
+    'terá', 'terão', 'terei', 'teremos', 'teria', 'teriam', 'teríamos', 'teu', 'teus', 'teve',
+    'tinha', 'tinham', 'tínhamos', 'tive', 'tivemos', 'tiver', 'tivera', 'tiveram', 'tiverem', 'tivermos',
+    'tivesse', 'tivessem', 'tivéssemos', 'tu', 'tua', 'tuas', 'um', 'uma', 'você', 'vocês',
+    'vos', 'vós'
+  ]);
+  
+  // Extract words
+  const words = text.toLowerCase()
+    .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, '')
+    .split(/\s+/)
+    .filter(word => word.length > 3 && !stopwords.has(word));
+  
+  // Count word frequency
+  const wordCount: Record<string, number> = {};
+  words.forEach(word => {
+    wordCount[word] = (wordCount[word] || 0) + 1;
+  });
+  
+  // Sort by frequency and get top 10
+  return Object.entries(wordCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([keyword, count]) => ({
+      keyword,
+      count,
+      density: words.length ? (count / words.length) * 100 : 0
+    }));
 }

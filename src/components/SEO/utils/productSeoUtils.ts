@@ -1,3 +1,4 @@
+
 import { extractTextFromHtml, getPortugueseStopwords } from './htmlUtils';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 
@@ -180,16 +181,35 @@ export const analyzeProductSEO = (product: NuvemshopProduct): ProductSEOResult =
 export const extractProductKeywords = (text: string) => {
   const stopWords = getPortugueseStopwords();
   
-  const words = text.toLowerCase()
+  // Ensure we have clean text without HTML entities
+  const cleanText = text.toLowerCase();
+  
+  // Extract words and filter out short ones and stopwords
+  const words = cleanText
     .replace(/[^\wáàâãéèêíìîóòôõúùûç\s]/g, '')
     .split(/\s+/)
-    .filter(w => w.length > 3 && !stopWords.has(w));
+    .filter(w => w.length > 3);
   
-  const wordCount = words.length;
+  // Additional filter for HTML entities that might have survived
+  const filteredWords = words.filter(word => 
+    !word.match(/^[a-z]+;$/) && // Avoid things like "eacute;"
+    !word.match(/^[a-z]+[0-9]+$/) && // Avoid things like "nbsp160"
+    !word.includes('&') && // Avoid partial entities with ampersand
+    word !== 'nbsp' && // Common entity name
+    word !== 'eacute' && // Common entity name
+    word !== 'ccedil' && // Common entity name
+    word !== 'atilde' && // Common entity name
+    word !== 'otilde' && // Common entity name
+    word !== 'aacute' // Common entity name
+  );
+  
+  const wordCount = filteredWords.length;
   const keywordCounts: Record<string, number> = {};
   
-  words.forEach(word => {
-    keywordCounts[word] = (keywordCounts[word] || 0) + 1;
+  filteredWords.forEach(word => {
+    if (!stopWords.has(word)) {
+      keywordCounts[word] = (keywordCounts[word] || 0) + 1;
+    }
   });
   
   return Object.entries(keywordCounts)

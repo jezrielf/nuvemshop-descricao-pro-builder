@@ -19,6 +19,7 @@ interface GooglebotAnalysisResult {
     images: { count: number; withoutAlt: number };
     links: { count: number; externalCount: number };
     performance: { htmlSize: number; estimatedLoadTime: number };
+    keywords: Array<{ keyword: string; count: number; density: number }>;
   };
 }
 
