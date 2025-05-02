@@ -1,256 +1,306 @@
 
-import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 
 export const waterFilterPremiumTemplate: Template = {
   id: uuidv4(),
-  name: 'Filtro IBBL CZ+7 Premium',
+  name: 'Refil de Água Premium',
   category: 'Casa e decoração',
   blocks: [
-    // Hero section
+    // Hero Block
     {
       id: uuidv4(),
       type: 'hero',
       title: 'Banner Principal',
-      heading: 'Filtro IBBL CZ+7 Premium',
-      subheading: 'Água pura e saudável para toda sua família',
-      backgroundImage: '/lovable-uploads/289bdaa9-9763-4c2d-8f8d-a417f1cc8803.png',
-      buttonText: 'Comprar Agora',
-      buttonUrl: '#',
       visible: true,
       columns: 'full',
+      heading: 'Refil IBBL CZ+7 Original',
+      subheading: 'Tecnologia avançada para água pura e saudável',
+      buttonText: '',
+      buttonUrl: '',
       style: {
-        backgroundColor: '#0077be',
-        textColor: '#ffffff',
-        textAlign: 'center',
-        padding: '40px',
-      },
+        backgroundColor: '#0088cc',
+        backgroundGradient: 'linear-gradient(135deg, #0088cc 0%, #005580 100%)',
+        textColor: 'white',
+        padding: '30px 20px',
+        borderBottom: '1px solid rgba(255,255,255,0.2)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+      }
     },
     
-    // Benefícios para família
+    // Text Block - Introdução
     {
       id: uuidv4(),
       type: 'text',
-      title: 'Benefícios para Família',
-      heading: 'A Escolha Ideal para Sua Família',
-      content: '<p class="text-center">Seu purificador IBBL merece apenas o melhor. O Refil Original CZ+7 garante água pura e saudável para toda família, mantendo o sabor natural da água e eliminando 99,9% das impurezas.</p>',
+      title: 'Introdução',
       visible: true,
       columns: 'full',
+      heading: 'A Escolha Ideal para Sua Família',
+      content: '<p style="font-size: 18px; color: #555; line-height: 1.7;">Se você está em busca de um refil de alto desempenho, qualidade comprovada e máxima eficiência na purificação da água, o <strong style="color: #0088cc;">Refil IBBL CZ+7 Original</strong> é a escolha ideal. Projetado com tecnologia avançada e compatível com diversos modelos da linha IBBL, ele garante água pura, livre de impurezas e pronta para o consumo diário de toda a sua família.</p>',
       style: {
-        backgroundColor: '#ffffff',
-        padding: '30px 20px',
-        textAlign: 'center',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        margin: '20px 0',
-      },
+        backgroundColor: 'white',
+        padding: '40px',
+        borderRadius: '24px',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+        margin: '40px auto',
+        border: '1px solid rgba(0,0,0,0.06)'
+      }
     },
     
-    // Ícones de benefícios
+    // Features Block
     {
       id: uuidv4(),
-      type: 'benefits',
-      title: 'Ícones de Recursos',
-      heading: 'Vantagens Exclusivas',
-      benefits: [
+      type: 'features',
+      title: 'Características Principais',
+      visible: true,
+      columns: 3,
+      heading: 'Características Principais',
+      features: [
         {
           id: uuidv4(),
-          title: 'Tempo de Filtragem',
-          description: '3 meses de uso',
-          icon: 'clock',
+          title: 'Etapas de Filtragem',
+          description: 'Processo completo de purificação',
+          icon: '7'
         },
         {
           id: uuidv4(),
-          title: 'Capacidade',
-          description: '3000 litros',
-          icon: 'droplet',
+          title: 'Original',
+          description: 'Garantia de autenticidade',
+          icon: '100%'
         },
         {
           id: uuidv4(),
           title: 'Durabilidade',
-          description: 'Alta performance',
-          icon: 'star',
+          description: 'Até 6 meses de uso',
+          icon: '6m'
         }
       ],
-      visible: true,
-      columns: 'full',
       style: {
-        backgroundColor: '#ffffff',
-        padding: '0 20px 30px 20px',
-        textAlign: 'center',
-      },
+        backgroundColor: 'transparent',
+        padding: '20px',
+        textAlign: 'center'
+      }
     },
     
-    // Descrição do produto
+    // Text Block - Descrição do Produto
     {
       id: uuidv4(),
-      type: 'imageText',
+      type: 'text',
       title: 'Descrição do Produto',
-      heading: 'Tecnologia Avançada de Purificação',
-      content: '<p>O Refil CZ+7 foi desenvolvido exclusivamente para os purificadores IBBL, garantindo máxima eficiência na purificação da água. Sua tecnologia avançada remove impurezas, cloro, bactérias e outros contaminantes, preservando os minerais benéficos à saúde.</p><p>A troca regular do refil a cada 3 meses ou 3000 litros mantém seu purificador funcionando perfeitamente, garantindo água pura e saudável para toda família.</p>',
-      image: {
-        src: '/lovable-uploads/05f724f5-3141-4fee-aa9e-d37e9faae0a4.png',
-        alt: 'Filtro IBBL CZ+7',
-      },
       visible: true,
       columns: 'full',
+      heading: 'Descrição do Produto',
+      content: '<p style="font-size: 16px; line-height: 1.8; margin-bottom: 20px;">O Refil IBBL CZ+7 Original foi desenvolvido com a mais alta tecnologia em purificação de água, proporcionando um consumo mais seguro, saudável e com excelente qualidade. Ideal para ambientes residenciais, corporativos e comerciais, este refil atende aos consumidores que valorizam desempenho, saúde e praticidade.</p><p style="font-size: 16px; line-height: 1.8; margin-bottom: 20px;">Sua principal característica está no sistema de sete etapas de filtragem, que atua de forma sequencial e progressiva, garantindo uma água extremamente limpa e agradável ao paladar. Cada etapa cumpre um papel fundamental, como a retenção de partículas sólidas (areia, barro, ferrugem), a redução do cloro livre presente na água, e o controle de odores e sabores que comprometem a qualidade do consumo.</p><p style="font-size: 16px; line-height: 1.8;">Além disso, o CZ+7 conta com ação bacteriostática, que evita a proliferação de bactérias no interior do refil, tornando-o ainda mais seguro e durável. O sistema Girou Trocou, exclusivo da IBBL, facilita a instalação e troca do refil sem necessidade de ferramentas ou assistência técnica. Com um simples movimento, você substitui o refil e já pode utilizar seu purificador com total segurança.</p>',
       style: {
-        backgroundColor: '#f5f5f5',
-        padding: '40px 20px',
-        textAlign: 'left',
-      },
+        backgroundColor: 'white',
+        padding: '60px 20px',
+        textAlign: 'left'
+      }
     },
     
-    // Principais benefícios
+    // Benefits Block
     {
       id: uuidv4(),
       type: 'benefits',
-      title: 'Principais Benefícios',
+      title: 'Benefícios',
+      visible: true,
+      columns: 'full',
       heading: 'Principais Benefícios',
       benefits: [
         {
           id: uuidv4(),
-          title: 'Retenção de Impurezas',
-          description: 'Elimina partículas sólidas e sedimentos da água',
-          icon: 'filter',
+          title: 'Purificação em 7 etapas',
+          description: 'Proporciona uma água cristalina, livre de impurezas e com sabor natural.',
+          icon: '7'
         },
         {
           id: uuidv4(),
-          title: 'Redução de Cloro',
-          description: 'Remove o cloro, melhorando sabor e odor da água',
-          icon: 'droplet',
+          title: 'Redução de cloro',
+          description: 'Melhora o gosto e o odor da água, além de proteger a saúde da sua família.',
+          icon: 'Cl'
         },
         {
           id: uuidv4(),
-          title: 'Ação Antimicrobiana',
-          description: 'Impede a proliferação de microorganismos',
-          icon: 'shield-check',
+          title: 'Ação bacteriostática',
+          description: 'Previne a proliferação de micro-organismos no interior do refil.',
+          icon: 'B'
         },
         {
           id: uuidv4(),
-          title: 'Tripla Ação',
-          description: 'Filtração, adsorção e troca iônica',
-          icon: 'star',
+          title: 'Troca fácil',
+          description: 'O sistema Girou Trocou permite substituição prática, sem ferramentas.',
+          icon: '↻'
         },
+        {
+          id: uuidv4(),
+          title: 'Alta durabilidade',
+          description: 'Com até 6 meses de uso contínuo ou 3.000 litros de água, reduz a necessidade de manutenções frequentes.',
+          icon: '6m'
+        }
       ],
-      visible: true,
-      columns: 'full',
       style: {
-        backgroundColor: '#f5f5f5',
-        padding: '20px',
-      },
+        backgroundColor: '#f5f5f7',
+        backgroundGradient: 'linear-gradient(to bottom, #f5f5f7, #ffffff)',
+        padding: '60px 20px',
+        borderRadius: '0'
+      }
     },
     
-    // Compatibilidade
+    // Specifications Block - Compatibilidade
     {
       id: uuidv4(),
-      type: 'text',
+      type: 'specifications',
       title: 'Compatibilidade',
-      heading: 'Compatibilidade com Purificadores IBBL',
-      content: '<div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center bg-white p-4 rounded-lg"><div>FR600</div><div>PDF100</div><div>PDF300</div><div>IMAM</div><div>Progágua</div><div>MISTI</div></div><p class="text-center mt-4">*Consulte a compatibilidade completa no manual do produto</p>',
       visible: true,
-      columns: 'full',
+      columns: 2,
+      heading: 'Compatibilidade com Purificadores IBBL',
+      specifications: [
+        { label: 'FR600 Expert', value: 'Compatível' },
+        { label: 'FR600 Speciale', value: 'Compatível' },
+        { label: 'FRQ600', value: 'Compatível' },
+        { label: 'Evolux', value: 'Compatível' },
+        { label: 'Immaginare', value: 'Compatível' },
+        { label: 'Atlantis', value: 'Compatível' },
+        { label: 'PDF', value: 'Compatível' },
+        { label: 'E-due', value: 'Compatível' },
+        { label: 'FR600 Exclusive', value: 'Compatível' },
+        { label: 'FR600 Refrigeração Eletrônica', value: 'Compatível' }
+      ],
       style: {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'white',
         padding: '40px 20px',
-      },
+        borderRadius: '24px',
+        marginTop: '40px',
+        marginBottom: '40px'
+      }
     },
     
-    // Especificações
+    // Specifications Block - Especificações Técnicas
     {
       id: uuidv4(),
       type: 'specifications',
       title: 'Especificações Técnicas',
-      heading: 'Especificações Técnicas',
-      specs: [
-        {
-          id: uuidv4(),
-          name: 'Modelo',
-          value: 'CZ+7',
-        },
-        {
-          id: uuidv4(),
-          name: 'Marca',
-          value: 'IBBL',
-        },
-        {
-          id: uuidv4(),
-          name: 'Cor',
-          value: 'Branco',
-        },
-        {
-          id: uuidv4(),
-          name: 'Peso (c/ Embalagem)',
-          value: '350g',
-        },
-        {
-          id: uuidv4(),
-          name: 'Tecnologia de Filtro',
-          value: 'Carvão Ativado + Prata Coloidal',
-        },
-        {
-          id: uuidv4(),
-          name: 'Vida Útil',
-          value: '3 meses ou 3000 litros',
-        },
-      ],
       visible: true,
-      columns: 'full',
+      columns: 2,
+      heading: 'Especificações Técnicas',
+      specifications: [
+        { label: 'Modelo', value: 'CZ+7' },
+        { label: 'Marca', value: 'IBBL' },
+        { label: 'Etapas de Filtragem', value: '7' },
+        { label: 'Tecnologia de Troca', value: 'Girou Trocou' },
+        { label: 'Eficiência na Retenção de Partículas', value: 'Classe C (≥ 5 a < 15 micra)' },
+        { label: 'Eficiência na Redução de Cloro', value: 'Aprovado segundo norma NBR 16098' },
+        { label: 'Certificação', value: 'INMETRO' },
+        { label: 'Vida útil', value: 'até 6 meses ou 3.000 litros' },
+        { label: 'Dimensões', value: '21 cm (altura) x 7,5 cm (largura)' },
+        { label: 'Temperatura de operação', value: 'de 5°C a 50°C' }
+      ],
       style: {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'white',
+        backgroundGradient: 'linear-gradient(to bottom, #f5f5f7, #ffffff)',
         padding: '40px 20px',
-      },
+        borderRadius: '24px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+      }
     },
     
-    // FAQ
+    // FAQ Block
     {
       id: uuidv4(),
       type: 'faq',
       title: 'Perguntas Frequentes',
+      visible: true,
+      columns: 'full',
       heading: 'Perguntas Frequentes',
       questions: [
         {
           id: uuidv4(),
-          question: 'Como sei que é hora de trocar o refil?',
-          answer: 'O refil deve ser trocado a cada 3 meses ou após a filtragem de 3000 litros, o que ocorrer primeiro. Alguns purificadores possuem indicador luminoso para alertar sobre a troca.',
+          question: 'Esse refil é original da IBBL?',
+          answer: 'Sim. O CZ+7 vendido pela H2O é 100% original, com selo IBBL e certificado pelo INMETRO.'
         },
         {
           id: uuidv4(),
-          question: 'O Refil CZ+7 serve para qualquer purificador?',
-          answer: 'Não, o Refil CZ+7 foi desenvolvido exclusivamente para os modelos IBBL compatíveis como FR600, PDF100, PDF300, IMAM, Progágua e MISTI. Consulte o manual do seu purificador para confirmar a compatibilidade.',
+          question: 'Como sei se o CZ+7 serve no meu purificador?',
+          answer: 'Verifique o modelo no corpo do seu purificador ou consulte nosso atendimento. Listamos todos os modelos compatíveis nesta descrição.'
         },
         {
           id: uuidv4(),
-          question: 'Como fazer a troca do refil?',
-          answer: 'A troca é simples: feche o registro de entrada de água, gire o refil antigo no sentido anti-horário para remover, insira o novo refil e gire no sentido horário até travar. Abra o registro e deixe a água correr por 5 minutos antes do primeiro uso.',
+          question: 'Posso trocar o refil sozinho?',
+          answer: 'Sim. Com o sistema Girou Trocou, basta girar e encaixar o novo refil – sem ferramentas.'
         },
+        {
+          id: uuidv4(),
+          question: 'Quanto tempo o refil dura?',
+          answer: 'A vida útil é de até 6 meses ou 3.000 litros de água, variando de acordo com a qualidade da água da sua região.'
+        },
+        {
+          id: uuidv4(),
+          question: 'Esse refil reduz bactérias?',
+          answer: 'Sim. O CZ+7 possui ação bacteriostática, impedindo a proliferação de bactérias no interior do filtro.'
+        }
       ],
-      visible: true,
-      columns: 'full',
       style: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f5f5f7',
+        backgroundGradient: 'linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%)',
         padding: '40px 20px',
-        borderRadius: '8px',
-        margin: '20px 0',
-      },
+        borderRadius: '24px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+      }
     },
     
-    // CTA Footer
+    // Text Block - Por Que Escolher
+    {
+      id: uuidv4(),
+      type: 'text',
+      title: 'Por Que Escolher',
+      visible: true,
+      columns: 'full',
+      heading: 'Por Que Escolher a H2O Purificadores?',
+      content: '<p style="font-size: 16px; color: #333; line-height: 1.8; margin-bottom: 30px;">A H2O Purificadores é uma empresa especializada em soluções para tratamento de água, com anos de experiência no mercado e compromisso com a qualidade. Trabalhamos com as melhores marcas e os produtos mais confiáveis do setor, sempre com foco em oferecer uma experiência de compra segura, rápida e transparente.</p><p style="font-size: 16px; color: #333; line-height: 1.8; margin-bottom: 30px;">Ao escolher a H2O, você conta com:</p><ul style="list-style-type: none; padding-left: 0;"><li style="display: flex; align-items: center; margin-bottom: 15px;"><span style="background-color: #0088cc; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">✓</span>Equipe técnica para orientações pré e pós-venda</li><li style="display: flex; align-items: center; margin-bottom: 15px;"><span style="background-color: #0088cc; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">✓</span>Produtos com garantia e procedência</li><li style="display: flex; align-items: center; margin-bottom: 15px;"><span style="background-color: #0088cc; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">✓</span>Frete ágil e seguro</li><li style="display: flex; align-items: center; margin-bottom: 15px;"><span style="background-color: #0088cc; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">✓</span>Suporte para lojistas e revendedores</li><li style="display: flex; align-items: center;"><span style="background-color: #0088cc; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">✓</span>Diversas formas de pagamento</li></ul>',
+      style: {
+        backgroundColor: 'white',
+        backgroundGradient: 'linear-gradient(to bottom, #f5f5f7, #ffffff)',
+        padding: '60px 20px',
+        borderRadius: '24px',
+        marginBottom: '40px',
+        marginTop: '40px'
+      }
+    },
+    
+    // Text Block - Cuidados com a Peça
+    {
+      id: uuidv4(),
+      type: 'text',
+      title: 'Cuidados com a Peça',
+      visible: true,
+      columns: 'full',
+      heading: 'Cuidados com a Peça',
+      content: '<div style="background: linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%); border-radius: 24px; padding: 40px;"><div style="display: flex; flex-wrap: wrap; justify-content: center;"><div style="flex: 1 1 300px; margin-bottom: 30px; display: flex; align-items: flex-start;"><div style="width: 50px; height: 50px; background-color: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;"><div style="font-size: 24px; color: white;">1</div></div><div><p style="margin: 0; line-height: 1.6;">Faça a troca do refil a cada 6 meses ou conforme indicado no manual do purificador.</p></div></div><div style="flex: 1 1 300px; margin-bottom: 30px; display: flex; align-items: flex-start;"><div style="width: 50px; height: 50px; background-color: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;"><div style="font-size: 24px; color: white;">2</div></div><div><p style="margin: 0; line-height: 1.6;">Evite expor o refil ao sol e ao calor excessivo.</p></div></div><div style="flex: 1 1 300px; margin-bottom: 30px; display: flex; align-items: flex-start;"><div style="width: 50px; height: 50px; background-color: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;"><div style="font-size: 24px; color: white;">3</div></div><div><p style="margin: 0; line-height: 1.6;">Armazene o produto em local seco, limpo e protegido.</p></div></div><div style="flex: 1 1 300px; display: flex; align-items: flex-start;"><div style="width: 50px; height: 50px; background-color: #0088cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;"><div style="font-size: 24px; color: white;">4</div></div><div><p style="margin: 0; line-height: 1.6;">Após a troca, descarte o refil usado de forma correta, respeitando o meio ambiente.</p></div></div></div></div>',
+      style: {
+        backgroundColor: 'white',
+        padding: '60px 20px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+      }
+    },
+    
+    // CTA Block
     {
       id: uuidv4(),
       type: 'cta',
-      title: 'CTA Final',
+      title: 'Chamada para Ação',
+      visible: true,
+      columns: 'full',
       heading: 'Garanta Água Pura e Saudável para Sua Família',
-      content: 'Adquira agora o Refil Original IBBL CZ+7 e garanta água pura e saudável para toda sua família.',
+      content: 'Invista em qualidade e segurança com o Refil IBBL CZ+7 Original. Produto 100% original com garantia de procedência.',
       buttonText: 'COMPRAR AGORA',
       buttonUrl: '#',
       style: {
-        backgroundColor: '#0077be',
-        padding: '40px 20px',
-        textAlign: 'center',
-        textColor: '#ffffff',
-      },
+        backgroundColor: '#0088cc',
+        backgroundGradient: 'linear-gradient(135deg, #0088cc 0%, #005580 100%)',
+        textColor: 'white',
+        padding: '80px 20px',
+        textAlign: 'center'
+      }
     },
-  ],
-  thumbnail: '/lovable-uploads/05f724f5-3141-4fee-aa9e-d37e9faae0a4.png',
+  ]
 };
