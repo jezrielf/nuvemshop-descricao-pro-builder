@@ -18,17 +18,37 @@ export function generateBenefitsBlockHtml(block: BenefitsBlock): string {
   // Convert to number for comparison
   const gridColumns = Math.min(Math.max(Number(columnsValue), 1), 4); // Between 1 and 4 columns
   
+  // Map Portuguese icon names to their symbols or icons
+  const iconMapping: Record<string, string> = {
+    'relogio': '⏱️',
+    'gota': '💧',
+    'estrela': '⭐',
+    'filtro': '🧹',
+    'escudo': '🛡️',
+    'verificado': '✅',
+    'raio': '⚡',
+    'lixo': '🗑️',
+    'ajustes': '⚙️',
+    'controles': '🎛️',
+    'positivo': '👍',
+  };
+  
   return `
     <div class="benefits-block my-6">
       <h2 class="text-2xl font-bold mb-4">${heading || 'Benefícios'}</h2>
       <div class="grid grid-cols-1 md:grid-cols-${gridColumns} gap-6">
-        ${benefits.map(benefit => `
-          <div class="flex flex-col items-center text-center p-4 border rounded-lg">
-            <div class="text-3xl mb-2">${benefit.icon || '✓'}</div>
-            <h3 class="text-lg font-semibold mb-2">${benefit.title}</h3>
-            <p>${benefit.description || ''}</p>
-          </div>
-        `).join('')}
+        ${benefits.map(benefit => {
+          // Try to use mapping for icon names, otherwise use the original icon or fallback
+          const iconDisplay = iconMapping[benefit.icon] || benefit.icon || '✓';
+          
+          return `
+            <div class="flex flex-col items-center text-center p-4 border rounded-lg">
+              <div class="text-3xl mb-2">${iconDisplay}</div>
+              <h3 class="text-lg font-semibold mb-2">${benefit.title}</h3>
+              <p>${benefit.description || ''}</p>
+            </div>
+          `;
+        }).join('')}
       </div>
     </div>
   `;

@@ -11,12 +11,33 @@ interface BlockTypeSelectorProps {
 }
 
 const BlockTypeSelector: React.FC<BlockTypeSelectorProps> = ({ onSelectType }) => {
+  // Mapping Portuguese icon names to English Lucide names
+  const iconMapping: Record<string, string> = {
+    'relogio': 'Clock',
+    'gota': 'Droplet',
+    'estrela': 'Star',
+    'filtro': 'Filter',
+    'escudo': 'ShieldCheck',
+    'verificado': 'CheckCircle',
+    'raio': 'Zap',
+    'lixo': 'Trash',
+    'ajustes': 'Settings',
+    'controles': 'Sliders',
+    'positivo': 'ThumbsUp',
+  };
+  
   // Helper function to dynamically render Lucide icons by name
   const renderIcon = (iconName: string) => {
-    // @ts-ignore - Dynamically accessing icons from lucide-react
-    const IconComponent = LucideIcons[iconName.split('-').map(
+    // Check if we have a Portuguese name to map
+    const englishName = iconMapping[iconName] || iconName;
+    
+    // Convert to PascalCase for Lucide icon names
+    const iconKey = englishName.split('-').map(
       part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
-    ).join('')];
+    ).join('');
+    
+    // @ts-ignore - Dynamically accessing icons from lucide-react
+    const IconComponent = LucideIcons[iconKey];
     
     return IconComponent ? <IconComponent size={16} /> : null;
   };
