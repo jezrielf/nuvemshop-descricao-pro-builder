@@ -16,6 +16,7 @@ export default function useTemplateUtils() {
     'electronics': 'Eletrônicos',
     'energy': 'Energia',
     'Casa e decoração': 'Casa e decoração',
+    'casa-decoracao': 'Casa e decoração',
     'other': 'Outros'
   }), []);
 
@@ -40,6 +41,7 @@ export default function useTemplateUtils() {
       'electronics': '/assets/thumbnails/electronics.jpg',
       'energy': '/assets/thumbnails/energy.jpg',
       'Casa e decoração': '/assets/thumbnails/home.jpg',
+      'casa-decoracao': '/assets/thumbnails/home.jpg',
       'other': '/assets/thumbnails/generic.jpg'
     };
     
