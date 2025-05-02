@@ -1,4 +1,3 @@
-
 import { extractTextFromHtml, getPortugueseStopwords } from './htmlUtils';
 import { NuvemshopProduct } from '@/components/Nuvemshop/types';
 
@@ -17,6 +16,17 @@ export interface ProductSEOResult {
   headingCount: number;
   hasImages: boolean;
   readabilityScore: number;
+  googleView?: {
+    simplifiedHtml: string;
+    crawlabilityScore: number;
+    technicalIssues: Array<{
+      issue: string;
+      severity: 'high' | 'medium' | 'low';
+      details: string;
+    }>;
+    hasStructuredData: boolean;
+    structuredDataValidity: boolean;
+  };
 }
 
 /**
@@ -115,6 +125,9 @@ export const analyzeProductSEO = (product: NuvemshopProduct): ProductSEOResult =
       });
     }
     
+    // Generate Google View analysis
+    const googleView = simulateGoogleView(htmlContent);
+    
     return {
       score: Math.min(100, score),
       keywords,
@@ -122,7 +135,8 @@ export const analyzeProductSEO = (product: NuvemshopProduct): ProductSEOResult =
       headingCount,
       hasImages,
       readabilityScore,
-      recommendations
+      recommendations,
+      googleView
     };
   } catch (error) {
     console.error('Error analyzing product SEO:', error);
@@ -191,4 +205,232 @@ export const calculateReadabilityScore = (text: string): number => {
   }
   
   return Math.max(0, Math.min(100, Math.round(readabilityScore)));
+};
+
+/**
+ * Simulates how Google would view the page content
+ * @param htmlContent Original HTML content
+ * @returns Google view analysis results
+ */
+export const simulateGoogleView = (htmlContent: string) => {
+  try {
+    // Simplify HTML as Google would see it
+    const simplifiedHtml = simplifyHtml(htmlContent);
+    
+    // Extract and validate structured data
+    const structuredDataResult = extractStructuredData(htmlContent);
+    
+    // Analyze crawlability and identify technical issues
+    const crawlabilityResult = analyzeCrawlability(htmlContent);
+    
+    return {
+      simplifiedHtml,
+      crawlabilityScore: crawlabilityResult.score,
+      technicalIssues: crawlabilityResult.issues,
+      hasStructuredData: structuredDataResult.hasStructuredData,
+      structuredDataValidity: structuredDataResult.isValid
+    };
+  } catch (error) {
+    console.error('Error simulating Google view:', error);
+    return {
+      simplifiedHtml: '<p>Erro ao processar HTML</p>',
+      crawlabilityScore: 0,
+      technicalIssues: [{
+        issue: 'Erro ao analisar conteúdo',
+        severity: 'high' as const,
+        details: 'Ocorreu um erro ao processar o HTML para simulação.'
+      }],
+      hasStructuredData: false,
+      structuredDataValidity: false
+    };
+  }
+};
+
+/**
+ * Simplifies HTML content to simulate Google's view
+ * @param html Original HTML content
+ * @returns Simplified HTML string
+ */
+const simplifyHtml = (html: string): string => {
+  if (!html) return '';
+  
+  let simplified = html;
+  
+  // Remove scripts - Google mostly ignores JavaScript
+  simplified = simplified.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  
+  // Remove style tags - focus on content not styling
+  simplified = simplified.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  
+  // Remove comments
+  simplified = simplified.replace(/<!--[\s\S]*?-->/g, '');
+  
+  // Simplify complex HTML structures but maintain content
+  simplified = simplified
+    .replace(/(\r\n|\n|\r)/gm, ' ')  // Remove line breaks
+    .replace(/\s+/g, ' ')           // Normalize whitespace
+    .replace(/<\/?div[^>]*>/gi, '') // Remove div tags
+    .replace(/<\/?span[^>]*>/gi, '') // Remove span tags
+    .trim();
+  
+  // Add highlighting for important elements
+  simplified = simplified
+    .replace(/<h1([^>]*)>(.*?)<\/h1>/gi, '<h1 style="color:#1a73e8">$2</h1>')
+    .replace(/<h2([^>]*)>(.*?)<\/h2>/gi, '<h2 style="color:#1a73e8">$2</h2>')
+    .replace(/<h3([^>]*)>(.*?)<\/h3>/gi, '<h3 style="color:#1a73e8">$2</h3>')
+    .replace(/<a([^>]*)>(.*?)<\/a>/gi, '<a style="color:#1a0dab" $1>$2</a>');
+  
+  return simplified;
+};
+
+/**
+ * Extracts and validates structured data from HTML
+ * @param html HTML content
+ * @returns Structure data analysis result
+ */
+const extractStructuredData = (html: string) => {
+  try {
+    // Check for JSON-LD script tags
+    const structuredDataMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/i);
+    
+    if (!structuredDataMatch) {
+      return { 
+        hasStructuredData: false, 
+        isValid: false 
+      };
+    }
+    
+    // Extract JSON content
+    const jsonContent = structuredDataMatch[1];
+    
+    // Check if it's valid JSON
+    try {
+      JSON.parse(jsonContent.trim());
+      return { 
+        hasStructuredData: true, 
+        isValid: true 
+      };
+    } catch (e) {
+      return { 
+        hasStructuredData: true, 
+        isValid: false 
+      };
+    }
+  } catch (error) {
+    console.error('Error extracting structured data:', error);
+    return { 
+      hasStructuredData: false, 
+      isValid: false 
+    };
+  }
+};
+
+/**
+ * Analyzes crawlability issues in HTML content
+ * @param html HTML content
+ * @returns Crawlability analysis
+ */
+const analyzeCrawlability = (html: string) => {
+  const issues: Array<{
+    issue: string;
+    severity: 'high' | 'medium' | 'low';
+    details: string;
+  }> = [];
+  
+  let score = 100;
+  
+  // Check missing title
+  if (!/<title>(.*?)<\/title>/i.test(html)) {
+    issues.push({
+      issue: 'Tag <title> não encontrada',
+      severity: 'high',
+      details: 'A tag title é crucial para SEO e deve descrever claramente o conteúdo da página.'
+    });
+    score -= 20;
+  }
+  
+  // Check missing meta description
+  if (!/<meta\s+[^>]*name=["']description["'][^>]*>/i.test(html)) {
+    issues.push({
+      issue: 'Meta description não encontrada',
+      severity: 'medium',
+      details: 'A meta description ajuda os mecanismos de busca a entender o conteúdo da página.'
+    });
+    score -= 10;
+  }
+  
+  // Check for noindex, nofollow
+  if (/<meta\s+[^>]*content=["'][^"']*noindex[^"']*["'][^>]*>/i.test(html)) {
+    issues.push({
+      issue: 'Meta noindex detectada',
+      severity: 'high',
+      details: 'Esta página está configurada para não ser indexada pelo Google.'
+    });
+    score -= 50;
+  }
+  
+  // Check for broken image tags
+  const imgTags = html.match(/<img[^>]+>/g) || [];
+  let imgTagsWithoutAlt = 0;
+  
+  imgTags.forEach(tag => {
+    if (!/ alt=["'][^"']*["']/i.test(tag)) {
+      imgTagsWithoutAlt++;
+    }
+  });
+  
+  if (imgTagsWithoutAlt > 0) {
+    issues.push({
+      issue: `${imgTagsWithoutAlt} imagem(ns) sem atributo alt`,
+      severity: 'medium',
+      details: 'Imagens sem texto alternativo prejudicam a acessibilidade e o SEO.'
+    });
+    score -= Math.min(15, imgTagsWithoutAlt * 3);
+  }
+  
+  // Check heading structure
+  const h1Count = (html.match(/<h1[^>]*>/gi) || []).length;
+  
+  if (h1Count === 0) {
+    issues.push({
+      issue: 'Sem cabeçalho H1',
+      severity: 'high',
+      details: 'Cada página deve ter um cabeçalho H1 que descreva claramente o conteúdo.'
+    });
+    score -= 15;
+  } else if (h1Count > 1) {
+    issues.push({
+      issue: 'Múltiplos cabeçalhos H1',
+      severity: 'medium',
+      details: 'É recomendado ter apenas um cabeçalho H1 por página.'
+    });
+    score -= 5;
+  }
+  
+  // Check for empty links
+  const emptyLinks = (html.match(/<a[^>]*>\s*<\/a>/gi) || []).length;
+  
+  if (emptyLinks > 0) {
+    issues.push({
+      issue: `${emptyLinks} link(s) vazio(s)`,
+      severity: 'low',
+      details: 'Links sem conteúdo afetam negativamente SEO e acessibilidade.'
+    });
+    score -= Math.min(10, emptyLinks * 2);
+  }
+  
+  // Check for canonical tag
+  if (!/<link\s+[^>]*rel=["']canonical["'][^>]*>/i.test(html)) {
+    issues.push({
+      issue: 'Link canônico não encontrado',
+      severity: 'low',
+      details: 'Um link canônico ajuda a evitar conteúdo duplicado.'
+    });
+    score -= 5;
+  }
+  
+  return {
+    score: Math.max(0, Math.min(100, Math.round(score))),
+    issues: issues
+  };
 };
