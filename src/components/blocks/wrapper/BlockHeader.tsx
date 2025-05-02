@@ -1,23 +1,46 @@
 
 import React from 'react';
 import { BlockBase } from '@/types/editor';
-import { getBlockTypeDisplayName } from '@/utils/blockTypeInfo';
-import { cn } from '@/lib/utils';
+import { getBlockTypeDisplayName, blockTypeInfo } from '@/utils/blockTypeInfo';
+import * as LucideIcons from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface BlockHeaderProps {
   block: BlockBase;
-  className?: string;
 }
 
-const BlockHeader: React.FC<BlockHeaderProps> = ({ block, className }) => {
-  const blockTypeName = getBlockTypeDisplayName(block.type);
+const BlockHeader: React.FC<BlockHeaderProps> = ({ block }) => {
+  // Helper function to dynamically render Lucide icons by name
+  const renderBlockTypeIcon = (iconName: string) => {
+    // Convert kebab-case to PascalCase for Lucide icon names
+    const iconKey = iconName.split('-').map(
+      part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    ).join('');
+    
+    // @ts-ignore - Dynamically accessing icons from lucide-react
+    const IconComponent = LucideIcons[iconKey];
+    
+    return IconComponent ? <IconComponent size={16} /> : null;
+  };
+  
+  const blockTypeDisplay = getBlockTypeDisplayName(block.type);
+  const blockIcon = blockTypeInfo[block.type].icon;
   
   return (
-    <div className={cn("block-header text-[10px] font-medium flex items-center gap-1", className)}>
-      <span className="px-1.5 py-0.5 rounded-sm bg-primary/10 text-primary">
-        {blockTypeName}
-      </span>
-      <span className="truncate max-w-[200px]">{block.title}</span>
+    <div className="flex items-center">
+      <div className="flex items-center mr-3">
+        <span className="mr-1.5">
+          {renderBlockTypeIcon(blockIcon)}
+        </span>
+        <span className="text-sm font-medium">{blockTypeDisplay}</span>
+      </div>
+      <div className="ml-auto">
+        {block.visible ? (
+          <Eye size={14} className="text-gray-500" />
+        ) : (
+          <EyeOff size={14} className="text-gray-400" />
+        )}
+      </div>
     </div>
   );
 };
