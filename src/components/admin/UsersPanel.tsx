@@ -6,7 +6,7 @@ import UserPanelHeader from './users/panels/UserPanelHeader';
 import UserPanelContent from './users/panels/UserPanelContent';
 import { adminService } from '@/services/admin';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ExclamationTriangleIcon, CheckCircledIcon } from "@radix-ui/react-icons";
+import { AlertTriangle, CheckCircle } from "lucide-react";
 
 const UsersPanel: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -123,8 +123,8 @@ const UsersPanel: React.FC = () => {
           className="mb-4"
         >
           {lastOperation.type === 'success' ? 
-            <CheckCircledIcon className="h-4 w-4" /> : 
-            <ExclamationTriangleIcon className="h-4 w-4" />
+            <CheckCircle className="h-4 w-4" /> : 
+            <AlertTriangle className="h-4 w-4" />
           }
           <AlertTitle>
             {lastOperation.type === 'success' ? 'Sucesso!' : 'Erro!'}

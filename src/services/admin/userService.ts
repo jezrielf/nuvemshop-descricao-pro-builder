@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
+import { formatRolesForStorage } from '@/utils/roleUtils';
 
 export const userService = {
   getUsers: async (): Promise<Profile[]> => {
@@ -51,7 +52,7 @@ export const userService = {
       console.log('Updating user profile:', userId, data);
       // Handle base profile data update (nome, avatar_url, etc)
       // Keep role handling separate to match the admin panel's approach
-      const updateData = { ...data };
+      const updateData: Record<string, any> = { ...data };
       
       // Remove role from updateData as it's handled separately
       delete updateData.role;
@@ -85,8 +86,11 @@ export const userService = {
     try {
       console.log('Updating role for user', userId, 'to', role);
       
+      // Convert role to string format if it's an array
+      const roleValue = Array.isArray(role) ? role.join(',') : role;
+      
       const { data, error } = await supabase.functions.invoke('admin-update-role', {
-        body: { userId, role }
+        body: { userId, role: roleValue }
       });
       
       if (error || !data) {
