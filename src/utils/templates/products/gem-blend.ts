@@ -7,7 +7,7 @@ export const gemBlendTemplate: Template = {
   name: 'Liquidificador Gem Blend',
   category: 'casa-decoracao',
   blocks: [
-    // Hero section
+    // Banner Principal
     {
       id: uuidv4(),
       type: 'hero',
@@ -27,7 +27,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Misture Como um Profissional section
+    // Misture Como um Profissional
     {
       id: uuidv4(),
       type: 'textImage',
@@ -47,7 +47,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Features section
+    // Características
     {
       id: uuidv4(),
       type: 'features',
@@ -88,7 +88,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // 4 Lâminas Afiadas section
+    // Lâminas de Aço Inoxidável
     {
       id: uuidv4(),
       type: 'imageText',
@@ -128,7 +128,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // CTA Button
+    // Botão de Compra
     {
       id: uuidv4(),
       type: 'cta',
@@ -147,7 +147,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Acredite no Poder section
+    // Acredite no Poder
     {
       id: uuidv4(),
       type: 'textImage',
@@ -230,7 +230,7 @@ export const gemBlendTemplate: Template = {
       id: uuidv4(),
       type: 'textImage',
       title: 'Amado por Outros',
-      heading: 'Amado por Outros',
+      heading: 'Amado por Clientes',
       content: '"O Gem Blend transformou minha rotina na cozinha. As receitas ficam prontas em minutos e com uma textura perfeita. Recomendo para todos que buscam qualidade e eficiência!" - Ana Silva',
       image: {
         src: '/lovable-uploads/289bdaa9-9763-4c2d-8f8d-a417f1cc8803.png',
@@ -250,7 +250,7 @@ export const gemBlendTemplate: Template = {
       id: uuidv4(),
       type: 'text',
       title: 'Comparação com Concorrência',
-      heading: 'NÃO NOS PREOCUPAMOS COM A CONCORRÊNCIA',
+      heading: 'VANTAGENS SOBRE A CONCORRÊNCIA',
       content: '<table class="w-full border-collapse" style="border: 1px solid #ddd"><thead><tr><th></th><th>Gem Blend</th><th>Outros Liquidificadores</th></tr></thead><tbody><tr><td>Potência</td><td>1200W</td><td>800W</td></tr><tr><td>Lâminas de Aço Inox</td><td>4</td><td>2</td></tr><tr><td>Velocidades</td><td>10</td><td>5</td></tr><tr><td>Garantia</td><td>5 anos</td><td>1 ano</td></tr><tr><td>Durabilidade</td><td class="text-center">✓</td><td class="text-center">✗</td></tr></tbody></table>',
       visible: true,
       columns: 'full',
@@ -262,7 +262,7 @@ export const gemBlendTemplate: Template = {
       },
     },
     
-    // Compre Hoje section
+    // Compre Hoje
     {
       id: uuidv4(),
       type: 'imageText',

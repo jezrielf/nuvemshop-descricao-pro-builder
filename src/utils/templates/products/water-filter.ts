@@ -73,26 +73,31 @@ export const waterFilterTemplate: Template = {
       heading: 'Principais Benefícios',
       benefits: [
         {
+          id: '1',
           title: 'Purificação em 7 etapas',
           description: 'Proporciona uma água cristalina, livre de impurezas e com sabor natural.',
           icon: '7'
         },
         {
+          id: '2',
           title: 'Redução de cloro',
           description: 'Melhora o gosto e o odor da água, além de proteger a saúde da sua família.',
           icon: 'Cl'
         },
         {
+          id: '3',
           title: 'Ação bacteriostática',
           description: 'Previne a proliferação de micro-organismos no interior do refil.',
           icon: 'B'
         },
         {
+          id: '4',
           title: 'Troca fácil',
           description: 'O sistema Girou Trocou permite substituição prática, sem ferramentas.',
           icon: '↻'
         },
         {
+          id: '5',
           title: 'Alta durabilidade',
           description: 'Com até 6 meses de uso contínuo ou 3.000 litros de água, reduz a necessidade de manutenções frequentes.',
           icon: '6m'

@@ -53,7 +53,7 @@ export const ibblFilterTemplate: Template = {
       ...createBenefitsBlock('full'),
       id: uuidv4(),
       title: 'Ícones de Recursos',
-      heading: '',
+      heading: 'Benefícios',
       benefits: [
         {
           id: uuidv4(),
