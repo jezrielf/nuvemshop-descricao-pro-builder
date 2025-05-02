@@ -27,3 +27,10 @@ export interface TemplateCategorySlice {
   getTemplatesByCategory: (category: string | null) => Template[];
   setSelectedCategory: (category: string | null) => void;
 }
+
+// Extend the Template interface to include user_id if it's not already included in @/types/editor
+declare module '@/types/editor' {
+  interface Template {
+    user_id?: string;
+  }
+}

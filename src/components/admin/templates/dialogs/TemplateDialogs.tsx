@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
 import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
-import { useTemplateStore } from '@/store/templates';
+import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
 import { NewTemplateDialog } from './NewTemplateDialog';
 import { EditTemplateDialog } from './EditTemplateDialog';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';
 import { PreviewTemplateDialog } from './PreviewTemplateDialog';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
 export const TemplateDialogs: React.FC = () => {
@@ -25,6 +24,7 @@ export const TemplateDialogs: React.FC = () => {
     closeAllDialogs
   } = useTemplateDialogs();
   
+  // Use the hook that already includes enhanced delete functionality
   const { deleteTemplate: removeTemplate } = useTemplateStore();
   const { toast } = useToast();
 
@@ -43,31 +43,18 @@ export const TemplateDialogs: React.FC = () => {
     console.log('Starting deletion process for template:', deleteTemplate.id);
     
     try {
-      // Direct Supabase deletion
-      console.log('Executing DELETE operation on Supabase for template:', deleteTemplate.id);
-      const { error, count } = await supabase
-        .from('templates')
-        .delete()
-        .eq('id', deleteTemplate.id)
-        .select('count');
+      // Use the store's delete method instead of direct Supabase call
+      const success = await removeTemplate(deleteTemplate.id);
       
-      if (error) {
-        console.error('Error deleting template from Supabase:', error);
+      if (!success) {
         toast({
           title: 'Erro ao deletar',
-          description: `Não foi possível deletar o template: ${error.message}`,
+          description: 'Não foi possível deletar o template',
           variant: 'destructive'
         });
         setIsDeleting(false);
         return;
       }
-      
-      // Verify deletion succeeded
-      console.log('Supabase deletion operation completed, verifying...');
-      
-      // Update local state
-      console.log('Updating local state to remove template:', deleteTemplate.id);
-      removeTemplate(deleteTemplate.id);
       
       toast({
         title: 'Template excluído',
@@ -82,14 +69,6 @@ export const TemplateDialogs: React.FC = () => {
       
       // Close the dialog
       closeAllDialogs();
-      
-      // Refresh page after a short delay
-      console.log('Scheduling page refresh');
-      setTimeout(() => {
-        console.log('Refreshing page to update template list');
-        window.location.reload();
-      }, 500);
-      
     } catch (error) {
       console.error('Exception during template deletion:', error);
       toast({

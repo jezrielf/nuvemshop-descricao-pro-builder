@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
@@ -7,6 +8,11 @@ export const templateService = {
   getTemplates: async (): Promise<Template[]> => {
     try {
       console.log('Iniciando carregamento de templates do banco de dados');
+      
+      // Check if user is authenticated
+      const { data: authData } = await supabase.auth.getSession();
+      const userId = authData.session?.user.id;
+      console.log('Current user ID:', userId);
       
       // First try to get templates from database
       const { data, error } = await supabase
@@ -60,7 +66,8 @@ export const templateService = {
           name: template.name,
           category: category,
           blocks: blockData,
-          thumbnail: '/placeholder.svg' // Default thumbnail
+          thumbnail: '/placeholder.svg', // Default thumbnail
+          user_id: template.user_id // Ensure we keep the user_id
         };
       });
       
@@ -90,24 +97,39 @@ export const templateService = {
   
   createTemplate: async (templateData: Omit<Template, 'id'>): Promise<Template> => {
     try {
+      // Get current authenticated user
+      const { data: authData } = await supabase.auth.getSession();
+      const userId = authData.session?.user.id;
+      
+      if (!userId) {
+        console.error('Error in createTemplate: Not authenticated');
+        throw new Error('Authentication required');
+      }
+      
       // Generate UUID for new template
       const id = crypto.randomUUID();
       
       // Ensure blocks is serialized properly for storage
       const blockData = templateData.blocks || [];
       
+      // Always include user_id when creating a template
+      console.log('Creating template with user_id:', userId);
       const { data, error } = await supabase
         .from('templates')
         .insert({
           id,
           name: templateData.name,
           category: templateData.category,
-          blocks: blockData
+          blocks: blockData,
+          user_id: templateData.user_id || userId // Use provided user_id or current user
         })
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error in supabase insert:', error);
+        throw error;
+      }
       
       // Ensure blocks is always an array
       let blocks: any[] = [];
@@ -124,9 +146,11 @@ export const templateService = {
         name: data.name,
         category: data.category as ProductCategory,
         blocks,
-        thumbnail: '/placeholder.svg' // Default thumbnail
+        thumbnail: '/placeholder.svg', // Default thumbnail
+        user_id: data.user_id // Include user_id in returned object
       };
       
+      console.log('Template created successfully:', template.id);
       return template;
     } catch (error) {
       console.error('Error in createTemplate:', error);
@@ -136,12 +160,24 @@ export const templateService = {
   
   updateTemplate: async (templateId: string, templateData: Partial<Template>): Promise<Template> => {
     try {
+      // Get current authenticated user
+      const { data: authData } = await supabase.auth.getSession();
+      const userId = authData.session?.user.id;
+      
+      if (!userId) {
+        console.error('Error in updateTemplate: Not authenticated');
+        throw new Error('Authentication required');
+      }
+      
+      console.log('Updating template with ID:', templateId);
+      
       // Prepare update data
       const updateData: any = {};
       
       if (templateData.name) updateData.name = templateData.name;
       if (templateData.category) updateData.category = templateData.category;
       if (templateData.blocks) updateData.blocks = templateData.blocks;
+      if (templateData.user_id) updateData.user_id = templateData.user_id;
       
       updateData.updated_at = new Date().toISOString();
       
@@ -152,7 +188,10 @@ export const templateService = {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error in supabase update:', error);
+        throw error;
+      }
       
       // Ensure blocks is always an array
       let blocks: any[] = [];
@@ -169,9 +208,11 @@ export const templateService = {
         name: data.name,
         category: data.category as ProductCategory,
         blocks,
-        thumbnail: '/placeholder.svg' // Default thumbnail
+        thumbnail: '/placeholder.svg', // Default thumbnail
+        user_id: data.user_id // Include user_id in returned object
       };
       
+      console.log('Template updated successfully:', template.id);
       return template;
     } catch (error) {
       console.error('Error in updateTemplate:', error);
@@ -181,12 +222,19 @@ export const templateService = {
   
   deleteTemplate: async (templateId: string): Promise<void> => {
     try {
+      console.log('Deleting template with ID:', templateId);
+      
       const { error } = await supabase
         .from('templates')
         .delete()
         .eq('id', templateId);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error in supabase delete:', error);
+        throw error;
+      }
+      
+      console.log('Template deleted successfully from database');
     } catch (error) {
       console.error('Error in deleteTemplate:', error);
       throw error;
