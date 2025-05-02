@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useTemplateStore } from '@/store/templates';
+import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
 import { TemplateList } from './TemplateList';
 import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,6 +8,7 @@ import { TemplateDialogs } from './dialogs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
 
 export const TemplatesView = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -16,6 +17,7 @@ export const TemplatesView = () => {
   const [loadError, setLoadError] = React.useState<string | null>(null);
   
   const { templates, loadTemplates, searchTemplates } = useTemplateStore();
+  const { openNewDialog } = useTemplateDialogs();
   const { toast } = useToast();
   
   // Load templates when component mounts
@@ -36,16 +38,15 @@ export const TemplatesView = () => {
         toast({
           title: 'Atenção',
           description: 'Nenhum template encontrado. Verifique sua conexão ou crie novos templates.',
-          variant: 'destructive',
         });
         setLoadError('Nenhum template encontrado.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading templates:', error);
       setLoadError('Ocorreu um erro ao carregar os templates.');
       toast({
         title: 'Erro',
-        description: 'Ocorreu um erro ao carregar os templates',
+        description: `Ocorreu um erro ao carregar os templates: ${error.message || 'Erro desconhecido'}`,
         variant: 'destructive',
       });
     } finally {
@@ -60,6 +61,11 @@ export const TemplatesView = () => {
   // Function to manually refresh templates
   const handleRefresh = () => {
     loadData();
+  };
+  
+  // Function to create a new template
+  const handleCreateTemplate = () => {
+    openNewDialog();
   };
   
   // Function to handle template deletion
@@ -89,6 +95,7 @@ export const TemplatesView = () => {
           onSearchChange={setSearchQuery}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          onCreateTemplate={handleCreateTemplate}
         />
         
         <Button

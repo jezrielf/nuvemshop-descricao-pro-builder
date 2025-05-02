@@ -1,8 +1,9 @@
+
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import { templateService } from '@/services/admin/templateService';
-import { getAllTemplates } from '@/utils/templates';
+import { adminService } from '@/services/admin';
+import { supabase } from '@/integrations/supabase/client';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -11,63 +12,43 @@ export const createLoadingSlice: StateCreator<
   TemplateLoadingSlice
 > = (set, get) => ({
   loadTemplates: async () => {
+    console.log('Loading templates from service');
+    
     try {
-      console.log('Tentando carregar templates do serviço...');
+      // Check for authentication
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current authenticated user:', user?.id || 'Not authenticated');
       
-      // Always have a fallback of local templates
-      const localTemplates = getAllTemplates();
+      const templates = await adminService.getTemplates();
+      console.log(`Loaded ${templates.length} templates`);
       
-      // Ensure we have templates available immediately
-      if (get().templates.length === 0) {
-        console.log('Definindo templates locais para uso imediato enquanto carregamos do servidor');
-        set({ templates: localTemplates });
-      }
-      
-      // Try to load from server
-      let templates = await templateService.getTemplates();
-      
-      // Ensure we always have templates available
-      if (!templates || templates.length === 0) {
-        console.log('Nenhum template retornado pelo serviço, usando templates locais');
-        templates = localTemplates;
-      }
-      
-      console.log(`Carregados ${templates.length} templates com sucesso`);
+      // Update state with loaded templates
       set({ templates });
+      
       return templates;
     } catch (error) {
-      console.error('Erro ao carregar templates:', error);
-      // Fallback to local templates in case of error
-      const localTemplates = getAllTemplates();
-      set({ templates: localTemplates });
-      console.log(`Fallback para ${localTemplates.length} templates locais`);
-      return localTemplates;
+      console.error('Error in loadTemplates:', error);
+      throw error;
     }
   },
   
-  searchTemplates: (query, category) => {
+  searchTemplates: (query, categoryFilter) => {
     const { templates } = get();
     
-    // Se não há templates, verificamos se precisamos carregar
-    if (!templates || templates.length === 0) {
-      console.warn('Tentando buscar templates, mas nenhum está carregado');
-      // Retornamos um array vazio, mas o componente deve tratar este caso
-      return [];
+    if (!query && !categoryFilter) {
+      return templates;
     }
     
     return templates.filter(template => {
-      // Filter by category if selected
-      if (category && template.category !== category) {
-        return false;
-      }
+      // Match by category if filter is applied
+      const categoryMatch = !categoryFilter || template.category === categoryFilter;
       
-      // Filter by search query if provided
-      if (query && query.trim() !== '') {
-        const normalizedQuery = query.toLowerCase().trim();
-        return template.name.toLowerCase().includes(normalizedQuery);
-      }
-      
-      return true;
+      // Match by search query if provided
+      const searchMatch = !query || 
+        template.name.toLowerCase().includes(query.toLowerCase()) ||
+        template.category.toLowerCase().includes(query.toLowerCase());
+        
+      return categoryMatch && searchMatch;
     });
-  }
+  },
 });
