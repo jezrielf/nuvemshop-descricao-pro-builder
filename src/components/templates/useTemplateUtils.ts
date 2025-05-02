@@ -1,7 +1,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { ProductCategory } from '@/types/editor';
-import { advancedTemplates } from '@/utils/templates';
 
 interface CategoryNamesMap {
   [key: string]: string;
@@ -22,7 +21,8 @@ export default function useTemplateUtils() {
 
   // Check if a template is from the advanced collection
   const isAdvancedTemplate = (id: string): boolean => {
-    return advancedTemplates.some(template => template.id === id);
+    // Simplified function as advancedTemplates no longer exists
+    return false;
   };
 
   // Get a thumbnail for a template

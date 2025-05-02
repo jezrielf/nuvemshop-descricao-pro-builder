@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 
 export const shoesTemplates: Template[] = [
@@ -220,7 +219,6 @@ export const shoesTemplates: Template[] = [
         },
         videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         aspectRatio: '16:9',
-        title: 'Veja a Tecnologia em Ação',
         description: 'Teste de performance realizado com atletas profissionais',
         autoplay: false,
         muteAudio: true

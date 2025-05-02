@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 
 export const electronicsTemplates: Template[] = [
@@ -222,7 +221,6 @@ export const electronicsTemplates: Template[] = [
         },
         videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         aspectRatio: '16:9',
-        title: 'Veja a Tecnologia em Ação',
         description: 'Demonstração completa das funcionalidades revolucionárias',
         autoplay: false,
         muteAudio: true

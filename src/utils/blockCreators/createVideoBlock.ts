@@ -7,16 +7,16 @@ export function createVideoBlock(columns: ColumnLayout = 'full'): VideoBlock {
   return {
     id: uuidv4(),
     type: 'video',
-    title: 'Vídeo',
+    title: 'Vídeo do Produto',
     videoUrl: '',
     aspectRatio: '16:9',
     autoplay: false,
     muteAudio: true,
-    heading: 'Vídeo do Produto',
     columns,
     visible: true,
     style: {
-      headingColor: '#333333',
+      backgroundColor: '#ffffff',
+      padding: '40px 20px'
     }
   };
 }

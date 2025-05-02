@@ -2,7 +2,7 @@
 import React from 'react';
 import { VideoBlock as VideoBlockType } from '@/types/editor';
 import { cn } from '@/lib/utils';
-import { BlockWrapper } from '../BlockWrapper';
+import BlockWrapper from '../BlockWrapper';
 
 interface VideoBlockProps {
   block: VideoBlockType;
@@ -53,7 +53,7 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
   }
 
   return (
-    <BlockWrapper block={block} isPreview={isPreview}>
+    <BlockWrapper block={block} isEditing={!isPreview}>
       <div className="w-full">
         {title && <h3 className="text-2xl font-semibold mb-4">{title}</h3>}
         {description && <p className="mb-4 text-gray-600">{description}</p>}
@@ -78,4 +78,5 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
   );
 };
 
+export { VideoBlock };
 export default VideoBlock;

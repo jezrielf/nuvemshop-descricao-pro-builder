@@ -1,10 +1,10 @@
 
 import { ColumnLayout, VideoBlock } from '@/types/editor';
-import { generateUniqueId } from '../../idGenerator';
+import { v4 as uuidv4 } from 'uuid';
 
 export const createVideoBlock = (columns: ColumnLayout = 'full', defaultTitle?: string): VideoBlock => {
   return {
-    id: generateUniqueId(),
+    id: uuidv4(),
     type: 'video',
     title: defaultTitle || 'Vídeo do Produto',
     visible: true,

@@ -2,8 +2,15 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import { templateService } from '@/services/admin';
 import { getAllTemplates } from '@/utils/templates';
+
+// Mock service for templates
+const templateService = {
+  getTemplates: async (): Promise<Template[]> => {
+    // In a real implementation, this would fetch from an API
+    return getAllTemplates();
+  }
+};
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,

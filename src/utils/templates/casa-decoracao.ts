@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 
 export const casaDecoracaoTemplates: Template[] = [
@@ -198,7 +197,6 @@ export const casaDecoracaoTemplates: Template[] = [
         },
         videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         aspectRatio: '16:9',
-        title: 'Tour pelos Nossos Ambientes',
         description: 'Conheça nossas sugestões de decoração e combinações',
         autoplay: false,
         muteAudio: true
