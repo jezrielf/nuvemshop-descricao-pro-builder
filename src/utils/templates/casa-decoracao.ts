@@ -1,6 +1,8 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
 import { ibblFilterTemplate } from './products/ibbl-filter-template';
+import { gemBlendTemplate } from './products/gem-blend';
 
 // Casa e decoração templates collection
 export const casaDecoracaoTemplates: Template[] = [
@@ -278,4 +280,7 @@ export const casaDecoracaoTemplates: Template[] = [
   
   // Add the IBBL filter template to the collection
   ibblFilterTemplate,
+  
+  // Add the Gem Blend template to the collection
+  gemBlendTemplate,
 ];
