@@ -30,13 +30,13 @@ export const emailAuthService = {
   resendConfirmationEmail: async (email: string) => {
     try {
       // Generate OTP for email verification
-      const { data, error: otpError } = await supabase.auth.resend({
+      const { data, error } = await supabase.auth.resend({
         type: 'signup',
         email,
       });
       
-      if (otpError) {
-        throw otpError;
+      if (error) {
+        throw error;
       }
       
       // Try to get user profile to get their name
@@ -55,10 +55,11 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Safe access to potentially null user data
+      // Create a default token value if user or email_confirm_token is missing
       const confirmationToken = data?.user?.email_confirm_token || '';
       
-      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
+      // Send the custom confirmation email
+      const result = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
           confirmationToken,
@@ -68,11 +69,11 @@ export const emailAuthService = {
         },
       });
       
-      if (emailError) {
-        throw emailError;
+      if (result.error) {
+        throw result.error;
       }
       
-      return { data: emailData, error: null };
+      return { data: result.data, error: null };
     } catch (error: any) {
       console.error('Error resending confirmation email:', error);
       return { data: null, error };

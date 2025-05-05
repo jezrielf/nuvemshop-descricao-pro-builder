@@ -28,7 +28,7 @@ const ResetPassword: React.FC = () => {
             <ResetPasswordForm 
               onSubmit={handleSubmit} 
               errorMessage={errorMessage} 
-              isSubmitting={status === 'submitting' ? true : false} 
+              isSubmitting={status === 'submitting'} 
             />
           )}
           
