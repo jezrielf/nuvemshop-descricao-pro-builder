@@ -11,11 +11,14 @@ import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/services/authService';
 import { supabase } from '@/integrations/supabase/client';
 
+// Define status type to fix comparison errors
+type ResetPasswordStatus = 'verifying' | 'ready' | 'submitting' | 'success' | 'error';
+
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [status, setStatus] = useState<'verifying' | 'ready' | 'submitting' | 'success' | 'error'>('verifying');
+  const [status, setStatus] = useState<ResetPasswordStatus>('verifying');
   const [countdown, setCountdown] = useState(5);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

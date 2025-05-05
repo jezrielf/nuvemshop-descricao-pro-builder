@@ -148,8 +148,7 @@ export const authService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Send custom email using the token
-      // Fixed the otpData.user? check to handle null safely
+      // Send custom email using the token - fix the potentially null check
       const confirmationToken = otpData?.user?.email_confirm_token || '';
       
       const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
@@ -167,7 +166,7 @@ export const authService = {
       }
       
       return { data, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error resending confirmation email:', error);
       return { data: null, error };
     }
@@ -216,7 +215,7 @@ export const authService = {
       }
       
       return { data, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error requesting password reset:', error);
       return { data: null, error };
     }
@@ -234,7 +233,7 @@ export const authService = {
       }
       
       return { data, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating password:', error);
       return { data: null, error };
     }
