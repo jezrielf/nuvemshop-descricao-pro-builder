@@ -30,7 +30,7 @@ export const emailAuthService = {
   resendConfirmationEmail: async (email: string) => {
     try {
       // Generate OTP for email verification
-      const { data, error: otpError } = await supabase.auth.resend({
+      const { data: otpData, error: otpError } = await supabase.auth.resend({
         type: 'signup',
         email,
       });
@@ -56,7 +56,7 @@ export const emailAuthService = {
       }
       
       // Handle null check properly
-      const confirmationToken = data?.user?.email_confirm_token || '';
+      const confirmationToken = otpData?.user?.email_confirm_token || '';
       
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
         body: {
