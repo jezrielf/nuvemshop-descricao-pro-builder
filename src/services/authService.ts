@@ -119,7 +119,7 @@ export const authService = {
     }
   },
   
-  // New method to resend confirmation email
+  // Fixed method to resend confirmation email
   resendConfirmationEmail: async (email: string) => {
     try {
       // Generate OTP for email verification
