@@ -30,13 +30,13 @@ export const emailAuthService = {
   resendConfirmationEmail: async (email: string) => {
     try {
       // Generate OTP for email verification
-      const { data, error } = await supabase.auth.resend({
+      const { data: otpData, error: otpError } = await supabase.auth.resend({
         type: 'signup',
         email,
       });
       
-      if (error) {
-        throw error;
+      if (otpError) {
+        throw otpError;
       }
       
       // Try to get user profile to get their name
@@ -56,7 +56,7 @@ export const emailAuthService = {
       }
       
       // Fix the null check with optional chaining
-      const confirmationToken = data?.user?.email_confirm_token || '';
+      const confirmationToken = otpData?.user?.email_confirm_token || '';
       
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
         body: {

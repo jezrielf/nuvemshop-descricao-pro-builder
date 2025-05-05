@@ -41,7 +41,7 @@ export const useResetPassword = () => {
     verifyToken();
   }, [searchParams, navigate, toast]);
   
-  const handleSubmit = async (password: string) => {
+  const handleSubmit = async (password: string): Promise<void> => {
     setStatus('submitting');
     
     try {
@@ -69,7 +69,7 @@ export const useResetPassword = () => {
         });
       }, 1000);
       
-      // Return a cleanup function that does not return anything (void)
+      // Return void instead of a function
       return;
     } catch (error: any) {
       console.error("Reset password error:", error);
