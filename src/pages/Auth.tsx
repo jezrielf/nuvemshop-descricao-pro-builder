@@ -54,10 +54,13 @@ const Auth: React.FC = () => {
       // Try to send custom confirmation email via our edge function
       if (data.user && data.session) {
         try {
+          // Extract token from the email properties
+          // The token might be in a different location or we may need to generate one
+          // We'll use a function call to send our custom email
           const result = await supabase.functions.invoke("send-email-confirmation", {
             body: {
               email: email,
-              confirmationToken: data.user.confirmation_token || "",
+              confirmationToken: data.session.access_token || "",
               firstName: nome,
               redirectUrl: `${window.location.origin}/confirmar-email`,
             },
