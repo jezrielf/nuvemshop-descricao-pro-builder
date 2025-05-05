@@ -6,7 +6,6 @@ import ResetPasswordForm from '@/components/auth/reset-password/ResetPasswordFor
 import ResetVerifying from '@/components/auth/reset-password/ResetVerifying';
 import ResetSuccess from '@/components/auth/reset-password/ResetSuccess';
 import ResetError from '@/components/auth/reset-password/ResetError';
-import { ResetPasswordStatus } from '@/types/resetPassword';
 
 const ResetPassword: React.FC = () => {
   const {

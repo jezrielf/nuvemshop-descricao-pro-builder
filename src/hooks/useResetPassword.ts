@@ -69,7 +69,8 @@ export const useResetPassword = () => {
         });
       }, 1000);
       
-      return () => clearInterval(timer);
+      // Return a cleanup function that does not return anything (void)
+      return;
     } catch (error: any) {
       console.error("Reset password error:", error);
       setStatus('error');
