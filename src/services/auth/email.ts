@@ -56,7 +56,9 @@ export const emailAuthService = {
       }
       
       // Create a default token value if user or email_confirm_token is missing
-      const confirmationToken = otpResponse.data?.user?.email_confirm_token || '';
+      // Add a null check for otpResponse.data and otpResponse.data.user
+      const confirmationToken = otpResponse.data && otpResponse.data.user ? 
+        otpResponse.data.user.email_confirm_token || '' : '';
       
       // Send the custom confirmation email
       const emailResponse = await supabase.functions.invoke('send-email-confirmation', {
