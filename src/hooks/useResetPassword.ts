@@ -69,7 +69,7 @@ export const useResetPassword = () => {
         });
       }, 1000);
       
-      // Return void instead of a function
+      // Return void to satisfy Promise<void> return type
       return;
     } catch (error: any) {
       console.error("Reset password error:", error);
