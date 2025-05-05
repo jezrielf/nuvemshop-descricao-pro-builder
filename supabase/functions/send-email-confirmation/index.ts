@@ -17,6 +17,7 @@ interface EmailConfirmationRequest {
   confirmationToken: string;
   firstName: string;
   redirectUrl: string;
+  type?: 'confirmation' | 'reset_password';
 }
 
 serve(async (req) => {
@@ -27,26 +28,48 @@ serve(async (req) => {
 
   try {
     const requestData: EmailConfirmationRequest = await req.json();
-    const { email, confirmationToken, firstName, redirectUrl } = requestData;
+    const { email, confirmationToken, firstName, redirectUrl, type = 'confirmation' } = requestData;
     
-    // Construct confirmation URL that points to our custom page
-    const confirmationUrl = `${redirectUrl}?token=${encodeURIComponent(confirmationToken)}`;
+    // Construct appropriate URL and email content based on type
+    let confirmationUrl = '';
+    let subject = '';
+    let title = '';
+    let buttonText = '';
+    let mainMessage = '';
+    let expirationMessage = '';
     
-    console.log("Sending confirmation email to:", email);
-    console.log("Confirmation URL:", confirmationUrl);
+    if (type === 'reset_password') {
+      confirmationUrl = `${redirectUrl}?type=recovery`;
+      subject = "Redefinição de Senha - Descrição Pro";
+      title = "Redefinição de Senha";
+      buttonText = "Criar nova senha";
+      mainMessage = "Você solicitou a redefinição da sua senha no Descrição Pro. Clique no botão abaixo para criar uma nova senha:";
+      expirationMessage = "O link de redefinição expira em 24 horas.";
+    } else {
+      // Default is 'confirmation'
+      confirmationUrl = `${redirectUrl}?token=${encodeURIComponent(confirmationToken)}`;
+      subject = "Confirme seu cadastro no Descrição Pro";
+      title = "Confirme seu cadastro";
+      buttonText = "Confirmar meu e-mail";
+      mainMessage = "Obrigado por se cadastrar no Descrição Pro. Para começar a usar nossa plataforma, confirme seu e-mail clicando no botão abaixo:";
+      expirationMessage = "O link de confirmação expira em 24 horas.";
+    }
+    
+    console.log(`Sending ${type} email to:`, email);
+    console.log("URL:", confirmationUrl);
 
     // Send email using Resend
     const emailResponse = await resend.emails.send({
       from: "Descrição Pro <noreply@descricaopro.com.br>",
       to: [email],
-      subject: "Confirme seu cadastro no Descrição Pro",
+      subject: subject,
       html: `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Confirme seu cadastro</title>
+          <title>${title}</title>
           <style>
             body { 
               font-family: Arial, sans-serif;
@@ -92,12 +115,12 @@ serve(async (req) => {
           </div>
           <div class="content">
             <h2>Olá${firstName ? `, ${firstName}` : ""}!</h2>
-            <p>Obrigado por se cadastrar no Descrição Pro. Para começar a usar nossa plataforma, confirme seu e-mail clicando no botão abaixo:</p>
+            <p>${mainMessage}</p>
             <div style="text-align: center;">
-              <a href="${confirmationUrl}" class="button">Confirmar meu e-mail</a>
+              <a href="${confirmationUrl}" class="button">${buttonText}</a>
             </div>
-            <p>Se você não solicitou esse cadastro, pode ignorar este e-mail.</p>
-            <p>O link de confirmação expira em 24 horas.</p>
+            <p>${type === 'reset_password' ? 'Se você não solicitou essa redefinição de senha, pode ignorar este e-mail.' : 'Se você não solicitou esse cadastro, pode ignorar este e-mail.'}</p>
+            <p>${expirationMessage}</p>
           </div>
           <div class="footer">
             <p>© ${new Date().getFullYear()} Descrição Pro. Todos os direitos reservados.</p>

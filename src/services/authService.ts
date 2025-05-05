@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export const authService = {
@@ -103,6 +104,7 @@ export const authService = {
           confirmationToken,
           firstName,
           redirectUrl: `${window.location.origin}/confirmar-email`,
+          type: 'confirmation',
         },
       });
       
@@ -113,6 +115,124 @@ export const authService = {
       return { data, error: null };
     } catch (error) {
       console.error('Error sending custom confirmation email:', error);
+      return { data: null, error };
+    }
+  },
+  
+  // New method to resend confirmation email
+  resendConfirmationEmail: async (email: string) => {
+    try {
+      // Generate OTP for email verification
+      const { data: otpData, error: otpError } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+      });
+      
+      if (otpError) {
+        throw otpError;
+      }
+      
+      // Try to get user profile to get their name
+      let firstName = '';
+      try {
+        const { data: userData } = await supabase
+          .from('profiles')
+          .select('nome')
+          .eq('email', email)
+          .single();
+          
+        if (userData?.nome) {
+          firstName = userData.nome.split(' ')[0];
+        }
+      } catch (e) {
+        console.log('Could not find user profile, continuing without name');
+      }
+      
+      // Send custom email using the token
+      const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
+        body: {
+          email,
+          confirmationToken: otpData?.user?.email_confirm_token || '',
+          firstName,
+          redirectUrl: `${window.location.origin}/confirmar-email`,
+          type: 'confirmation',
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error resending confirmation email:', error);
+      return { data: null, error };
+    }
+  },
+  
+  // New method to request password reset
+  requestPasswordReset: async (email: string) => {
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/resetar-senha`,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Try to get user profile to get their name
+      let firstName = '';
+      try {
+        const { data: userData } = await supabase
+          .from('profiles')
+          .select('nome')
+          .eq('email', email)
+          .single();
+          
+        if (userData?.nome) {
+          firstName = userData.nome.split(' ')[0];
+        }
+      } catch (e) {
+        console.log('Could not find user profile, continuing without name');
+      }
+      
+      // Send custom password reset email
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
+        body: {
+          email,
+          confirmationToken: 'custom-flow', // The token is handled by Supabase, we just indicate this is a different type
+          firstName,
+          redirectUrl: `${window.location.origin}/resetar-senha`,
+          type: 'reset_password',
+        },
+      });
+      
+      if (emailError) {
+        console.warn('Failed to send custom password reset email, falling back to default Supabase email');
+      }
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error requesting password reset:', error);
+      return { data: null, error };
+    }
+  },
+  
+  // New method to update password with token
+  updatePasswordWithToken: async (password: string) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        password,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error updating password:', error);
       return { data: null, error };
     }
   }
