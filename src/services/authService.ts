@@ -149,10 +149,13 @@ export const authService = {
       }
       
       // Send custom email using the token
+      // Fixed the otpData.user? check to handle null safely
+      const confirmationToken = otpData?.user?.email_confirm_token || '';
+      
       const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
-          confirmationToken: otpData?.user?.email_confirm_token || '',
+          confirmationToken,
           firstName,
           redirectUrl: `${window.location.origin}/confirmar-email`,
           type: 'confirmation',
