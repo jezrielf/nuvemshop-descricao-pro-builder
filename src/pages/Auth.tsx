@@ -6,17 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth: React.FC = () => {
-  const { user, signIn, signUp, loading } = useAuth();
+  const { user, signIn, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nome, setNome] = useState('');
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const location = useLocation();
+  const { toast } = useToast();
   
   // Se o usuário já estiver autenticado, redireciona para a página inicial
   if (user) {
-    return <Navigate to="/" />;
+    const from = location.state?.from || "/";
+    return <Navigate to={from} />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,7 +32,62 @@ const Auth: React.FC = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signUp(email, password, nome);
+    setRegisterLoading(true);
+    
+    try {
+      // Custom signup with Supabase and custom confirmation email
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            nome,
+          },
+          emailRedirectTo: `${window.location.origin}/confirmar-email`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Try to send custom confirmation email via our edge function
+      if (data.user && data.session) {
+        try {
+          const result = await supabase.functions.invoke("send-email-confirmation", {
+            body: {
+              email: email,
+              confirmationToken: data.user.confirmation_token || "",
+              firstName: nome,
+              redirectUrl: `${window.location.origin}/confirmar-email`,
+            },
+          });
+
+          if (result.error) {
+            console.error("Error sending custom email:", result.error);
+            // If custom email fails, the default Supabase email will be sent
+            // So we show a success message anyway
+          }
+        } catch (emailError) {
+          console.error("Failed to send custom email:", emailError);
+          // Default Supabase email will be sent
+        }
+      }
+
+      toast({
+        title: "Cadastro realizado com sucesso!",
+        description: "Enviamos um e-mail de confirmação para o endereço fornecido. Por favor, verifique sua caixa de entrada.",
+      });
+      
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao realizar cadastro",
+        description: error.message,
+      });
+    } finally {
+      setRegisterLoading(false);
+    }
   };
 
   return (
@@ -114,8 +175,8 @@ const Auth: React.FC = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Processando...' : 'Criar Conta'}
+                <Button type="submit" className="w-full" disabled={registerLoading}>
+                  {registerLoading ? 'Processando...' : 'Criar Conta'}
                 </Button>
               </CardFooter>
             </form>

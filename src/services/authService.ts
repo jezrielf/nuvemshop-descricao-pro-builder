@@ -17,12 +17,20 @@ export const authService = {
         data: {
           nome,
         },
+        emailRedirectTo: `${window.location.origin}/confirmar-email`,
       },
     });
   },
 
   signOut: async () => {
     return await supabase.auth.signOut();
+  },
+  
+  verifyEmail: async (token: string) => {
+    return await supabase.auth.verifyOtp({
+      token_hash: token,
+      type: 'email',
+    });
   },
   
   // Updated method for admin to create users - using functions.invoke to use service role
@@ -83,6 +91,29 @@ export const authService = {
       return { data, error: null };
     } catch (error) {
       console.error('Error in updateUserRole:', error);
+      return { data: null, error };
+    }
+  },
+
+  // Method to send a custom email confirmation
+  sendCustomConfirmationEmail: async (email: string, confirmationToken: string, firstName: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
+        body: {
+          email,
+          confirmationToken,
+          firstName,
+          redirectUrl: `${window.location.origin}/confirmar-email`,
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error sending custom confirmation email:', error);
       return { data: null, error };
     }
   }

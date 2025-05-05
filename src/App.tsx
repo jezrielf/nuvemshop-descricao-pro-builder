@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
+import EmailConfirmation from './pages/EmailConfirmation';
 import DescriptionAnalysis from './pages/DescriptionAnalysis';
 import Admin from './pages/Admin';
 import AdminAuth from './pages/AdminAuth';
@@ -65,6 +66,7 @@ const App: React.FC = () => {
                   {!isEmbedded && <Route path="/" element={<Landing />} />}
                   {!isEmbedded && <Route path="/editor" element={<Index />} />}
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/confirmar-email" element={<EmailConfirmation />} />
                   <Route path="/description-analysis" element={<DescriptionAnalysis />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin-auth" element={<AdminAuth />} />
