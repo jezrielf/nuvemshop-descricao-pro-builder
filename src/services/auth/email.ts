@@ -30,13 +30,13 @@ export const emailAuthService = {
   resendConfirmationEmail: async (email: string) => {
     try {
       // Generate OTP for email verification
-      const resendResult = await supabase.auth.resend({
+      const result = await supabase.auth.resend({
         type: 'signup',
         email,
       });
       
-      if (resendResult.error) {
-        throw resendResult.error;
+      if (result.error) {
+        throw result.error;
       }
       
       // Try to get user profile to get their name
@@ -57,9 +57,9 @@ export const emailAuthService = {
       
       // Extract confirmation token safely
       let confirmationToken = '';
-      if (resendResult.data && resendResult.data.user) {
+      if (result.data && result.data.user) {
         // Type assertion for the user object
-        const userObj = resendResult.data.user as Record<string, unknown>;
+        const userObj = result.data.user as { [key: string]: unknown };
         if (typeof userObj.email_confirm_token === 'string') {
           confirmationToken = userObj.email_confirm_token;
         }
