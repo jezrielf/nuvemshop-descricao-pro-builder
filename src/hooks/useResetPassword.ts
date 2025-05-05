@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { authService } from '@/services/authService';
+import { authService } from '@/services/auth';
 import { ResetPasswordStatus } from '@/types/resetPassword';
 
 export const useResetPassword = () => {
