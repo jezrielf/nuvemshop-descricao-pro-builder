@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/services/authService';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define status type to fix comparison errors
+// Define a proper enum or type for status to fix the comparison errors
 type ResetPasswordStatus = 'verifying' | 'ready' | 'submitting' | 'success' | 'error';
 
 const ResetPassword: React.FC = () => {
