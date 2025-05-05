@@ -62,7 +62,7 @@ export const authService = {
       
       console.log('User created successfully, function returned:', data);
       return { data, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in adminCreateUser:', error);
       return { data: null, error };
     }
@@ -89,7 +89,7 @@ export const authService = {
       console.log('Role updated successfully for user:', userId);
       console.log('Response data:', data);
       return { data, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in updateUserRole:', error);
       return { data: null, error };
     }
@@ -113,7 +113,7 @@ export const authService = {
       }
       
       return { data, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending custom confirmation email:', error);
       return { data: null, error };
     }
