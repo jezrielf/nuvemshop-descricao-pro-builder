@@ -148,7 +148,7 @@ export const authService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Fixed: potential null check issue with optional chaining and fallback
+      // Fixed null check issue with optional chaining and fallback
       const confirmationToken = otpData?.user?.email_confirm_token || '';
       
       const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
