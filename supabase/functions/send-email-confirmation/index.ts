@@ -32,8 +32,8 @@ serve(async (req) => {
     // Construct confirmation URL that points to our custom page
     const confirmationUrl = `${redirectUrl}?token=${encodeURIComponent(confirmationToken)}`;
     
-    console.log("Sending confirmation email to:", email);
-    console.log("Confirmation URL:", confirmationUrl);
+    console.log("Enviando email de confirmação para:", email);
+    console.log("URL de confirmação:", confirmationUrl);
 
     // Send email using Resend
     const emailResponse = await resend.emails.send({
@@ -107,7 +107,7 @@ serve(async (req) => {
       `,
     });
 
-    console.log("Email sent response:", emailResponse);
+    console.log("Email enviado com sucesso:", emailResponse);
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
@@ -117,7 +117,7 @@ serve(async (req) => {
       },
     });
   } catch (error) {
-    console.error("Error in send-email-confirmation function:", error);
+    console.error("Erro na função send-email-confirmation:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

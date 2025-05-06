@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { authService } from '@/services/authService';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth: React.FC = () => {
@@ -35,43 +35,11 @@ const Auth: React.FC = () => {
     setRegisterLoading(true);
     
     try {
-      // Custom signup with Supabase and custom confirmation email
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            nome,
-          },
-          emailRedirectTo: `${window.location.origin}/confirmar-email`,
-        },
-      });
+      // Use our updated signup method
+      const { data, error } = await authService.signUp(email, password, nome);
 
       if (error) {
         throw error;
-      }
-
-      // Try to send custom confirmation email via our edge function
-      if (data.user && data.session) {
-        try {
-          const result = await supabase.functions.invoke("send-email-confirmation", {
-            body: {
-              email: email,
-              confirmationToken: data.user.confirmation_token || "",
-              firstName: nome,
-              redirectUrl: `${window.location.origin}/confirmar-email`,
-            },
-          });
-
-          if (result.error) {
-            console.error("Error sending custom email:", result.error);
-            // If custom email fails, the default Supabase email will be sent
-            // So we show a success message anyway
-          }
-        } catch (emailError) {
-          console.error("Failed to send custom email:", emailError);
-          // Default Supabase email will be sent
-        }
       }
 
       toast({

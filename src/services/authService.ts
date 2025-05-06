@@ -10,7 +10,8 @@ export const authService = {
   },
 
   signUp: async (email: string, password: string, nome: string) => {
-    return await supabase.auth.signUp({
+    // First register the user with Supabase without sending the default email
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -20,6 +21,26 @@ export const authService = {
         emailRedirectTo: `${window.location.origin}/confirmar-email`,
       },
     });
+
+    if (error || !data.user) {
+      console.error('Error during signup:', error);
+      return { data, error };
+    }
+
+    // Now send our custom email
+    try {
+      const confirmToken = data.user.confirmation_token;
+      if (confirmToken) {
+        await authService.sendCustomConfirmationEmail(email, confirmToken, nome);
+      } else {
+        console.warn('No confirmation token available for custom email');
+      }
+    } catch (emailError) {
+      console.error('Error sending custom email:', emailError);
+      // We don't return an error here as the user is already created
+    }
+
+    return { data, error };
   },
 
   signOut: async () => {
@@ -95,7 +116,7 @@ export const authService = {
     }
   },
 
-  // Method to send a custom email confirmation
+  // Method to send a custom email confirmation in Portuguese
   sendCustomConfirmationEmail: async (email: string, confirmationToken: string, firstName: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('send-email-confirmation', {

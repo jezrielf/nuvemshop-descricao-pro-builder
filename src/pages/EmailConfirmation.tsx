@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { authService } from '@/services/authService';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -30,11 +30,8 @@ const EmailConfirmation: React.FC = () => {
     
     const verifyToken = async () => {
       try {
-        console.log("Verifying token...");
-        const { error } = await supabase.auth.verifyOtp({ 
-          token_hash: token, 
-          type: 'email' 
-        });
+        console.log("Verificando token:", token);
+        const { error } = await authService.verifyEmail(token);
         
         if (error) {
           console.error("Token verification error:", error);
