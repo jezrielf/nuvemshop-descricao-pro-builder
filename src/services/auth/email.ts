@@ -30,7 +30,7 @@ export const emailAuthService = {
   resendConfirmationEmail: async (email: string) => {
     try {
       // Generate OTP for email verification
-      const { data, error } = await supabase.auth.resend({
+      const { error, data } = await supabase.auth.resend({
         type: 'signup',
         email,
       });
@@ -55,13 +55,14 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Simplified direct access without deep type inference
+      // Extract token using a simple approach without deep type inference
       let confirmationToken = '';
       
-      // Use a basic type assertion to avoid deep type inference
-      if (data && 'user' in data) {
-        // Use a simple Record type to access properties without complex type inference
-        const user = data.user as Record<string, any>;
+      // Safely access potential user data without complex type inference
+      // This avoids the "Type instantiation is excessively deep" error
+      if (data) {
+        // Access as simple object with any type
+        const user = data.user as any;
         confirmationToken = user?.email_confirm_token || '';
       }
       
