@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertCircle, Check, Loader2 } from 'lucide-react';
@@ -14,11 +14,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { authService } from '@/services/auth';
 
 const Auth: React.FC = () => {
-  const { user, signIn, loading } = useAuth();
+  const { user, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nome, setNome] = useState('');
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
   const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState('');
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
@@ -36,32 +37,35 @@ const Auth: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await authService.signIn(email, password);
       
       if (error) {
         // Check for unverified email error
         if (error.message.includes('Email not confirmed') || error.message.includes('Email não confirmado')) {
           setUnverifiedAccount(true);
+          setLoginLoading(false);
           return;
         }
         
-        toast({
-          variant: "destructive",
-          title: "Erro ao realizar login",
-          description: error.message,
-        });
+        throw error;
       }
+      
+      toast({
+        title: "Login realizado com sucesso!",
+        description: `Bem-vindo(a) de volta!`,
+      });
+      
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erro ao realizar login",
-        description: error.message,
+        description: error.message || "Ocorreu um erro durante o login. Por favor, tente novamente.",
       });
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -70,43 +74,20 @@ const Auth: React.FC = () => {
     setRegisterLoading(true);
     
     try {
-      // Custom signup with Supabase and custom confirmation email
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            nome,
-          },
-          emailRedirectTo: `${window.location.origin}/confirmar-email`,
-        },
-      });
+      // Sign up with Supabase
+      const { data, error } = await authService.signUp(email, password, nome);
 
       if (error) {
         throw error;
       }
 
-      // Try to send custom confirmation email via our edge function
-      if (data.user && data.session) {
+      // Send custom confirmation email
+      if (data?.user) {
         try {
-          const result = await supabase.functions.invoke("send-email-confirmation", {
-            body: {
-              email: email,
-              confirmationToken: data.session.access_token || "",
-              firstName: nome,
-              redirectUrl: `${window.location.origin}/confirmar-email`,
-              type: 'confirmation',
-            },
-          });
-
-          if (result.error) {
-            console.error("Error sending custom email:", result.error);
-            // If custom email fails, the default Supabase email will be sent
-            // So we show a success message anyway
-          }
+          await authService.sendCustomConfirmationEmail(email, nome.split(' ')[0]);
         } catch (emailError) {
           console.error("Failed to send custom email:", emailError);
-          // Default Supabase email will be sent
+          // Continue with signup process even if custom email fails
         }
       }
 
@@ -119,7 +100,7 @@ const Auth: React.FC = () => {
       toast({
         variant: "destructive",
         title: "Erro ao realizar cadastro",
-        description: error.message,
+        description: error.message || "Ocorreu um erro durante o cadastro. Por favor, tente novamente.",
       });
     } finally {
       setRegisterLoading(false);
@@ -131,7 +112,7 @@ const Auth: React.FC = () => {
     setResetPasswordLoading(true);
     
     try {
-      const { data, error } = await authService.requestPasswordReset(resetPasswordEmail);
+      const { error } = await authService.requestPasswordReset(resetPasswordEmail);
       
       if (error) {
         throw error;
@@ -254,8 +235,13 @@ const Auth: React.FC = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Processando...' : 'Entrar'}
+                <Button type="submit" className="w-full" disabled={loginLoading}>
+                  {loginLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : 'Entrar'}
                 </Button>
               </CardFooter>
             </form>
@@ -299,7 +285,12 @@ const Auth: React.FC = () => {
               </CardContent>
               <CardFooter>
                 <Button type="submit" className="w-full" disabled={registerLoading}>
-                  {registerLoading ? 'Processando...' : 'Criar Conta'}
+                  {registerLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : 'Criar Conta'}
                 </Button>
               </CardFooter>
             </form>

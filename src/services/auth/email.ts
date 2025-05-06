@@ -3,12 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const emailAuthService = {
   // Method to send a custom email confirmation
-  sendCustomConfirmationEmail: async (email: string, confirmationToken: string, firstName: string) => {
+  sendCustomConfirmationEmail: async (email: string, firstName: string) => {
     try {
+      // We're simplifying the approach to avoid deep type inference issues
       const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
-          confirmationToken,
           firstName,
           redirectUrl: `${window.location.origin}/confirmar-email`,
           type: 'confirmation',
@@ -20,7 +20,7 @@ export const emailAuthService = {
       }
       
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending custom confirmation email:', error);
       return { data: null, error };
     }
@@ -29,52 +29,50 @@ export const emailAuthService = {
   // Method to resend confirmation email
   resendConfirmationEmail: async (email: string) => {
     try {
-      // Generate OTP for email verification
-      const { error, data } = await supabase.auth.resend({
+      // First, generate OTP for email verification using Supabase
+      const resendResult = await supabase.auth.resend({
         type: 'signup',
         email,
       });
       
-      if (error) {
-        throw error;
+      // Avoid deep type inference by simplifying error handling
+      if (resendResult.error) {
+        throw resendResult.error;
       }
       
       // Try to get user profile to get their name
       let firstName = '';
       try {
-        const { data: userData } = await supabase
+        const profileResult = await supabase
           .from('profiles')
           .select('nome')
           .eq('email', email)
           .single();
           
-        if (userData?.nome) {
-          firstName = userData.nome.split(' ')[0];
+        if (profileResult.data?.nome) {
+          firstName = profileResult.data.nome.split(' ')[0];
         }
       } catch (e) {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Bypass complex type inference completely
-      let confirmationToken = '';
-      
-      // Send the custom confirmation email without trying to extract token
-      const emailResponse = await supabase.functions.invoke('send-email-confirmation', {
+      // Send the custom confirmation email
+      const emailResult = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
-          confirmationToken,
           firstName,
           redirectUrl: `${window.location.origin}/confirmar-email`,
           type: 'confirmation',
         },
       });
       
-      if (emailResponse.error) {
-        throw emailResponse.error;
+      // Simple error handling to avoid deep type inference
+      if (emailResult.error) {
+        throw emailResult.error;
       }
       
-      return { data: emailResponse.data, error: null };
-    } catch (error: any) {
+      return { data: emailResult.data, error: null };
+    } catch (error) {
       console.error('Error resending confirmation email:', error);
       return { data: null, error };
     }

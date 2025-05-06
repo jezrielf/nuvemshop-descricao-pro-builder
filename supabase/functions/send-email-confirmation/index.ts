@@ -14,7 +14,6 @@ const corsHeaders = {
 
 interface EmailConfirmationRequest {
   email: string;
-  confirmationToken: string;
   firstName: string;
   redirectUrl: string;
   type?: 'confirmation' | 'reset_password';
@@ -28,7 +27,7 @@ serve(async (req) => {
 
   try {
     const requestData: EmailConfirmationRequest = await req.json();
-    const { email, confirmationToken, firstName, redirectUrl, type = 'confirmation' } = requestData;
+    const { email, firstName, redirectUrl, type = 'confirmation' } = requestData;
     
     // Construct appropriate URL and email content based on type
     let confirmationUrl = '';
@@ -47,7 +46,7 @@ serve(async (req) => {
       expirationMessage = "O link de redefinição expira em 24 horas.";
     } else {
       // Default is 'confirmation'
-      confirmationUrl = `${redirectUrl}?token=${encodeURIComponent(confirmationToken)}`;
+      confirmationUrl = redirectUrl;
       subject = "Confirme seu cadastro no Descrição Pro";
       title = "Confirme seu cadastro";
       buttonText = "Confirmar meu e-mail";
