@@ -55,15 +55,13 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Extraindo token de confirmação de forma segura
+      // Extract confirmation token safely
       let confirmationToken = '';
       
       if (data && data.user) {
-        // Usando uma asserção de tipo simples para evitar verificação de tipo profunda
-        const userAny = data.user as any;
-        if (userAny && typeof userAny.email_confirm_token === 'string') {
-          confirmationToken = userAny.email_confirm_token;
-        }
+        // Use type assertion to avoid deep type checking
+        const userWithToken = data.user as { email_confirm_token?: string };
+        confirmationToken = userWithToken.email_confirm_token || '';
       }
       
       // Send the custom confirmation email
