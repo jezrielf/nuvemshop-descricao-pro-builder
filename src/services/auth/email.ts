@@ -55,15 +55,15 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Extract token using a simple approach without deep type inference
+      // Bypass complex type inference completely
       let confirmationToken = '';
       
-      // Safely access potential user data without complex type inference
-      // This avoids the "Type instantiation is excessively deep" error
-      if (data) {
-        // Access as simple object with any type
-        const user = data.user as any;
-        confirmationToken = user?.email_confirm_token || '';
+      // Ignore the typing and use a simple string for token
+      if (data && typeof data === 'object') {
+        const user = data as any;
+        if (user && user.user && user.user.email_confirm_token) {
+          confirmationToken = user.user.email_confirm_token;
+        }
       }
       
       // Send the custom confirmation email

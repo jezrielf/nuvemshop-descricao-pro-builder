@@ -5,9 +5,14 @@ export const passwordAuthService = {
   // Method to request password reset
   requestPasswordReset: async (email: string) => {
     try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      // Use a simple type approach - avoid deep type inference completely
+      const result = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/resetar-senha`,
       });
+      
+      // Extract with simple variables
+      const data = result.data;
+      const error = result.error;
       
       if (error) {
         throw error;
@@ -30,7 +35,7 @@ export const passwordAuthService = {
       }
       
       // Send custom password reset email
-      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
+      const emailResult = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
           confirmationToken: 'custom-flow', // The token is handled by Supabase, we just indicate this is a different type
@@ -39,6 +44,9 @@ export const passwordAuthService = {
           type: 'reset_password',
         },
       });
+      
+      const emailData = emailResult.data;
+      const emailError = emailResult.error;
       
       if (emailError) {
         console.warn('Failed to send custom password reset email, falling back to default Supabase email');
@@ -54,9 +62,14 @@ export const passwordAuthService = {
   // Method to update password with token
   updatePasswordWithToken: async (password: string) => {
     try {
-      const { data, error } = await supabase.auth.updateUser({
+      // Use a simple type approach - avoid deep type inference completely
+      const result = await supabase.auth.updateUser({
         password,
       });
+      
+      // Extract with simple variables
+      const data = result.data;
+      const error = result.error;
       
       if (error) {
         throw error;
