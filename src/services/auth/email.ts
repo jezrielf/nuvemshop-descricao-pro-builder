@@ -58,15 +58,7 @@ export const emailAuthService = {
       // Bypass complex type inference completely
       let confirmationToken = '';
       
-      // Ignore the typing and use a simple string for token
-      if (data && typeof data === 'object') {
-        const user = data as any;
-        if (user && user.user && user.user.email_confirm_token) {
-          confirmationToken = user.user.email_confirm_token;
-        }
-      }
-      
-      // Send the custom confirmation email
+      // Send the custom confirmation email without trying to extract token
       const emailResponse = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
