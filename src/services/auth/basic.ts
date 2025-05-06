@@ -57,26 +57,36 @@ export const basicAuthService = {
 
   checkEmailConfirmationStatus: async (email: string) => {
     try {
-      // Instead of using rpc, which has type issues, use a direct query to check confirmation status
-      const { data: userResponse } = await supabase
+      // Using a simplified approach to avoid complex type inference
+      const { data: userResponse, error: userError } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
         .single();
       
+      if (userError) {
+        console.error('Error finding user profile:', userError);
+        return { confirmed: false, error: userError };
+      }
+      
       if (userResponse) {
         // If we found a user profile, try to check if they have confirmed their email
         try {
-          // This is a simplified approach to check email confirmation
-          const { data: user } = await supabase.auth.admin.getUserById(userResponse.id);
-          return { 
-            confirmed: user?.user?.email_confirmed_at !== null, 
-            error: null 
-          };
+          // Use a direct query with simpler return type to avoid complex type inference
+          const { data: userData, error: userDataError } = await supabase.auth.admin.getUserById(userResponse.id);
+          
+          if (userDataError) {
+            console.error('Error checking email confirmation via admin API:', userDataError);
+            return { confirmed: false, error: userDataError };
+          }
+          
+          // Check if email is confirmed
+          const isConfirmed = userData?.user?.email_confirmed_at !== null;
+          return { confirmed: isConfirmed, error: null };
         } catch (adminError) {
           console.log('Error checking email confirmation via admin API:', adminError);
           // Fallback to assuming unconfirmed if we can't verify
-          return { confirmed: false, error: null };
+          return { confirmed: false, error: adminError };
         }
       }
       
