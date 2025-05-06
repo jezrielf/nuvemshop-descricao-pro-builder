@@ -60,7 +60,7 @@ export const emailAuthService = {
       
       if (data && data.user) {
         // Simple type assertion to avoid deep type checking
-        const userWithToken = data.user as { email_confirm_token?: string };
+        const userWithToken = data.user as any;
         confirmationToken = userWithToken.email_confirm_token || '';
       }
       
