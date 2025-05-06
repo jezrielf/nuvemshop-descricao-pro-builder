@@ -55,8 +55,9 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Extract confirmation token safely
+      // Extract confirmation token safely using type assertion
       let confirmationToken = '';
+      // Safely cast to any to avoid deep type checking
       const userObj = data?.user ? (data.user as any) : null;
       if (userObj && typeof userObj.email_confirm_token === 'string') {
         confirmationToken = userObj.email_confirm_token;
