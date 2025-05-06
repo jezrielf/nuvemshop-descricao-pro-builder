@@ -55,14 +55,14 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Extract token safely without complex type inference
+      // Simplified direct access without deep type inference
       let confirmationToken = '';
       
-      // Safely extract token using optional chaining and type assertions
-      if (data?.user) {
-        // Access the token property directly without deep type checking
-        const token = (data.user as Record<string, any>)?.email_confirm_token;
-        confirmationToken = token || '';
+      // Use a basic type assertion to avoid deep type inference
+      if (data && 'user' in data) {
+        // Use a simple Record type to access properties without complex type inference
+        const user = data.user as Record<string, any>;
+        confirmationToken = user?.email_confirm_token || '';
       }
       
       // Send the custom confirmation email
