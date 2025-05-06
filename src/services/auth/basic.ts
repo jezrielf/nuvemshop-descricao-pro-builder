@@ -1,6 +1,17 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// Tipos auxiliares para evitar a inferência profunda de tipos
+type AuthResponse = {
+  data: any;
+  error: Error | null;
+}
+
+type EmailConfirmationResponse = {
+  confirmed: boolean;
+  error: Error | null;
+}
+
 export const basicAuthService = {
   signIn: async (email: string, password: string) => {
     try {
@@ -17,7 +28,6 @@ export const basicAuthService = {
 
   signUp: async (email: string, password: string, nome: string) => {
     try {
-      // Don't use emailRedirectTo here as we'll handle custom email confirmation
       const response = await supabase.auth.signUp({
         email,
         password,
@@ -55,57 +65,48 @@ export const basicAuthService = {
     }
   },
 
-  checkEmailConfirmationStatus: async (email: string) => {
+  checkEmailConfirmationStatus: async (email: string): Promise<EmailConfirmationResponse> => {
     try {
-      // Using a simplified approach to avoid complex type inference
-      const { data: userResponse, error: userError } = await supabase
+      // Buscamos primeiro o perfil do usuário
+      const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
         .single();
       
-      if (userError) {
-        console.error('Error finding user profile:', userError);
-        return { confirmed: false, error: userError };
+      if (profileError) {
+        console.error('Error finding user profile:', profileError);
+        return { confirmed: false, error: profileError };
       }
       
-      if (userResponse) {
-        // If we found a user profile, try to check if they have confirmed their email
+      if (userProfile) {
         try {
-          // Cast the response type explicitly to avoid deep type inference issues
-          type AdminUserResponse = {
-            user: {
-              email_confirmed_at: string | null;
-            } | null;
-          };
+          // Usamos tipagem explícita para evitar inferência profunda
+          const response = await supabase.auth.admin.getUserById(userProfile.id);
           
-          // Use explicit type annotation to avoid excessive type inference
-          const { data, error } = await supabase.auth.admin.getUserById(
-            userResponse.id
-          ) as unknown as {
-            data: AdminUserResponse | null;
-            error: Error | null;
-          };
+          // Extraímos os dados necessários de forma segura
+          const userData = response.data?.user;
+          const userError = response.error;
           
-          if (error) {
-            console.error('Error checking email confirmation via admin API:', error);
-            return { confirmed: false, error };
+          if (userError) {
+            console.error('Error checking email confirmation via admin API:', userError);
+            return { confirmed: false, error: userError };
           }
           
-          // Check if email is confirmed
-          const isConfirmed = data?.user?.email_confirmed_at !== null;
-          return { confirmed: isConfirmed, error: null };
+          // Verificamos se o email foi confirmado
+          const isConfirmed = userData?.email_confirmed_at !== null;
+          return { confirmed: Boolean(isConfirmed), error: null };
         } catch (adminError) {
           console.log('Error checking email confirmation via admin API:', adminError);
-          // Fallback to assuming unconfirmed if we can't verify
-          return { confirmed: false, error: adminError };
+          // Fallback para não confirmado se não conseguirmos verificar
+          return { confirmed: false, error: adminError as Error };
         }
       }
       
       return { confirmed: false, error: null };
     } catch (error) {
       console.error('Error checking email confirmation:', error);
-      return { confirmed: false, error };
+      return { confirmed: false, error: error as Error };
     }
   }
 };
