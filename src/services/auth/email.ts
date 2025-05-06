@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { AuthTokenResponse } from '@supabase/supabase-js';
 
 // Define a simple interface for the user with the email confirmation token
 interface UserWithToken {
@@ -63,8 +64,9 @@ export const emailAuthService = {
       // Extract token safely with proper type definition
       let confirmationToken = '';
       
-      if (data && data.user) {
-        // Type assertion with specific interface to avoid deep type checking
+      // Use a more straightforward approach to extract the token
+      if (data?.user) {
+        // Cast to our simple interface to avoid deep type checking
         const userWithToken = data.user as UserWithToken;
         confirmationToken = userWithToken.email_confirm_token || '';
       }
