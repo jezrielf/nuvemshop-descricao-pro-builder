@@ -1,13 +1,13 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-// Tipos auxiliares para evitar a inferência profunda de tipos
-type AuthResponse = {
+// Simple response types to avoid excessive type inference
+interface AuthResponse {
   data: any;
   error: Error | null;
 }
 
-type EmailConfirmationResponse = {
+interface EmailConfirmationResponse {
   confirmed: boolean;
   error: Error | null;
 }
@@ -67,46 +67,45 @@ export const basicAuthService = {
 
   checkEmailConfirmationStatus: async (email: string): Promise<EmailConfirmationResponse> => {
     try {
-      // Buscamos primeiro o perfil do usuário
-      const { data: userProfile, error: profileError } = await supabase
+      // First get the user profile
+      const profileQuery = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
         .single();
       
-      if (profileError) {
-        console.error('Error finding user profile:', profileError);
-        return { confirmed: false, error: profileError };
+      // Handle profile query error
+      if (profileQuery.error) {
+        console.error('Error finding user profile:', profileQuery.error);
+        return { confirmed: false, error: profileQuery.error };
       }
       
-      if (userProfile) {
+      // If we found the user profile
+      if (profileQuery.data) {
         try {
-          // Usamos tipagem explícita para evitar inferência profunda
-          const response = await supabase.auth.admin.getUserById(userProfile.id);
+          // Get user data from admin API
+          // Use any types to avoid deep type inference issues
+          const userQuery: any = await supabase.auth.admin.getUserById(profileQuery.data.id);
           
-          // Extraímos os dados necessários de forma segura
-          const userData = response.data?.user;
-          const userError = response.error;
-          
-          if (userError) {
-            console.error('Error checking email confirmation via admin API:', userError);
-            return { confirmed: false, error: userError };
+          if (userQuery.error) {
+            console.error('Error checking email confirmation:', userQuery.error);
+            return { confirmed: false, error: userQuery.error };
           }
           
-          // Verificamos se o email foi confirmado
-          const isConfirmed = userData?.email_confirmed_at !== null;
-          return { confirmed: Boolean(isConfirmed), error: null };
-        } catch (adminError) {
-          console.log('Error checking email confirmation via admin API:', adminError);
-          // Fallback para não confirmado se não conseguirmos verificar
-          return { confirmed: false, error: adminError as Error };
+          // Check if email is confirmed
+          const isEmailConfirmed = userQuery.data?.user?.email_confirmed_at !== null;
+          return { confirmed: Boolean(isEmailConfirmed), error: null };
+        } catch (error: any) {
+          console.log('Error in admin API call:', error);
+          return { confirmed: false, error };
         }
       }
       
+      // User not found
       return { confirmed: false, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error checking email confirmation:', error);
-      return { confirmed: false, error: error as Error };
+      return { confirmed: false, error };
     }
   }
 };
