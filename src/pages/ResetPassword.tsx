@@ -16,6 +16,9 @@ const ResetPassword: React.FC = () => {
     redirectToLogin
   } = useResetPassword();
   
+  // Determine if the form is currently submitting
+  const isSubmitting = status === 'submitting';
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <Card className="w-full max-w-md">
@@ -28,7 +31,7 @@ const ResetPassword: React.FC = () => {
             <ResetPasswordForm 
               onSubmit={handleSubmit} 
               errorMessage={errorMessage} 
-              isSubmitting={status === 'submitting'} 
+              isSubmitting={isSubmitting} 
             />
           )}
           
