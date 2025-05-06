@@ -1,21 +1,26 @@
 
 import { basicAuthService } from './basic';
-import { passwordAuthService } from './password';
+import { adminAuthService } from './admin';
 import { emailAuthService } from './email';
+import { passwordAuthService } from './password';
 
+// Combine all the auth services into a single export
 export const authService = {
-  // Basic auth methods
+  // Basic auth functions
   signIn: basicAuthService.signIn,
   signUp: basicAuthService.signUp,
   signOut: basicAuthService.signOut,
   verifyEmail: basicAuthService.verifyEmail,
-  checkEmailConfirmationStatus: basicAuthService.checkEmailConfirmationStatus,
   
-  // Password-related methods
-  updatePasswordWithToken: passwordAuthService.updatePasswordWithToken,
-  requestPasswordReset: passwordAuthService.requestPasswordReset,
+  // Admin functions
+  adminCreateUser: adminAuthService.createUser,
+  updateUserRole: adminAuthService.updateUserRole,
   
-  // Email-related methods
-  resendConfirmationEmail: emailAuthService.resendConfirmationEmail,
+  // Email functions
   sendCustomConfirmationEmail: emailAuthService.sendCustomConfirmationEmail,
+  resendConfirmationEmail: emailAuthService.resendConfirmationEmail,
+  
+  // Password functions
+  requestPasswordReset: passwordAuthService.requestPasswordReset,
+  updatePasswordWithToken: passwordAuthService.updatePasswordWithToken,
 };

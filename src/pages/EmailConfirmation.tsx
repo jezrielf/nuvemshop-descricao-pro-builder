@@ -1,12 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { authService } from '@/services/auth';
 
 const EmailConfirmation: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -30,8 +30,11 @@ const EmailConfirmation: React.FC = () => {
     
     const verifyToken = async () => {
       try {
-        console.log("Verificando token...");
-        const { error } = await authService.verifyEmail(token);
+        console.log("Verifying token...");
+        const { error } = await supabase.auth.verifyOtp({ 
+          token_hash: token, 
+          type: 'email' 
+        });
         
         if (error) {
           console.error("Token verification error:", error);

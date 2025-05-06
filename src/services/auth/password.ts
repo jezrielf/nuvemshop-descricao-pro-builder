@@ -5,52 +5,47 @@ export const passwordAuthService = {
   // Method to request password reset
   requestPasswordReset: async (email: string) => {
     try {
-      // Call the reset password method
-      const resetResponse = await supabase.auth.resetPasswordForEmail(email, {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/resetar-senha`,
       });
       
-      // Simple error handling
-      if (resetResponse.error) {
-        throw resetResponse.error;
+      if (error) {
+        throw error;
       }
       
       // Try to get user profile to get their name
       let firstName = '';
       try {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: userData } = await supabase
           .from('profiles')
           .select('nome')
           .eq('email', email)
           .single();
           
-        if (!profileError && profileData?.nome) {
-          firstName = profileData.nome.split(' ')[0];
+        if (userData?.nome) {
+          firstName = userData.nome.split(' ')[0];
         }
       } catch (e) {
         console.log('Could not find user profile, continuing without name');
       }
       
       // Send custom password reset email
-      try {
-        const emailResult = await supabase.functions.invoke('send-email-confirmation', {
-          body: {
-            email,
-            firstName,
-            redirectUrl: `${window.location.origin}/resetar-senha`,
-            type: 'reset_password',
-          },
-        });
-        
-        if (emailResult.error) {
-          console.warn('Failed to send custom password reset email, falling back to default Supabase email');
-        }
-      } catch (emailError) {
-        console.warn('Error sending custom email:', emailError);
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
+        body: {
+          email,
+          confirmationToken: 'custom-flow', // The token is handled by Supabase, we just indicate this is a different type
+          firstName,
+          redirectUrl: `${window.location.origin}/resetar-senha`,
+          type: 'reset_password',
+        },
+      });
+      
+      if (emailError) {
+        console.warn('Failed to send custom password reset email, falling back to default Supabase email');
       }
       
-      return { data: resetResponse.data, error: null };
-    } catch (error) {
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Error requesting password reset:', error);
       return { data: null, error };
     }
@@ -59,18 +54,16 @@ export const passwordAuthService = {
   // Method to update password with token
   updatePasswordWithToken: async (password: string) => {
     try {
-      // Update user password
-      const updateResult = await supabase.auth.updateUser({
+      const { data, error } = await supabase.auth.updateUser({
         password,
       });
       
-      // Simple error handling
-      if (updateResult.error) {
-        throw updateResult.error;
+      if (error) {
+        throw error;
       }
       
-      return { data: updateResult.data, error: null };
-    } catch (error) {
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Error updating password:', error);
       return { data: null, error };
     }

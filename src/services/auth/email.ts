@@ -3,24 +3,24 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const emailAuthService = {
   // Method to send a custom email confirmation
-  sendCustomConfirmationEmail: async (email: string, firstName: string) => {
+  sendCustomConfirmationEmail: async (email: string, confirmationToken: string, firstName: string) => {
     try {
-      // Call the edge function to send a custom email
-      const response = await supabase.functions.invoke('send-email-confirmation', {
+      const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
+          confirmationToken,
           firstName,
           redirectUrl: `${window.location.origin}/confirmar-email`,
           type: 'confirmation',
         },
       });
       
-      if (response.error) {
-        throw response.error;
+      if (error) {
+        throw error;
       }
       
-      return { data: response.data, error: null };
-    } catch (error) {
+      return { data, error: null };
+    } catch (error: any) {
       console.error('Error sending custom confirmation email:', error);
       return { data: null, error };
     }
@@ -29,55 +29,51 @@ export const emailAuthService = {
   // Method to resend confirmation email
   resendConfirmationEmail: async (email: string) => {
     try {
-      // First, generate OTP for email verification using Supabase
-      const resendResponse = await supabase.auth.resend({
+      // Generate OTP for email verification
+      const { data, error: otpError } = await supabase.auth.resend({
         type: 'signup',
         email,
       });
       
-      // Simple error handling
-      if (resendResponse.error) {
-        throw resendResponse.error;
+      if (otpError) {
+        throw otpError;
       }
       
       // Try to get user profile to get their name
       let firstName = '';
       try {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: userData } = await supabase
           .from('profiles')
           .select('nome')
           .eq('email', email)
           .single();
           
-        if (!profileError && profileData?.nome) {
-          firstName = profileData.nome.split(' ')[0];
+        if (userData?.nome) {
+          firstName = userData.nome.split(' ')[0];
         }
       } catch (e) {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Send the custom confirmation email
-      try {
-        const emailResult = await supabase.functions.invoke('send-email-confirmation', {
-          body: {
-            email,
-            firstName,
-            redirectUrl: `${window.location.origin}/confirmar-email`,
-            type: 'confirmation',
-          },
-        });
-        
-        if (emailResult.error) {
-          throw emailResult.error;
-        }
-        
-        return { data: emailResult.data, error: null };
-      } catch (emailError) {
-        console.error('Error sending custom email:', emailError);
-        // Fall back to the default email that was sent by the resend method
-        return { data: resendResponse.data, error: null };
+      // Handle null check properly
+      const confirmationToken = data?.user?.email_confirm_token || '';
+      
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
+        body: {
+          email,
+          confirmationToken,
+          firstName,
+          redirectUrl: `${window.location.origin}/confirmar-email`,
+          type: 'confirmation',
+        },
+      });
+      
+      if (emailError) {
+        throw emailError;
       }
-    } catch (error) {
+      
+      return { data: emailData, error: null };
+    } catch (error: any) {
       console.error('Error resending confirmation email:', error);
       return { data: null, error };
     }
