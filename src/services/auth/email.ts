@@ -55,11 +55,11 @@ export const emailAuthService = {
         console.log('Could not find user profile, continuing without name');
       }
       
-      // Extract confirmation token safely
+      // Extract token safely without complex type checking
       let confirmationToken = '';
       
       if (data && data.user) {
-        // Use type assertion to avoid deep type checking
+        // Simple type assertion to avoid deep type checking
         const userWithToken = data.user as { email_confirm_token?: string };
         confirmationToken = userWithToken.email_confirm_token || '';
       }

@@ -39,7 +39,7 @@ export const useResetPassword = () => {
     };
     
     verifyToken();
-  }, [searchParams, navigate, toast]);
+  }, [searchParams, toast, navigate]);
   
   const handleSubmit = async (password: string): Promise<void> => {
     setStatus('submitting');
