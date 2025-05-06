@@ -72,16 +72,28 @@ export const basicAuthService = {
       if (userResponse) {
         // If we found a user profile, try to check if they have confirmed their email
         try {
-          // Use a direct query with simpler return type to avoid complex type inference
-          const { data: userData, error: userDataError } = await supabase.auth.admin.getUserById(userResponse.id);
+          // Cast the response type explicitly to avoid deep type inference issues
+          type AdminUserResponse = {
+            user: {
+              email_confirmed_at: string | null;
+            } | null;
+          };
           
-          if (userDataError) {
-            console.error('Error checking email confirmation via admin API:', userDataError);
-            return { confirmed: false, error: userDataError };
+          // Use explicit type annotation to avoid excessive type inference
+          const { data, error } = await supabase.auth.admin.getUserById(
+            userResponse.id
+          ) as unknown as {
+            data: AdminUserResponse | null;
+            error: Error | null;
+          };
+          
+          if (error) {
+            console.error('Error checking email confirmation via admin API:', error);
+            return { confirmed: false, error };
           }
           
           // Check if email is confirmed
-          const isConfirmed = userData?.user?.email_confirmed_at !== null;
+          const isConfirmed = data?.user?.email_confirmed_at !== null;
           return { confirmed: isConfirmed, error: null };
         } catch (adminError) {
           console.log('Error checking email confirmation via admin API:', adminError);
