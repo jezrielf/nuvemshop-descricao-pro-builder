@@ -80,7 +80,7 @@ const EmailConfirmation: React.FC = () => {
           
           {status === 'verifying' && (
             <div className="flex flex-col items-center py-8">
-              <LoadingSpinner size={48} />
+              <LoadingSpinner size="lg" />
               <p className="mt-4 text-gray-600">Verificando seu e-mail...</p>
             </div>
           )}

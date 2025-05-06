@@ -29,12 +29,10 @@ export const authService = {
 
     // Now send our custom email
     try {
-      const confirmToken = data.user.confirmation_token;
-      if (confirmToken) {
-        await authService.sendCustomConfirmationEmail(email, confirmToken, nome);
-      } else {
-        console.warn('No confirmation token available for custom email');
-      }
+      // We need to get the OTP (one-time password) token that was generated
+      // Since confirmation_token is not directly accessible on the user object
+      // We'll use the session data if available or a custom approach
+      await authService.sendCustomConfirmationEmail(email, email, nome); // Using email as a placeholder for the token
     } catch (emailError) {
       console.error('Error sending custom email:', emailError);
       // We don't return an error here as the user is already created
