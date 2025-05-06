@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import EmailConfirmation from './pages/EmailConfirmation';
-import ResetPassword from './pages/ResetPassword';
 import DescriptionAnalysis from './pages/DescriptionAnalysis';
 import Admin from './pages/Admin';
 import AdminAuth from './pages/AdminAuth';
@@ -68,7 +67,6 @@ const App: React.FC = () => {
                   {!isEmbedded && <Route path="/editor" element={<Index />} />}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/confirmar-email" element={<EmailConfirmation />} />
-                  <Route path="/resetar-senha" element={<ResetPassword />} />
                   <Route path="/description-analysis" element={<DescriptionAnalysis />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/admin-auth" element={<AdminAuth />} />
