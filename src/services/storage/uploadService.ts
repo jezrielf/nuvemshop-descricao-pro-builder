@@ -38,22 +38,41 @@ export const uploadService = {
         ? `${user.id}/${path}/${fileName}`
         : `${user.id}/${fileName}`;
       
-      // Simulate upload progress
-      let progressInterval: number | null = null;
+      // Create progress tracker
+      let progressInterval: NodeJS.Timeout | null = null;
+      
       if (onProgress) {
         let progress = 0;
         progressInterval = setInterval(() => {
-          progress += 10;
+          progress += 5;
           if (progress <= 90) {
             onProgress(progress);
           } else {
-            clearInterval(progressInterval);
+            if (progressInterval) clearInterval(progressInterval);
+            progressInterval = null;
           }
-        }, 200) as unknown as number;
+        }, 100);
+      }
+
+      console.log('Initiating upload to path:', filePath);
+
+      // Ensure the bucket exists
+      try {
+        const { data: buckets } = await supabase.storage.listBuckets();
+        if (!buckets?.find(b => b.name === 'user-images')) {
+          console.log('Creating user-images bucket');
+          await supabase.storage.createBucket('user-images', {
+            public: true,
+            fileSizeLimit: 5242880 // 5MB
+          });
+        }
+      } catch (bucketError) {
+        console.log('Bucket operation error (continuing):', bucketError);
+        // Continue anyway as the bucket might exist
       }
 
       // Upload file
-      const { data, error } = await supabase.storage
+      const { data, error: uploadError } = await supabase.storage
         .from('user-images')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -63,16 +82,19 @@ export const uploadService = {
       // Clear progress interval
       if (progressInterval) {
         clearInterval(progressInterval);
+        progressInterval = null;
       }
 
       // Handle upload errors
-      if (error) {
-        console.error('Upload error:', error);
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
         return { 
           success: false, 
-          error: error.message || 'Upload failed'
+          error: uploadError.message || 'Upload failed'
         };
       }
+
+      console.log('Upload successful, getting public URL for:', filePath);
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
@@ -80,11 +102,14 @@ export const uploadService = {
         .getPublicUrl(filePath);
 
       if (!publicUrlData?.publicUrl) {
+        console.error('Failed to get public URL');
         return { 
           success: false, 
           error: 'Could not retrieve public URL' 
         };
       }
+
+      console.log('Public URL retrieved:', publicUrlData.publicUrl);
 
       // Final progress update
       if (onProgress) {

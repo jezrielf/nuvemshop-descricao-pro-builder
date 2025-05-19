@@ -14,39 +14,39 @@ export const useImageLibraryUpload = () => {
   const { toast } = useToast();
   const auth = useAuth();
   
-  // Preparar bucket de imagens
+  // Ensure image bucket exists
   const ensureBucketExists = async () => {
     try {
-      // Verificar se o bucket existe
+      // Check if bucket exists
       const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
       
       if (bucketsError) {
-        console.error('Erro ao verificar buckets:', bucketsError);
-        throw new Error(`Erro ao verificar buckets: ${bucketsError.message}`);
+        console.error('Error checking buckets:', bucketsError);
+        throw new Error(`Error checking buckets: ${bucketsError.message}`);
       }
       
       const userImagesBucket = buckets?.find(bucket => bucket.name === 'user-images');
       
       if (!userImagesBucket) {
-        console.log('Bucket de imagens não existe, criando...');
+        console.log('Creating user-images bucket...');
         const { error: createError } = await supabase.storage.createBucket('user-images', {
           public: true,
           fileSizeLimit: 5242880 // 5MB
         });
         
         if (createError) {
-          console.error('Erro ao criar bucket:', createError);
-          throw new Error(`Erro ao criar bucket: ${createError.message}`);
+          console.error('Error creating bucket:', createError);
+          throw new Error(`Error creating bucket: ${createError.message}`);
         }
         
-        console.log('Bucket user-images criado com sucesso');
+        console.log('user-images bucket created successfully');
       } else {
-        console.log('Bucket user-images já existe');
+        console.log('user-images bucket already exists');
       }
       
       return true;
     } catch (error) {
-      console.error('Erro ao garantir existência do bucket:', error);
+      console.error('Error ensuring bucket exists:', error);
       return false;
     }
   };
@@ -55,9 +55,9 @@ export const useImageLibraryUpload = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    console.log('Arquivo selecionado:', file.name, file.type, file.size);
+    console.log('File selected:', file.name, file.type, file.size);
     
-    // Validações
+    // Validations
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Tipo de arquivo inválido",
@@ -79,7 +79,7 @@ export const useImageLibraryUpload = () => {
     setImageFile(file);
     setImageAlt(file.name.split('.')[0] || '');
     
-    // Criar preview da imagem
+    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewUrl(reader.result as string);
@@ -89,12 +89,12 @@ export const useImageLibraryUpload = () => {
   
   const uploadImage = async () => {
     if (!imageFile) {
-      console.log('Nenhum arquivo para upload');
+      console.log('No file to upload');
       return null;
     }
     
     if (!auth.user) {
-      console.log('Usuário não autenticado');
+      console.log('User not authenticated');
       toast({
         title: "Erro de autenticação",
         description: "Você precisa estar logado para fazer upload de imagens.",
@@ -103,68 +103,68 @@ export const useImageLibraryUpload = () => {
       return null;
     }
     
-    console.log('Iniciando upload:', imageFile.name);
+    console.log('Starting upload:', imageFile.name);
     setUploading(true);
     setUploadProgress(0);
     
     try {
-      // Garantir que o bucket existe
+      // Ensure bucket exists
       const bucketReady = await ensureBucketExists();
       if (!bucketReady) {
-        throw new Error('Não foi possível preparar o armazenamento');
+        throw new Error('Could not prepare storage');
       }
       
       const userId = auth.user.id;
       if (!userId) {
-        throw new Error('ID de usuário não disponível');
+        throw new Error('User ID not available');
       }
       
-      console.log('ID do usuário:', userId);
+      console.log('User ID:', userId);
       
-      // Nome de arquivo único
+      // Create unique filename
       const fileExt = imageFile.name.split('.').pop();
       const safeFileName = `${Date.now()}_${(imageAlt || 'image').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${fileExt}`;
       const filePath = `${userId}/${safeFileName}`;
       
-      console.log('Caminho do arquivo para upload:', filePath);
+      console.log('Upload file path:', filePath);
       
-      // Simular progresso
+      // Simulate progress
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           const newProgress = Math.min(prev + 5, 90);
-          console.log('Progresso de upload:', newProgress);
+          console.log('Upload progress:', newProgress);
           return newProgress;
         });
       }, 100);
       
-      // Upload do arquivo
+      // Upload file
       const { error: uploadError } = await supabase.storage
         .from('user-images')
         .upload(filePath, imageFile, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true // Changed to true to overwrite if file exists
         });
       
       clearInterval(progressInterval);
       
       if (uploadError) {
-        console.error('Erro de upload:', uploadError);
+        console.error('Upload error:', uploadError);
         throw uploadError;
       }
       
-      console.log('Upload concluído com sucesso');
+      console.log('Upload completed successfully');
       setUploadProgress(100);
       
-      // Obter URL pública
+      // Get public URL
       const { data: fileData } = supabase
         .storage
         .from('user-images')
         .getPublicUrl(filePath);
       
-      console.log('URL pública:', fileData?.publicUrl);
+      console.log('Public URL:', fileData?.publicUrl);
       
       if (!fileData?.publicUrl) {
-        throw new Error('Não foi possível obter URL pública da imagem');
+        throw new Error('Could not get image public URL');
       }
       
       toast({
@@ -179,11 +179,11 @@ export const useImageLibraryUpload = () => {
         alt: imageAlt 
       };
     } catch (error: any) {
-      console.error('Erro detalhado do upload:', error);
+      console.error('Detailed upload error:', error);
       
       let errorMessage = "Não foi possível enviar sua imagem. Tente novamente mais tarde.";
       
-      // Verificar erros específicos
+      // Check for specific errors
       if (error.message?.includes('storage/object_not_found')) {
         errorMessage = "Diretório não encontrado. Verifique suas permissões.";
       } else if (error.message?.includes('Permission denied')) {

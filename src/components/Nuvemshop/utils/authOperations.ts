@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { NuvemshopAuthResponse } from '../types';
 
@@ -78,10 +77,20 @@ export const detectAuthCode = (): string | null => {
  */
 export const clearAuthCodeFromUrl = () => {
   if (window.history && window.history.replaceState) {
-    const cleanUrl = window.location.pathname + 
-                     window.location.search.replace(/[\?&]code=[^&]+/, '') +
-                     window.location.hash;
+    // First, get the current URL and create a URL object
+    const currentUrl = new URL(window.location.href);
+    
+    // Remove both 'code' and 'state' parameters
+    currentUrl.searchParams.delete('code');
+    currentUrl.searchParams.delete('state');
+    
+    // Convert back to string, keeping only the necessary parts
+    const cleanUrl = currentUrl.pathname + 
+                    (currentUrl.searchParams.toString() ? '?' + currentUrl.searchParams.toString() : '') +
+                    currentUrl.hash;
+    
+    // Update browser history without navigating
     window.history.replaceState({}, document.title, cleanUrl);
-    console.log("Código de autorização removido da URL");
+    console.log("Código de autorização e parâmetros de estado removidos da URL");
   }
 };

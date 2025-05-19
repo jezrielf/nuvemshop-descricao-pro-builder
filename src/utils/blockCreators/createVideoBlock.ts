@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { VideoBlock } from '@/types/editor/blocks';
+import { VideoBlock } from '@/types/editor/blocks/video';
 import { ColumnLayout } from '@/types/editor';
 
 export function createVideoBlock(columns: ColumnLayout = 'full'): VideoBlock {

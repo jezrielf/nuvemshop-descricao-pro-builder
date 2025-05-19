@@ -17,66 +17,68 @@ interface VideoBlockProps {
   isPreview?: boolean;
 }
 
-// Schema de validação para o formulário
+// Schema for form validation
 const formSchema = z.object({
-  videoUrl: z.string().url({ message: "URL inválida" }),
+  videoUrl: z.string().url({ message: "URL inválida" }).or(z.string().length(0)),
   title: z.string(),
   description: z.string().optional(),
-  autoplay: z.boolean().default(true),
-  muteAudio: z.boolean().default(false)
+  autoplay: z.boolean().default(false),
+  muteAudio: z.boolean().default(true)
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => {
   const { updateBlock } = useEditorStore();
   const [embedUrl, setEmbedUrl] = useState<string>('');
   
-  // Inicializar o formulário com os valores do bloco
-  const form = useForm<z.infer<typeof formSchema>>({
+  // Initialize form with block values
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      videoUrl: block.videoUrl,
-      title: block.title,
+      videoUrl: block.videoUrl || '',
+      title: block.title || 'Vídeo do Produto',
       description: block.description || '',
-      autoplay: block.autoplay ?? true,
-      muteAudio: block.muteAudio ?? false
+      autoplay: block.autoplay ?? false,
+      muteAudio: block.muteAudio ?? true
     }
   });
 
-  // Atualizar o bloco quando os valores do formulário mudarem
-  const onValueChange = (field: string, value: any) => {
+  // Update block when form values change
+  const onValueChange = (field: keyof FormValues, value: any) => {
+    console.log(`Updating ${field} to:`, value);
     updateBlock(block.id, { [field]: value });
   };
   
   useEffect(() => {
-    // Extrair ID do vídeo da URL do YouTube
+    // Extract YouTube video ID and create embed URL
     const getYouTubeEmbedUrl = (url: string) => {
-      // Lidar com diferentes formatos de URLs do YouTube
-      const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^\s&?/]+)/;
-      const match = url.match(regExp);
+      if (!url) return '';
+      
+      // Match YouTube URL patterns
+      const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/;
+      const match = url.match(youtubeRegex);
       
       if (match && match[1]) {
-        // Formar URL de incorporação com parâmetros de autoplay e mudo
+        // Create embed URL with parameters
         const videoId = match[1];
-        return `https://www.youtube.com/embed/${videoId}?autoplay=${block.autoplay ? '1' : '0'}&mute=${block.muteAudio ? '1' : '0'}&rel=0`;
+        const params = new URLSearchParams({
+          autoplay: block.autoplay ? '1' : '0',
+          mute: block.muteAudio ? '1' : '0',
+          rel: '0'
+        });
+        
+        return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
       
       return '';
     };
     
-    setEmbedUrl(getYouTubeEmbedUrl(block.videoUrl));
+    setEmbedUrl(getYouTubeEmbedUrl(block.videoUrl || ''));
   }, [block.videoUrl, block.autoplay, block.muteAudio]);
 
+  // Render preview mode
   if (isPreview) {
-    if (!embedUrl) {
-      return (
-        <BlockWrapper block={block} isEditing={false}>
-          <div className="bg-gray-100 p-4 rounded text-center">
-            <p>URL de vídeo inválida</p>
-          </div>
-        </BlockWrapper>
-      );
-    }
-    
     return (
       <BlockWrapper block={block} isEditing={false}>
         <div className="video-container">
@@ -85,14 +87,20 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
           )}
           
           <div className="aspect-w-16 aspect-h-9 mb-3">
-            <iframe
-              src={embedUrl}
-              title={block.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full rounded"
-            ></iframe>
+            {embedUrl ? (
+              <iframe
+                src={embedUrl}
+                title={block.title || 'Video'}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full rounded"
+              ></iframe>
+            ) : (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded">
+                <p className="text-gray-500">URL de vídeo não definida</p>
+              </div>
+            )}
           </div>
           
           {block.description && (
@@ -103,9 +111,10 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
     );
   }
   
+  // Render edit mode
   return (
     <BlockWrapper block={block} isEditing={!isPreview}>
-      <div className="space-y-4">
+      <div className="space-y-4 p-4">
         <Form {...form}>
           <div className="grid gap-4">
             <FormField
@@ -125,7 +134,7 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
                     />
                   </FormControl>
                   <FormDescription>
-                    Cole a URL do vídeo do YouTube aqui.
+                    Cole a URL do vídeo do YouTube aqui
                   </FormDescription>
                 </FormItem>
               )}
@@ -171,62 +180,59 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="autoplay"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Reprodução Automática</FormLabel>
-                    <FormDescription>
-                      Iniciar o vídeo automaticamente quando a página carregar
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={(checked) => {
-                        field.onChange(checked);
-                        onValueChange('autoplay', checked);
-                      }}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="muteAudio"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Silenciar Áudio</FormLabel>
-                    <FormDescription>
-                      Reproduzir o vídeo sem áudio
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={(checked) => {
-                        field.onChange(checked);
-                        onValueChange('muteAudio', checked);
-                      }}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="autoplay"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Reprodução Automática</FormLabel>
+                      <FormDescription className="text-xs">
+                        Iniciar automaticamente
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          onValueChange('autoplay', checked);
+                        }}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="muteAudio"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Silenciar Áudio</FormLabel>
+                      <FormDescription className="text-xs">
+                        Sem som
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          onValueChange('muteAudio', checked);
+                        }}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
         </Form>
         
-        {!embedUrl && block.videoUrl && (
-          <div className="bg-red-50 p-4 rounded text-red-600 text-sm">
-            URL de vídeo inválida. Por favor, use uma URL válida do YouTube.
-          </div>
-        )}
-        
+        {/* Preview */}
         {embedUrl && (
           <div className="mt-4 border rounded-md p-4">
             <h4 className="text-sm font-medium mb-2">Pré-visualização</h4>
