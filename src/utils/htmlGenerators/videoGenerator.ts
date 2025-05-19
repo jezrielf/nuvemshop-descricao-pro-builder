@@ -2,10 +2,10 @@
 import { VideoBlock } from '@/types/editor/blocks';
 
 export const generateVideoBlockHtml = (block: VideoBlock): string => {
-  const { videoUrl, aspectRatio = '16:9', description, autoplay = false, muteAudio = true } = block;
+  const { videoUrl, aspectRatio = '16:9', description, autoplay = false, muteAudio = true, title } = block;
   
   if (!videoUrl) {
-    return '<div class="video-container empty"><p>Vídeo não disponível</p></div>';
+    return '<div class="video-container" style="padding: 1rem; text-align: center; border: 1px solid #e5e7eb; border-radius: 0.5rem;"><p>Vídeo não disponível</p></div>';
   }
   
   // Extract video ID if it's a YouTube URL
@@ -30,7 +30,7 @@ export const generateVideoBlockHtml = (block: VideoBlock): string => {
   
   const embedUrl = getYoutubeEmbedUrl(videoUrl);
   
-  // Determine aspect ratio class for the container
+  // Determine aspect ratio style for the container
   let aspectRatioStyle = 'padding-top: 56.25%;'; // Default 16:9 ratio
   if (aspectRatio === '4:3') {
     aspectRatioStyle = 'padding-top: 75%;';
@@ -53,16 +53,19 @@ export const generateVideoBlockHtml = (block: VideoBlock): string => {
   
   return `
     <div class="video-block" ${containerStyle}>
+      ${title ? `<h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">${title}</h3>` : ''}
+      
       <div class="video-container" style="position: relative; width: 100%; ${aspectRatioStyle}">
         <iframe 
           src="${embedUrl}" 
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-          title="Video" 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 0.375rem;" 
+          title="${title || 'Video'}" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowfullscreen
         ></iframe>
       </div>
-      ${description ? `<p class="video-description">${description}</p>` : ''}
+      
+      ${description ? `<p class="video-description" style="margin-top: 0.75rem; font-size: 0.875rem; color: #4b5563;">${description}</p>` : ''}
     </div>
   `;
 };

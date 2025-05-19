@@ -41,6 +41,28 @@ export const uploadService = {
       // Create progress tracker
       let progressInterval: NodeJS.Timeout | null = null;
       
+      console.log('Initiating upload to path:', filePath);
+
+      // Ensure the bucket exists
+      try {
+        const { data: buckets } = await supabase.storage.listBuckets();
+        const userImagesBucket = buckets?.find(b => b.name === 'user-images');
+        
+        if (!userImagesBucket) {
+          console.log('Creating user-images bucket');
+          await supabase.storage.createBucket('user-images', {
+            public: true,
+            fileSizeLimit: 5242880 // 5MB
+          });
+        } else {
+          console.log('user-images bucket already exists');
+        }
+      } catch (bucketError) {
+        console.log('Bucket operation error:', bucketError);
+        // Continue anyway as the bucket might exist with different permissions
+      }
+
+      // Setup progress handling
       if (onProgress) {
         let progress = 0;
         progressInterval = setInterval(() => {
@@ -54,29 +76,12 @@ export const uploadService = {
         }, 100);
       }
 
-      console.log('Initiating upload to path:', filePath);
-
-      // Ensure the bucket exists
-      try {
-        const { data: buckets } = await supabase.storage.listBuckets();
-        if (!buckets?.find(b => b.name === 'user-images')) {
-          console.log('Creating user-images bucket');
-          await supabase.storage.createBucket('user-images', {
-            public: true,
-            fileSizeLimit: 5242880 // 5MB
-          });
-        }
-      } catch (bucketError) {
-        console.log('Bucket operation error (continuing):', bucketError);
-        // Continue anyway as the bucket might exist
-      }
-
       // Upload file
       const { data, error: uploadError } = await supabase.storage
         .from('user-images')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true // Changed to true to overwrite if file exists
         });
 
       // Clear progress interval

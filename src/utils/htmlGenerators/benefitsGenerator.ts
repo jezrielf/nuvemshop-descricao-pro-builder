@@ -33,23 +33,38 @@ export function generateBenefitsBlockHtml(block: BenefitsBlock): string {
     'positivo': '👍',
   };
   
+  // Using standard CSS instead of Tailwind for Nuvemshop compatibility
   return `
-    <div class="benefits-block my-6">
-      <h2 class="text-2xl font-bold mb-4">${heading || 'Benefícios'}</h2>
-      <div class="grid grid-cols-1 md:grid-cols-${gridColumns} gap-6">
+    <div class="benefits-container" style="margin: 1.5rem 0;">
+      <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">${heading || 'Benefícios'}</h2>
+      <div class="benefits-grid" style="display: flex; flex-wrap: wrap; margin: -8px;">
         ${benefits.map(benefit => {
           // Try to use mapping for icon names, otherwise use the original icon or fallback
           const iconDisplay = iconMapping[benefit.icon] || benefit.icon || '✓';
           
+          // Calculate width based on number of columns (with some margin)
+          const columnWidth = (100 / gridColumns);
+          
           return `
-            <div class="flex flex-col items-center text-center p-4 border rounded-lg">
-              <div class="text-3xl mb-2">${iconDisplay}</div>
-              <h3 class="text-lg font-semibold mb-2">${benefit.title}</h3>
-              <p>${benefit.description || ''}</p>
+            <div class="benefit-item" style="flex: 0 0 calc(${columnWidth}% - 16px); margin: 8px; box-sizing: border-box;">
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; height: 100%;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">${iconDisplay}</div>
+                <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">${benefit.title}</h3>
+                <p style="margin: 0; font-size: 0.875rem; color: #4b5563;">${benefit.description || ''}</p>
+              </div>
             </div>
           `;
         }).join('')}
       </div>
+      
+      <!-- Responsive styles for mobile devices -->
+      <style>
+        @media (max-width: 768px) {
+          .benefits-grid .benefit-item {
+            flex: 0 0 calc(100% - 16px) !important;
+          }
+        }
+      </style>
     </div>
   `;
 }
