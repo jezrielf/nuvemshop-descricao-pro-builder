@@ -3,8 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { VideoBlock } from '@/types/editor/blocks/video';
 import { ColumnLayout } from '@/types/editor';
 
-// This file is deprecated and will be removed in a future update
-// Please use the createVideoBlock from the blocks directory instead
 export function createVideoBlock(columns: ColumnLayout = 'full'): VideoBlock {
   return {
     id: uuidv4(),
