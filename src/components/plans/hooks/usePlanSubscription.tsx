@@ -12,6 +12,7 @@ export const usePlanSubscription = () => {
   const { toast } = useToast();
 
   const handleSubscribe = async (planId: string) => {
+    console.log("✅ ID recebido no botão:", planId);
   if (!user) {
     navigate('/auth');
     toast({
