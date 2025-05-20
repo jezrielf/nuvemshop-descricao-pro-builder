@@ -27,10 +27,10 @@ export const usePlanSubscription = () => {
     setLoading(planId);
 
     // Troca direta para o link fixo da Stripe
-    if (planId === 'prod_SLHhyuSHcuFR0h') {
-      window.location.href = 'https://buy.stripe.com/eVqcN7crCd4w67Q1kF5EY00';
-      return;
-    }
+   if (planId === 'prod_S83APA2WGT2UCd') {
+  window.location.href = 'https://buy.stripe.com/eVqcN7crCd4w67Q1kF5EY00';
+  return;
+}
 
     // Qualquer outro plano usa o fluxo dinâmico
     const checkoutUrl = await subscriptionService.createCheckout(planId);
