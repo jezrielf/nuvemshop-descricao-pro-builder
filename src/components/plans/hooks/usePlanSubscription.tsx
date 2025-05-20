@@ -12,38 +12,38 @@ export const usePlanSubscription = () => {
   const { toast } = useToast();
 
   const handleSubscribe = async (planId: string) => {
-    console.log("Plano clicado:", planId);
-    if (!user) {
-      navigate('/auth');
-      toast({
-        title: 'Login necessário',
-        description: 'Faça login para assinar um plano',
-      });
+  if (!user) {
+    navigate('/auth');
+    toast({
+      title: 'Login necessário',
+      description: 'Faça login para assinar um plano',
+    });
+    return;
+  }
+
+  try {
+    setLoading(planId);
+
+    // Troca direta para o link fixo da Stripe
+    if (planId === 'prod_SLHhyuSHcuFR0h') {
+      window.location.href = 'https://buy.stripe.com/eVqcN7crCd4w67Q1kF5EY00';
       return;
     }
-    
-    try {
-      setLoading(planId);
-      
-      // Special case for the Premium plan with direct Stripe checkout URL
-      if (planId === 'prod_SLHhyuSHcuFR0h') {
-        window.location.href = 'https://buy.stripe.com/eVqcN7crCd4w67Q1kF5EY00';
-        return;
-      }
-      
-      // Regular flow for other plans
-      const checkoutUrl = await subscriptionService.createCheckout(planId);
-      window.location.href = checkoutUrl;
-    } catch (error: any) {
-      toast({
-        title: 'Erro ao processar assinatura',
-        description: error.message || "Não foi possível iniciar o processo de assinatura.",
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
+
+    // Qualquer outro plano usa o fluxo dinâmico
+    const checkoutUrl = await subscriptionService.createCheckout(planId);
+    window.location.href = checkoutUrl;
+
+  } catch (error: any) {
+    toast({
+      title: 'Erro ao processar assinatura',
+      description: error.message || "Não foi possível iniciar o processo de assinatura.",
+      variant: 'destructive',
+    });
+  } finally {
+    setLoading(null);
+  }
+};
 
   const handleManageSubscription = async () => {
     if (!user || !isSubscribed()) {
