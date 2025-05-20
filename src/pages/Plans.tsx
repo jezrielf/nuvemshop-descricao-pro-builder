@@ -164,7 +164,7 @@ const Plans: React.FC = () => {
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-center">Planos de Assinatura</h1>
+          <h1 className="text-3xl font-bold text-center">🚨 Novo título só pra testar</h1>
           <p className="text-center text-muted-foreground">
             Escolha o plano ideal para suas necessidades
           </p>
