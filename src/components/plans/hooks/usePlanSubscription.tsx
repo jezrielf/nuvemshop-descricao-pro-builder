@@ -12,7 +12,8 @@ export const usePlanSubscription = () => {
   const { toast } = useToast();
 
   const handleSubscribe = async (planId: string) => {
-    console,log("✅ ID recebido no botão:", planId);
+    alert("🟢 Você clicou em Assinar");
+  console.log("🟢 Plano clicado:", planId);
   if (!user) {
     navigate('/auth');
     toast({
