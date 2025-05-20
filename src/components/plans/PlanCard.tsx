@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Check } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import PlanFeaturesList from './PlanFeaturesList';
 
 interface StripePlan {
@@ -27,14 +27,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
 }) => {
   const formatPrice = (price: number) => {
     if (price === 0) return 'Grátis';
-    
-    // For plan with ID prod_SLHhyuSHcuFR0h, show R$ 79,90 regardless of actual price
-    if (plan.id === 'prod_SLHhyuSHcuFR0h') {
-      return 'R$ 79,90';
-    }
-    
-    // For other plans, use the original formatting
-    return `R$ ${(price / 100).toFixed(2).replace('.', ',')}`;
+    return `R$ ${price.toFixed(2).replace('.', ',')}`;
   };
 
   const getPlanDescription = (planName: string) => {
@@ -71,23 +64,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
       </CardHeader>
       
       <CardContent className="flex-grow">
-        {plan.id === 'prod_SLHhyuSHcuFR0h' ? (
-          <div className="space-y-2">
-            {[
-              'Descrições ilimitadas',
-              'Templates ilimitados',
-              'Gestão completa de todas as descrições',
-              'Análise e diagnóstico completo de SEO'
-            ].map((feature, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <PlanFeaturesList features={plan.features} isPriceFree={plan.price === 0} />
-        )}
+        <PlanFeaturesList features={plan.features} isPriceFree={plan.price === 0} />
       </CardContent>
       
       <CardFooter className="pt-4">
