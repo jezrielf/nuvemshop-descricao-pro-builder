@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { subscriptionService } from '@/services/subscriptionService';
 
+console.log("Plano selecionado:", planId);
+
 export const usePlanSubscription = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const { isSubscribed, user } = useAuth();
