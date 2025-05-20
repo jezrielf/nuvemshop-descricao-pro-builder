@@ -19,7 +19,7 @@ export const mockPlans: Plan[] = [
     ]
   },
   {
-    id: 'premium-plan',
+    id: 'prod_SLHhyuSHcuFR0h',
     name: 'Premium',
     price: 4990,
     isActive: true,
