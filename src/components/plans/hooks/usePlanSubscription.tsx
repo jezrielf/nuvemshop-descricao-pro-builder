@@ -23,6 +23,14 @@ export const usePlanSubscription = () => {
     
     try {
       setLoading(planId);
+      
+      // Special case for the Premium plan with direct Stripe checkout URL
+      if (planId === 'prod_SLHhyuSHcuFR0h') {
+        window.location.href = 'https://buy.stripe.com/eVqcN7crCd4w67Q1kF5EY00';
+        return;
+      }
+      
+      // Regular flow for other plans
       const checkoutUrl = await subscriptionService.createCheckout(planId);
       window.location.href = checkoutUrl;
     } catch (error: any) {
