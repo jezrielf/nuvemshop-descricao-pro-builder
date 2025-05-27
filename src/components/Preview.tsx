@@ -51,6 +51,29 @@ const Preview: React.FC = () => {
   
   return (
     <div className="h-full flex flex-col">
+      <style>
+        {`
+          .preview-focused {
+            animation: focusPulse 2s ease-in-out;
+            outline: 2px solid #3b82f6;
+            outline-offset: 4px;
+            border-radius: 8px;
+          }
+          
+          @keyframes focusPulse {
+            0% { 
+              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+            50% { 
+              box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
+            }
+            100% { 
+              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+          }
+        `}
+      </style>
+      
       <div className="p-2 sm:p-4 border-b bg-gray-50 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-medium text-sm sm:text-base">Pré-visualização</h2>
         
@@ -94,27 +117,6 @@ const Preview: React.FC = () => {
           )}
         </div>
       </ScrollArea>
-      
-      <style jsx>{`
-        .preview-focused {
-          animation: focusPulse 2s ease-in-out;
-          outline: 2px solid #3b82f6;
-          outline-offset: 4px;
-          border-radius: 8px;
-        }
-        
-        @keyframes focusPulse {
-          0% { 
-            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-          }
-          50% { 
-            box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
-          }
-          100% { 
-            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-          }
-        }
-      `}</style>
     </div>
   );
 };
