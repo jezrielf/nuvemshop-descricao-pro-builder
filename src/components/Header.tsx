@@ -12,20 +12,14 @@ import HtmlOutputDialog from './header/HtmlOutputDialog';
 import AIGeneratorButton from './header/AIGeneratorButton';
 
 const Header = () => {
-  const { user, isPremium, isSubscribed, canCreateMoreDescriptions, descriptionCount, incrementDescriptionCount } = useAuth();
-  const { description, setAuthContext } = useEditorStore();
+  const authContext = useAuth();
+  const { user, isPremium, isSubscribed, canCreateMoreDescriptions, descriptionCount, incrementDescriptionCount, session, profile, signIn, signUp, signOut, loading, hasRole, isAdmin, isBusiness, subscriptionTier, subscriptionEnd, refreshSubscription, openCustomerPortal, refreshProfile } = authContext;
+  const { description, setAuthContext, savedDescriptions } = useEditorStore();
 
   // Set auth context in the store so save actions can access it
   useEffect(() => {
-    setAuthContext({
-      user,
-      isPremium,
-      isSubscribed,
-      canCreateMoreDescriptions,
-      descriptionCount,
-      incrementDescriptionCount
-    });
-  }, [user, isPremium, isSubscribed, canCreateMoreDescriptions, descriptionCount, incrementDescriptionCount, setAuthContext]);
+    setAuthContext(authContext);
+  }, [authContext, setAuthContext]);
 
   return (
     <header className="border-b border-gray-200 bg-white px-4 py-2">
@@ -52,7 +46,11 @@ const Header = () => {
               canCreateMoreDescriptions={canCreateMoreDescriptions}
             />
             
-            <SavedDescriptionsDialog />
+            <SavedDescriptionsDialog 
+              isPremium={isPremium}
+              descriptionCount={descriptionCount}
+              savedDescriptions={savedDescriptions}
+            />
             
             <Separator orientation="vertical" className="h-6" />
             

@@ -51,8 +51,14 @@ export const useEditor = () => {
       // Call the store function with logging for debugging
       console.log('Creating new description with name:', descriptionName);
       
-      // Create the description without additional limit checking since we already checked
-      const result = createNewDescription(descriptionName, false);
+      // Increment counter for free users BEFORE creating the description
+      if (!isPremiumUser && !isBusinessUser) {
+        incrementDescriptionCount();
+        console.log('Incremented description count to:', descriptionCount + 1);
+      }
+      
+      // Create the description with the correct single argument
+      const result = createNewDescription(descriptionName);
       console.log('Description creation result:', result);
       
       // Display success message to user

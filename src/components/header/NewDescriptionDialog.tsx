@@ -58,8 +58,8 @@ const NewDescriptionDialog: React.FC<NewDescriptionDialogProps> = ({
       console.log('Incremented description count to:', descriptionCount + 1);
     }
 
-    // Create the description without additional limit checking since we already checked
-    createNewDescription(newDescriptionName, false);
+    // Create the description with the correct single argument
+    createNewDescription(newDescriptionName);
     setNewDescriptionName('');
     setOpen(false);
     
