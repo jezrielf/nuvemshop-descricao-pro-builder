@@ -36,12 +36,17 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
         
         // Check if user is premium/business or has saved less than 3 descriptions
         if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
+          console.log('User has reached free description limit');
           return false;
         }
         
-        // Increment description count for free users
-        if (!authContext.isPremium()) {
+        // Increment description count for free users ONLY when saving a NEW description
+        const existingDescriptions = get().savedDescriptions;
+        const isNewDescription = !existingDescriptions.find(d => d.id === description.id);
+        
+        if (!authContext.isPremium() && isNewDescription) {
           authContext.incrementDescriptionCount();
+          console.log('Incremented description count for free user');
         }
         
         // Update the timestamp

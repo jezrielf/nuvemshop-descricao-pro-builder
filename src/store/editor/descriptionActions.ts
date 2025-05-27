@@ -4,22 +4,32 @@ import { EditorState } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const createDescriptionActions = (get: () => EditorState, set: any) => ({
-  createNewDescription: (name: string) => {
+  createNewDescription: (name: string, checkLimits: boolean = true) => {
     // Log for debugging
-    console.log('Creating new description in store:', name);
+    console.log('Creating new description in store:', name, 'checkLimits:', checkLimits);
+    
+    // If we need to check limits, verify auth context is available
+    if (checkLimits) {
+      const state = get();
+      // We can't access auth context directly here, so we'll rely on the component to check limits
+      console.log('Limits checking enabled for new description creation');
+    }
     
     // Create a new description with proper initialization
+    const newDescription = {
+      id: uuidv4(),
+      name,
+      blocks: [], // Initialize with empty blocks array
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
     set({
-      description: {
-        id: uuidv4(),
-        name,
-        blocks: [], // Initialize with empty blocks array
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
+      description: newDescription,
       selectedBlockId: null,
     });
     
+    console.log('New description created:', newDescription.id);
     return true; // Return success value for error handling
   },
 
