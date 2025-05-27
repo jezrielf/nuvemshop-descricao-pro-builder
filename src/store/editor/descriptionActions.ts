@@ -9,20 +9,17 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
     console.log('Creating new description in store:', name);
     
     // Create a new description with proper initialization
-    const newDescription = {
-      id: uuidv4(),
-      name,
-      blocks: [], // Initialize with empty blocks array
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
     set({
-      description: newDescription,
+      description: {
+        id: uuidv4(),
+        name,
+        blocks: [], // Initialize with empty blocks array
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
       selectedBlockId: null,
     });
     
-    console.log('New description created:', newDescription.id);
     return true; // Return success value for error handling
   },
 

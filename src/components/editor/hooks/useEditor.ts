@@ -8,7 +8,7 @@ import { toast } from '@/hooks/use-toast';
 
 export const useEditor = () => {
   const { description, reorderBlocks, updateBlock, createNewDescription } = useEditorStore();
-  const { isPremium, isBusiness, canCreateMoreDescriptions, incrementDescriptionCount, descriptionCount } = useAuth();
+  const { isPremium, isBusiness } = useAuth();
   const navigate = useNavigate();
   
   const isPremiumUser = isPremium();
@@ -28,36 +28,12 @@ export const useEditor = () => {
   const handleStartNewDescription = () => {
     console.log('Starting new description...');
     
-    // Check limits first
-    if (!canCreateMoreDescriptions()) {
-      console.log('User has reached description limit');
-      toast({
-        title: "Limite atingido",
-        description: "Você atingiu o limite de 3 descrições gratuitas. Faça upgrade para o plano premium para criar mais.",
-        variant: "destructive"
-      });
-      
-      // Redirect to plans page after showing the toast
-      setTimeout(() => {
-        navigate('/plans');
-      }, 2000);
-      return;
-    }
-    
     try {
       // Generate a name with date and time for uniqueness
       const descriptionName = 'Nova Descrição ' + new Date().toLocaleTimeString();
       
       // Call the store function with logging for debugging
       console.log('Creating new description with name:', descriptionName);
-      
-      // Increment counter for free users BEFORE creating the description
-      if (!isPremiumUser && !isBusinessUser) {
-        incrementDescriptionCount();
-        console.log('Incremented description count to:', descriptionCount + 1);
-      }
-      
-      // Create the description with the correct single argument
       const result = createNewDescription(descriptionName);
       console.log('Description creation result:', result);
       
