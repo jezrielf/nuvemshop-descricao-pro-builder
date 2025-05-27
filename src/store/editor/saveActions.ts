@@ -1,4 +1,3 @@
-
 import { ProductDescription } from '@/types/editor';
 import { EditorState } from './types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +22,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     // Add the setter function for auth context
     setAuthContext,
     
-    saveCurrentDescription: () => {
+    saveCurrentDescription: (isNewDescription: boolean = true) => {
       const description = get().description;
       if (!description) return false;
       
@@ -34,13 +33,13 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           return false;
         }
         
-        // Check if user is premium/business or has saved less than 3 descriptions
-        if (!authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
+        // Check limits only for NEW descriptions
+        if (isNewDescription && !authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
           return false;
         }
         
-        // Increment description count for free users
-        if (!authContext.isPremium()) {
+        // Increment description count only for NEW descriptions for free users
+        if (isNewDescription && !authContext.isPremium()) {
           authContext.incrementDescriptionCount();
         }
         

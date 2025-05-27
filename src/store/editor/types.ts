@@ -28,7 +28,7 @@ export interface EditorState {
   reorderBlocks: (fromIndex: number, toIndex: number) => void;
   selectBlock: (id: string | null) => void;
   getHtmlOutput: () => string;
-  saveCurrentDescription: () => boolean;
+  saveCurrentDescription: (isNewDescription?: boolean) => boolean;
   loadSavedDescriptions: () => void;
   getSavedDescriptions: () => ProductDescription[];
   setAuthContext: (authContext: ReturnType<typeof useAuth>) => void;
