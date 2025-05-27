@@ -10,6 +10,7 @@ import { createSaveActions } from './saveActions';
 export const useEditorStore = create<EditorState>((set, get) => ({
   description: null,
   selectedBlockId: null,
+  focusedBlockId: null,
   availableTemplates: [],
   savedDescriptions: [],
   user: null,

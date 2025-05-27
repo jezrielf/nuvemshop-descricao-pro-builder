@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export interface EditorState {
   description: ProductDescription | null;
   selectedBlockId: string | null;
+  focusedBlockId: string | null; // Novo estado para rastrear o bloco em foco na preview
   availableTemplates: Template[];
   savedDescriptions: ProductDescription[];
   user: { id: string } | null;
@@ -27,6 +28,7 @@ export interface EditorState {
   moveBlockDown: (id: string) => void;
   reorderBlocks: (fromIndex: number, toIndex: number) => void;
   selectBlock: (id: string | null) => void;
+  focusBlock: (id: string | null) => void; // Nova ação para focar bloco na preview
   getHtmlOutput: () => string;
   saveCurrentDescription: (isNewDescription?: boolean) => boolean;
   loadSavedDescriptions: () => void;

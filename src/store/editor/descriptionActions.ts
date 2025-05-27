@@ -18,6 +18,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
         updatedAt: new Date().toISOString(),
       },
       selectedBlockId: null,
+      focusedBlockId: null,
     });
     
     return true; // Return success value for error handling
@@ -28,6 +29,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
     set({
       description,
       selectedBlockId: null,
+      focusedBlockId: null,
     });
   },
 
@@ -68,6 +70,7 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
       return {
         ...state,
         selectedBlockId: null,
+        focusedBlockId: null,
         description: {
           ...description,
           blocks: updatedBlocks,

@@ -168,6 +168,13 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
   },
 
   selectBlock: (id: string | null) => {
-    set({ selectedBlockId: id });
+    set({ 
+      selectedBlockId: id,
+      focusedBlockId: id // Quando seleciona um bloco, também foca nele na preview
+    });
+  },
+
+  focusBlock: (id: string | null) => {
+    set({ focusedBlockId: id });
   }
 });

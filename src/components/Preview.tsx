@@ -5,26 +5,37 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Eye, Smartphone, Monitor } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePreviewFocus } from './Preview/hooks/usePreviewFocus';
 
 const Preview: React.FC = () => {
-  const { description, getHtmlOutput } = useEditorStore();
+  const { description, getHtmlOutput, focusedBlockId } = useEditorStore();
   const [deviceView, setDeviceView] = React.useState<'desktop' | 'mobile'>('desktop');
   const [htmlOutput, setHtmlOutput] = useState<string>('');
   const isMobile = useIsMobile();
+  const { previewRef } = usePreviewFocus();
   
   // Update HTML output whenever description changes
   useEffect(() => {
     if (description) {
       // Generate fresh HTML output
       try {
-        const output = getHtmlOutput();
+        let output = getHtmlOutput();
+        
+        // Add data attributes to blocks for focus functionality
+        if (description.blocks) {
+          description.blocks.forEach(block => {
+            const blockPattern = new RegExp(`(<[^>]*class="[^"]*block-${block.type}[^"]*"[^>]*>)`, 'gi');
+            output = output.replace(blockPattern, `$1<div data-preview-block-id="${block.id}" class="preview-block-wrapper ${focusedBlockId === block.id ? 'preview-focused' : ''}">`);
+          });
+        }
+        
         console.log('Generated HTML output:', output.substring(0, 100) + '...');
         setHtmlOutput(output);
       } catch (error) {
         console.error('Error generating HTML output:', error);
       }
     }
-  }, [description, getHtmlOutput]);
+  }, [description, getHtmlOutput, focusedBlockId]);
   
   if (!description) {
     return (
@@ -66,7 +77,10 @@ const Preview: React.FC = () => {
       </div>
       
       <ScrollArea className="flex-1 h-[calc(100%-50px)]">
-        <div className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}>
+        <div 
+          ref={previewRef}
+          className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}
+        >
           {visibleBlocks.length > 0 ? (
             <div 
               className="preview-container"
@@ -80,6 +94,27 @@ const Preview: React.FC = () => {
           )}
         </div>
       </ScrollArea>
+      
+      <style jsx>{`
+        .preview-focused {
+          animation: focusPulse 2s ease-in-out;
+          outline: 2px solid #3b82f6;
+          outline-offset: 4px;
+          border-radius: 8px;
+        }
+        
+        @keyframes focusPulse {
+          0% { 
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+          }
+          50% { 
+            box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
+          }
+          100% { 
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
