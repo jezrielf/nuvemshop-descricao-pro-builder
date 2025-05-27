@@ -51,10 +51,7 @@ const NewDescriptionDialog: React.FC<NewDescriptionDialogProps> = ({
   };
   return <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center font-normal text-xs">
-          <Plus className="mr-2 h-4 w-4" />
-          Nova Descrição
-        </Button>
+        
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
