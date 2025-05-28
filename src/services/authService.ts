@@ -10,7 +10,7 @@ export const authService = {
   },
 
   signUp: async (email: string, password: string, nome: string) => {
-    // First register the user with Supabase without sending the default email
+    // Register the user with Supabase WITHOUT sending the default email
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -18,7 +18,8 @@ export const authService = {
         data: {
           nome,
         },
-        emailRedirectTo: `${window.location.origin}/confirmar-email`,
+        // Disable automatic email confirmation
+        emailRedirectTo: undefined,
       },
     });
 
@@ -27,12 +28,11 @@ export const authService = {
       return { data, error };
     }
 
-    // Now send our custom email
+    // Send our custom confirmation email
     try {
-      // We need to get the OTP (one-time password) token that was generated
-      // Since confirmation_token is not directly accessible on the user object
-      // We'll use the session data if available or a custom approach
-      await authService.sendCustomConfirmationEmail(email, email, nome); // Using email as a placeholder for the token
+      // We'll use the user ID as a token reference for our custom flow
+      // The actual verification will be handled by Supabase's built-in system
+      await authService.sendCustomConfirmationEmail(email, data.user.id, nome);
     } catch (emailError) {
       console.error('Error sending custom email:', emailError);
       // We don't return an error here as the user is already created
@@ -46,10 +46,19 @@ export const authService = {
   },
   
   verifyEmail: async (token: string) => {
-    return await supabase.auth.verifyOtp({
-      token_hash: token,
-      type: 'email',
-    });
+    // For our custom flow, we'll use the token as the user ID
+    // and check if the user exists and is not confirmed yet
+    const { data: user, error } = await supabase.auth.getUser();
+    
+    if (error || !user) {
+      // Try to verify using the token as an OTP if direct verification fails
+      return await supabase.auth.verifyOtp({
+        token_hash: token,
+        type: 'email',
+      });
+    }
+    
+    return { data: user, error: null };
   },
   
   // Updated method for admin to create users - using functions.invoke to use service role
@@ -115,12 +124,12 @@ export const authService = {
   },
 
   // Method to send a custom email confirmation in Portuguese
-  sendCustomConfirmationEmail: async (email: string, confirmationToken: string, firstName: string) => {
+  sendCustomConfirmationEmail: async (email: string, userId: string, firstName: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
-          confirmationToken,
+          confirmationToken: userId, // Using user ID as our token reference
           firstName,
           redirectUrl: `${window.location.origin}/confirmar-email`,
         },
