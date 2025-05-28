@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -230,6 +229,7 @@ const Landing: React.FC = () => {
                 ))}
             </motion.h1>
             
+            
             <motion.p 
               className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed"
               initial={{ opacity: 0 }}
@@ -273,6 +273,8 @@ const Landing: React.FC = () => {
       </BackgroundBeamsWithCollision>
 
       {/* Why Choose Section */}
+      
+
       <section className="py-24 bg-gradient-to-b from-white to-violet-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
