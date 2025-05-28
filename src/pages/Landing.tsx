@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -263,9 +264,11 @@ const Landing: React.FC = () => {
               className="relative max-w-4xl mx-auto"
             >
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-violet-100">
-                <div className="aspect-video bg-gradient-to-br from-violet-100 to-pink-100 rounded-xl flex items-center justify-center text-violet-600 font-semibold text-lg">
-                  "Descrições que vendem mais, sem complicação."
-                </div>
+                <img 
+                  src="/lovable-uploads/b276bca5-ec90-4f48-abdd-dabdc77f5c67.png"
+                  alt="DescriçãoPRO - Editor de descrições de produtos"
+                  className="w-full h-auto rounded-xl shadow-lg"
+                />
               </div>
             </motion.div>
           </div>
