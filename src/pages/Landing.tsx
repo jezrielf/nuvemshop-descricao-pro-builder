@@ -162,7 +162,7 @@ const Landing: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <img 
-                src="/lovable-uploads/f6cadb24-e515-45e4-93b9-6d5abf46919d.png" 
+                src="/lovable-uploads/3844fc6f-0538-43f8-a969-8aff8742921b.png" 
                 alt="DescriçãoPRO Logo"
                 className="h-8 w-auto mr-3"
               />
@@ -590,7 +590,7 @@ const Landing: React.FC = () => {
             <div className="md:col-span-2">
               <div className="flex items-center mb-3 md:mb-4">
                 <img 
-                  src="/lovable-uploads/f6cadb24-e515-45e4-93b9-6d5abf46919d.png" 
+                  src="/lovable-uploads/3844fc6f-0538-43f8-a969-8aff8742921b.png" 
                   alt="DescriçãoPRO Logo"
                   className="h-8 w-auto mr-3"
                 />

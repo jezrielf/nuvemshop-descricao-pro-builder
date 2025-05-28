@@ -116,7 +116,7 @@ const Header: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/f6cadb24-e515-45e4-93b9-6d5abf46919d.png" 
+              src="/lovable-uploads/3844fc6f-0538-43f8-a969-8aff8742921b.png" 
               alt="DescriçãoPRO Logo"
               className="h-8 w-auto"
             />
