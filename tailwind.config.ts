@@ -75,10 +75,55 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        first: {
+          "0%, 16.667%, 100%": {
+            opacity: "1",
+          },
+          "33.333%, 83.333%": {
+            opacity: "0",
+          },
+        },
+        second: {
+          "0%, 16.667%, 66.667%, 100%": {
+            opacity: "0",
+          },
+          "33.333%, 50%": {
+            opacity: "1",
+          },
+        },
+        third: {
+          "0%, 50%, 100%": {
+            opacity: "0",
+          },
+          "66.667%, 83.333%": {
+            opacity: "1",
+          },
+        },
+        fourth: {
+          "0%, 50%, 100%": {
+            opacity: "0",
+          },
+          "66.667%, 83.333%": {
+            opacity: "1",
+          },
+        },
+        fifth: {
+          "0%, 83.333%, 100%": {
+            opacity: "0",
+          },
+          "16.667%, 66.667%": {
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        first: "first 3s ease-in-out infinite",
+        second: "second 3s ease-in-out infinite",
+        third: "third 3s ease-in-out infinite",
+        fourth: "fourth 3s ease-in-out infinite",
+        fifth: "fifth 3s ease-in-out infinite",
       },
     },
   },
