@@ -47,10 +47,10 @@ const EmailConfirmation: React.FC = () => {
         setStatus('success');
         toast({
           title: "E-mail confirmado!",
-          description: "Seu cadastro foi confirmado com sucesso.",
+          description: "Sua conta foi ativada com sucesso. Redirecionando para o editor...",
         });
         
-        // Start countdown for redirect
+        // Start countdown for redirect to editor
         const timer = setInterval(() => {
           setCountdown((prev) => {
             if (prev <= 1) {
@@ -81,16 +81,19 @@ const EmailConfirmation: React.FC = () => {
           {status === 'verifying' && (
             <div className="flex flex-col items-center py-8">
               <LoadingSpinner size="lg" />
-              <p className="mt-4 text-gray-600">Verificando seu e-mail...</p>
+              <p className="mt-4 text-gray-600">Verificando e ativando sua conta...</p>
             </div>
           )}
           
           {status === 'success' && (
             <Alert variant="success" className="bg-green-50 border-green-300">
               <CheckCircle className="h-5 w-5 text-green-600" />
-              <AlertTitle className="text-green-800">E-mail confirmado com sucesso!</AlertTitle>
+              <AlertTitle className="text-green-800">Conta ativada com sucesso!</AlertTitle>
               <AlertDescription className="text-green-700">
-                <p>Seu cadastro foi confirmado. Você será redirecionado para o editor em {countdown} segundos...</p>
+                <p>Seu cadastro foi confirmado e sua conta está ativa.</p>
+                <p className="mt-2 font-medium">
+                  Redirecionando para o editor em {countdown} segundos...
+                </p>
               </AlertDescription>
             </Alert>
           )}
@@ -101,12 +104,17 @@ const EmailConfirmation: React.FC = () => {
               <AlertTitle>Erro na confirmação</AlertTitle>
               <AlertDescription>
                 <p>Não foi possível verificar seu e-mail. O link pode ter expirado ou ser inválido.</p>
-                <button 
-                  onClick={() => navigate('/auth')}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                >
-                  Ir para a página de login
-                </button>
+                <div className="mt-4 space-y-2">
+                  <button 
+                    onClick={() => navigate('/auth')}
+                    className="block w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Ir para a página de login
+                  </button>
+                  <p className="text-xs text-gray-600">
+                    Se você não conseguir ativar sua conta, tente fazer um novo cadastro.
+                  </p>
+                </div>
               </AlertDescription>
             </Alert>
           )}

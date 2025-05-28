@@ -109,6 +109,12 @@ export const useAuthSession = () => {
         password,
       });
       if (error) {
+        // Verificar se é erro de conta não confirmada
+        if (error.message?.includes('email_not_confirmed') || 
+            error.message?.includes('Email not confirmed') ||
+            error.message?.includes('not confirmed')) {
+          throw new Error('Você precisa ativar sua conta através do e-mail enviado. Verifique sua caixa de entrada e spam.');
+        }
         throw new Error(error.message);
       }
       setSession(data.session);
@@ -125,6 +131,7 @@ export const useAuthSession = () => {
         title: "Erro ao realizar login",
         description: error.message,
       });
+      throw error; // Re-throw para que o componente possa tratar
     } finally {
       setLoading(false);
     }
@@ -157,6 +164,7 @@ export const useAuthSession = () => {
         title: "Erro ao realizar cadastro",
         description: error.message,
       });
+      throw error; // Re-throw para que o componente possa tratar
     } finally {
       setLoading(false);
     }
