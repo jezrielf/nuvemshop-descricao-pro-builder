@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -162,10 +161,11 @@ const Landing: React.FC = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="size-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 mr-3" />
-              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">
-                DescriçãoPRO
-              </h1>
+              <img 
+                src="/lovable-uploads/f6cadb24-e515-45e4-93b9-6d5abf46919d.png" 
+                alt="DescriçãoPRO Logo"
+                className="h-8 w-auto mr-3"
+              />
             </div>
             
             {/* Desktop Navigation */}
@@ -589,8 +589,11 @@ const Landing: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center mb-3 md:mb-4">
-                <div className="size-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 mr-3" />
-                <h3 className="text-lg md:text-xl font-bold text-white">DescriçãoPRO</h3>
+                <img 
+                  src="/lovable-uploads/f6cadb24-e515-45e4-93b9-6d5abf46919d.png" 
+                  alt="DescriçãoPRO Logo"
+                  className="h-8 w-auto mr-3"
+                />
               </div>
               <p className="text-gray-400 mb-3 md:mb-4 max-w-md text-sm md:text-base">
                 Descrições profissionais para e-commerce.

@@ -114,8 +114,12 @@ const Header: React.FC = () => {
     <header className="border-b bg-white shadow-sm px-3 sm:px-6 py-4 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-          <Link to="/">
-            <h1 className="text-xl sm:text-2xl font-bold text-brand-blue">Descrição Pro</h1>
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/f6cadb24-e515-45e4-93b9-6d5abf46919d.png" 
+              alt="DescriçãoPRO Logo"
+              className="h-8 w-auto"
+            />
           </Link>
           {description && (
             <span className="text-xs sm:text-sm text-gray-500">
