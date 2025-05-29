@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 import { supplementsTemplates } from './supplements';
 import { fashionTemplates } from './fashion';
@@ -9,6 +8,11 @@ import { casaDecoracaoTemplates } from './casa-decoracao';
 import { eletronicoTemplates } from './eletronicos';
 import { belezaTemplates } from './beleza';
 import { petShopTemplates } from './pet-shop';
+import { saudeTemplates } from './saude';
+import { vestuarioTemplates } from './vestuario';
+import { acessoriosLuxoTemplates } from './acessorios-luxo';
+import { modaLuxoTemplates } from './moda-luxo';
+import { produtosIntimosTemplates } from './produtos-intimos';
 
 // Debug logging for template loading
 console.log('Loading templates from individual files:');
@@ -21,6 +25,11 @@ console.log('- Casa decoração templates:', casaDecoracaoTemplates.length);
 console.log('- Eletrônicos templates:', eletronicoTemplates.length);
 console.log('- Beleza templates:', belezaTemplates.length);
 console.log('- Pet Shop templates:', petShopTemplates.length);
+console.log('- Saúde templates:', saudeTemplates.length);
+console.log('- Vestuário templates:', vestuarioTemplates.length);
+console.log('- Acessórios Luxo templates:', acessoriosLuxoTemplates.length);
+console.log('- Moda Luxo templates:', modaLuxoTemplates.length);
+console.log('- Produtos Íntimos templates:', produtosIntimosTemplates.length);
 
 // Combining all templates including the new ones
 export const allTemplates: Template[] = [
@@ -32,7 +41,12 @@ export const allTemplates: Template[] = [
   ...casaDecoracaoTemplates,
   ...eletronicoTemplates,
   ...belezaTemplates,
-  ...petShopTemplates
+  ...petShopTemplates,
+  ...saudeTemplates,
+  ...vestuarioTemplates,
+  ...acessoriosLuxoTemplates,
+  ...modaLuxoTemplates,
+  ...produtosIntimosTemplates
 ];
 
 console.log('Total templates combined:', allTemplates.length);
@@ -62,3 +76,8 @@ export * from './casa-decoracao';
 export * from './eletronicos';
 export * from './beleza';
 export * from './pet-shop';
+export * from './saude';
+export * from './vestuario';
+export * from './acessorios-luxo';
+export * from './moda-luxo';
+export * from './produtos-intimos';
