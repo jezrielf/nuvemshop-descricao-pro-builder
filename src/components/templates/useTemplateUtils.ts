@@ -23,10 +23,10 @@ export default function useTemplateUtils() {
     'other': 'Outros'
   }), []);
 
-  // Check if a template is from the advanced collection
+  // Check if a template has a valid thumbnail (making it "advanced")
   const isAdvancedTemplate = (id: string): boolean => {
-    // Simplified function as advancedTemplates no longer exists
-    return false;
+    // For now, all templates with thumbnails are considered advanced
+    return true;
   };
 
   // Get a thumbnail for a template

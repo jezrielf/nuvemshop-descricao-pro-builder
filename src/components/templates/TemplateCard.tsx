@@ -20,13 +20,14 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
   isAdvancedTemplate,
 }) => {
   const isAdvanced = isAdvancedTemplate(template.id);
+  const thumbnailUrl = getThumbnail(template);
   
   return (
     <div className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow">
       <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
-        {isAdvanced ? (
+        {thumbnailUrl && thumbnailUrl !== '/placeholder.svg' ? (
           <img 
-            src={getThumbnail(template)} 
+            src={thumbnailUrl} 
             alt={template.name}
             className="w-full h-full object-cover"
           />
