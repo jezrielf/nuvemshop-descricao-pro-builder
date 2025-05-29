@@ -2,546 +2,282 @@
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
 
-// Fashion Template Collection
 export const fashionTemplates: Template[] = [
-  // TEMPLATE 1: Premium Fashion
   {
     id: uuidv4(),
-    name: 'Moda Premium',
+    name: 'Moda de Luxo',
     category: 'clothing',
     thumbnail: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
     blocks: [
-      // Hero Block
+      // Banner Principal
       {
         id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
-        columns: 1,
         visible: true,
-        heading: 'Elegância que transforma o seu estilo',
-        subheading: 'Descubra peças exclusivas que elevam seu visual a um novo patamar',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1560243563-062bfc001d68',
+        columns: 'full',
         style: {
           backgroundColor: '#f5f5f5',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+          padding: '80px 20px',
+          textAlign: 'center'
+        },
+        heading: 'Elegância Atemporal',
+        subheading: 'Nova coleção de roupas premium com design exclusivo e materiais sustentáveis que definem o futuro da moda',
+        buttonText: 'Ver Coleção',
+        buttonUrl: '#'
       },
-      // Benefits Block
-      {
-        id: uuidv4(),
-        type: 'benefits',
-        title: 'Diferenciais da Marca',
-        columns: 3,
-        visible: true,
-        heading: 'Por que escolher nossa marca',
-        benefits: [
-          {
-            id: uuidv4(),
-            title: 'Design Exclusivo',
-            description: 'Peças desenvolvidas por estilistas renomados com atenção aos mínimos detalhes.',
-            icon: '✨'
-          },
-          {
-            id: uuidv4(),
-            title: 'Materiais Premium',
-            description: 'Utilizamos apenas tecidos de alta qualidade que garantem conforto e durabilidade.',
-            icon: '🧵'
-          },
-          {
-            id: uuidv4(),
-            title: 'Produção Ética',
-            description: 'Compromisso com práticas sustentáveis e condições justas de trabalho.',
-            icon: '♻️'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Gallery Block
+      
+      // Galeria em 3 colunas
       {
         id: uuidv4(),
         type: 'gallery',
         title: 'Galeria da Coleção',
-        columns: 3,
         visible: true,
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Destaques da Nova Coleção',
         images: [
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b',
-            alt: 'Modelo vestindo roupa da coleção',
-            caption: 'Blazer Estruturado'
+            src: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3',
+            alt: 'Modelo vestindo casaco premium',
+            caption: 'Casaco Inverno Premium'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
-            alt: 'Modelo vestindo roupa da coleção',
-            caption: 'Vestido Midi'
+            src: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e',
+            alt: 'Detalhe de tecido premium',
+            caption: 'Tecido Exclusivo Importado'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1551232864-3f0890e580d9',
-            alt: 'Modelo vestindo roupa da coleção',
-            caption: 'Conjunto Coordenado'
+            src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
+            alt: 'Vestido elegante',
+            caption: 'Vestido de Festa Coleção Primavera'
           }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
+        ]
       },
-      // Specifications Block
-      {
-        id: uuidv4(),
-        type: 'specifications',
-        title: 'Especificações do Produto',
-        columns: 1,
-        visible: true,
-        heading: 'Detalhes técnicos',
-        specs: [
-          {
-            id: uuidv4(),
-            name: 'Composição',
-            value: '100% Algodão Egípcio'
-          },
-          {
-            id: uuidv4(),
-            name: 'Peso do Tecido',
-            value: '180g/m²'
-          },
-          {
-            id: uuidv4(),
-            name: 'Origem',
-            value: 'Fabricado no Brasil'
-          },
-          {
-            id: uuidv4(),
-            name: 'Instruções de Lavagem',
-            value: 'Lavagem à mão ou máquina em ciclo delicado, água fria'
-          },
-          {
-            id: uuidv4(),
-            name: 'Certificações',
-            value: 'GOTS (Global Organic Textile Standard)'
-          }
-        ],
-        style: {
-          backgroundColor: '#f8f9fa',
-          headingColor: '#000000',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // CTA Block
-      {
-        id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
-        visible: true,
-        heading: 'Transforme seu estilo hoje mesmo',
-        content: 'Garanta suas peças exclusivas enquanto o estoque está disponível. Frete grátis para compras acima de R$ 500.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#',
-        style: {
-          backgroundColor: '#000000',
-          headingColor: '#ffffff',
-          textColor: '#ffffff',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 2: Sustainable Fashion
-  {
-    id: uuidv4(),
-    name: 'Moda Sustentável',
-    category: 'clothing',
-    thumbnail: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Moda Consciente e Sustentável',
-        subheading: 'Peças que respeitam o planeta e valorizam o seu estilo',
-        buttonText: 'Conhecer Coleção',
-        buttonUrl: '#eco-collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1516762689617-e1cffcef479d',
-        style: {
-          backgroundColor: '#e9f5db',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Text Block
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Nossa Filosofia',
-        columns: 1,
-        visible: true,
-        heading: 'Moda com Propósito',
-        content: '<p>Acreditamos que a moda pode ser bonita, confortável e responsável. Nossa marca nasceu do desejo de criar roupas que não só destacam a beleza de quem as veste, mas também respeitam os recursos naturais e as pessoas envolvidas em sua produção.</p><p>Utilizamos materiais orgânicos, reciclados e biodegradáveis, além de práticas de produção que minimizam o impacto ambiental e garantem condições justas de trabalho para todos os envolvidos.</p>',
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // Benefits Block
+      
+      // Benefícios em 3 colunas
       {
         id: uuidv4(),
         type: 'benefits',
-        title: 'Benefícios',
-        columns: 3,
+        title: 'Diferenciais da Marca',
         visible: true,
-        heading: 'Por que escolher moda sustentável',
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        heading: 'Por Que Escolher Nossa Marca',
         benefits: [
           {
             id: uuidv4(),
-            title: 'Materiais Ecológicos',
-            description: 'Algodão orgânico, linho e tecidos reciclados livres de químicos nocivos',
-            icon: '🌱'
+            icon: '✨',
+            title: 'Design Exclusivo',
+            description: 'Peças desenvolvidas por estilistas renomados com atenção aos mínimos detalhes'
           },
           {
             id: uuidv4(),
-            title: 'Produção Responsável',
-            description: 'Processos que economizam água e reduzem emissões de carbono',
-            icon: '💧'
+            icon: '🧵',
+            title: 'Materiais Premium',
+            description: 'Utilizamos apenas tecidos de alta qualidade que garantem conforto e durabilidade'
           },
           {
             id: uuidv4(),
-            title: 'Comércio Justo',
-            description: 'Garantimos condições justas e éticas em toda nossa cadeia produtiva',
-            icon: '🤝'
-          },
-          {
-            id: uuidv4(),
-            title: 'Embalagens Sustentáveis',
-            description: 'Todas as embalagens são biodegradáveis ou recicláveis',
-            icon: '♻️'
-          },
-          {
-            id: uuidv4(),
-            title: 'Peças Duráveis',
-            description: 'Roupas feitas para durar, contrariando a lógica do fast-fashion',
-            icon: '⏳'
-          },
-          {
-            id: uuidv4(),
-            title: 'Impacto Positivo',
-            description: 'Parte das vendas é destinada a projetos ambientais',
-            icon: '🌍'
+            icon: '🌿',
+            title: 'Sustentabilidade',
+            description: 'Produção consciente com materiais eco-friendly e processos responsáveis'
           }
-        ],
-        style: {
-          backgroundColor: '#f0f8ea',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+        ]
       },
-      // Gallery Block
-      {
-        id: uuidv4(),
-        type: 'gallery',
-        title: 'Coleção Eco',
-        columns: 2,
-        visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03',
-            alt: 'Roupa sustentável',
-            caption: 'Vestido de Algodão Orgânico'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1',
-            alt: 'Roupa sustentável',
-            caption: 'Blazer de Linho Natural'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2',
-            alt: 'Acessório sustentável',
-            caption: 'Bolsa de Material Reciclado'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1523381140794-a1eef1fff818',
-            alt: 'Roupa sustentável',
-            caption: 'Calça de Tecido Eco'
-          }
-        ],
-        style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#2d6a4f',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
-        }
-      },
-      // CTA Block
-      {
-        id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
-        visible: true,
-        heading: 'Vista-se com Consciência',
-        content: 'Escolher nossas peças é optar por um futuro mais sustentável para a moda. Faça parte desta mudança.',
-        buttonText: 'Explorar Coleção Eco',
-        buttonUrl: '#eco-collection',
-        style: {
-          backgroundColor: '#52b788',
-          headingColor: '#ffffff',
-          textColor: '#ffffff',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
-      }
-    ]
-  },
-  
-  // TEMPLATE 3: Seasonal Collection
-  {
-    id: uuidv4(),
-    name: 'Coleção Sazonal',
-    category: 'clothing',
-    thumbnail: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b',
-    blocks: [
-      // Hero Block
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        columns: 1,
-        visible: true,
-        heading: 'Nova Coleção Verão 2023',
-        subheading: 'Cores vibrantes e tecidos leves para os dias mais quentes',
-        buttonText: 'Ver Lançamentos',
-        buttonUrl: '#summer-collection',
-        backgroundImage: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b',
-        style: {
-          backgroundColor: '#f9f2f2',
-          headingColor: '#d62828',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
-      },
-      // ImageText Block
+      
+      // Imagem + Texto
       {
         id: uuidv4(),
         type: 'imageText',
-        title: 'Inspiração',
-        columns: 1,
+        title: 'Materiais Premium',
         visible: true,
-        image: {
-          src: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be',
-          alt: 'Inspiração da coleção'
-        },
-        heading: 'Inspirada nas Praias Tropicais',
-        content: 'Nossa coleção de verão traz elementos das mais belas praias tropicais do mundo. Padrões inspirados na natureza, cores vibrantes que remetem ao pôr do sol e tecidos leves e fluidos que capturam a brisa do mar. Cada peça foi pensada para trazer conforto nos dias quentes sem abrir mão do estilo.',
+        columns: 'full',
         style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#d62828',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Tecidos Exclusivos de Origem Controlada',
+        content: 'Selecionamos cuidadosamente os melhores tecidos do mundo para criar peças que não apenas parecem premium, mas também proporcionam conforto e durabilidade excepcionais. Do algodão egípcio à seda italiana, cada material é escolhido pela sua qualidade superior e características únicas que fazem toda a diferença no resultado final.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1464699511458-87e156ad3a97',
+          alt: 'Tecido premium de alta qualidade'
         }
       },
-      // Features Block
+      
+      // Texto + Imagem
+      {
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Processo Artesanal',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        heading: 'Tradição Artesanal em Cada Peça',
+        content: 'Nossas peças são confeccionadas por artesãos altamente qualificados que dominam técnicas tradicionais passadas por gerações. Cada item recebe atenção meticulosa, com costuras feitas à mão e acabamentos precisos que só anos de experiência podem proporcionar. Este compromisso com a excelência se traduz em peças de qualidade incomparável.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1591382386627-349b692688ff',
+          alt: 'Artesão trabalhando em peça de roupa'
+        }
+      },
+      
+      // Recursos em 2 colunas
       {
         id: uuidv4(),
         type: 'features',
-        title: 'Características',
-        columns: 2,
+        title: 'Características da Coleção',
         visible: true,
-        heading: 'Características da Coleção',
+        columns: '2',
+        layout: 'vertical',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Características Exclusivas',
         features: [
           {
             id: uuidv4(),
-            title: 'Tecidos Naturais',
-            description: 'Linho, algodão e seda para máximo conforto em dias quentes',
-            icon: '✓'
+            icon: '🧵',
+            title: 'Costuras Reforçadas',
+            description: 'Técnicas especiais para maior durabilidade e acabamento perfeito'
           },
           {
             id: uuidv4(),
-            title: 'Cores Tropicais',
-            description: 'Paleta inspirada em destinos praiano',
-            icon: '✓'
+            icon: '🌡️',
+            title: 'Conforto Térmico',
+            description: 'Tecidos que se adaptam à temperatura corporal para máximo conforto'
           },
           {
             id: uuidv4(),
-            title: 'Proteção UV',
-            description: 'Tecidos com proteção contra raios ultravioleta',
-            icon: '✓'
+            icon: '💧',
+            title: 'Repelente à Água',
+            description: 'Tratamento especial que protege contra líquidos e manchas'
           },
           {
             id: uuidv4(),
-            title: 'Peças Versáteis',
-            description: 'Design pensado para múltiplas combinações',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Estampas Exclusivas',
-            description: 'Padrões desenvolvidos por artistas locais',
-            icon: '✓'
-          },
-          {
-            id: uuidv4(),
-            title: 'Modelagem Confortável',
-            description: 'Cortes que valorizam todos os tipos de corpos',
-            icon: '✓'
+            icon: '👔',
+            title: 'Ajuste Perfeito',
+            description: 'Modelagem estudada para valorizar todas as silhuetas'
           }
-        ],
-        style: {
-          backgroundColor: '#f9f2f2',
-          headingColor: '#d62828',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+        ]
       },
-      // Gallery Block
+      
+      // Especificações
       {
         id: uuidv4(),
-        type: 'gallery',
-        title: 'Destaques da Coleção',
-        columns: 3,
+        type: 'specifications',
+        title: 'Detalhes do Produto',
         visible: true,
-        images: [
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1577898561467-020ca3a3d56c',
-            alt: 'Vestido verão',
-            caption: 'Vestido Longo Brisa'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1480455624313-e29b44bbfde1',
-            alt: 'Camiseta verão',
-            caption: 'Camiseta Estampada Coral'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2',
-            alt: 'Acessório verão',
-            caption: 'Chapéu de Palha Natural'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1475178626620-a4d074967452',
-            alt: 'Shorts verão',
-            caption: 'Shorts Linho Coqueiro'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1545291730-faff8ca1d4b0',
-            alt: 'Bolsa verão',
-            caption: 'Bolsa de Palha Havaí'
-          },
-          {
-            id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1517345593424-21466a523b50',
-            alt: 'Sandália verão',
-            caption: 'Sandália Trançada Areia'
-          }
-        ],
+        columns: 'full',
         style: {
-          backgroundColor: '#ffffff',
-          headingColor: '#d62828',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md',
-          imageFit: 'cover'
+          padding: '60px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        heading: 'Especificações do Tecido',
+        specs: [
+          { name: 'Composição', value: '95% Algodão Egípcio, 5% Elastano' },
+          { name: 'Gramatura', value: '180g/m²' },
+          { name: 'Origem', value: 'Itália' },
+          { name: 'Certificações', value: 'GOTS, OEKO-TEX' },
+          { name: 'Lavagem', value: 'À mão ou máquina em ciclo delicado (30°C)' },
+          { name: 'Secagem', value: 'Na horizontal à sombra' }
+        ]
+      },
+      
+      // Texto + Imagem (adicional)
+      {
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Cuidados Especiais',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Como Preservar a Qualidade',
+        content: 'Para garantir que suas peças mantenham a beleza e qualidade por anos, desenvolvemos um guia completo de cuidados. Recomendamos lavagem delicada, secagem natural e armazenamento adequado. Nossa equipe de atendimento está sempre disponível para orientações personalizadas sobre cuidados específicos para cada tecido.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64',
+          alt: 'Cuidados com roupas premium'
         }
       },
-      // FAQ Block
+      
+      // Imagem standalone
+      {
+        id: uuidv4(),
+        type: 'image',
+        title: 'Coleção Completa',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa',
+          textAlign: 'center'
+        },
+        src: 'https://images.unsplash.com/photo-1604176424472-9d7e12de566c',
+        alt: 'Modelo apresentando item da coleção completa',
+        caption: 'Novo lançamento - Disponível em todas as lojas'
+      },
+      
+      // Perguntas Frequentes
       {
         id: uuidv4(),
         type: 'faq',
         title: 'Perguntas Frequentes',
-        columns: 1,
         visible: true,
-        heading: 'Dúvidas sobre a Coleção',
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Perguntas Frequentes',
         questions: [
           {
-            id: uuidv4(),
-            question: 'Quando a coleção estará disponível nas lojas físicas?',
-            answer: 'A coleção de verão chegará a todas as nossas lojas físicas a partir do dia 15 de outubro. Online, já está disponível com pré-venda.'
+            question: 'Como garantir a durabilidade das peças?',
+            answer: 'Recomendamos seguir as instruções de lavagem na etiqueta. Em geral, lave em água fria com detergente suave, evite usar alvejante e seque naturalmente para preservar as fibras e cores.'
           },
           {
-            id: uuidv4(),
-            question: 'As peças têm tamanhos inclusivos?',
-            answer: 'Sim, temos orgulho de oferecer peças do PP ao G4, garantindo que todos possam aproveitar nossa coleção.'
+            question: 'Vocês oferecem ajustes personalizados?',
+            answer: 'Sim, oferecemos serviços de ajuste para todos os produtos da coleção premium. Visite uma de nossas lojas com sua peça para uma consulta com nossos alfaiates especializados.'
           },
           {
-            id: uuidv4(),
-            question: 'Os tecidos podem ser lavados em máquina?',
-            answer: 'A maioria das peças é adequada para lavagem em máquina no ciclo delicado. Consulte a etiqueta específica de cada peça para instruções detalhadas.'
+            question: 'Qual a política de devolução?',
+            answer: 'Aceitamos devoluções em até 30 dias após a compra, desde que o produto esteja em perfeitas condições, com etiquetas originais e acompanhado da nota fiscal.'
           }
-        ],
-        style: {
-          backgroundColor: '#f9f2f2',
-          headingColor: '#d62828',
-          textColor: '#333333',
-          padding: 'lg',
-          blockSpacing: 'md'
-        }
+        ]
       },
-      // CTA Block
+      
+      // Chamada para Ação
       {
         id: uuidv4(),
         type: 'cta',
-        title: 'Chamada para Ação',
-        columns: 1,
+        title: 'Chamada Final',
         visible: true,
-        heading: 'Garanta as Peças da Nova Estação',
-        content: 'Seja o primeiro a usar as tendências do verão com nossa coleção exclusiva.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#summer-buy',
+        columns: 'full',
         style: {
-          backgroundColor: '#fb8500',
-          headingColor: '#ffffff',
+          padding: '80px 20px',
+          backgroundColor: '#000000',
           textColor: '#ffffff',
-          padding: 'lg',
-          blockSpacing: 'none'
-        }
+          textAlign: 'center'
+        },
+        heading: 'Eleve seu Guarda-Roupa ao Próximo Nível',
+        content: 'Descubra a coleção completa em nossas lojas ou faça sua compra online com frete grátis para todo o Brasil',
+        buttonText: 'Comprar Agora',
+        buttonUrl: '#'
       }
     ]
   }
 ];
-
-// For backward compatibility with existing code that might expect a single template
-export const fashionTemplate = fashionTemplates[0];

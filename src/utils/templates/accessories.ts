@@ -1,32 +1,35 @@
 
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 
 export const accessoriesTemplates: Template[] = [
   {
-    id: 'accessories-premium-1',
+    id: uuidv4(),
     name: 'Acessórios Premium',
     category: 'accessories',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1631485055112-c9b2aec772a1',
     blocks: [
+      // Banner Principal
       {
-        id: 'hero-1',
+        id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
         visible: true,
         columns: 'full',
         style: {
           backgroundColor: '#f0f0f0',
-          padding: '60px 20px',
-          borderRadius: '0',
+          padding: '80px 20px',
           textAlign: 'center'
         },
         heading: 'Acessórios que Definem Estilo',
-        subheading: 'Detalhes precisos, materiais nobres e design contemporâneo para complementar seu visual',
+        subheading: 'Detalhes precisos, materiais nobres e design contemporâneo para complementar seu visual com sofisticação única',
         buttonText: 'Explore a Coleção',
         buttonUrl: '#'
       },
+      
+      // Galeria em 3 colunas
       {
-        id: 'gallery-1',
+        id: uuidv4(),
         type: 'gallery',
         title: 'Galeria de Produtos',
         visible: true,
@@ -35,89 +38,104 @@ export const accessoriesTemplates: Template[] = [
           padding: '60px 20px',
           backgroundColor: '#ffffff'
         },
-        heading: '',
+        heading: 'Nossa Coleção Exclusiva',
         images: [
           {
+            id: uuidv4(),
             src: 'https://images.unsplash.com/photo-1631485055112-c9b2aec772a1',
             alt: 'Relógio premium em fundo neutro',
             caption: 'Relógio Cronógrafo Serie Premium'
           },
           {
+            id: uuidv4(),
             src: 'https://images.unsplash.com/photo-1509112756314-34a0badb29d4',
             alt: 'Bolsa de couro genuíno',
             caption: 'Bolsa Artesanal em Couro Italiano'
           },
           {
+            id: uuidv4(),
             src: 'https://images.unsplash.com/photo-1601740982034-56bc36106e82',
             alt: 'Joias finas',
             caption: 'Coleção Exclusiva de Joias'
           }
         ]
       },
+      
+      // Benefícios em 3 colunas
       {
-        id: 'text-1',
-        type: 'text',
-        title: 'Sobre a Coleção',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0',
-          textAlign: 'center'
-        },
-        content: '<h2 style="font-size: 28px; font-weight: 400; color: #333; margin-bottom: 24px;">Elevando o Conceito de Luxo</h2><p style="font-size: 16px; line-height: 1.8; color: #555; max-width: 800px; margin: 0 auto;">Nossa coleção de acessórios premium redefine o significado de elegância através de peças meticulosamente elaboradas que combinam design contemporâneo com técnicas artesanais tradicionais. Cada item é criado para ser não apenas um complemento ao seu visual, mas uma declaração de estilo e sofisticação.</p>'
-      },
-      {
-        id: 'benefits-1',
+        id: uuidv4(),
         type: 'benefits',
         title: 'Vantagens da Nossa Linha',
         visible: true,
         columns: '3',
         style: {
           padding: '60px 20px',
-          backgroundColor: '#f7f7f7',
-          margin: '0'
+          backgroundColor: '#f7f7f7'
         },
         heading: 'Por Que Escolher Nossos Acessórios',
         benefits: [
           {
+            id: uuidv4(),
             icon: '💎',
             title: 'Qualidade Superior',
-            description: 'Materiais premium selecionados das melhores fontes globais'
+            description: 'Materiais premium selecionados das melhores fontes globais para máxima durabilidade'
           },
           {
+            id: uuidv4(),
             icon: '🔄',
-            title: 'Durabilidade',
-            description: 'Peças projetadas para durar e manter sua beleza por anos'
+            title: 'Durabilidade Excepcional',
+            description: 'Peças projetadas para durar décadas mantendo sua beleza e funcionalidade'
           },
           {
+            id: uuidv4(),
             icon: '✨',
             title: 'Design Exclusivo',
-            description: 'Criações únicas desenvolvidas por designers renomados'
+            description: 'Criações únicas desenvolvidas por designers renomados internacionalmente'
           }
         ]
       },
+      
+      // Imagem + Texto
       {
-        id: 'imageText-1',
+        id: uuidv4(),
         type: 'imageText',
         title: 'Artesanato de Precisão',
         visible: true,
         columns: 'full',
         style: {
           padding: '60px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0'
+          backgroundColor: '#ffffff'
         },
-        heading: 'Artesanato de Excelência',
-        content: '<p style="font-size: 16px; line-height: 1.8; color: #555;">Cada peça da nossa coleção passa por um rigoroso processo de fabricação onde artesãos especializados utilizam técnicas refinadas ao longo de décadas de experiência. A atenção aos mínimos detalhes é o que diferencia nossos acessórios, desde o corte preciso do couro até o polimento final das peças metálicas.</p><p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 20px;">Este compromisso com a excelência resulta em acessórios que não apenas complementam seu visual, mas também contam uma história de tradição e qualidade.</p>',
+        heading: 'Artesanato de Excelência Mundial',
+        content: 'Cada peça da nossa coleção passa por um rigoroso processo de fabricação onde artesãos especializados utilizam técnicas refinadas ao longo de décadas de experiência. A atenção aos mínimos detalhes é o que diferencia nossos acessórios, desde o corte preciso do couro até o polimento final das peças metálicas, resultando em produtos verdadeiramente excepcionais.',
         image: {
           src: 'https://images.unsplash.com/photo-1533758488827-caf6f782e87d',
-          alt: 'Artesão trabalhando em acessório de couro',
+          alt: 'Artesão trabalhando em acessório de couro'
         }
       },
+      
+      // Texto + Imagem
       {
-        id: 'features-1',
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Materiais Selecionados',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f7f7f7'
+        },
+        heading: 'Seleção Rigorosa de Materiais Premium',
+        content: 'Trabalhamos exclusivamente com fornecedores certificados que compartilham nossos valores de qualidade e sustentabilidade. Couro italiano de primeira linha, metais nobres e componentes de precisão suíça se combinam para criar acessórios que não apenas impressionam pela beleza, mas também pela funcionalidade e longevidade excepcionais.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5',
+          alt: 'Materiais premium para acessórios'
+        }
+      },
+      
+      // Recursos em 2 colunas
+      {
+        id: uuidv4(),
         type: 'features',
         title: 'Diferenciais dos Produtos',
         visible: true,
@@ -125,98 +143,105 @@ export const accessoriesTemplates: Template[] = [
         layout: 'vertical',
         style: {
           padding: '60px 20px',
-          backgroundColor: '#f7f7f7',
-          margin: '0'
+          backgroundColor: '#ffffff'
         },
         heading: 'Características Exclusivas',
         features: [
           {
+            id: uuidv4(),
             icon: '🔧',
             title: 'Hardware Premium',
             description: 'Componentes metálicos banhados a ouro e resistentes à corrosão'
           },
           {
+            id: uuidv4(),
             icon: '🧵',
             title: 'Costuras Precisas',
-            description: 'Cada ponto é meticulosamente aplicado para garantir durabilidade'
+            description: 'Cada ponto é meticulosamente aplicado para garantir durabilidade máxima'
           },
           {
+            id: uuidv4(),
             icon: '🛡️',
             title: 'Proteção Garantida',
             description: 'Tratamentos especiais para resistência à água e manchas'
           },
           {
+            id: uuidv4(),
             icon: '🔒',
             title: 'Segurança Integrada',
-            description: 'Sistemas anti-roubo discretos em bolsas e carteiras'
+            description: 'Sistemas anti-roubo discretos em bolsas e carteiras premium'
           }
         ]
       },
+      
+      // Especificações
       {
-        id: 'image-1',
-        type: 'image',
-        title: 'Detalhe do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '20px',
-          backgroundColor: '#ffffff',
-          margin: '0',
-          textAlign: 'center'
-        },
-        src: 'https://images.unsplash.com/photo-1604695442099-4f78f3bf9623',
-        alt: 'Detalhe de costura em acessório de couro',
-        caption: 'Detalhe da costura artesanal em couro italiano de primeira qualidade'
-      },
-      {
-        id: 'specifications-1',
+        id: uuidv4(),
         type: 'specifications',
         title: 'Especificações Técnicas',
         visible: true,
         columns: 'full',
         style: {
           padding: '60px 20px',
-          backgroundColor: '#f7f7f7',
-          margin: '0'
+          backgroundColor: '#f7f7f7'
         },
         heading: 'Especificações Detalhadas',
         specs: [
           { name: 'Material Principal', value: 'Couro Italiano Full Grain' },
-          { name: 'Forro', value: 'Suede Premium' },
+          { name: 'Forro', value: 'Suede Premium Antimicrobiano' },
           { name: 'Hardware', value: 'Metal Hipoalergênico Banhado a Ouro 18k' },
           { name: 'Dimensões', value: '25cm x 18cm x 10cm' },
           { name: 'Peso', value: '0.8kg' },
           { name: 'Garantia', value: '5 anos contra defeitos de fabricação' }
         ]
       },
+      
+      // Texto + Imagem (adicional)
       {
-        id: 'textImage-1',
+        id: uuidv4(),
         type: 'textImage',
         title: 'Cuidados com o Produto',
         visible: true,
         columns: 'full',
         style: {
           padding: '60px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0'
+          backgroundColor: '#ffffff'
         },
-        heading: 'Como Preservar seu Acessório',
-        content: '<p style="font-size: 16px; line-height: 1.8; color: #555;">Para garantir que seu acessório premium mantenha sua beleza e durabilidade por muitos anos, recomendamos seguir nossas diretrizes de cuidado. Produtos em couro devem ser mantidos longe de umidade excessiva e luz solar direta. Aplique condicionador de couro específico periodicamente para manter a maciez e evitar ressecamento.</p><p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 20px;">Para peças metálicas, evite contato com perfumes, loções e outros produtos químicos que podem causar oxidação. Limpe regularmente com um pano macio e seco.</p>',
+        heading: 'Como Preservar seu Acessório Premium',
+        content: 'Para garantir que seu acessório premium mantenha sua beleza e durabilidade por muitos anos, desenvolvemos um guia completo de cuidados específicos. Produtos em couro devem ser mantidos longe de umidade excessiva e luz solar direta. Aplicamos condicionador específico periodicamente e fornecemos um kit de manutenção completo com cada compra.',
         image: {
           src: 'https://images.unsplash.com/photo-1606222074634-eb45interactionpdf10dc3b',
-          alt: 'Kit de manutenção para acessórios premium',
+          alt: 'Kit de manutenção para acessórios premium'
         }
       },
+      
+      // Imagem standalone
       {
-        id: 'faq-1',
+        id: uuidv4(),
+        type: 'image',
+        title: 'Detalhe do Produto',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f7f7f7',
+          textAlign: 'center'
+        },
+        src: 'https://images.unsplash.com/photo-1604695442099-4f78f3bf9623',
+        alt: 'Detalhe de costura em acessório de couro',
+        caption: 'Detalhe da costura artesanal em couro italiano de primeira qualidade'
+      },
+      
+      // Perguntas Frequentes
+      {
+        id: uuidv4(),
         type: 'faq',
         title: 'Perguntas Frequentes',
         visible: true,
         columns: 'full',
         style: {
           padding: '60px 20px',
-          backgroundColor: '#f7f7f7',
-          margin: '0'
+          backgroundColor: '#ffffff'
         },
         heading: 'Dúvidas Comuns',
         questions: [
@@ -234,8 +259,10 @@ export const accessoriesTemplates: Template[] = [
           }
         ]
       },
+      
+      // Chamada para Ação
       {
-        id: 'cta-1',
+        id: uuidv4(),
         type: 'cta',
         title: 'Chamada Final',
         visible: true,
@@ -243,12 +270,11 @@ export const accessoriesTemplates: Template[] = [
         style: {
           padding: '80px 20px',
           backgroundColor: '#333333',
-          color: '#ffffff',
-          margin: '0',
+          textColor: '#ffffff',
           textAlign: 'center'
         },
         heading: 'Eleve seu Estilo com Nossa Coleção Exclusiva',
-        content: 'Adquira agora um acessório premium e receba um kit de manutenção especial como cortesia',
+        content: 'Adquira agora um acessório premium e receba um kit de manutenção especial como cortesia. Frete grátis para todo o Brasil.',
         buttonText: 'Comprar Agora',
         buttonUrl: '#'
       }

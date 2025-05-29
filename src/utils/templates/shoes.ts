@@ -1,682 +1,274 @@
+
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 
 export const shoesTemplates: Template[] = [
   {
-    id: 'shoes-product-1',
-    name: 'Sapatos Modernos',
+    id: uuidv4(),
+    name: 'Calçados Premium',
     category: 'shoes',
-    thumbnail: '/templates/shoes/shoes-template-1-thumb.jpg',
+    thumbnail: 'https://images.unsplash.com/photo-1549298916-b41d501d3772',
     blocks: [
+      // Banner Principal
       {
-        id: 'hero-1',
+        id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
         visible: true,
         columns: 'full',
         style: {
           backgroundColor: '#f8f9fa',
-          padding: '40px 20px',
-          borderRadius: '8px',
+          padding: '80px 20px',
           textAlign: 'center'
         },
-        heading: 'Descubra o Conforto e Estilo dos Nossos Sapatos',
-        subheading: 'Encontre o par perfeito para cada ocasião.',
-        buttonText: 'Ver Coleção',
+        heading: 'Passos em Direção à Excelência',
+        subheading: 'Calçados que combinam conforto excepcional com design sofisticado para cada momento do seu dia',
+        buttonText: 'Explorar Coleção',
         buttonUrl: '#'
       },
+      
+      // Galeria em 3 colunas
       {
-        id: 'text-1',
-        type: 'text',
-        title: 'Descrição do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        content: '<p>Nossos sapatos são projetados para oferecer o máximo de conforto e estilo. Feitos com materiais de alta qualidade, eles são perfeitos para o uso diário e ocasiões especiais. Descubra a combinação ideal de design e funcionalidade.</p>'
-      },
-      {
-        id: 'image-1',
-        type: 'image',
-        title: 'Imagem do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '20px',
-          backgroundColor: '#ffffff',
-          textAlign: 'center'
-        },
-        src: '/templates/shoes/shoes-template-1-main.jpg',
-        alt: 'Sapatos modernos',
-        caption: 'Conforto e estilo em cada passo.'
-      },
-      {
-        id: 'features-1',
-        type: 'features',
-        title: 'Características',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#f8f9fa'
-        },
-        heading: 'Características Principais',
-        features: [
-          {
-            id: 'feature-1',
-            title: 'Conforto Superior',
-            description: 'Palmilhas macias e design ergonômico para o máximo de conforto.',
-            icon: '✓'
-          },
-          {
-            id: 'feature-2',
-            title: 'Materiais Duráveis',
-            description: 'Feitos com couro genuíno e materiais resistentes para maior durabilidade.',
-            icon: '✓'
-          },
-          {
-            id: 'feature-3',
-            title: 'Design Moderno',
-            description: 'Estilo contemporâneo que combina com qualquer look.',
-            icon: '✓'
-          }
-        ]
-      },
-      {
-        id: 'benefits-1',
-        type: 'benefits',
-        title: 'Benefícios',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        heading: 'Por que Escolher Nossos Sapatos?',
-        benefits: [
-          {
-            id: 'benefit-1',
-            title: 'Versatilidade',
-            description: 'Perfeitos para o trabalho, lazer e eventos sociais.',
-            icon: '✓'
-          },
-          {
-            id: 'benefit-2',
-            title: 'Qualidade Garantida',
-            description: 'Produzidos com rigorosos padrões de qualidade.',
-            icon: '✓'
-          },
-          {
-            id: 'benefit-3',
-            title: 'Suporte ao Cliente',
-            description: 'Atendimento personalizado para todas as suas necessidades.',
-            icon: '✓'
-          }
-        ]
-      },
-      {
-        id: 'gallery-1',
+        id: uuidv4(),
         type: 'gallery',
-        title: 'Galeria de Imagens',
+        title: 'Galeria da Coleção',
         visible: true,
-        columns: 'full',
+        columns: '3',
         style: {
-          padding: '20px',
-          backgroundColor: '#f8f9fa'
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
         },
+        heading: 'Nossa Coleção Premium',
         images: [
           {
-            id: 'gallery-image-1',
-            src: '/templates/shoes/shoes-template-1-gallery-1.jpg',
-            alt: 'Sapato em detalhe',
-            caption: 'Detalhes que fazem a diferença.'
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1549298916-b41d501d3772',
+            alt: 'Sapato social premium',
+            caption: 'Linha Executiva'
           },
           {
-            id: 'gallery-image-2',
-            src: '/templates/shoes/shoes-template-1-gallery-2.jpg',
-            alt: 'Sapato sendo usado',
-            caption: 'Estilo e conforto em movimento.'
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43',
+            alt: 'Tênis esportivo de luxo',
+            caption: 'Linha Esportiva'
+          },
+          {
+            id: uuidv4(),
+            src: 'https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f',
+            alt: 'Sapato feminino elegante',
+            caption: 'Linha Feminina'
           }
         ]
       },
+      
+      // Benefícios em 3 colunas
       {
-        id: 'cta-1',
-        type: 'cta',
-        title: 'Chamada para Ação',
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Benefícios dos Nossos Calçados',
         visible: true,
-        columns: 'full',
+        columns: '3',
         style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff',
-          textAlign: 'center'
+          padding: '60px 20px',
+          backgroundColor: '#f8f9fa'
         },
-        heading: 'Não Perca Tempo!',
-        content: 'Adquira já o seu par de sapatos e experimente o conforto e estilo que você merece.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#'
-      }
-    ]
-  },
-  {
-    id: 'shoes-product-2',
-    name: 'Tênis Esportivo',
-    category: 'shoes',
-    thumbnail: '/templates/shoes/shoes-template-2-thumb.jpg',
-    blocks: [
-      {
-        id: 'hero-1',
-        type: 'hero',
-        title: 'Banner Principal',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#e9ecef',
-          padding: '40px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
-        },
-        heading: 'Performance e Estilo com Nossos Tênis Esportivos',
-        subheading: 'Ideal para treinos e atividades do dia a dia.',
-        buttonText: 'Descobrir Agora',
-        buttonUrl: '#'
+        heading: 'Por Que Escolher Nossos Calçados',
+        benefits: [
+          {
+            id: uuidv4(),
+            icon: '👟',
+            title: 'Conforto Supremo',
+            description: 'Tecnologia de amortecimento avançada para máximo conforto durante todo o dia'
+          },
+          {
+            id: uuidv4(),
+            icon: '🏆',
+            title: 'Qualidade Premium',
+            description: 'Materiais selecionados e acabamento artesanal que garantem durabilidade excepcional'
+          },
+          {
+            id: uuidv4(),
+            icon: '✨',
+            title: 'Design Exclusivo',
+            description: 'Modelos únicos criados por designers renomados que elevam seu estilo pessoal'
+          }
+        ]
       },
+      
+      // Imagem + Texto
       {
-        id: 'image-1',
-        type: 'image',
-        title: 'Imagem do Produto',
+        id: uuidv4(),
+        type: 'imageText',
+        title: 'Artesanato Tradicional',
         visible: true,
         columns: 'full',
         style: {
-          padding: '20px',
-          backgroundColor: '#ffffff',
-          textAlign: 'center'
-        },
-        src: '/templates/shoes/shoes-template-2-main.jpg',
-        alt: 'Tênis esportivo',
-        caption: 'Seu melhor aliado nos treinos.'
-      },
-      {
-        id: 'text-1',
-        type: 'text',
-        title: 'Descrição do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
+          padding: '60px 20px',
           backgroundColor: '#ffffff'
         },
-        content: '<p>Nossos tênis esportivos combinam tecnologia e design para oferecer o melhor desempenho. Com amortecimento responsivo e materiais respiráveis, eles são perfeitos para corrida, academia e outras atividades físicas.</p>'
+        heading: 'Tradição e Inovação em Cada Passo',
+        content: 'Nossos calçados são resultado de décadas de experiência em sapataria tradicional combinada com as mais modernas tecnologias de produção. Cada par passa por mais de 50 etapas de fabricação, garantindo que você receba um produto de qualidade incomparável que durará por anos.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1582588678413-dbf45f4823e9',
+          alt: 'Artesão trabalhando em sapato'
+        }
       },
+      
+      // Texto + Imagem
       {
-        id: 'specifications-1',
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Tecnologia Avançada',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f8f9fa'
+        },
+        heading: 'Tecnologia que Faz a Diferença',
+        content: 'Incorporamos as mais avançadas tecnologias em nossos calçados: solas com retorno de energia, materiais respiráveis, sistemas de amortecimento personalizado e tratamentos antibacterianos. Tudo isso para proporcionar uma experiência única aos seus pés.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa',
+          alt: 'Tecnologia em calçados'
+        }
+      },
+      
+      // Recursos em 3 colunas
+      {
+        id: uuidv4(),
+        type: 'features',
+        title: 'Recursos Técnicos',
+        visible: true,
+        columns: '3',
+        layout: 'vertical',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Características Técnicas Avançadas',
+        features: [
+          {
+            id: uuidv4(),
+            icon: '🌬️',
+            title: 'Respirabilidade',
+            description: 'Sistema de ventilação que mantém os pés secos e frescos'
+          },
+          {
+            id: uuidv4(),
+            icon: '🛡️',
+            title: 'Proteção',
+            description: 'Reforços estratégicos para maior durabilidade'
+          },
+          {
+            id: uuidv4(),
+            icon: '⚖️',
+            title: 'Leveza',
+            description: 'Materiais ultralight para conforto durante todo o dia'
+          }
+        ]
+      },
+      
+      // Especificações
+      {
+        id: uuidv4(),
         type: 'specifications',
-        title: 'Especificações',
+        title: 'Especificações Técnicas',
         visible: true,
         columns: 'full',
         style: {
-          padding: '40px 20px',
+          padding: '60px 20px',
           backgroundColor: '#f8f9fa'
         },
-        heading: 'Especificações Técnicas',
+        heading: 'Detalhes Técnicos',
         specs: [
-          {
-            id: 'spec-1',
-            name: 'Material',
-            value: 'Mesh respirável'
-          },
-          {
-            id: 'spec-2',
-            name: 'Solado',
-            value: 'Borracha antiderrapante'
-          },
-          {
-            id: 'spec-3',
-            name: 'Amortecimento',
-            value: 'Tecnologia de absorção de impacto'
-          }
+          { name: 'Material Superior', value: 'Couro Premium Full Grain' },
+          { name: 'Forro', value: 'Tecido Respirável Antimicrobiano' },
+          { name: 'Solado', value: 'Borracha Premium com Tecnologia de Retorno de Energia' },
+          { name: 'Amortecimento', value: 'Sistema Multicamadas de Absorção de Impacto' },
+          { name: 'Peso', value: '320g (por pé - tamanho 42)' },
+          { name: 'Garantia', value: '2 anos contra defeitos de fabricação' }
         ]
       },
+      
+      // Texto + Imagem (adicional)
       {
-        id: 'benefits-1',
-        type: 'benefits',
-        title: 'Benefícios',
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Sustentabilidade',
         visible: true,
         columns: 'full',
         style: {
-          padding: '40px 20px',
+          padding: '60px 20px',
           backgroundColor: '#ffffff'
         },
-        heading: 'Por que Escolher Nossos Tênis Esportivos?',
-        benefits: [
-          {
-            id: 'benefit-1',
-            title: 'Desempenho Aprimorado',
-            description: 'Tecnologia que impulsiona seus treinos.',
-            icon: '✓'
-          },
-          {
-            id: 'benefit-2',
-            title: 'Conforto Duradouro',
-            description: 'Materiais que garantem conforto durante todo o dia.',
-            icon: '✓'
-          },
-          {
-            id: 'benefit-3',
-            title: 'Estilo Moderno',
-            description: 'Design que combina com seu estilo de vida ativo.',
-            icon: '✓'
-          }
-        ]
+        heading: 'Compromisso com o Meio Ambiente',
+        content: 'Nosso compromisso vai além da qualidade. Utilizamos processos de produção sustentáveis, materiais eco-friendly e apoiamos programas de reflorestamento. Cada par de sapatos contribui para um futuro mais verde.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09',
+          alt: 'Sustentabilidade na produção'
+        }
       },
+      
+      // Imagem standalone
       {
-        id: 'cta-1',
-        type: 'cta',
-        title: 'Chamada para Ação',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#e9ecef',
-          textAlign: 'center'
-        },
-        heading: 'Eleve Seu Desempenho!',
-        content: 'Adquira já seus tênis esportivos e sinta a diferença em cada movimento.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#'
-      }
-    ]
-  },
-  {
-    id: 'shoes-product-3',
-    name: 'Sandálias de Verão',
-    category: 'shoes',
-    thumbnail: '/templates/shoes/shoes-template-3-thumb.jpg',
-    blocks: [
-      {
-        id: 'hero-1',
-        type: 'hero',
-        title: 'Banner Principal',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#fffaf0',
-          padding: '40px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
-        },
-        heading: 'Leveza e Frescor com Nossas Sandálias de Verão',
-        subheading: 'Perfeitas para os dias quentes e ensolarados.',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#'
-      },
-      {
-        id: 'image-1',
+        id: uuidv4(),
         type: 'image',
-        title: 'Imagem do Produto',
+        title: 'Detalhe da Qualidade',
         visible: true,
         columns: 'full',
         style: {
-          padding: '20px',
-          backgroundColor: '#ffffff',
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa',
           textAlign: 'center'
         },
-        src: '/templates/shoes/shoes-template-3-main.jpg',
-        alt: 'Sandálias de verão',
-        caption: 'Seus pés merecem este conforto.'
+        src: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2',
+        alt: 'Detalhe da costura e acabamento',
+        caption: 'Atenção aos mínimos detalhes em cada acabamento'
       },
+      
+      // Perguntas Frequentes
       {
-        id: 'text-1',
-        type: 'text',
-        title: 'Descrição do Produto',
+        id: uuidv4(),
+        type: 'faq',
+        title: 'Perguntas Frequentes',
         visible: true,
         columns: 'full',
         style: {
-          padding: '40px 20px',
+          padding: '60px 20px',
           backgroundColor: '#ffffff'
         },
-        content: '<p>Nossas sandálias de verão são a escolha ideal para quem busca conforto e estilo nos dias mais quentes. Com designs modernos e materiais leves, elas proporcionam frescor e bem-estar em cada passo.</p>'
-      },
-      {
-        id: 'features-1',
-        type: 'features',
-        title: 'Características',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#fffaf0'
-        },
-        heading: 'Características Principais',
-        features: [
+        heading: 'Dúvidas Comuns',
+        questions: [
           {
-            id: 'feature-1',
-            title: 'Leveza Incrível',
-            description: 'Materiais que proporcionam a sensação de estar descalço.',
-            icon: '✓'
+            question: 'Como escolher o tamanho ideal?',
+            answer: 'Recomendamos medir os pés no final do dia quando estão ligeiramente inchados. Use nossa tabela de medidas ou visite uma de nossas lojas para experimentar.'
           },
           {
-            id: 'feature-2',
-            title: 'Design Moderno',
-            description: 'Estilo que combina com qualquer look de verão.',
-            icon: '✓'
+            question: 'Qual o período de amaciamento?',
+            answer: 'Nossos calçados são projetados para conforto imediato, mas recomendamos uso gradual nos primeiros 3-5 dias para adaptação perfeita.'
           },
           {
-            id: 'feature-3',
-            title: 'Conforto Duradouro',
-            description: 'Materiais que garantem conforto durante todo o dia.',
-            icon: '✓'
+            question: 'Como cuidar dos meus calçados?',
+            answer: 'Use produtos específicos para couro, evite umidade excessiva e permita que sequem naturalmente. Fornecemos um kit de cuidados com cada compra.'
           }
         ]
       },
+      
+      // Chamada para Ação
       {
-        id: 'gallery-1',
-        type: 'gallery',
-        title: 'Galeria de Imagens',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '20px',
-          backgroundColor: '#ffffff'
-        },
-        images: [
-          {
-            id: 'gallery-image-1',
-            src: '/templates/shoes/shoes-template-3-gallery-1.jpg',
-            alt: 'Sandália em detalhe',
-            caption: 'Detalhes que fazem a diferença.'
-          },
-          {
-            id: 'gallery-image-2',
-            src: '/templates/shoes/shoes-template-3-gallery-2.jpg',
-            alt: 'Sandália sendo usada',
-            caption: 'Estilo e conforto em cada passo.'
-          }
-        ]
-      },
-      {
-        id: 'cta-1',
+        id: uuidv4(),
         type: 'cta',
-        title: 'Chamada para Ação',
+        title: 'Chamada Final',
         visible: true,
         columns: 'full',
         style: {
-          padding: '40px 20px',
-          backgroundColor: '#fffaf0',
+          padding: '80px 20px',
+          backgroundColor: '#2c3e50',
+          textColor: '#ffffff',
           textAlign: 'center'
         },
-        heading: 'Aproveite o Verão com Estilo!',
-        content: 'Adquira já suas sandálias de verão e sinta a leveza e o frescor que você merece.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#'
-      }
-    ]
-  },
-  {
-    id: 'shoes-product-4',
-    name: 'Botas de Inverno',
-    category: 'shoes',
-    thumbnail: '/templates/shoes/shoes-template-4-thumb.jpg',
-    blocks: [
-      {
-        id: 'hero-1',
-        type: 'hero',
-        title: 'Banner Principal',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#f5f5f5',
-          padding: '40px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
-        },
-        heading: 'Aqueça Seus Pés com Nossas Botas de Inverno',
-        subheading: 'Conforto e proteção para os dias frios.',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#'
-      },
-      {
-        id: 'image-1',
-        type: 'image',
-        title: 'Imagem do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '20px',
-          backgroundColor: '#ffffff',
-          textAlign: 'center'
-        },
-        src: '/templates/shoes/shoes-template-4-main.jpg',
-        alt: 'Botas de inverno',
-        caption: 'Proteção e estilo para os dias frios.'
-      },
-      {
-        id: 'text-1',
-        type: 'text',
-        title: 'Descrição do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        content: '<p>Nossas botas de inverno são projetadas para manter seus pés quentes e protegidos nos dias mais frios. Com materiais impermeáveis e isolamento térmico, elas garantem conforto e segurança em todas as suas atividades.</p>'
-      },
-      {
-        id: 'specifications-1',
-        type: 'specifications',
-        title: 'Especificações',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#f5f5f5'
-        },
-        heading: 'Especificações Técnicas',
-        specs: [
-          {
-            id: 'spec-1',
-            name: 'Material',
-            value: 'Couro impermeável'
-          },
-          {
-            id: 'spec-2',
-            name: 'Isolamento',
-            value: 'Térmico de alta performance'
-          },
-          {
-            id: 'spec-3',
-            name: 'Solado',
-            value: 'Antiderrapante'
-          }
-        ]
-      },
-      {
-        id: 'benefits-1',
-        type: 'benefits',
-        title: 'Benefícios',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        heading: 'Por que Escolher Nossas Botas de Inverno?',
-        benefits: [
-          {
-            id: 'benefit-1',
-            title: 'Proteção Contra o Frio',
-            description: 'Mantenha seus pés quentes e protegidos.',
-            icon: '✓'
-          },
-          {
-            id: 'benefit-2',
-            title: 'Conforto Duradouro',
-            description: 'Materiais que garantem conforto durante todo o dia.',
-            icon: '✓'
-          },
-          {
-            id: 'benefit-3',
-            title: 'Segurança',
-            description: 'Solado antiderrapante para evitar quedas.',
-            icon: '✓'
-          }
-        ]
-      },
-      {
-        id: 'cta-1',
-        type: 'cta',
-        title: 'Chamada para Ação',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#f5f5f5',
-          textAlign: 'center'
-        },
-        heading: 'Prepare-se para o Inverno!',
-        content: 'Adquira já suas botas de inverno e enfrente o frio com conforto e estilo.',
-        buttonText: 'Comprar Agora',
-        buttonUrl: '#'
-      }
-    ]
-  },
-  {
-    id: 'shoes-product-5',
-    name: 'Sapatos Sociais',
-    category: 'shoes',
-    thumbnail: '/templates/shoes/shoes-template-5-thumb.jpg',
-    blocks: [
-      {
-        id: 'hero-1',
-        type: 'hero',
-        title: 'Banner Principal',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#f8f8ff',
-          padding: '40px 20px',
-          borderRadius: '8px',
-          textAlign: 'center'
-        },
-        heading: 'Elegância e Sofisticação com Nossos Sapatos Sociais',
-        subheading: 'O toque final para um look impecável.',
-        buttonText: 'Ver Coleção',
-        buttonUrl: '#'
-      },
-      {
-        id: 'image-1',
-        type: 'image',
-        title: 'Imagem do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '20px',
-          backgroundColor: '#ffffff',
-          textAlign: 'center'
-        },
-        src: '/templates/shoes/shoes-template-5-main.jpg',
-        alt: 'Sapatos sociais',
-        caption: 'Elegância em cada detalhe.'
-      },
-      {
-        id: 'text-1',
-        type: 'text',
-        title: 'Descrição do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#ffffff'
-        },
-        content: '<p>Nossos sapatos sociais são a escolha perfeita para quem busca elegância e sofisticação. Com designs clássicos e materiais de alta qualidade, eles garantem um look impecável em qualquer ocasião formal.</p>'
-      },
-      {
-        id: 'features-1',
-        type: 'features',
-        title: 'Características',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#f8f8ff'
-        },
-        heading: 'Características Principais',
-        features: [
-          {
-            id: 'feature-1',
-            title: 'Design Clássico',
-            description: 'Estilo atemporal que nunca sai de moda.',
-            icon: '✓'
-          },
-          {
-            id: 'feature-2',
-            title: 'Materiais Nobres',
-            description: 'Couro genuíno e acabamento impecável.',
-            icon: '✓'
-          },
-          {
-            id: 'feature-3',
-            title: 'Conforto Duradouro',
-            description: 'Materiais que garantem conforto durante todo o dia.',
-            icon: '✓'
-          }
-        ]
-      },
-      {
-        id: 'gallery-1',
-        type: 'gallery',
-        title: 'Galeria de Imagens',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '20px',
-          backgroundColor: '#ffffff'
-        },
-        images: [
-          {
-            id: 'gallery-image-1',
-            src: '/templates/shoes/shoes-template-5-gallery-1.jpg',
-            alt: 'Sapato social em detalhe',
-            caption: 'Detalhes que fazem a diferença.'
-          },
-          {
-            id: 'gallery-image-2',
-            src: '/templates/shoes/shoes-template-5-gallery-2.jpg',
-            alt: 'Sapato social sendo usado',
-            caption: 'Elegância em cada passo.'
-          }
-        ]
-      },
-      {
-        id: 'video-1',
-        type: 'video',
-        title: 'Vídeo do Produto',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#f8f8ff'
-        },
-        videoUrl: 'https://www.youtube.com/watch?v=your_youtube_video_id',
-        aspectRatio: '16:9',
-        autoplay: false,
-        muteAudio: true,
-        description: 'Veja como nossos sapatos sociais são feitos e como eles podem transformar seu look.'
-      },
-      {
-        id: 'cta-1',
-        type: 'cta',
-        title: 'Chamada para Ação',
-        visible: true,
-        columns: 'full',
-        style: {
-          padding: '40px 20px',
-          backgroundColor: '#f8f8ff',
-          textAlign: 'center'
-        },
-        heading: 'Eleve Seu Estilo!',
-        content: 'Adquira já seus sapatos sociais e adicione um toque de elegância ao seu guarda-roupa.',
+        heading: 'Dê o Próximo Passo com Confiança',
+        content: 'Experimente a diferença de calçados verdadeiramente premium. Frete grátis e devolução sem custo em 30 dias.',
         buttonText: 'Comprar Agora',
         buttonUrl: '#'
       }

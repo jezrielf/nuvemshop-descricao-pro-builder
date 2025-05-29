@@ -1,286 +1,288 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
-import { ibblFilterTemplate } from './products/ibbl-filter-template';
 import { gemBlendTemplate } from './products/gem-blend';
 
-// Casa e decoração templates collection
 export const casaDecoracaoTemplates: Template[] = [
-  // Template 1: Air Purifier
   {
     id: uuidv4(),
-    name: 'Purificador de Ar Premium',
+    name: 'Casa e Decoração Premium',
     category: 'casa-decoracao',
+    thumbnail: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7',
     blocks: [
+      // Banner Principal
       {
         id: uuidv4(),
         type: 'hero',
         title: 'Banner Principal',
-        heading: 'Ar Puro e Revigorante',
-        subheading: 'Desfrute de um ambiente mais saudável com nosso purificador de ar de alta performance.',
-        backgroundImage: '/assets/templates/casa-decoracao/air-purifier-hero.jpg',
-        buttonText: 'Compre Agora',
-        buttonUrl: '#',
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#f0f4f8',
-          textColor: '#333',
-          textAlign: 'center',
-          padding: '40px',
+          backgroundColor: '#f7f3f0',
+          padding: '80px 20px',
+          textAlign: 'center'
         },
+        heading: 'Transforme Sua Casa em um Lar',
+        subheading: 'Peças exclusivas de decoração que refletem seu estilo e criam ambientes únicos e acolhedores',
+        buttonText: 'Descobrir Coleção',
+        buttonUrl: '#'
       },
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Descrição do Produto',
-        heading: 'Por que escolher nosso purificador de ar?',
-        content: 'Nosso purificador de ar utiliza tecnologia de ponta para eliminar poeira, alérgenos e odores, proporcionando um ar mais limpo e saudável para você e sua família.',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#fff',
-          padding: '20px',
-          textAlign: 'left',
-        },
-      },
-      {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Recursos Avançados',
-        heading: 'Conheça os recursos que fazem a diferença',
-        layout: 'horizontal',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Filtro HEPA',
-            description: 'Remove até 99,97% das partículas no ar.',
-            icon: 'shield',
-          },
-          {
-            id: uuidv4(),
-            title: 'Ionizador',
-            description: 'Neutraliza poluentes e melhora a qualidade do ar.',
-            icon: 'zap',
-          },
-          {
-            id: uuidv4(),
-            title: 'Design Moderno',
-            description: 'Integra-se perfeitamente a qualquer ambiente.',
-            icon: 'layout',
-          },
-        ],
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#f9f9f9',
-          padding: '20px',
-        },
-      },
-      {
-        id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
-        heading: 'Transforme seu ambiente agora!',
-        content: 'Adquira já o seu purificador de ar e respire um ar mais puro e saudável.',
-        buttonText: 'Compre Agora',
-        buttonUrl: '#',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#4a90e2',
-          textColor: '#fff',
-          textAlign: 'center',
-          padding: '30px',
-        },
-      },
-    ],
-    thumbnail: '/assets/templates/casa-decoracao/air-purifier-thumbnail.jpg',
-  },
-  
-  // Template 2: Smart Home Kit
-  {
-    id: uuidv4(),
-    name: 'Kit Casa Inteligente',
-    category: 'casa-decoracao',
-    blocks: [
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        heading: 'Controle sua Casa na Palma da Mão',
-        subheading: 'Simplifique sua vida com nosso kit casa inteligente completo.',
-        backgroundImage: '/assets/templates/casa-decoracao/smart-home-hero.jpg',
-        buttonText: 'Saiba Mais',
-        buttonUrl: '#',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#28a745',
-          textColor: '#fff',
-          textAlign: 'center',
-          padding: '40px',
-        },
-      },
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Descrição do Produto',
-        heading: 'O que você pode fazer com nosso kit?',
-        content: 'Com nosso kit casa inteligente, você pode controlar a iluminação, segurança e eletrodomésticos de qualquer lugar, proporcionando conforto e segurança para sua família.',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#fff',
-          padding: '20px',
-          textAlign: 'left',
-        },
-      },
-      {
-        id: uuidv4(),
-        type: 'features',
-        title: 'Componentes do Kit',
-        heading: 'Descubra os componentes essenciais',
-        layout: 'vertical',
-        features: [
-          {
-            id: uuidv4(),
-            title: 'Central de Controle',
-            description: 'Conecte e controle todos os dispositivos.',
-            icon: 'home',
-          },
-          {
-            id: uuidv4(),
-            title: 'Sensores de Presença',
-            description: 'Detecte movimentos e acione alarmes.',
-            icon: 'eye',
-          },
-          {
-            id: uuidv4(),
-            title: 'Lâmpadas Inteligentes',
-            description: 'Ajuste a intensidade e cor da luz.',
-            icon: 'sun',
-          },
-        ],
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#f9f9f9',
-          padding: '20px',
-        },
-      },
-      {
-        id: uuidv4(),
-        type: 'cta',
-        title: 'Chamada para Ação',
-        heading: 'Comece a viver no futuro hoje!',
-        content: 'Adquira já o seu kit casa inteligente e transforme sua casa em um ambiente conectado e seguro.',
-        buttonText: 'Compre Agora',
-        buttonUrl: '#',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#28a745',
-          textColor: '#fff',
-          textAlign: 'center',
-          padding: '30px',
-        },
-      },
-    ],
-    thumbnail: '/assets/templates/casa-decoracao/smart-home-thumbnail.jpg',
-  },
-  
-  // Template 3: Decorative Lighting
-  {
-    id: uuidv4(),
-    name: 'Iluminação Decorativa',
-    category: 'casa-decoracao',
-    blocks: [
-      {
-        id: uuidv4(),
-        type: 'hero',
-        title: 'Banner Principal',
-        heading: 'Transforme Seus Espaços com Luz',
-        subheading: 'Descubra nossa coleção exclusiva de iluminação decorativa.',
-        backgroundImage: '/assets/templates/casa-decoracao/decorative-lighting-hero.jpg',
-        buttonText: 'Veja a Coleção',
-        buttonUrl: '#',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#ffc107',
-          textColor: '#333',
-          textAlign: 'center',
-          padding: '40px',
-        },
-      },
-      {
-        id: uuidv4(),
-        type: 'text',
-        title: 'Descrição do Produto',
-        heading: 'Por que a iluminação faz toda a diferença?',
-        content: 'A iluminação decorativa certa pode transformar qualquer ambiente, criando atmosferas acolhedoras e realçando a beleza de seus espaços.',
-        visible: true,
-        columns: 'full',
-        style: {
-          backgroundColor: '#fff',
-          padding: '20px',
-          textAlign: 'left',
-        },
-      },
+      
+      // Galeria em 3 colunas
       {
         id: uuidv4(),
         type: 'gallery',
-        title: 'Galeria de Produtos',
-        heading: 'Inspire-se com nossas opções',
+        title: 'Galeria de Ambientes',
+        visible: true,
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Inspire-se com Nossos Ambientes',
         images: [
           {
             id: uuidv4(),
-            src: '/assets/templates/casa-decoracao/lighting-1.jpg',
-            alt: 'Luminária Pendente',
+            src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7',
+            alt: 'Sala de estar moderna',
+            caption: 'Sala de Estar Contemporânea'
           },
           {
             id: uuidv4(),
-            src: '/assets/templates/casa-decoracao/lighting-2.jpg',
-            alt: 'Abajur Moderno',
+            src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
+            alt: 'Quarto minimalista',
+            caption: 'Quarto Minimalista'
           },
           {
             id: uuidv4(),
-            src: '/assets/templates/casa-decoracao/lighting-3.jpg',
-            alt: 'Arandela Elegante',
+            src: 'https://images.unsplash.com/photo-1556020685-ae41abfc9365',
+            alt: 'Cozinha gourmet',
+            caption: 'Cozinha Gourmet'
+          }
+        ]
+      },
+      
+      // Benefícios em 3 colunas
+      {
+        id: uuidv4(),
+        type: 'benefits',
+        title: 'Vantagens dos Nossos Produtos',
+        visible: true,
+        columns: '3',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f9f7f4'
+        },
+        heading: 'Por Que Escolher Nossos Produtos',
+        benefits: [
+          {
+            id: uuidv4(),
+            icon: '🏠',
+            title: 'Design Exclusivo',
+            description: 'Peças únicas criadas por designers renomados que transformam qualquer ambiente'
           },
-        ],
+          {
+            id: uuidv4(),
+            icon: '🌱',
+            title: 'Sustentabilidade',
+            description: 'Materiais eco-friendly e processos responsáveis para um futuro mais verde'
+          },
+          {
+            id: uuidv4(),
+            icon: '💎',
+            title: 'Qualidade Premium',
+            description: 'Materiais nobres e acabamento artesanal que garantem durabilidade e beleza'
+          }
+        ]
+      },
+      
+      // Imagem + Texto
+      {
+        id: uuidv4(),
+        type: 'imageText',
+        title: 'Artesanato Exclusivo',
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#f9f9f9',
-          padding: '20px',
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
         },
+        heading: 'Arte e Funcionalidade em Perfeita Harmonia',
+        content: 'Cada peça da nossa coleção é cuidadosamente elaborada por artesãos especializados que dominam técnicas tradicionais transmitidas por gerações. Combinamos essa expertise com design contemporâneo para criar objetos únicos que são verdadeiras obras de arte funcionais para o seu lar.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1586373962517-b2cc2bc7cf97',
+          alt: 'Artesão trabalhando em peça decorativa'
+        }
       },
+      
+      // Texto + Imagem
+      {
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Materiais Nobres',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f9f7f4'
+        },
+        heading: 'Seleção Criteriosa de Materiais',
+        content: 'Utilizamos apenas os melhores materiais disponíveis: madeiras certificadas, metais nobres, tecidos de alta qualidade e pedras naturais. Cada material é escolhido não apenas pela sua beleza, mas também pela durabilidade e impacto ambiental responsável.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89',
+          alt: 'Materiais nobres para decoração'
+        }
+      },
+      
+      // Recursos em 2 colunas
+      {
+        id: uuidv4(),
+        type: 'features',
+        title: 'Características Especiais',
+        visible: true,
+        columns: '2',
+        layout: 'vertical',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Diferenciais dos Nossos Produtos',
+        features: [
+          {
+            id: uuidv4(),
+            icon: '🔧',
+            title: 'Montagem Simples',
+            description: 'Sistema inteligente de montagem com instruções claras e ferramentas inclusas'
+          },
+          {
+            id: uuidv4(),
+            icon: '🎨',
+            title: 'Personalização',
+            description: 'Opções de customização para adequar perfeitamente ao seu estilo'
+          },
+          {
+            id: uuidv4(),
+            icon: '📐',
+            title: 'Medidas Precisas',
+            description: 'Dimensões exatas para aproveitamento otimizado do espaço'
+          },
+          {
+            id: uuidv4(),
+            icon: '🛡️',
+            title: 'Garantia Estendida',
+            description: 'Proteção completa com garantia de 5 anos contra defeitos'
+          }
+        ]
+      },
+      
+      // Especificações
+      {
+        id: uuidv4(),
+        type: 'specifications',
+        title: 'Especificações Detalhadas',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#f9f7f4'
+        },
+        heading: 'Informações Técnicas',
+        specs: [
+          { name: 'Material Principal', value: 'Madeira Maciça de Reflorestamento' },
+          { name: 'Acabamento', value: 'Verniz Ecológico UV Resistente' },
+          { name: 'Ferragens', value: 'Aço Inox Escovado Premium' },
+          { name: 'Dimensões', value: '120 x 80 x 40 cm (LxAxP)' },
+          { name: 'Peso', value: '25kg' },
+          { name: 'Capacidade', value: 'Suporta até 50kg' },
+          { name: 'Certificações', value: 'FSC, ISO 14001' }
+        ]
+      },
+      
+      // Texto + Imagem (adicional)
+      {
+        id: uuidv4(),
+        type: 'textImage',
+        title: 'Cuidados e Manutenção',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Mantenha a Beleza Por Muito Tempo',
+        content: 'Nossos produtos são desenvolvidos para durar décadas com os cuidados adequados. Fornecemos um guia completo de manutenção e oferecemos produtos específicos para limpeza e conservação. Nossa equipe de suporte está sempre disponível para orientações personalizadas.',
+        image: {
+          src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64',
+          alt: 'Cuidados com móveis e decoração'
+        }
+      },
+      
+      // Imagem standalone
+      {
+        id: uuidv4(),
+        type: 'image',
+        title: 'Ambiente Completo',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '40px 20px',
+          backgroundColor: '#f9f7f4',
+          textAlign: 'center'
+        },
+        src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7',
+        alt: 'Ambiente decorado completo',
+        caption: 'Transformação completa com nossa linha de produtos'
+      },
+      
+      // Perguntas Frequentes
+      {
+        id: uuidv4(),
+        type: 'faq',
+        title: 'Perguntas Frequentes',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '60px 20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Tire Suas Dúvidas',
+        questions: [
+          {
+            question: 'Vocês fazem entrega e montagem?',
+            answer: 'Sim! Oferecemos entrega em todo o país e serviço de montagem profissional. A montagem está inclusa em compras acima de R$ 1.000.'
+          },
+          {
+            question: 'É possível personalizar as peças?',
+            answer: 'Absolutamente! Oferecemos diversas opções de personalização incluindo cores, acabamentos e dimensões. Consulte nossa equipe para orçamento personalizado.'
+          },
+          {
+            question: 'Qual o prazo de entrega?',
+            answer: 'Peças em estoque: 5 a 10 dias úteis. Peças personalizadas: 15 a 30 dias úteis. Informamos o prazo exato no momento da compra.'
+          }
+        ]
+      },
+      
+      // Chamada para Ação
       {
         id: uuidv4(),
         type: 'cta',
-        title: 'Chamada para Ação',
-        heading: 'Ilumine seus sonhos!',
-        content: 'Explore nossa coleção de iluminação decorativa e encontre as peças perfeitas para seus espaços.',
-        buttonText: 'Compre Agora',
-        buttonUrl: '#',
+        title: 'Chamada Final',
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#ffc107',
-          textColor: '#333',
-          textAlign: 'center',
-          padding: '30px',
+          padding: '80px 20px',
+          backgroundColor: '#8B4513',
+          textColor: '#ffffff',
+          textAlign: 'center'
         },
-      },
-    ],
-    thumbnail: '/assets/templates/casa-decoracao/decorative-lighting-thumbnail.jpg',
+        heading: 'Transforme Sua Casa Hoje Mesmo',
+        content: 'Descubra nossa coleção completa e crie o lar dos seus sonhos. Consultoria gratuita e financiamento em até 12x sem juros.',
+        buttonText: 'Ver Produtos',
+        buttonUrl: '#'
+      }
+    ]
   },
   
-  // Add the IBBL filter template to the collection
-  ibblFilterTemplate,
-  
-  // Add the Gem Blend template to the collection
-  gemBlendTemplate,
+  // Manter o template do Gem Blend
+  gemBlendTemplate
 ];
