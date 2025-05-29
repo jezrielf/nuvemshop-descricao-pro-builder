@@ -26,6 +26,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(src);
+  const [fallbackUsed, setFallbackUsed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // Optimize the source URL based on preset
@@ -41,21 +42,38 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     setCurrentSrc(src);
     setIsLoaded(false);
     setHasError(false);
+    setFallbackUsed(false);
   }, [src]);
 
   const handleLoad = () => {
     setIsLoaded(true);
+    setHasError(false);
     onLoad?.();
   };
 
   const handleError = () => {
-    setHasError(true);
-    if (fallbackSrc && currentSrc !== fallbackSrc) {
+    console.log('Image load error for:', optimizedSrc);
+    
+    // Try fallback first if provided and not used yet
+    if (fallbackSrc && !fallbackUsed) {
+      console.log('Trying fallback image:', fallbackSrc);
       setCurrentSrc(fallbackSrc);
+      setFallbackUsed(true);
       setHasError(false);
-    } else {
-      onError?.();
+      return;
     }
+    
+    // Try placeholder.svg as last resort
+    if (currentSrc !== '/placeholder.svg') {
+      console.log('Trying placeholder.svg as final fallback');
+      setCurrentSrc('/placeholder.svg');
+      setHasError(false);
+      return;
+    }
+    
+    // All fallbacks failed
+    setHasError(true);
+    onError?.();
   };
 
   return (
@@ -83,10 +101,13 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         onError={handleError}
       />
       
-      {/* Error fallback */}
+      {/* Error fallback - simpler placeholder */}
       {hasError && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <span className="text-gray-400 text-sm">Imagem não encontrada</span>
+          <div className="text-center text-gray-400">
+            <div className="w-8 h-8 mx-auto mb-2 bg-gray-300 rounded"></div>
+            <span className="text-xs">Preview</span>
+          </div>
         </div>
       )}
       
