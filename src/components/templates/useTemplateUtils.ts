@@ -17,6 +17,9 @@ export default function useTemplateUtils() {
     'energy': 'Energia',
     'Casa e decoração': 'Casa e decoração',
     'casa-decoracao': 'Casa e decoração',
+    'health': 'Saúde',
+    'luxury': 'Luxo',
+    'adult': 'Produtos Íntimos',
     'other': 'Outros'
   }), []);
 
@@ -42,6 +45,9 @@ export default function useTemplateUtils() {
       'energy': '/assets/thumbnails/energy.jpg',
       'Casa e decoração': '/assets/thumbnails/home.jpg',
       'casa-decoracao': '/assets/thumbnails/home.jpg',
+      'health': '/assets/thumbnails/health.jpg',
+      'luxury': '/assets/thumbnails/luxury.jpg',
+      'adult': '/assets/thumbnails/adult.jpg',
       'other': '/assets/thumbnails/generic.jpg'
     };
     
