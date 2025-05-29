@@ -1,6 +1,7 @@
-
 import { Template } from '@/types/editor';
 import { v4 as uuidv4 } from 'uuid';
+
+console.log('Loading shoes templates...');
 
 export const shoesTemplates: Template[] = [
   {
@@ -33,7 +34,7 @@ export const shoesTemplates: Template[] = [
         type: 'gallery',
         title: 'Galeria da Coleção',
         visible: true,
-        columns: '3',
+        columns: 3,
         style: {
           padding: '60px 20px',
           backgroundColor: '#ffffff'
@@ -67,7 +68,7 @@ export const shoesTemplates: Template[] = [
         type: 'benefits',
         title: 'Benefícios dos Nossos Calçados',
         visible: true,
-        columns: '3',
+        columns: 3,
         style: {
           padding: '60px 20px',
           backgroundColor: '#f8f9fa'
@@ -139,7 +140,7 @@ export const shoesTemplates: Template[] = [
         type: 'features',
         title: 'Recursos Técnicos',
         visible: true,
-        columns: '3',
+        columns: 3,
         layout: 'vertical',
         style: {
           padding: '60px 20px',
@@ -275,3 +276,8 @@ export const shoesTemplates: Template[] = [
     ]
   }
 ];
+
+console.log(`shoes templates loaded: ${shoesTemplates.length} templates`);
+shoesTemplates.forEach((template, index) => {
+  console.log(`  ${index + 1}. ${template.name} - ${template.blocks.length} blocks`);
+});

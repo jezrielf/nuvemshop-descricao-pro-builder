@@ -1,7 +1,7 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
-import { gemBlendTemplate } from './products/gem-blend';
+
+console.log('Loading casa-decoracao templates...');
 
 export const casaDecoracaoTemplates: Template[] = [
   {
@@ -34,7 +34,7 @@ export const casaDecoracaoTemplates: Template[] = [
         type: 'gallery',
         title: 'Galeria de Ambientes',
         visible: true,
-        columns: '3',
+        columns: 3,
         style: {
           padding: '60px 20px',
           backgroundColor: '#ffffff'
@@ -68,7 +68,7 @@ export const casaDecoracaoTemplates: Template[] = [
         type: 'benefits',
         title: 'Vantagens dos Nossos Produtos',
         visible: true,
-        columns: '3',
+        columns: 3,
         style: {
           padding: '60px 20px',
           backgroundColor: '#f9f7f4'
@@ -140,7 +140,7 @@ export const casaDecoracaoTemplates: Template[] = [
         type: 'features',
         title: 'Características Especiais',
         visible: true,
-        columns: '2',
+        columns: 2,
         layout: 'vertical',
         style: {
           padding: '60px 20px',
@@ -281,8 +281,10 @@ export const casaDecoracaoTemplates: Template[] = [
         buttonUrl: '#'
       }
     ]
-  },
-  
-  // Manter o template do Gem Blend
-  gemBlendTemplate
+  }
 ];
+
+console.log(`casa-decoracao templates loaded: ${casaDecoracaoTemplates.length} templates`);
+casaDecoracaoTemplates.forEach((template, index) => {
+  console.log(`  ${index + 1}. ${template.name} - ${template.blocks.length} blocks`);
+});
