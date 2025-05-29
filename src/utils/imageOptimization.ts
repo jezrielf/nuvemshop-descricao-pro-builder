@@ -13,7 +13,8 @@ export const OPTIMIZATION_PRESETS = {
   thumbnail: { width: 400, height: 300, quality: 80, format: 'auto' as const, fit: 'crop' as const },
   gallery: { width: 800, height: 600, quality: 85, format: 'auto' as const, fit: 'crop' as const },
   hero: { width: 1200, height: 800, quality: 90, format: 'auto' as const, fit: 'crop' as const },
-  preview: { width: 300, height: 200, quality: 75, format: 'auto' as const, fit: 'crop' as const }
+  preview: { width: 300, height: 200, quality: 75, format: 'auto' as const, fit: 'crop' as const },
+  miniThumbnail: { width: 80, height: 80, quality: 70, format: 'auto' as const, fit: 'crop' as const }
 };
 
 /**

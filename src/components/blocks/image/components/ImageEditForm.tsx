@@ -6,6 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Upload } from 'lucide-react';
 import ImageLibrary from '@/components/ImageLibrary/ImageLibrary';
+import OptimizedImage from '@/components/ui/OptimizedImage';
+import { optimizeImageUrl } from '@/utils/imageOptimization';
 
 interface ImageEditFormProps {
   src: string;
@@ -33,12 +35,28 @@ const ImageEditForm: React.FC<ImageEditFormProps> = ({
   onSelectFromLibrary,
   onFileChange
 }) => {
-  // Lista de imagens placeholder
+  // Lista de imagens placeholder com URLs otimizadas
   const placeholderImages = [
-    { url: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b', alt: 'Laptop com código' },
-    { url: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d', alt: 'Pessoa usando laptop' },
-    { url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158', alt: 'Mulher trabalhando no computador' },
-    { url: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1', alt: 'Laptop na mesa' },
+    { 
+      url: optimizeImageUrl('https://images.unsplash.com/photo-1488590528505-98d2b5aba04b', 'miniThumbnail'), 
+      originalUrl: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
+      alt: 'Laptop com código' 
+    },
+    { 
+      url: optimizeImageUrl('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d', 'miniThumbnail'), 
+      originalUrl: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
+      alt: 'Pessoa usando laptop' 
+    },
+    { 
+      url: optimizeImageUrl('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158', 'miniThumbnail'), 
+      originalUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+      alt: 'Mulher trabalhando no computador' 
+    },
+    { 
+      url: optimizeImageUrl('https://images.unsplash.com/photo-1531297484001-80022131f5a1', 'miniThumbnail'), 
+      originalUrl: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
+      alt: 'Laptop na mesa' 
+    },
   ];
 
   return (
@@ -73,7 +91,7 @@ const ImageEditForm: React.FC<ImageEditFormProps> = ({
             </div>
           </div>
           
-          {/* Alternativa de imagens pré-definidas */}
+          {/* Alternativa de imagens pré-definidas otimizadas */}
           <div className="mt-4">
             <p className="text-sm font-medium mb-2">Imagens pré-definidas:</p>
             <div className="grid grid-cols-4 gap-2">
@@ -81,12 +99,14 @@ const ImageEditForm: React.FC<ImageEditFormProps> = ({
                 <div 
                   key={index} 
                   className="cursor-pointer border rounded-md overflow-hidden hover:ring-2 hover:ring-primary"
-                  onClick={() => onSelectFromLibrary(img.url, img.alt)}
+                  onClick={() => onSelectFromLibrary(img.originalUrl, img.alt)}
                 >
-                  <img 
-                    src={img.url} 
-                    alt={img.alt} 
-                    className="h-20 w-full object-cover"
+                  <OptimizedImage
+                    src={img.url}
+                    alt={img.alt}
+                    preset="miniThumbnail"
+                    className="h-20 w-full"
+                    loading="lazy"
                   />
                 </div>
               ))}
