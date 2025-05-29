@@ -8,4 +8,7 @@ export type ProductCategory =
   | 'energy'
   | 'casa-decoracao'
   | 'Casa e decoração'
+  | 'health'
+  | 'luxury'
+  | 'adult'
   | 'other';
