@@ -2,6 +2,7 @@
 import React from 'react';
 import { GalleryBlock } from '@/types/editor';
 import { Image } from 'lucide-react';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface GalleryPreviewProps {
   block: GalleryBlock;
@@ -40,10 +41,12 @@ const GalleryPreview: React.FC<GalleryPreviewProps> = ({ block }) => {
         {block.images && block.images.map(image => (
           <figure key={image.id} className="text-center">
             {image.src ? (
-              <img
+              <OptimizedImage
                 src={image.src}
                 alt={image.alt}
-                className={`w-full h-auto ${imageObjectFit} rounded-md`}
+                preset="gallery"
+                className={`w-full h-auto rounded-md ${imageObjectFit}`}
+                loading="lazy"
               />
             ) : (
               <div className="bg-gray-100 aspect-video flex items-center justify-center rounded-md">

@@ -1,15 +1,22 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Template } from '@/types/editor';
+import { optimizeImageUrl } from '@/utils/imageOptimization';
 
 console.log('Loading moda-luxo templates...');
+
+// Optimized Unsplash URLs for better performance
+const OPTIMIZED_IMAGES = {
+  hero: optimizeImageUrl('https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7', 'hero'),
+  thumbnail: optimizeImageUrl('https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7', 'thumbnail'),
+  gallery: optimizeImageUrl('https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7', 'gallery'),
+};
 
 export const modaLuxoTemplates: Template[] = [
   {
     id: uuidv4(),
     name: 'Moda Luxo Couture',
     category: 'luxury',
-    thumbnail: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+    thumbnail: OPTIMIZED_IMAGES.thumbnail,
     blocks: [
       // Banner Principal
       {
@@ -45,13 +52,13 @@ export const modaLuxoTemplates: Template[] = [
         images: [
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+            src: OPTIMIZED_IMAGES.gallery,
             alt: 'Haute couture dress',
             caption: 'Vestidos de Gala'
           },
           {
             id: uuidv4(),
-            src: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+            src: OPTIMIZED_IMAGES.gallery,
             alt: 'Luxury suits',
             caption: 'Ternos Exclusivos'
           }
@@ -106,7 +113,7 @@ export const modaLuxoTemplates: Template[] = [
         heading: 'O Processo da Alta Costura',
         content: 'Cada peça couture passa por mais de 200 horas de trabalho manual. Nossos mestres artesãos utilizam técnicas centenárias transmitidas através de gerações, combinadas com inovação contemporânea. Desde o primeiro esboço até a entrega final, cada detalhe é meticulosamente planejado e executado à mão.',
         image: {
-          src: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+          src: OPTIMIZED_IMAGES.gallery,
           alt: 'Processo artesanal de costura'
         }
       },
@@ -125,7 +132,7 @@ export const modaLuxoTemplates: Template[] = [
         heading: 'Materiais de Exceção',
         content: 'Trabalhamos exclusivamente com as mais prestigiadas tecelagens europeias. Sedas de Lyon, lãs de Cashmere do Himalaia, algodões egípcios de fibra extra-longa e tecidos desenvolvidos especialmente para nossa marca. Cada metro é selecionado pela qualidade excepcional e raridade.',
         image: {
-          src: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+          src: OPTIMIZED_IMAGES.gallery,
           alt: 'Tecidos de luxo exclusivos'
         }
       },
@@ -203,7 +210,7 @@ export const modaLuxoTemplates: Template[] = [
         heading: 'Atendimento Exclusivo de Ateliê',
         content: 'A experiência couture começa com uma consulta privativa em nosso ateliê. Nosso estilista principal trabalha diretamente com você para criar uma peça que reflita sua personalidade e estilo. Cada encontro é uma sessão de criação colaborativa, onde seus sonhos se tornam realidade.',
         image: {
-          src: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+          src: OPTIMIZED_IMAGES.gallery,
           alt: 'Consulta personalizada em ateliê'
         }
       },
@@ -220,7 +227,7 @@ export const modaLuxoTemplates: Template[] = [
           backgroundColor: '#f8f8f8',
           textAlign: 'center'
         },
-        src: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7',
+        src: OPTIMIZED_IMAGES.gallery,
         alt: 'Obra de arte da alta costura',
         caption: 'Onde a moda encontra a arte - Criações que transcendem o tempo'
       },

@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
 import { Template } from '@/types/editor';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface TemplateCardProps {
   template: Template;
@@ -26,10 +27,12 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
     <div className="border rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow">
       <div className="bg-gray-100 h-32 flex items-center justify-center overflow-hidden">
         {thumbnailUrl && thumbnailUrl !== '/placeholder.svg' ? (
-          <img 
-            src={thumbnailUrl} 
+          <OptimizedImage
+            src={thumbnailUrl}
             alt={template.name}
-            className="w-full h-full object-cover"
+            preset="thumbnail"
+            className="w-full h-full"
+            loading="lazy"
           />
         ) : (
           <span className="text-gray-400 text-sm">

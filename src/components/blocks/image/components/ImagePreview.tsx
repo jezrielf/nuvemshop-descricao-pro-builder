@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ImageBlock } from '@/types/editor';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface ImagePreviewProps {
   block: ImageBlock;
@@ -12,10 +13,12 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ block }) => {
       <div className="max-w-2xl mx-auto">
         {block.src ? (
           <>
-            <img 
-              src={block.src} 
-              alt={block.alt || 'Imagem do produto'} 
+            <OptimizedImage
+              src={block.src}
+              alt={block.alt || 'Imagem do produto'}
+              preset="gallery"
               className="w-full h-auto rounded-md"
+              loading="lazy"
             />
             {block.caption && (
               <p className="text-sm text-gray-500 text-center mt-2">{block.caption}</p>
