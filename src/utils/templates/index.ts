@@ -6,6 +6,9 @@ import { accessoriesTemplates } from './accessories';
 import { gemBlendTemplate } from './products/gem-blend';
 import { shoesTemplates } from './shoes';
 import { casaDecoracaoTemplates } from './casa-decoracao';
+import { eletronicoTemplates } from './eletronicos';
+import { belezaTemplates } from './beleza';
+import { petShopTemplates } from './pet-shop';
 
 // Debug logging for template loading
 console.log('Loading templates from individual files:');
@@ -15,15 +18,21 @@ console.log('- Accessories templates:', accessoriesTemplates.length);
 console.log('- Gem blend template:', gemBlendTemplate ? 1 : 0);
 console.log('- Shoes templates:', shoesTemplates.length);
 console.log('- Casa decoração templates:', casaDecoracaoTemplates.length);
+console.log('- Eletrônicos templates:', eletronicoTemplates.length);
+console.log('- Beleza templates:', belezaTemplates.length);
+console.log('- Pet Shop templates:', petShopTemplates.length);
 
-// Combining only the selected templates
+// Combining all templates including the new ones
 export const allTemplates: Template[] = [
   ...supplementsTemplates,
   ...fashionTemplates,
   ...accessoriesTemplates,
   gemBlendTemplate,
   ...shoesTemplates,
-  ...casaDecoracaoTemplates
+  ...casaDecoracaoTemplates,
+  ...eletronicoTemplates,
+  ...belezaTemplates,
+  ...petShopTemplates
 ];
 
 console.log('Total templates combined:', allTemplates.length);
@@ -50,3 +59,6 @@ export * from './accessories';
 export * from './products/gem-blend';
 export * from './shoes';
 export * from './casa-decoracao';
+export * from './eletronicos';
+export * from './beleza';
+export * from './pet-shop';
