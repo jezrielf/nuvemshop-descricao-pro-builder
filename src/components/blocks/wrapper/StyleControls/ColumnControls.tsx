@@ -10,7 +10,7 @@ interface ColumnControlsProps {
 }
 
 const ColumnControls: React.FC<ColumnControlsProps> = ({ block, updateStyle }) => {
-  const currentColumns = block.columns || 'full';
+  const currentColumns = String(block.columns || 'full');
   
   // Definir quais tipos de bloco suportam controle de colunas
   const supportsColumns = ['gallery', 'benefits', 'features'].includes(block.type);
@@ -20,7 +20,12 @@ const ColumnControls: React.FC<ColumnControlsProps> = ({ block, updateStyle }) =
   }
   
   const handleColumnChange = (value: string) => {
-    updateStyle({ columns: value });
+    // Convert string values back to appropriate types
+    let columnValue: string | number = value;
+    if (value === '1' || value === '2' || value === '3' || value === '4') {
+      columnValue = parseInt(value);
+    }
+    updateStyle({ columns: columnValue });
   };
   
   return (
