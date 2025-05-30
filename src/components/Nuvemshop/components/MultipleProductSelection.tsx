@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -50,6 +49,18 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     }
   };
 
+  const resetDialogState = () => {
+    setSelectedProducts([]);
+    setUpdateStatuses([]);
+    setProgress(0);
+    setIsUpdating(false);
+  };
+
+  const handleClose = () => {
+    resetDialogState();
+    onClose();
+  };
+
   const handleApplyDescriptions = async () => {
     if (selectedProducts.length === 0) {
       toast({
@@ -66,22 +77,30 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
 
     if (!confirmed) return;
 
+    console.log('Iniciando aplicação em múltiplos produtos:', selectedProducts);
+    
     setIsUpdating(true);
     setProgress(0);
     
     // Initialize status for all selected products
-    setUpdateStatuses(selectedProducts.map(id => ({ id, status: 'pending' })));
+    const initialStatuses = selectedProducts.map(id => ({ id, status: 'pending' as const }));
+    setUpdateStatuses(initialStatuses);
 
     try {
+      console.log('Chamando onApplyToProducts com IDs:', selectedProducts);
+      
+      // Call the parent function to handle the updates
       await onApplyToProducts(selectedProducts);
       
-      // Mark all as successful
-      setUpdateStatuses(selectedProducts.map(id => ({ 
-        id, 
-        status: 'success',
-        message: 'Descrição atualizada com sucesso'
-      })));
+      console.log('onApplyToProducts executado com sucesso');
       
+      // Mark all as successful if no error was thrown
+      const successStatuses = selectedProducts.map(id => ({ 
+        id, 
+        status: 'success' as const,
+        message: 'Descrição atualizada com sucesso'
+      }));
+      setUpdateStatuses(successStatuses);
       setProgress(100);
       
       toast({
@@ -89,30 +108,29 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
         description: `Descrições aplicadas a ${selectedProducts.length} produto(s) com sucesso!`,
       });
       
-      // Close dialog after success
+      // Close dialog after success with a small delay to show the success state
       setTimeout(() => {
-        onClose();
-        setSelectedProducts([]);
-        setUpdateStatuses([]);
-        setProgress(0);
-      }, 2000);
+        handleClose();
+      }, 1500);
       
     } catch (error) {
       console.error('Erro ao aplicar descrições:', error);
       
       // Mark all as error
-      setUpdateStatuses(selectedProducts.map(id => ({ 
+      const errorStatuses = selectedProducts.map(id => ({ 
         id, 
-        status: 'error',
-        message: 'Erro ao atualizar descrição'
-      })));
+        status: 'error' as const,
+        message: error instanceof Error ? error.message : 'Erro ao atualizar descrição'
+      }));
+      setUpdateStatuses(errorStatuses);
       
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Ocorreu um erro ao aplicar as descrições. Tente novamente.',
+        description: error instanceof Error ? error.message : 'Ocorreu um erro ao aplicar as descrições. Tente novamente.',
       });
-    } finally {
+      
+      // Reset updating state but keep the dialog open to show errors
       setIsUpdating(false);
     }
   };
@@ -128,7 +146,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -194,6 +212,12 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
                         SKU: {product.sku}
                       </div>
                     )}
+                    
+                    {status?.message && (
+                      <div className={`text-sm ${status.status === 'error' ? 'text-red-600' : 'text-green-600'}`}>
+                        {status.message}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Status indicator */}
@@ -219,10 +243,10 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
           <div className="flex justify-end gap-2">
             <Button 
               variant="outline" 
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isUpdating}
             >
-              Cancelar
+              {isUpdating ? 'Cancelar' : 'Fechar'}
             </Button>
             <Button 
               onClick={handleApplyDescriptions}

@@ -23,7 +23,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
   const { accessToken, userId } = useNuvemshopAuth();
-  const { description } = useEditorStore();
+  const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
   
   const {
@@ -72,34 +72,64 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     setIsOpen(false);
   };
 
-  // Handle applying description to multiple products
+  // Handle applying description to multiple products with improved error handling and progress tracking
   const handleApplyToMultipleProducts = async (productIds: number[]) => {
     if (!description) {
-      throw new Error('Nenhuma descrição ativa');
+      throw new Error('Nenhuma descrição ativa para aplicar');
     }
 
-    const failedUpdates: number[] = [];
+    console.log('Iniciando aplicação para produtos:', productIds);
+    console.log('Descrição atual:', description);
+
+    const errors: Array<{ productId: number; error: string }> = [];
     
     for (let i = 0; i < productIds.length; i++) {
       const productId = productIds[i];
       const product = products.find(p => p.id === productId);
       
-      if (product) {
-        try {
-          const success = await handleSaveToNuvemshop(product);
-          if (!success) {
-            failedUpdates.push(productId);
-          }
-        } catch (error) {
-          console.error(`Erro ao atualizar produto ${productId}:`, error);
-          failedUpdates.push(productId);
+      if (!product) {
+        console.error(`Produto não encontrado para ID: ${productId}`);
+        errors.push({ productId, error: 'Produto não encontrado' });
+        continue;
+      }
+      
+      try {
+        console.log(`Processando produto ${i + 1}/${productIds.length}: ${productId}`);
+        
+        // Get product title for HTML generation
+        const productTitle = product.name && typeof product.name === 'object' && product.name.pt 
+          ? product.name.pt 
+          : (typeof product.name === 'string' ? product.name : '');
+
+        console.log(`Título do produto: ${productTitle}`);
+        
+        // Generate HTML output with product title
+        const htmlOutput = getHtmlOutput(productTitle);
+        console.log(`HTML gerado (primeiros 100 chars): ${htmlOutput.substring(0, 100)}...`);
+        
+        const success = await handleSaveToNuvemshop(product);
+        
+        if (!success) {
+          console.error(`Falha ao salvar produto ${productId}`);
+          errors.push({ productId, error: 'Falha ao salvar na Nuvemshop' });
+        } else {
+          console.log(`Produto ${productId} atualizado com sucesso`);
         }
+      } catch (error) {
+        console.error(`Erro ao processar produto ${productId}:`, error);
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+        errors.push({ productId, error: errorMessage });
       }
     }
 
-    if (failedUpdates.length > 0) {
-      throw new Error(`Falha ao atualizar ${failedUpdates.length} produto(s)`);
+    // If there were errors, throw an error with details
+    if (errors.length > 0) {
+      const errorMessage = `Falha ao atualizar ${errors.length} de ${productIds.length} produto(s)`;
+      console.error('Erros encontrados:', errors);
+      throw new Error(errorMessage);
     }
+
+    console.log(`Todos os ${productIds.length} produtos foram atualizados com sucesso`);
   };
 
   // Helper to render product name
