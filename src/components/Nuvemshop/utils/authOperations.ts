@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { NuvemshopAuthResponse } from '../types';
 
@@ -7,23 +8,50 @@ import { NuvemshopAuthResponse } from '../types';
 export const exchangeCodeForToken = async (authCode: string): Promise<NuvemshopAuthResponse> => {
   console.log('Processing authorization code:', authCode);
   
-  // Call the Edge Function to exchange the code for an access token
-  const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-auth', {
-    body: { code: authCode },
-  });
-  
-  if (functionError) {
-    console.error('Function error:', functionError);
-    throw new Error(`Function error: ${functionError.message}`);
+  try {
+    // Call the Edge Function to exchange the code for an access token
+    const { data, error: functionError } = await supabase.functions.invoke('nuvemshop-auth', {
+      body: { code: authCode },
+    });
+    
+    if (functionError) {
+      console.error('Function error:', functionError);
+      throw new Error(`Erro na conexão: ${functionError.message}`);
+    }
+    
+    if (data?.error) {
+      console.error('API error:', data.error);
+      
+      // Provide more user-friendly error messages
+      let userMessage = 'Erro ao conectar com a Nuvemshop';
+      if (data.details) {
+        if (typeof data.details === 'string' && data.details.includes('invalid_grant')) {
+          userMessage = 'Código de autorização inválido ou expirado. Tente conectar novamente.';
+        } else if (typeof data.details === 'string' && data.details.includes('unauthorized')) {
+          userMessage = 'Credenciais inválidas. Verifique a configuração do app na Nuvemshop.';
+        } else {
+          userMessage = `${userMessage}: ${data.details}`;
+        }
+      }
+      
+      throw new Error(userMessage);
+    }
+    
+    if (!data) {
+      throw new Error('Resposta vazia da Nuvemshop. Tente novamente.');
+    }
+    
+    console.log('Authentication success:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in exchangeCodeForToken:', error);
+    // Re-throw the error with additional context if needed
+    if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error('Erro desconhecido ao conectar com a Nuvemshop');
+    }
   }
-  
-  if (data.error) {
-    console.error('API error:', data.error);
-    throw new Error(data.error);
-  }
-  
-  console.log('Authentication success:', data);
-  return data;
 };
 
 /**
@@ -92,5 +120,23 @@ export const clearAuthCodeFromUrl = () => {
     // Update browser history without navigating
     window.history.replaceState({}, document.title, cleanUrl);
     console.log("Código de autorização e parâmetros de estado removidos da URL");
+  }
+};
+
+/**
+ * Test connection to Nuvemshop API
+ */
+export const testNuvemshopConnection = async (): Promise<boolean> => {
+  try {
+    // Simple test to check if we can reach Nuvemshop
+    const response = await fetch('https://www.tiendanube.com/apps/', {
+      method: 'HEAD',
+      mode: 'no-cors'
+    });
+    
+    return true; // If we reach here, connection is working
+  } catch (error) {
+    console.error('Connection test failed:', error);
+    return false;
   }
 };

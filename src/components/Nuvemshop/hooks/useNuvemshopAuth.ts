@@ -7,7 +7,8 @@ import {
   exchangeCodeForToken, 
   getNuvemshopAuthUrl, 
   detectAuthCode,
-  clearAuthCodeFromUrl
+  clearAuthCodeFromUrl,
+  testNuvemshopConnection
 } from '../utils/authOperations';
 
 export function useNuvemshopAuth() {
@@ -72,7 +73,19 @@ export function useNuvemshopAuth() {
       setError(null);
       
       console.log("Processando código de autorização:", authCode);
+      
+      // Test connection first
+      const connectionTest = await testNuvemshopConnection();
+      if (!connectionTest) {
+        console.warn('Connection test failed, but proceeding with authentication');
+      }
+      
       const data = await exchangeCodeForToken(authCode);
+      
+      // Validate response data
+      if (!data.access_token || !data.user_id) {
+        throw new Error('Resposta inválida da Nuvemshop: dados de acesso não encontrados');
+      }
       
       // Validate and sanitize store name
       let validStoreName = 'Loja Nuvemshop';
@@ -97,11 +110,20 @@ export function useNuvemshopAuth() {
       return true;
     } catch (err: any) {
       console.error('Erro na autenticação:', err);
-      setError(err.message);
+      
+      // Provide user-friendly error messages
+      let errorMessage = err.message;
+      if (errorMessage.includes('Failed to fetch')) {
+        errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      } else if (errorMessage.includes('NetworkError')) {
+        errorMessage = 'Erro de rede. Tente novamente em alguns momentos.';
+      }
+      
+      setError(errorMessage);
       toast({
         variant: 'destructive',
         title: 'Erro ao conectar',
-        description: err.message,
+        description: errorMessage,
       });
       return false;
     } finally {
@@ -111,6 +133,7 @@ export function useNuvemshopAuth() {
 
   const handleConnect = () => {
     setLoading(true);
+    setError(null);
     // Limpar o cache antes de conectar
     clearAuthCache(false);
     // Redirect to Nuvemshop authorization URL
@@ -148,6 +171,8 @@ export function useNuvemshopAuth() {
     setStoreName(null);
     setSuccess(false);
     setError(null);
+    setLoading(false);
+    setAutoAuthTriggered(false);
     
     if (showNotification) {
       toast({
