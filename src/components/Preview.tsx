@@ -16,10 +16,15 @@ const Preview: React.FC = () => {
   
   // Update HTML output whenever description changes
   useEffect(() => {
+    console.log('Preview useEffect triggered - description:', !!description);
+    console.log('Preview useEffect triggered - blocks count:', description?.blocks?.length || 0);
+    
     if (description) {
-      // Generate fresh HTML output
       try {
+        // Generate fresh HTML output
         let output = getHtmlOutput();
+        console.log('Generated HTML output length:', output.length);
+        console.log('Generated HTML output preview:', output.substring(0, 200) + '...');
         
         // Add data attributes to blocks for focus functionality
         if (description.blocks) {
@@ -29,13 +34,16 @@ const Preview: React.FC = () => {
           });
         }
         
-        console.log('Generated HTML output:', output.substring(0, 100) + '...');
         setHtmlOutput(output);
       } catch (error) {
-        console.error('Error generating HTML output:', error);
+        console.error('Error generating HTML output in Preview:', error);
+        setHtmlOutput('<p>Erro ao gerar pré-visualização</p>');
       }
+    } else {
+      console.log('No description available for preview');
+      setHtmlOutput('');
     }
-  }, [description, getHtmlOutput, focusedBlockId]);
+  }, [description, description?.blocks, getHtmlOutput, focusedBlockId]);
   
   if (!description) {
     return (
@@ -48,6 +56,7 @@ const Preview: React.FC = () => {
   }
   
   const visibleBlocks = description.blocks.filter(block => block.visible);
+  console.log('Visible blocks count:', visibleBlocks.length);
   
   return (
     <div className="h-full flex flex-col">
@@ -104,11 +113,16 @@ const Preview: React.FC = () => {
           ref={previewRef}
           className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}
         >
-          {visibleBlocks.length > 0 ? (
+          {htmlOutput && htmlOutput.trim() ? (
             <div 
               className="preview-container"
               dangerouslySetInnerHTML={{ __html: htmlOutput }}
             />
+          ) : visibleBlocks.length > 0 ? (
+            <div className="text-center p-8 text-gray-500">
+              <p>Gerando pré-visualização...</p>
+              <p className="text-sm mt-2">Se o problema persistir, tente recarregar a página.</p>
+            </div>
           ) : (
             <div className="text-center p-8 text-gray-500">
               <p>Nenhum bloco visível para exibir.</p>
