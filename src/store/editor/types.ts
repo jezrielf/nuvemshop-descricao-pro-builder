@@ -29,7 +29,8 @@ export interface EditorState {
   reorderBlocks: (fromIndex: number, toIndex: number) => void;
   selectBlock: (id: string | null) => void;
   focusBlock: (id: string | null) => void; // Nova ação para focar bloco na preview
-  getHtmlOutput: () => string;
+  getHtmlOutput: (productTitle?: string) => string; // Updated to accept optional parameter
+  getPlainTextOutput: () => string; // Added missing method
   saveCurrentDescription: (isNewDescription?: boolean) => boolean;
   loadSavedDescriptions: () => void;
   getSavedDescriptions: () => ProductDescription[];
