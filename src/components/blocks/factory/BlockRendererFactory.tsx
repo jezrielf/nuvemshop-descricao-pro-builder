@@ -56,21 +56,21 @@ export class BlockRendererFactory {
         case 'gallery':
           return <GalleryBlock key={block.id} block={block} isPreview={isPreview} />;
         default:
-          console.warn(`BlockRendererFactory: Block type ${(block as Block).type} not implemented yet`);
+          console.warn(`BlockRendererFactory: Block type ${block.type} not implemented yet`);
           return (
             <div className="p-4 border border-gray-200 rounded-md" key={block.id}>
               <p className="text-sm text-gray-500">
-                Bloco do tipo "{(block as Block).type}" ainda não implementado.
+                Bloco do tipo "{block.type}" ainda não implementado.
               </p>
             </div>
           );
       }
     } catch (error) {
-      console.error(`BlockRendererFactory: Error rendering block of type ${(block as Block).type}:`, error);
+      console.error(`BlockRendererFactory: Error rendering block of type ${block.type}:`, error);
       return (
         <div className="p-4 border border-red-200 rounded-md bg-red-50" key={block.id}>
           <p className="text-sm text-red-500">
-            Erro ao renderizar bloco do tipo "{(block as Block).type}".
+            Erro ao renderizar bloco do tipo "{block.type}".
           </p>
         </div>
       );
