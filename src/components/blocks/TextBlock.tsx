@@ -55,25 +55,39 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
   };
   
   const handleUpdateContent = (rawContent: string) => {
+    // Convert line breaks to <br> tags and wrap in paragraph if needed
+    let content = rawContent;
+    
+    // If content contains line breaks, convert them to <br> tags
+    if (content.includes('\n')) {
+      content = content.replace(/\n/g, '<br>');
+    }
+    
     // Wrap plain text in paragraph tags if it doesn't contain HTML
-    const content = !rawContent.includes('<') 
-      ? `<p>${rawContent}</p>` 
-      : rawContent;
+    if (!content.includes('<') && content.trim()) {
+      content = `<p>${content}</p>`;
+    } else if (content.trim() && !content.startsWith('<')) {
+      content = `<p>${content}</p>`;
+    }
+    
     updateBlock(block.id, { content });
   };
   
-  // Convert HTML to plain text for editing
+  // Convert HTML to plain text for editing, preserving line breaks
   const getPlainTextContent = (html: string) => {
     if (!html) return '';
     const temp = document.createElement('div');
     temp.innerHTML = html;
+    // Convert <br> tags back to line breaks for editing
+    const textWithBreaks = temp.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+    temp.innerHTML = textWithBreaks;
     return temp.innerText;
   };
   
   // Handler for AI-generated content
   const handleGeneratedContent = (content: string) => {
     const formattedContent = content.startsWith('<') ? content : `<p>${content}</p>`;
-    handleUpdateContent(formattedContent);
+    updateBlock(block.id, { content: formattedContent });
   };
 
   const handleGeneratedHeading = (heading: string) => {
@@ -132,7 +146,7 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
               rows={8}
             />
             <div className="mt-1 text-xs text-gray-500">
-              Digite seu texto normalmente. A formatação será aplicada automaticamente.
+              Digite seu texto normalmente. Pressione Enter para quebras de linha.
             </div>
           </div>
         </div>

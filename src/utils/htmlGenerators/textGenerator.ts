@@ -52,6 +52,9 @@ export const generateTextHtml = (block: TextBlock): string => {
     }
   }
   
+  // Ensure line breaks are properly formatted in HTML output
+  content = content.replace(/\n/g, '<br>');
+  
   // Format text according to the style settings
   let textStyle = '';
   

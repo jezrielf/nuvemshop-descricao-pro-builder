@@ -29,8 +29,7 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
         : (typeof product.name === 'string' ? product.name : '');
       
       // Generate HTML with product title
-      // Fix: Don't pass productTitle if getHtmlOutput doesn't accept arguments
-      const htmlOutput = getHtmlOutput();
+      const htmlOutput = getHtmlOutput(productTitle);
       
       const success = await updateProductDescription(product.id, htmlOutput);
       

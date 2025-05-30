@@ -1,160 +1,285 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import { NuvemshopProduct } from '../types';
-import { useNuvemshopProducts } from '../hooks/useNuvemshopProducts';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Search, Package, RefreshCw, Users } from 'lucide-react';
 import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
-import { Spinner } from '@/components/ui/spinner';
-import { useEditorStore } from '@/store/editor';
+import { useNuvemshopProducts } from '../hooks/useNuvemshopProducts';
+import { useProductDescriptionSaver } from '../hooks/useProductDescriptionSaver';
+import { NuvemshopProduct } from '../types';
 import { useToast } from '@/hooks/use-toast';
+import { useEditorStore } from '@/store/editor';
+import MultipleProductSelection from './MultipleProductSelection';
 
 interface ProductSearchProps {
-  onProductSelect?: (product: NuvemshopProduct) => void;
+  onProductSelect: (product: NuvemshopProduct) => void;
 }
 
 const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
-  const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const { accessToken, userId, success: isConnected } = useNuvemshopAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
+  const { accessToken, userId } = useNuvemshopAuth();
+  const { description } = useEditorStore();
   const { toast } = useToast();
   
   const {
     products,
     loadingProducts,
+    productError,
     fetchProducts,
-    resetProducts,
+    currentPage,
+    totalPages,
+    handleNextPage,
+    handlePrevPage
   } = useNuvemshopProducts(accessToken, userId);
 
-  // Filter products based on search query
+  const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
+
+  // Fetch products when dialog opens
+  useEffect(() => {
+    if (isOpen && accessToken && userId && products.length === 0) {
+      fetchProducts();
+    }
+  }, [isOpen, accessToken, userId, fetchProducts, products.length]);
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    if (accessToken && userId) {
+      fetchProducts(1); // Reset to first page
+      toast({
+        title: 'Lista atualizada',
+        description: 'A lista de produtos foi atualizada.',
+      });
+    }
+  };
+
+  // Filter products based on search term
   const filteredProducts = products.filter(product => {
-    const searchLower = searchQuery.toLowerCase();
-    const name = typeof product.name === 'string' 
-      ? product.name.toLowerCase() 
-      : (product.name?.pt?.toLowerCase() || '');
+    const productName = typeof product.name === 'string' 
+      ? product.name 
+      : (product.name?.pt || '');
     
-    const sku = product.sku?.toLowerCase() || '';
-    
-    return name.includes(searchLower) || sku.includes(searchLower);
+    return productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()));
   });
 
-  // Load products when dialog opens if connected
-  useEffect(() => {
-    if (open && isConnected && products.length === 0) {
-      fetchProducts(1);
-    }
-  }, [open, isConnected, products.length, fetchProducts]);
-
-  // Clean up when dialog closes
-  useEffect(() => {
-    if (!open) {
-      setSearchQuery('');
-    }
-  }, [open]);
-
-  const handleSelectProduct = (product: NuvemshopProduct) => {
-    if (onProductSelect) {
-      onProductSelect(product);
-    }
-    setOpen(false);
+  const handleProductClick = (product: NuvemshopProduct) => {
+    onProductSelect(product);
+    setIsOpen(false);
   };
 
-  const getProductNameDisplay = (product: NuvemshopProduct) => {
-    return typeof product.name === 'string' 
-      ? product.name 
-      : (product.name?.pt || 'Produto sem nome');
+  // Handle applying description to multiple products
+  const handleApplyToMultipleProducts = async (productIds: number[]) => {
+    if (!description) {
+      throw new Error('Nenhuma descrição ativa');
+    }
+
+    const failedUpdates: number[] = [];
+    
+    for (let i = 0; i < productIds.length; i++) {
+      const productId = productIds[i];
+      const product = products.find(p => p.id === productId);
+      
+      if (product) {
+        try {
+          const success = await handleSaveToNuvemshop(product);
+          if (!success) {
+            failedUpdates.push(productId);
+          }
+        } catch (error) {
+          console.error(`Erro ao atualizar produto ${productId}:`, error);
+          failedUpdates.push(productId);
+        }
+      }
+    }
+
+    if (failedUpdates.length > 0) {
+      throw new Error(`Falha ao atualizar ${failedUpdates.length} produto(s)`);
+    }
   };
+
+  // Helper to render product name
+  const renderProductName = (name: string | { pt?: string; [key: string]: string | undefined }) => {
+    if (typeof name === 'string') {
+      return name;
+    } else if (name && typeof name === 'object' && 'pt' in name) {
+      return name.pt || 'Produto sem nome';
+    }
+    return 'Produto sem nome';
+  };
+
+  if (!accessToken || !userId) {
+    return (
+      <div className="text-sm text-gray-500">
+        Conecte sua conta Nuvemshop para buscar produtos
+      </div>
+    );
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full sm:w-auto">
-          <Search className="h-4 w-4 mr-2" />
-          Buscar produtos da Nuvemshop
-        </Button>
-      </DialogTrigger>
-      
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Buscar produtos</DialogTitle>
-        </DialogHeader>
-        
-        {!isConnected ? (
-          <div className="flex flex-col items-center justify-center p-4">
-            <p className="text-center mb-4">
-              Você precisa conectar sua loja Nuvemshop para buscar produtos.
-            </p>
-            <Button onClick={() => window.location.href = '/nuvemshop-connect'}>
-              Conectar Nuvemshop
-            </Button>
-          </div>
-        ) : (
-          <Command>
-            <CommandInput 
-              placeholder="Busque por nome ou SKU..." 
-              value={searchQuery}
-              onValueChange={setSearchQuery}
-            />
-            
-            <CommandList>
-              {loadingProducts ? (
-                <div className="flex justify-center p-4">
-                  <Spinner />
-                </div>
-              ) : products.length === 0 ? (
-                <CommandEmpty>
-                  Nenhum produto encontrado na sua loja.
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="mt-2" 
-                    onClick={() => fetchProducts(1)}
-                  >
-                    Recarregar produtos
-                  </Button>
-                </CommandEmpty>
-              ) : (
-                <>
-                  <CommandEmpty>Nenhum produto corresponde à sua busca.</CommandEmpty>
-                  <CommandGroup heading="Produtos">
-                    {filteredProducts.map((product) => (
-                      <CommandItem 
-                        key={product.id}
-                        value={getProductNameDisplay(product)}
-                        onSelect={() => handleSelectProduct(product)}
-                      >
-                        <div className="flex flex-col">
-                          <span className="font-medium">{getProductNameDisplay(product)}</span>
-                          {product.sku && (
-                            <span className="text-xs text-gray-500">SKU: {product.sku}</span>
-                          )}
+    <>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="flex items-center">
+            <Search className="h-4 w-4 mr-2" />
+            Buscar Produtos
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                Produtos da Loja
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={loadingProducts}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loadingProducts ? 'animate-spin' : ''}`} />
+                  Atualizar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsMultipleSelectionOpen(true)}
+                  disabled={!description || products.length === 0}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Seleção Múltipla
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Search input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar por nome ou SKU..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Error state */}
+            {productError && (
+              <div className="text-center p-4 text-red-600 bg-red-50 rounded-md">
+                <p>Erro ao carregar produtos: {productError}</p>
+                <Button variant="outline" onClick={handleRefresh} className="mt-2">
+                  Tentar novamente
+                </Button>
+              </div>
+            )}
+
+            {/* Loading state */}
+            {loadingProducts && (
+              <div className="text-center p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-2 text-sm text-gray-600">Carregando produtos...</p>
+              </div>
+            )}
+
+            {/* Products list */}
+            {!loadingProducts && filteredProducts.length > 0 && (
+              <ScrollArea className="h-96">
+                <div className="space-y-2">
+                  {filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleProductClick(product)}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium truncate">
+                            {renderProductName(product.name)}
+                          </span>
+                          <Badge variant="outline" className="text-xs">
+                            ID: {product.id}
+                          </Badge>
                         </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </>
-              )}
-            </CommandList>
-          </Command>
-        )}
-      </DialogContent>
-    </Dialog>
+                        
+                        {product.sku && (
+                          <div className="text-sm text-gray-500">
+                            SKU: {product.sku}
+                          </div>
+                        )}
+                        
+                        {product.price && (
+                          <div className="text-sm font-medium text-green-600">
+                            R$ {parseFloat(product.price.toString()).toFixed(2)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
+
+            {/* Empty state */}
+            {!loadingProducts && filteredProducts.length === 0 && products.length > 0 && (
+              <div className="text-center p-8 text-gray-500">
+                <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Nenhum produto encontrado para "{searchTerm}"</p>
+              </div>
+            )}
+
+            {/* No products */}
+            {!loadingProducts && products.length === 0 && !productError && (
+              <div className="text-center p-8 text-gray-500">
+                <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Nenhum produto encontrado na sua loja</p>
+                <Button variant="outline" onClick={handleRefresh} className="mt-2">
+                  Atualizar lista
+                </Button>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {!loadingProducts && products.length > 0 && totalPages > 1 && (
+              <div className="flex justify-between items-center">
+                <Button 
+                  variant="outline" 
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  Anterior
+                </Button>
+                <span className="text-sm text-gray-500">
+                  Página {currentPage} de {totalPages}
+                </span>
+                <Button 
+                  variant="outline" 
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Próxima
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Multiple product selection dialog */}
+      <MultipleProductSelection
+        products={products}
+        isOpen={isMultipleSelectionOpen}
+        onClose={() => setIsMultipleSelectionOpen(false)}
+        onApplyToProducts={handleApplyToMultipleProducts}
+      />
+    </>
   );
 };
 
