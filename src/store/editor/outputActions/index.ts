@@ -5,43 +5,58 @@ import { generateBlockHtml } from '@/utils/htmlGenerators';
 export const createOutputActions = (get: any) => ({
   getHtmlOutput: (productTitle?: string) => {
     try {
-      const { blocks, description } = get();
+      const { description } = get();
       
-      console.log('getHtmlOutput chamado com:', { productTitle, hasDescription: !!description, blocksCount: blocks?.length || 0 });
+      console.log('getHtmlOutput chamado:', { 
+        productTitle, 
+        hasDescription: !!description, 
+        blocksCount: description?.blocks?.length || 0 
+      });
       
       if (!description) {
         console.warn('Nenhuma descrição ativa encontrada');
         return '<p>Nenhuma descrição ativa</p>';
       }
       
-      // Use the provided product title or fall back to description name
-      const title = productTitle || description.name || 'Produto';
-      console.log('Título usado para geração HTML:', title);
+      if (!description.blocks || description.blocks.length === 0) {
+        console.warn('Nenhum bloco encontrado na descrição');
+        return '<p>Nenhum bloco para exibir</p>';
+      }
       
-      // Generate HTML for all blocks
-      const blocksHtml = blocks
-        .map((block: Block) => {
+      // Generate HTML for visible blocks only
+      const visibleBlocks = description.blocks.filter((block: Block) => block.visible !== false);
+      
+      if (visibleBlocks.length === 0) {
+        console.warn('Nenhum bloco visível encontrado');
+        return '<p>Nenhum bloco visível para exibir</p>';
+      }
+      
+      console.log(`Gerando HTML para ${visibleBlocks.length} blocos visíveis`);
+      
+      const blocksHtml = visibleBlocks
+        .map((block: Block, index: number) => {
           try {
+            console.log(`Processando bloco ${index + 1}: ${block.type} (${block.id})`);
             const html = generateBlockHtml(block);
-            console.log(`HTML gerado para bloco ${block.type} (${block.id}):`, html.substring(0, 50) + '...');
+            console.log(`HTML gerado para bloco ${block.type}:`, html.substring(0, 100) + '...');
             return html;
           } catch (blockError) {
             console.error(`Erro ao gerar HTML para bloco ${block.type}:`, blockError);
-            return '';
+            return `<div class="error-block">Erro no bloco ${block.type}</div>`;
           }
         })
         .filter((html: string) => html.trim() !== '')
         .join('\n\n');
       
       if (!blocksHtml.trim()) {
-        console.warn('Nenhum HTML gerado dos blocos');
-        return `<h1>${title}</h1>\n<p>Descrição em branco</p>`;
+        console.warn('Nenhum HTML válido gerado dos blocos');
+        return '<p>Erro ao gerar conteúdo dos blocos</p>';
       }
       
-      console.log(`HTML final gerado (${blocksHtml.length} caracteres)`);
+      console.log(`HTML final gerado com sucesso (${blocksHtml.length} caracteres)`);
       return blocksHtml;
     } catch (error) {
-      console.error('Erro em getHtmlOutput:', error);
+      console.error('Erro geral em getHtmlOutput:', error);
       return '<p>Erro ao gerar descrição</p>';
     }
   },

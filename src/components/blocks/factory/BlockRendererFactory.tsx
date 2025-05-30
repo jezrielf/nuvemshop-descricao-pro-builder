@@ -21,40 +21,44 @@ interface BlockRendererProps {
 
 export class BlockRendererFactory {
   static createBlockComponent({ block, isPreview = false }: BlockRendererProps): React.ReactNode {
+    // Log para debug
+    console.log(`BlockRendererFactory: Renderizando bloco ${block.type} (${block.id}), visível: ${block.visible}, preview: ${isPreview}`);
+    
     if (!block.visible && !isPreview) {
+      console.log(`BlockRendererFactory: Bloco ${block.id} não é visível, retornando null`);
       return null;
     }
     
     try {
       switch (block.type) {
         case 'hero':
-          return <HeroBlock block={block} isPreview={isPreview} />;
+          return <HeroBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'text':
-          return <TextBlock block={block} isPreview={isPreview} />;
+          return <TextBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'image':
-          return <ImageBlock block={block} isPreview={isPreview} />;
+          return <ImageBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'video':
-          return <VideoBlock block={block} isPreview={isPreview} />;
+          return <VideoBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'features':
-          return <FeaturesBlock block={block} isPreview={isPreview} />;
+          return <FeaturesBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'benefits':
-          return <BenefitsBlock block={block} isPreview={isPreview} />;
+          return <BenefitsBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'specifications':
-          return <SpecificationsBlock block={block} isPreview={isPreview} />;
+          return <SpecificationsBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'imageText':
-          return <ImageTextBlock block={block} isPreview={isPreview} />;
+          return <ImageTextBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'textImage':
-          return <TextImageBlock block={block} isPreview={isPreview} />;
+          return <TextImageBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'faq':
-          return <FAQBlock block={block} isPreview={isPreview} />;
+          return <FAQBlock key={block.id} block={block} isPreview={isPreview} />;
         case 'cta':
-          return <CTABlock block={block} isPreview={isPreview} />;
+          return <CTABlock key={block.id} block={block} isPreview={isPreview} />;
         case 'gallery':
-          return <GalleryBlock block={block} isPreview={isPreview} />;
+          return <GalleryBlock key={block.id} block={block} isPreview={isPreview} />;
         default:
-          console.warn(`Block type ${(block as Block).type} not implemented yet`);
+          console.warn(`BlockRendererFactory: Block type ${(block as Block).type} not implemented yet`);
           return (
-            <div className="p-4 border border-gray-200 rounded-md">
+            <div className="p-4 border border-gray-200 rounded-md" key={block.id}>
               <p className="text-sm text-gray-500">
                 Bloco do tipo "{(block as Block).type}" ainda não implementado.
               </p>
@@ -62,9 +66,9 @@ export class BlockRendererFactory {
           );
       }
     } catch (error) {
-      console.error(`Error rendering block of type ${(block as Block).type}:`, error);
+      console.error(`BlockRendererFactory: Error rendering block of type ${(block as Block).type}:`, error);
       return (
-        <div className="p-4 border border-red-200 rounded-md bg-red-50">
+        <div className="p-4 border border-red-200 rounded-md bg-red-50" key={block.id}>
           <p className="text-sm text-red-500">
             Erro ao renderizar bloco do tipo "{(block as Block).type}".
           </p>

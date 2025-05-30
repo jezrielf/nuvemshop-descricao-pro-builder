@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Eye, Smartphone, Monitor } from 'lucide-react';
+import { Eye, Smartphone, Monitor, RefreshCw } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { usePreviewFocus } from './Preview/hooks/usePreviewFocus';
 
@@ -11,31 +11,70 @@ const Preview: React.FC = () => {
   const { description, getHtmlOutput, focusedBlockId } = useEditorStore();
   const [deviceView, setDeviceView] = React.useState<'desktop' | 'mobile'>('desktop');
   const [htmlOutput, setHtmlOutput] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const isMobile = useIsMobile();
   const { previewRef } = usePreviewFocus();
   
+  const generatePreview = () => {
+    if (!description) {
+      console.log('Preview: Nenhuma descrição ativa');
+      setHtmlOutput('');
+      return;
+    }
+    
+    console.log('Preview: Iniciando geração de HTML', {
+      descriptionId: description.id,
+      descriptionName: description.name,
+      blocksCount: description.blocks?.length || 0
+    });
+    
+    setIsGenerating(true);
+    
+    try {
+      // Generate fresh HTML output
+      const output = getHtmlOutput();
+      console.log('Preview: HTML gerado:', output.substring(0, 200) + '...');
+      
+      let processedOutput = output;
+      
+      // Add data attributes to blocks for focus functionality
+      if (description.blocks && description.blocks.length > 0) {
+        description.blocks.forEach(block => {
+          if (block.visible !== false) {
+            const blockId = block.id;
+            const isFocused = focusedBlockId === blockId;
+            
+            // Add wrapper div with focus styling if needed
+            const focusClass = isFocused ? 'preview-focused' : '';
+            const wrapperDiv = `<div data-preview-block-id="${blockId}" class="preview-block-wrapper ${focusClass}">`;
+            
+            // Try to wrap each block's HTML content
+            const blockPattern = new RegExp(`(<div[^>]*class="[^"]*${block.type}-block[^"]*"[^>]*>.*?</div>)`, 'gis');
+            processedOutput = processedOutput.replace(blockPattern, `${wrapperDiv}$1</div>`);
+          }
+        });
+      }
+      
+      console.log('Preview: HTML processado com sucesso');
+      setHtmlOutput(processedOutput);
+    } catch (error) {
+      console.error('Preview: Erro ao gerar HTML:', error);
+      setHtmlOutput('<div class="error-preview">Erro ao gerar pré-visualização</div>');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
   // Update HTML output whenever description changes
   useEffect(() => {
-    if (description) {
-      // Generate fresh HTML output
-      try {
-        let output = getHtmlOutput();
-        
-        // Add data attributes to blocks for focus functionality
-        if (description.blocks) {
-          description.blocks.forEach(block => {
-            const blockPattern = new RegExp(`(<[^>]*class="[^"]*block-${block.type}[^"]*"[^>]*>)`, 'gi');
-            output = output.replace(blockPattern, `$1<div data-preview-block-id="${block.id}" class="preview-block-wrapper ${focusedBlockId === block.id ? 'preview-focused' : ''}">`);
-          });
-        }
-        
-        console.log('Generated HTML output:', output.substring(0, 100) + '...');
-        setHtmlOutput(output);
-      } catch (error) {
-        console.error('Error generating HTML output:', error);
-      }
-    }
+    console.log('Preview: useEffect executado', { hasDescription: !!description });
+    generatePreview();
   }, [description, getHtmlOutput, focusedBlockId]);
+  
+  const handleRefresh = () => {
+    console.log('Preview: Refresh manual solicitado');
+    generatePreview();
+  };
   
   if (!description) {
     return (
@@ -47,7 +86,7 @@ const Preview: React.FC = () => {
     );
   }
   
-  const visibleBlocks = description.blocks.filter(block => block.visible);
+  const visibleBlocks = description.blocks?.filter(block => block.visible !== false) || [];
   
   return (
     <div className="h-full flex flex-col">
@@ -71,6 +110,16 @@ const Preview: React.FC = () => {
               box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
             }
           }
+          
+          .error-preview {
+            padding: 20px;
+            text-align: center;
+            color: #ef4444;
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            margin: 20px;
+          }
         `}
       </style>
       
@@ -78,6 +127,16 @@ const Preview: React.FC = () => {
         <h2 className="font-medium text-sm sm:text-base">Pré-visualização</h2>
         
         <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs sm:text-sm h-8"
+            onClick={handleRefresh}
+            disabled={isGenerating}
+          >
+            <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${isGenerating ? 'animate-spin' : ''}`} />
+            <span className="hidden xs:inline">Atualizar</span>
+          </Button>
           <Button
             variant={deviceView === 'desktop' ? 'default' : 'outline'}
             size="sm"
@@ -104,7 +163,12 @@ const Preview: React.FC = () => {
           ref={previewRef}
           className={`p-4 mx-auto ${deviceView === 'mobile' ? 'max-w-sm border-x border-gray-200' : ''}`}
         >
-          {visibleBlocks.length > 0 ? (
+          {isGenerating ? (
+            <div className="text-center p-8">
+              <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
+              <p className="text-gray-500">Gerando pré-visualização...</p>
+            </div>
+          ) : visibleBlocks.length > 0 ? (
             <div 
               className="preview-container"
               dangerouslySetInnerHTML={{ __html: htmlOutput }}
@@ -113,6 +177,14 @@ const Preview: React.FC = () => {
             <div className="text-center p-8 text-gray-500">
               <p>Nenhum bloco visível para exibir.</p>
               <p className="text-sm mt-2">Adicione blocos no editor para visualizar.</p>
+              <Button 
+                variant="outline" 
+                onClick={handleRefresh}
+                className="mt-4"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Tentar Novamente
+              </Button>
             </div>
           )}
         </div>
