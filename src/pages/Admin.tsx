@@ -1,13 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from '@/components/admin/AdminLayout';
 import UsersPanel from '@/components/admin/UsersPanel';
-import SettingsPanel from '@/components/admin/SettingsPanel';
 import DescriptionsPanel from '@/components/admin/DescriptionsPanel';
 import PlansPanel from '@/components/admin/PlansPanel';
 import DashboardPanel from '@/components/admin/DashboardPanel';
-import LandingPagePanel from '@/components/admin/LandingPagePanel';
 import AccessDenied from '@/components/admin/AccessDenied';
 import { useToast } from '@/hooks/use-toast';
 import { AdminTab } from '@/components/admin/navigation/NavigationTabs';
@@ -67,8 +66,6 @@ const Admin: React.FC = () => {
       {activeTab === 'users' && <UsersPanel />}
       {activeTab === 'descriptions' && <DescriptionsPanel />}
       {activeTab === 'plans' && <PlansPanel />}
-      {activeTab === 'landing' && <LandingPagePanel />}
-      {activeTab === 'settings' && <SettingsPanel />}
     </AdminLayout>
   );
 };

@@ -1,12 +1,12 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
-import { formatRolesForStorage } from '@/utils/roleUtils';
 
 export const userService = {
   getUsers: async (): Promise<Profile[]> => {
     try {
-      console.log('Fetching users from admin-list-users edge function');
+      console.log('UserService: Fetching users from admin-list-users edge function');
+      
       // Get users from auth.users through the admin API
       const { data, error } = await supabase.functions.invoke('admin-list-users');
       
@@ -20,24 +20,25 @@ export const userService = {
         return [];
       }
       
-      console.log(`Fetched ${data.users.length} users from admin API`);
+      console.log(`UserService: Fetched ${data.users.length} users from admin API`);
       
       // Map the combined user data to profile format for compatibility
       const enrichedProfiles: Profile[] = data.users.map((user: any) => {
         // Get the profile from the user data, or construct a default one
         const profile = user.profile || {
           id: user.id,
-          nome: null,
+          nome: user.email?.split('@')[0] || 'Usuário',
           avatar_url: null,
           role: 'user',
           criado_em: user.created_at,
           atualizado_em: user.created_at
         };
         
-        // Ensure email is included
+        // Ensure email is included and role is properly formatted
         return {
           ...profile,
-          email: user.email
+          email: user.email,
+          role: profile.role || 'user'
         };
       });
       
@@ -50,9 +51,9 @@ export const userService = {
   
   updateUserProfile: async (userId: string, data: Partial<Profile>): Promise<Profile> => {
     try {
-      console.log('Updating user profile:', userId, data);
+      console.log('UserService: Updating user profile:', userId, data);
+      
       // Handle base profile data update (nome, avatar_url, etc)
-      // Keep role handling separate to match the admin panel's approach
       const updateData: Record<string, any> = { ...data };
       
       // Remove role from updateData as it's handled separately
@@ -71,18 +72,14 @@ export const userService = {
         .update(profileUpdateData)
         .eq('id', userId)
         .select()
-        .maybeSingle();
+        .single();
         
       if (error) {
         console.error('Error updating user profile:', error);
         throw error;
       }
       
-      if (!updatedProfile) {
-        throw new Error('Profile not found after update');
-      }
-      
-      console.log('Profile updated successfully:', updatedProfile);
+      console.log('UserService: Profile updated successfully:', updatedProfile);
       return updatedProfile;
     } catch (error) {
       console.error('Error in updateUserProfile:', error);
@@ -92,22 +89,27 @@ export const userService = {
   
   updateUserRole: async (userId: string, role: string | string[]): Promise<Profile> => {
     try {
-      console.log('Updating role for user', userId, 'to', role);
+      console.log('UserService: Updating role for user', userId, 'to', role);
       
       // Convert role to string format if it's an array
       const roleValue = Array.isArray(role) ? role.join(',') : role;
       
+      // Use edge function for role update to ensure proper permissions
       const { data, error } = await supabase.functions.invoke('admin-update-role', {
         body: { userId, role: roleValue }
       });
       
-      if (error || !data) {
+      if (error) {
         console.error('Error invoking admin-update-role function:', error);
-        throw error || new Error('Failed to update user role');
+        throw new Error(`Erro ao atualizar role: ${error.message}`);
       }
       
-      console.log('Role updated successfully:', data);
-      return data;
+      if (!data?.data) {
+        throw new Error('Resposta inválida da função de atualização');
+      }
+      
+      console.log('UserService: Role updated successfully:', data.data);
+      return data.data;
     } catch (error) {
       console.error('Error in updateUserRole:', error);
       throw error;
@@ -116,12 +118,16 @@ export const userService = {
   
   createUser: async (email: string, password: string, userData: any): Promise<any> => {
     try {
-      console.log('Creating new user:', email, userData);
+      console.log('UserService: Creating new user:', email, userData);
+      
       const { data, error } = await supabase.functions.invoke('admin-create-user', {
         body: {
           email,
           password,
-          userData
+          userData: {
+            nome: userData.nome || email.split('@')[0],
+            role: userData.role || 'user'
+          }
         }
       });
       
@@ -130,7 +136,7 @@ export const userService = {
         throw error;
       }
       
-      console.log('User created successfully:', data);
+      console.log('UserService: User created successfully:', data);
       return data;
     } catch (error) {
       console.error('Error in createUser:', error);
@@ -140,7 +146,8 @@ export const userService = {
   
   deleteUser: async (userId: string): Promise<void> => {
     try {
-      console.log('Deleting user:', userId);
+      console.log('UserService: Deleting user:', userId);
+      
       const { data, error } = await supabase.functions.invoke('admin-delete-user', {
         body: { userId }
       });
@@ -150,7 +157,7 @@ export const userService = {
         throw error;
       }
       
-      console.log('User deleted successfully:', data);
+      console.log('UserService: User deleted successfully:', data);
     } catch (error) {
       console.error('Error in deleteUser:', error);
       throw error;

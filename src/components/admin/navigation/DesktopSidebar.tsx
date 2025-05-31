@@ -27,7 +27,12 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       darkMode ? "border-gray-700 bg-gray-900" : "border-gray-200"
     )}>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-bold">Admin Panel</h1>
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">A</span>
+          </div>
+          <h1 className="text-lg font-bold">Admin Panel</h1>
+        </div>
         <Button 
           variant="ghost" 
           size="icon" 

@@ -20,7 +20,12 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
       "lg:hidden flex justify-between items-center p-4 border-b",
       darkMode ? "border-gray-700" : "border-gray-200"
     )}>
-      <h1 className="text-xl font-bold">Admin</h1>
+      <div className="flex items-center space-x-3">
+        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-sm">A</span>
+        </div>
+        <h1 className="text-xl font-bold">Admin Panel</h1>
+      </div>
       <div className="flex items-center gap-2">
         <Button 
           variant="ghost" 
