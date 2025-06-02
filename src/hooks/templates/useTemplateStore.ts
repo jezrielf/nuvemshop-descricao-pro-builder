@@ -4,61 +4,34 @@ import { useEffect } from 'react';
 import { Template } from '@/types/editor';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { getAllTemplates } from '@/utils/templates';
 
 export function useTemplateStore() {
   const {
     templates,
-    loadTemplates: loadTemplatesFromStore,
-    createTemplate: createTemplateInStore,
-    updateTemplate: updateTemplateInStore,
-    deleteTemplate: deleteTemplateFromStore,
+    loadTemplates,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
     getTemplatesByCategory,
     searchTemplates
   } = useZustandTemplateStore();
   
   const { toast } = useToast();
 
-  // Load templates with fallback to local templates
-  const loadTemplates = async () => {
-    try {
-      console.log('Loading templates from database...');
-      
-      // First try to get templates from database
-      const { data, error } = await supabase
-        .from('templates')
-        .select('*')
-        .order('updated_at', { ascending: false });
-      
-      if (error) {
-        console.warn('Error loading templates from database:', error);
-        // Use local templates as fallback
-        const localTemplates = getAllTemplates();
-        console.log(`Using ${localTemplates.length} local templates as fallback`);
-        return localTemplates;
-      }
-      
-      // If no data, use local templates
-      if (!data || data.length === 0) {
-        console.log('No templates found in database, using local templates');
-        const localTemplates = getAllTemplates();
-        console.log(`Loaded ${localTemplates.length} local templates as fallback`);
-        return localTemplates;
-      }
-      
-      console.log(`Successfully loaded ${data.length} templates from database`);
-      return data as Template[];
-    } catch (error) {
-      console.error('Exception loading templates:', error);
-      // Use local templates as fallback
-      const localTemplates = getAllTemplates();
-      console.log(`Using ${localTemplates.length} local templates due to exception`);
-      return localTemplates;
-    }
-  };
+  // Carrega os templates quando o hook for montado
+  useEffect(() => {
+    loadTemplates().catch(error => {
+      console.error("Failed to load templates:", error);
+      toast({
+        title: "Erro ao carregar templates",
+        description: "Não foi possível carregar os templates. Por favor, tente novamente.",
+        variant: "destructive"
+      });
+    });
+  }, [loadTemplates, toast]);
 
-  // Wrapper for creating a template with error handling
-  const createTemplate = async (templateData: Omit<Template, "id">) => {
+  // Wrapper para criar um template com log e tratamento de erro
+  const createTemplateWithLog = async (templateData: Omit<Template, "id">) => {
     try {
       console.log("Creating template:", templateData);
       const { data: { user } } = await supabase.auth.getUser();
@@ -73,8 +46,9 @@ export function useTemplateStore() {
         return null;
       }
       
-      const result = await createTemplateInStore({
+      const result = await createTemplate({
         ...templateData,
+        // Ensure user_id is explicitly set
         user_id: user.id
       });
       
@@ -91,11 +65,11 @@ export function useTemplateStore() {
     }
   };
 
-  // Wrapper for updating a template with error handling
-  const updateTemplate = async (id: string, templateData: Partial<Template>) => {
+  // Wrapper para atualizar um template com log e tratamento de erro
+  const updateTemplateWithLog = async (id: string, templateData: Partial<Template>) => {
     try {
       console.log("Updating template:", id, templateData);
-      const result = await updateTemplateInStore(id, templateData);
+      const result = await updateTemplate(id, templateData);
       
       if (!result) {
         toast({
@@ -119,11 +93,11 @@ export function useTemplateStore() {
     }
   };
 
-  // Wrapper for deleting a template with error handling
-  const deleteTemplate = async (id: string) => {
+  // Wrapper para deletar um template com log e tratamento de erro
+  const deleteTemplateWithLog = async (id: string) => {
     try {
       console.log("Deleting template:", id);
-      const result = await deleteTemplateFromStore(id);
+      const result = await deleteTemplate(id);
       
       if (!result) {
         toast({
@@ -135,6 +109,10 @@ export function useTemplateStore() {
       }
       
       console.log("Template deleted successfully");
+      toast({
+        title: "Template excluído",
+        description: "O template foi excluído com sucesso.",
+      });
       return true;
     } catch (error) {
       console.error("Error deleting template:", error);
@@ -150,9 +128,9 @@ export function useTemplateStore() {
   return {
     templates,
     loadTemplates,
-    createTemplate,
-    updateTemplate,
-    deleteTemplate,
+    createTemplate: createTemplateWithLog,
+    updateTemplate: updateTemplateWithLog,
+    deleteTemplate: deleteTemplateWithLog,
     getTemplatesByCategory,
     searchTemplates
   };

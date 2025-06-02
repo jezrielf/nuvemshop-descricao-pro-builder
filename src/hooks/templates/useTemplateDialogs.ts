@@ -17,7 +17,7 @@ export function useTemplateDialogs() {
   
   const openNewDialog = () => {
     console.log('Opening new template dialog');
-    closeAllDialogs(); // Close other dialogs first
+    closeAllDialogs();
     setIsNewDialogOpen(true);
   };
   
@@ -33,7 +33,7 @@ export function useTemplateDialogs() {
     }
     
     console.log('Opening preview dialog for template:', template.id, template.name);
-    closeAllDialogs(); // Close other dialogs first
+    closeAllDialogs();
     setPreviewTemplate(template);
     setIsPreviewDialogOpen(true);
   };
@@ -50,7 +50,7 @@ export function useTemplateDialogs() {
     }
     
     console.log('Opening edit dialog for template:', template.id, template.name);
-    closeAllDialogs(); // Close other dialogs first
+    closeAllDialogs();
     setEditTemplate(template);
     setIsEditDialogOpen(true);
   };
@@ -67,7 +67,7 @@ export function useTemplateDialogs() {
     }
     
     console.log('Opening delete dialog for template:', template.id, template.name);
-    closeAllDialogs(); // Close other dialogs first
+    closeAllDialogs();
     setDeleteTemplate(template);
     setDeleteCallback(() => onDeleted);
     setIsDeleteDialogOpen(true);
@@ -79,10 +79,6 @@ export function useTemplateDialogs() {
     setIsPreviewDialogOpen(false);
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
-    setPreviewTemplate(null);
-    setEditTemplate(null);
-    setDeleteTemplate(null);
-    setDeleteCallback(undefined);
   };
   
   return {

@@ -1,13 +1,14 @@
 
 import React, { useEffect } from 'react';
-import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
+import { useTemplateStore } from '@/store/templates';
 import { TemplateList } from './TemplateList';
 import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TemplateDialogs } from './dialogs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
 
 export const TemplatesView = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -16,6 +17,7 @@ export const TemplatesView = () => {
   const [loadError, setLoadError] = React.useState<string | null>(null);
   
   const { templates, loadTemplates, searchTemplates } = useTemplateStore();
+  const { openNewDialog } = useTemplateDialogs();
   const { toast } = useToast();
   
   // Load templates when component mounts
@@ -91,15 +93,24 @@ export const TemplatesView = () => {
           onCategoryChange={setSelectedCategory}
         />
         
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRefresh}
-          type="button"
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Atualizar
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={openNewDialog}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Novo Template
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Atualizar
+          </Button>
+        </div>
       </div>
       
       <ScrollArea className="h-[calc(100vh-220px)]">
@@ -113,10 +124,16 @@ export const TemplatesView = () => {
             <p className="text-muted-foreground mb-4">
               {loadError || 'Nenhum template encontrado. Crie um novo template ou atualize a lista.'}
             </p>
-            <Button onClick={handleRefresh} variant="outline" type="button">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Tentar novamente
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={openNewDialog} variant="default">
+                <Plus className="h-4 w-4 mr-2" />
+                Criar Template
+              </Button>
+              <Button onClick={handleRefresh} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Tentar novamente
+              </Button>
+            </div>
           </div>
         )}
       </ScrollArea>

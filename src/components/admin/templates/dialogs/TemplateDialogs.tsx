@@ -7,6 +7,7 @@ import { EditTemplateDialog } from './EditTemplateDialog';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';
 import { PreviewTemplateDialog } from './PreviewTemplateDialog';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 export const TemplateDialogs: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -23,6 +24,7 @@ export const TemplateDialogs: React.FC = () => {
     closeAllDialogs
   } = useTemplateDialogs();
   
+  // Use the hook that already includes enhanced delete functionality
   const { deleteTemplate: removeTemplate } = useTemplateStore();
   const { toast } = useToast();
 
@@ -41,6 +43,7 @@ export const TemplateDialogs: React.FC = () => {
     console.log('Starting deletion process for template:', deleteTemplate.id);
     
     try {
+      // Use the store's delete method instead of direct Supabase call
       const success = await removeTemplate(deleteTemplate.id);
       
       if (!success) {
@@ -80,12 +83,14 @@ export const TemplateDialogs: React.FC = () => {
 
   return (
     <>
-      <NewTemplateDialog 
-        open={isNewDialogOpen} 
-        onClose={closeAllDialogs} 
-      />
+      {isNewDialogOpen && (
+        <NewTemplateDialog 
+          open={isNewDialogOpen} 
+          onClose={closeAllDialogs} 
+        />
+      )}
       
-      {previewTemplate && (
+      {isPreviewDialogOpen && previewTemplate && (
         <PreviewTemplateDialog
           open={isPreviewDialogOpen}
           onClose={closeAllDialogs}
@@ -93,7 +98,7 @@ export const TemplateDialogs: React.FC = () => {
         />
       )}
       
-      {editTemplate && (
+      {isEditDialogOpen && editTemplate && (
         <EditTemplateDialog
           open={isEditDialogOpen}
           onClose={closeAllDialogs}
@@ -101,7 +106,7 @@ export const TemplateDialogs: React.FC = () => {
         />
       )}
       
-      {deleteTemplate && (
+      {isDeleteDialogOpen && deleteTemplate && (
         <DeleteTemplateDialog
           open={isDeleteDialogOpen}
           onClose={closeAllDialogs}
