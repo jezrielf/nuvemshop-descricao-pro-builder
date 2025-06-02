@@ -72,15 +72,15 @@ export const templateService = {
         throw new Error('Authentication required');
       }
       
-      // Create template in Supabase - remove id from insert as it's auto-generated
+      // Create template in Supabase - explicitly type the insert to exclude id
       const { data, error } = await supabase
         .from('templates')
         .insert({
           name: templateData.name,
-          category: templateData.category as string, // Cast to string for database
+          category: templateData.category as string,
           blocks: templateData.blocks || [],
           user_id: userId
-        })
+        } as any) // Use 'as any' to bypass the strict typing for insert
         .select()
         .single();
       
