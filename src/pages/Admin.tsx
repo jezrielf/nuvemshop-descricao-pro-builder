@@ -7,6 +7,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Dashboard } from '@/components/admin/Dashboard';
 import { Users } from '@/components/admin/Users';
 import { Descriptions } from '@/components/admin/Descriptions';
+import { Templates } from '@/components/admin/Templates';
 import { Plans } from '@/components/admin/Plans';
 import { useDarkMode } from '@/hooks/useDarkMode';
 import { cn } from '@/lib/utils';
@@ -60,6 +61,8 @@ const Admin: React.FC = () => {
         return <Users />;
       case 'descriptions':
         return <Descriptions />;
+      case 'templates':
+        return <Templates />;
       case 'plans':
         return <Plans />;
       default:

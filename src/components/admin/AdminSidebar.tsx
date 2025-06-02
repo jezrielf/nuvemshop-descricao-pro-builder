@@ -8,7 +8,8 @@ import {
   CreditCard, 
   LogOut, 
   Moon, 
-  Sun 
+  Sun,
+  Layout
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'users', label: 'Usuários', icon: Users },
   { id: 'descriptions', label: 'Descrições', icon: FileText },
+  { id: 'templates', label: 'Templates', icon: Layout },
   { id: 'plans', label: 'Planos', icon: CreditCard },
 ];
 
