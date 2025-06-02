@@ -13,12 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Search, Eye, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Template } from '@/types/editor';
+import { Template, ProductCategory } from '@/types/editor';
 import { parseHtmlToBlocks } from '@/utils/htmlParsers';
 
 interface TemplateFormData {
   name: string;
-  category: string;
+  category: ProductCategory;
 }
 
 const categoryNames: Record<string, string> = {
@@ -71,7 +71,7 @@ export const AdminTemplates: React.FC = () => {
       const loadedTemplates: Template[] = (data || []).map(item => ({
         id: item.id,
         name: item.name,
-        category: item.category,
+        category: item.category as ProductCategory,
         blocks: Array.isArray(item.blocks) ? item.blocks : [],
         user_id: item.user_id
       }));
@@ -156,8 +156,8 @@ export const AdminTemplates: React.FC = () => {
       const newTemplate: Template = {
         id: data.id,
         name: data.name,
-        category: data.category,
-        blocks: data.blocks || [],
+        category: data.category as ProductCategory,
+        blocks: Array.isArray(data.blocks) ? data.blocks : [],
         user_id: data.user_id
       };
 
@@ -274,7 +274,7 @@ export const AdminTemplates: React.FC = () => {
                   <Label htmlFor="category">Categoria</Label>
                   <Select
                     value={formData.category}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                    onValueChange={(value: ProductCategory) => setFormData(prev => ({ ...prev, category: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
