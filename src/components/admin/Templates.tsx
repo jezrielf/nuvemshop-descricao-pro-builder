@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +32,18 @@ export const Templates: React.FC = () => {
       setLoading(true);
       console.log('Carregando templates do Supabase...');
       
+      // Verificar autenticação primeiro
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        console.error('Usuário não autenticado');
+        toast({
+          title: "Erro de autenticação",
+          description: "Você precisa estar logado para ver os templates",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('templates')
         .select('*')
@@ -44,6 +55,7 @@ export const Templates: React.FC = () => {
       }
 
       console.log('Templates carregados:', data?.length || 0);
+      console.log('Dados dos templates:', data);
 
       const formattedTemplates: Template[] = (data || []).map(item => ({
         id: item.id,
@@ -71,7 +83,7 @@ export const Templates: React.FC = () => {
       console.error('Erro ao carregar templates:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar templates",
+        description: "Erro ao carregar templates. Verifique sua conexão e tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -183,8 +195,11 @@ export const Templates: React.FC = () => {
       ) : totalTemplates === 0 ? (
         <Card>
           <CardContent className="p-6">
-            <div className="text-center">
+            <div className="text-center space-y-3">
               <p className="text-muted-foreground">Nenhum template encontrado</p>
+              <p className="text-sm text-muted-foreground">
+                Comece criando seu primeiro template usando o botão "Novo Template" acima.
+              </p>
             </div>
           </CardContent>
         </Card>
