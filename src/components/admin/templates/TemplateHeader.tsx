@@ -39,6 +39,11 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
     'other'
   ];
 
+  const handleNewTemplateClick = () => {
+    console.log('New template button clicked');
+    openNewDialog();
+  };
+
   return (
     <div className="flex flex-col md:flex-row gap-2 w-full">
       <div className="relative flex-1">
@@ -68,7 +73,7 @@ export const TemplateHeader: React.FC<TemplateHeaderProps> = ({
         </SelectContent>
       </Select>
 
-      <Button onClick={openNewDialog}>
+      <Button onClick={handleNewTemplateClick} type="button">
         <Plus className="h-4 w-4 mr-2" />
         Novo Template
       </Button>

@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useTemplateStore } from '@/store/templates';
+import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
 import { TemplateList } from './TemplateList';
 import { TemplateHeader } from './TemplateHeader';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -59,6 +59,11 @@ export const TemplatesView = () => {
   const handleRefresh = () => {
     loadData();
   };
+
+  const handleNewTemplateClick = () => {
+    console.log('Novo Template button clicked');
+    openNewDialog();
+  };
   
   // Function to handle template deletion
   const handleTemplateDeleted = () => {
@@ -95,8 +100,9 @@ export const TemplatesView = () => {
         
         <div className="flex gap-2">
           <Button
-            onClick={openNewDialog}
+            onClick={handleNewTemplateClick}
             className="flex items-center gap-2"
+            type="button"
           >
             <Plus className="h-4 w-4" />
             Novo Template
@@ -106,6 +112,7 @@ export const TemplatesView = () => {
             variant="outline"
             size="sm"
             onClick={handleRefresh}
+            type="button"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Atualizar
@@ -125,11 +132,11 @@ export const TemplatesView = () => {
               {loadError || 'Nenhum template encontrado. Crie um novo template ou atualize a lista.'}
             </p>
             <div className="flex gap-2">
-              <Button onClick={openNewDialog} variant="default">
+              <Button onClick={handleNewTemplateClick} variant="default" type="button">
                 <Plus className="h-4 w-4 mr-2" />
                 Criar Template
               </Button>
-              <Button onClick={handleRefresh} variant="outline">
+              <Button onClick={handleRefresh} variant="outline" type="button">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Tentar novamente
               </Button>
