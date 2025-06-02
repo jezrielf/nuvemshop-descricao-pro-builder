@@ -66,6 +66,10 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
     }
   };
 
+  const handleRoleChange = (value: string) => {
+    setFormData({ ...formData, role: value });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-6">
       <div>
@@ -104,10 +108,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
 
       <div>
         <Label htmlFor="role">Role</Label>
-        <Select
-          value={formData.role}
-          onValueChange={(value) => setFormData({ ...formData, role: value })}
-        >
+        <Select value={formData.role} onValueChange={handleRoleChange}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>

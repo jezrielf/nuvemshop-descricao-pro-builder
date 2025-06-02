@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,7 +27,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Template {
@@ -94,11 +92,11 @@ export const Templates: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('templates')
-        .insert({
+        .insert([{
           name: newTemplate.name,
           category: newTemplate.category,
           blocks: []
-        })
+        }])
         .select()
         .single();
 
