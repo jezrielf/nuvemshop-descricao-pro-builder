@@ -14,6 +14,16 @@ export const createLoadingSlice: StateCreator<
     try {
       console.log('Loading templates from Supabase...');
       
+      // Primeiro, tentar migrar templates se necessário
+      try {
+        console.log('Verificando se precisa migrar templates...');
+        const { data: migrationResult } = await supabase.functions.invoke('migrate-templates');
+        console.log('Resultado da migração:', migrationResult);
+      } catch (migrationError) {
+        console.warn('Aviso na migração de templates:', migrationError);
+        // Continuar mesmo se a migração falhar
+      }
+      
       const { data, error } = await supabase
         .from('templates')
         .select('*')
@@ -33,6 +43,7 @@ export const createLoadingSlice: StateCreator<
       }));
 
       console.log('Templates loaded successfully:', templates.length);
+      console.log('Template names:', templates.map(t => t.name));
       
       set({ templates });
       return templates;

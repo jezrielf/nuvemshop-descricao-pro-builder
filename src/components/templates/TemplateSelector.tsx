@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import CategoryFilter from './CategoryFilter';
 import TemplateGrid from './TemplateGrid';
 import useTemplateUtils from './useTemplateUtils';
-import { getAllTemplates } from '@/utils/templates';
 
 const TemplateSelector: React.FC = () => {
   const { templates, categories, setSelectedCategory, selectedCategory, loadTemplates, searchTemplates } = useTemplateStore();
@@ -31,28 +30,22 @@ const TemplateSelector: React.FC = () => {
         setIsLoading(true);
         setLoadError(null);
         try {
-          // Se não temos templates, garantimos que carregamos do serviço
-          if (!templates || templates.length === 0) {
-            console.log('TemplateSelector - Nenhum template carregado, buscando do serviço');
-            const loadedTemplates = await loadTemplates();
-            console.log('Templates loaded in TemplateSelector, count:', loadedTemplates.length);
-            
-            if (loadedTemplates.length === 0) {
-              // Se ainda não temos templates, usamos os locais
-              const localTemplates = getAllTemplates();
-              console.log('Usando templates locais como último recurso:', localTemplates.length);
-              
-              if (localTemplates.length === 0) {
-                setLoadError('Não foram encontrados templates.');
-                toast({
-                  title: "Aviso",
-                  description: "Não foi possível encontrar templates. Entre em contato com o suporte.",
-                  variant: "destructive",
-                });
-              }
-            }
+          console.log('TemplateSelector - Carregando templates do Supabase');
+          const loadedTemplates = await loadTemplates();
+          console.log('Templates carregados no TemplateSelector:', loadedTemplates.length);
+          
+          if (loadedTemplates.length === 0) {
+            setLoadError('Nenhum template encontrado. Verifique se os templates foram migrados.');
+            toast({
+              title: "Aviso",
+              description: "Nenhum template encontrado. Entre em contato com o suporte.",
+              variant: "destructive",
+            });
           } else {
-            console.log('TemplateSelector - Templates já carregados:', templates.length);
+            toast({
+              title: "Templates carregados",
+              description: `${loadedTemplates.length} templates disponíveis.`,
+            });
           }
         } catch (error) {
           console.error('Error loading templates in TemplateSelector:', error);
@@ -69,7 +62,7 @@ const TemplateSelector: React.FC = () => {
     };
     
     fetchTemplates();
-  }, [dialogOpen, loadTemplates, templates]);
+  }, [dialogOpen, loadTemplates, toast]);
   
   // Refresh templates manually
   const handleRefreshTemplates = async () => {
@@ -77,7 +70,7 @@ const TemplateSelector: React.FC = () => {
     setLoadError(null);
     try {
       const refreshedTemplates = await loadTemplates();
-      console.log('Templates refreshed, count:', refreshedTemplates.length);
+      console.log('Templates atualizados:', refreshedTemplates.length);
       
       if (refreshedTemplates.length > 0) {
         toast({
@@ -85,21 +78,12 @@ const TemplateSelector: React.FC = () => {
           description: `${refreshedTemplates.length} templates disponíveis.`,
         });
       } else {
-        // Se não temos templates do serviço, carregamos locais
-        const localTemplates = getAllTemplates();
-        if (localTemplates.length > 0) {
-          toast({
-            title: "Templates locais carregados",
-            description: `${localTemplates.length} templates padrão disponíveis.`,
-          });
-        } else {
-          setLoadError('Nenhum template encontrado após atualização.');
-          toast({
-            title: "Aviso",
-            description: "Não encontramos templates após a atualização.",
-            variant: "destructive",
-          });
-        }
+        setLoadError('Nenhum template encontrado após atualização.');
+        toast({
+          title: "Aviso",
+          description: "Não encontramos templates após a atualização.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error refreshing templates:', error);
@@ -116,7 +100,6 @@ const TemplateSelector: React.FC = () => {
   
   // Apply search and category filtering
   const displayedTemplates = React.useMemo(() => {
-    // Se não temos templates, verificamos se precisamos carregar
     if (!templates || templates.length === 0) {
       console.warn('TemplateSelector - Sem templates disponíveis para filtrar');
       return [];

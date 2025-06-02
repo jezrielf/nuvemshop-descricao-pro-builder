@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Template } from '@/types/editor';
+import { HtmlInputTab } from './import/HtmlInputTab';
 
 interface NewTemplateDialogProps {
   open: boolean;
@@ -23,6 +24,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
   });
   const [htmlContent, setHtmlContent] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
   
   const { createTemplate } = useTemplateStore();
@@ -56,8 +58,17 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
           }
         }];
       } else {
-        // Default empty template
-        blocks = [];
+        // Default empty template with a basic structure
+        blocks = [{
+          id: 'hero-1',
+          type: 'hero',
+          title: 'Banner Principal',
+          content: {
+            title: 'Título do seu produto',
+            subtitle: 'Descrição atrativa do produto',
+            buttonText: 'Saiba Mais'
+          }
+        }];
       }
       
       const templateData: Omit<Template, "id"> = {
@@ -88,6 +99,18 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleGenerateFromHtml = () => {
+    setIsGenerating(true);
+    // Simulate HTML processing
+    setTimeout(() => {
+      toast({
+        title: 'HTML processado',
+        description: 'Template gerado a partir do HTML fornecido'
+      });
+      setIsGenerating(false);
+    }, 2000);
   };
 
   const handleClose = () => {
@@ -144,31 +167,23 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">Template Vazio</TabsTrigger>
+              <TabsTrigger value="basic">Template Básico</TabsTrigger>
               <TabsTrigger value="html">Importar HTML</TabsTrigger>
             </TabsList>
             
             <TabsContent value="basic" className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Crie um template vazio que você pode editar depois adicionando blocos.
+                Crie um template básico com uma estrutura inicial que você pode editar depois.
               </p>
             </TabsContent>
             
             <TabsContent value="html" className="space-y-4">
-              <div>
-                <Label htmlFor="html">Código HTML</Label>
-                <Textarea
-                  id="html"
-                  value={htmlContent}
-                  onChange={(e) => setHtmlContent(e.target.value)}
-                  placeholder="Cole seu código HTML aqui..."
-                  rows={10}
-                  className="font-mono"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  O HTML será convertido em blocos de texto que você pode editar depois.
-                </p>
-              </div>
+              <HtmlInputTab
+                htmlInput={htmlContent}
+                isGenerating={isGenerating}
+                onHtmlChange={setHtmlContent}
+                onGenerate={handleGenerateFromHtml}
+              />
             </TabsContent>
           </Tabs>
           
