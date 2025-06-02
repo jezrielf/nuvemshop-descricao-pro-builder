@@ -19,24 +19,54 @@ export const TemplateActions: React.FC<TemplateActionsProps> = ({
   const { openPreviewDialog, openEditDialog, openDeleteDialog } = useTemplateDialogs();
   const { toast } = useToast();
 
-  const handlePreviewClick = () => {
+  const handlePreviewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log('Preview button clicked for template:', template.id);
+    if (!template) {
+      toast({
+        title: 'Erro',
+        description: 'Template não encontrado',
+        variant: 'destructive'
+      });
+      return;
+    }
     openPreviewDialog(template);
   };
 
-  const handleEditClick = () => {
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log('Edit button clicked for template:', template.id);
+    if (!template) {
+      toast({
+        title: 'Erro',
+        description: 'Template não encontrado',
+        variant: 'destructive'
+      });
+      return;
+    }
     openEditDialog(template);
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log('Delete button clicked for template:', template.id);
+    if (!template) {
+      toast({
+        title: 'Erro',
+        description: 'Template não encontrado',
+        variant: 'destructive'
+      });
+      return;
+    }
     setIsLoading(true);
     // Small delay to prevent accidental clicks
     setTimeout(() => {
       openDeleteDialog(template, onTemplateDeleted);
       setIsLoading(false);
-    }, 300);
+    }, 100);
   };
 
   return (

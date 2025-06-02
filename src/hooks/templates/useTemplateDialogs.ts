@@ -79,6 +79,10 @@ export function useTemplateDialogs() {
     setIsPreviewDialogOpen(false);
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
+    setPreviewTemplate(null);
+    setEditTemplate(null);
+    setDeleteTemplate(null);
+    setDeleteCallback(undefined);
   };
   
   return {
