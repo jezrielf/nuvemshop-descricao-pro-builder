@@ -30,29 +30,34 @@ const TemplateSelector: React.FC = () => {
         setIsLoading(true);
         setLoadError(null);
         try {
-          console.log('TemplateSelector - Carregando templates do Supabase');
+          console.log('TemplateSelector - Dialog aberto, carregando templates...');
           const loadedTemplates = await loadTemplates();
-          console.log('Templates carregados no TemplateSelector:', loadedTemplates.length);
+          console.log('TemplateSelector - Templates carregados:', loadedTemplates.length);
           
           if (loadedTemplates.length === 0) {
-            setLoadError('Nenhum template encontrado. Verifique se os templates foram migrados.');
+            setLoadError('Nenhum template encontrado no banco de dados.');
             toast({
               title: "Aviso",
-              description: "Nenhum template encontrado. Entre em contato com o suporte.",
+              description: "Nenhum template encontrado. Verifique se os templates foram criados.",
               variant: "destructive",
             });
           } else {
+            console.log('TemplateSelector - Templates encontrados:');
+            loadedTemplates.forEach((template, index) => {
+              console.log(`- ${index + 1}: ${template.name} (${template.category})`);
+            });
+            
             toast({
               title: "Templates carregados",
               description: `${loadedTemplates.length} templates disponíveis.`,
             });
           }
         } catch (error) {
-          console.error('Error loading templates in TemplateSelector:', error);
-          setLoadError('Erro ao carregar templates. Tente novamente.');
+          console.error('TemplateSelector - Erro ao carregar templates:', error);
+          setLoadError('Erro ao conectar com o banco de dados. Tente novamente.');
           toast({
             title: "Erro ao carregar templates",
-            description: "Não foi possível carregar os templates. Tente novamente.",
+            description: "Não foi possível conectar com o banco de dados. Verifique sua conexão.",
             variant: "destructive",
           });
         } finally {
@@ -69,8 +74,9 @@ const TemplateSelector: React.FC = () => {
     setIsLoading(true);
     setLoadError(null);
     try {
+      console.log('TemplateSelector - Atualizando templates manualmente...');
       const refreshedTemplates = await loadTemplates();
-      console.log('Templates atualizados:', refreshedTemplates.length);
+      console.log('TemplateSelector - Templates atualizados:', refreshedTemplates.length);
       
       if (refreshedTemplates.length > 0) {
         toast({
@@ -81,13 +87,13 @@ const TemplateSelector: React.FC = () => {
         setLoadError('Nenhum template encontrado após atualização.');
         toast({
           title: "Aviso",
-          description: "Não encontramos templates após a atualização.",
+          description: "Ainda não há templates no banco de dados.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error refreshing templates:', error);
-      setLoadError('Erro ao atualizar templates. Tente novamente.');
+      console.error('TemplateSelector - Erro ao atualizar templates:', error);
+      setLoadError('Erro ao atualizar templates. Verifique sua conexão.');
       toast({
         title: "Erro ao atualizar templates",
         description: "Não foi possível atualizar os templates. Tente novamente.",
@@ -100,17 +106,23 @@ const TemplateSelector: React.FC = () => {
   
   // Apply search and category filtering
   const displayedTemplates = React.useMemo(() => {
+    console.log('TemplateSelector - Recalculando templates filtrados...');
+    console.log('TemplateSelector - Total de templates:', templates.length);
+    console.log('TemplateSelector - Query de busca:', searchQuery);
+    console.log('TemplateSelector - Categoria selecionada:', selectedCategory);
+    
     if (!templates || templates.length === 0) {
       console.warn('TemplateSelector - Sem templates disponíveis para filtrar');
       return [];
     }
     
     const filtered = searchTemplates(searchQuery, selectedCategory);
-    console.log(`TemplateSelector - Filtrados ${filtered.length} templates de ${templates.length} total`);
+    console.log(`TemplateSelector - Resultado final: ${filtered.length} templates filtrados`);
     return filtered;
   }, [templates, selectedCategory, searchQuery, searchTemplates]);
 
   const handleSelectTemplate = (template: TemplateType) => {
+    console.log('TemplateSelector - Template selecionado:', template.name);
     loadTemplate(template);
     setDialogOpen(false);
     
@@ -172,12 +184,14 @@ const TemplateSelector: React.FC = () => {
               {(loadError && (!templates || templates.length === 0)) ? (
                 <div className="flex flex-col items-center justify-center h-40 text-center">
                   <AlertCircle className="h-8 w-8 text-amber-500 mb-2" />
-                  <p className="text-muted-foreground">{loadError}</p>
+                  <p className="text-muted-foreground mb-2">{loadError}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Certifique-se de que os templates foram criados no painel administrativo.
+                  </p>
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={handleRefreshTemplates}
-                    className="mt-4"
                     disabled={isLoading}
                   >
                     <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />

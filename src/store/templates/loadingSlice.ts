@@ -12,44 +12,61 @@ export const createLoadingSlice: StateCreator<
 > = (set, get) => ({
   loadTemplates: async () => {
     try {
-      console.log('Loading templates from Supabase...');
+      console.log('loadingSlice - Carregando templates do Supabase...');
       
-      // Primeiro, tentar migrar templates se necessário
-      try {
-        console.log('Verificando se precisa migrar templates...');
-        const { data: migrationResult } = await supabase.functions.invoke('migrate-templates');
-        console.log('Resultado da migração:', migrationResult);
-      } catch (migrationError) {
-        console.warn('Aviso na migração de templates:', migrationError);
-        // Continuar mesmo se a migração falhar
+      // Verificar conexão com Supabase
+      const { data: testData, error: testError } = await supabase
+        .from('templates')
+        .select('count')
+        .limit(1);
+        
+      if (testError) {
+        console.error('loadingSlice - Erro na conexão com Supabase:', testError);
+        throw testError;
       }
       
+      console.log('loadingSlice - Conexão com Supabase OK');
+      
+      // Carregar todos os templates
       const { data, error } = await supabase
         .from('templates')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading templates:', error);
+        console.error('loadingSlice - Erro ao carregar templates:', error);
         throw error;
       }
 
-      const templates: Template[] = (data || []).map(item => ({
-        id: item.id,
-        name: item.name,
-        category: item.category as any,
-        blocks: Array.isArray(item.blocks) ? item.blocks : [],
-        user_id: item.user_id
-      }));
+      console.log('loadingSlice - Dados brutos do banco:', data);
 
-      console.log('Templates loaded successfully:', templates.length);
-      console.log('Template names:', templates.map(t => t.name));
+      const templates: Template[] = (data || []).map(item => {
+        console.log('loadingSlice - Processando template:', item.name);
+        return {
+          id: item.id,
+          name: item.name,
+          category: item.category as any,
+          blocks: Array.isArray(item.blocks) ? item.blocks : [],
+          user_id: item.user_id
+        };
+      });
+
+      console.log('loadingSlice - Templates processados:', templates.length);
+      templates.forEach((template, index) => {
+        console.log(`loadingSlice - Template ${index + 1}: ${template.name} (${template.category}) - ${template.blocks.length} blocos`);
+      });
       
       set({ templates });
+      
+      // Extrair categorias únicas
+      const uniqueCategories = [...new Set(templates.map(t => t.category))];
+      console.log('loadingSlice - Categorias encontradas:', uniqueCategories);
+      set({ categories: uniqueCategories });
+      
       return templates;
     } catch (error) {
-      console.error('Error in loadTemplates:', error);
-      set({ templates: [] });
+      console.error('loadingSlice - Erro fatal no carregamento:', error);
+      set({ templates: [], categories: [] });
       throw error;
     }
   },
@@ -57,26 +74,34 @@ export const createLoadingSlice: StateCreator<
   searchTemplates: (query: string, category: string | null) => {
     const { templates } = get();
     
+    console.log('loadingSlice - searchTemplates chamado:', { query, category, totalTemplates: templates.length });
+    
     if (!templates || templates.length === 0) {
+      console.warn('loadingSlice - Sem templates para filtrar');
       return [];
     }
 
     let filtered = [...templates];
 
-    // Filter by category
-    if (category && category !== 'all') {
+    // Filtrar por categoria
+    if (category && category !== 'all' && category !== null) {
+      const originalCount = filtered.length;
       filtered = filtered.filter(template => template.category === category);
+      console.log(`loadingSlice - Filtro por categoria '${category}': ${originalCount} -> ${filtered.length}`);
     }
 
-    // Filter by search query
+    // Filtrar por busca
     if (query && query.trim() !== '') {
       const searchTerm = query.toLowerCase();
+      const originalCount = filtered.length;
       filtered = filtered.filter(template =>
         template.name.toLowerCase().includes(searchTerm) ||
         template.category.toLowerCase().includes(searchTerm)
       );
+      console.log(`loadingSlice - Filtro por busca '${searchTerm}': ${originalCount} -> ${filtered.length}`);
     }
 
+    console.log('loadingSlice - Templates filtrados final:', filtered.length);
     return filtered;
   }
 });
