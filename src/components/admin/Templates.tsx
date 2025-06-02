@@ -855,13 +855,15 @@ export const Templates: React.FC = () => {
       }
 
       // Inserir os novos templates premium
+      const templatesForInsert = premiumTemplates.map(template => ({
+        name: template.name,
+        category: template.category,
+        blocks: template.blocks
+      }));
+
       const { error: insertError } = await supabase
         .from('templates')
-        .insert(premiumTemplates.map(template => ({
-          name: template.name,
-          category: template.category,
-          blocks: template.blocks
-        })));
+        .insert(templatesForInsert);
 
       if (insertError) throw insertError;
 
