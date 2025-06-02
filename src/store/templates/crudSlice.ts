@@ -23,12 +23,12 @@ export const createCRUDSlice: StateCreator<
       
       const { data, error } = await supabase
         .from('templates')
-        .insert([{
+        .insert({
           name: templateData.name,
-          category: templateData.category,
+          category: templateData.category as string,
           blocks: templateData.blocks || [],
           user_id: userId
-        }])
+        } as any)
         .select()
         .single();
       
@@ -69,7 +69,7 @@ export const createCRUDSlice: StateCreator<
         .from('templates')
         .update({
           name: templateData.name || existingTemplate.name,
-          category: templateData.category || existingTemplate.category,
+          category: (templateData.category as string) || (existingTemplate.category as string),
           blocks: templateData.blocks || existingTemplate.blocks
         })
         .eq('id', id)

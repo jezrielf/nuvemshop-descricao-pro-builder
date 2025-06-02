@@ -6,7 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { CreateUserFormValues } from './types';
+
+interface CreateUserFormValues {
+  nome: string;
+  email: string;
+  password: string;
+  role: string;
+}
 
 interface CreateUserFormProps {
   onUserCreated: () => Promise<void>;

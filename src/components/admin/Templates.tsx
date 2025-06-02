@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,11 +93,11 @@ export const Templates: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('templates')
-        .insert([{
+        .insert({
           name: newTemplate.name,
           category: newTemplate.category,
-          blocks: []
-        }])
+          blocks: [] as any
+        } as any)
         .select()
         .single();
 
