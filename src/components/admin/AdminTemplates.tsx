@@ -140,15 +140,18 @@ export const AdminTemplates: React.FC = () => {
         }];
       }
 
-      // Insert without id - let Supabase auto-generate it
+      // Generate UUID for the template
+      const templateId = crypto.randomUUID();
+
       const { data, error } = await supabase
         .from('templates')
-        .insert([{
+        .insert({
+          id: templateId,
           name: formData.name,
           category: formData.category as string,
           blocks: blocks as any,
           user_id: user.id
-        }])
+        })
         .select()
         .single();
 
