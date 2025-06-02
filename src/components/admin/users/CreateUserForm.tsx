@@ -1,59 +1,50 @@
-
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
-import { CreateUserFormValues } from './types';
-import CreateUserRoleSelector from './CreateUserRoleSelector';
-import { adminService } from '@/services/admin';
+import { userService } from '@/services/admin/userService';
+import { cn } from '@/lib/utils';
 
 interface CreateUserFormProps {
-  onUserCreated: () => void;
+  onClose: () => void;
+  onUserCreated?: (user: any) => void;
 }
 
-const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
+const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose, onUserCreated }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [nome, setNome] = useState('');
+  const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { toast } = useToast();
-  const form = useForm<CreateUserFormValues>({
-    defaultValues: {
-      email: '',
-      password: '',
-      nome: '',
-      role: 'user'
-    }
-  });
 
-  const handleSubmit = async (values: CreateUserFormValues) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
     try {
-      setLoading(true);
-      console.log('Creating user with values:', values);
+      console.log('CreateUserForm: Submitting form with:', { email, nome, role });
       
-      // Prepare user data
-      const userData = {
-        nome: values.nome,
-        role: values.role
-      };
-      
-      // Create the user using the admin service
-      const data = await adminService.createUser(values.email, values.password, userData);
-      
-      console.log('User created successfully:', data);
+      const result = await userService.createUser(email, password, nome, Array.isArray(role) ? role.join(',') : role);
       
       toast({
         title: 'Usuário criado com sucesso',
-        description: `Usuário ${values.nome} foi criado com email ${values.email}`,
+        description: `O usuário ${nome} foi criado e receberá um email de confirmação.`,
       });
-      
-      onUserCreated();
-      form.reset();
+
+      onUserCreated?.(result);
+      onClose();
     } catch (error: any) {
-      console.error('Error creating user:', error);
+      console.error('CreateUserForm: Error creating user:', error);
+      setError(error.message || 'Erro ao criar usuário');
+      
       toast({
         title: 'Erro ao criar usuário',
-        description: error.message || 'Ocorreu um erro ao criar o usuário',
+        description: error.message || 'Ocorreu um erro inesperado',
         variant: 'destructive',
       });
     } finally {
@@ -62,52 +53,62 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 mt-6">
-      <div className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <div className="text-red-500">{error}</div>}
+      <div>
         <Label htmlFor="email">Email</Label>
         <Input
-          id="email"
           type="email"
-          placeholder="email@example.com"
-          {...form.register('email', { required: true })}
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
         />
       </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="nome">Nome</Label>
-        <Input
-          id="nome"
-          placeholder="Nome do usuário"
-          {...form.register('nome', { required: true })}
-        />
-      </div>
-      
-      <div className="space-y-2">
+      <div>
         <Label htmlFor="password">Senha</Label>
         <Input
-          id="password"
           type="password"
-          placeholder="********"
-          {...form.register('password', { required: true })}
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={loading}
         />
       </div>
-      
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium">Tipo de Usuário</h3>
-        <CreateUserRoleSelector 
-          watch={form.watch} 
-          setValue={form.setValue} 
+      <div>
+        <Label htmlFor="nome">Nome</Label>
+        <Input
+          type="text"
+          id="nome"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          required
+          disabled={loading}
         />
       </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full mt-6" 
-        disabled={loading}
-      >
-        {loading ? <Spinner className="mr-2" /> : null}
-        Criar Usuário
-      </Button>
+      <div>
+        <Label htmlFor="role">Role</Label>
+        <Select onValueChange={setRole} defaultValue="user">
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecione um role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="user">User</SelectItem>
+            <SelectItem value="premium">Premium</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button variant="secondary" onClick={onClose} disabled={loading}>
+          Cancelar
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Criando...' : 'Criar Usuário'}
+        </Button>
+      </div>
     </form>
   );
 };

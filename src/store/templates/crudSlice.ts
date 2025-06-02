@@ -1,7 +1,7 @@
 
 import { StateCreator } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { Template } from '@/types/editor';
+import { Template, ProductCategory } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,7 +29,7 @@ export const createCRUDSlice: StateCreator<
       const templates: Template[] = data.map(template => ({
         id: template.id,
         name: template.name,
-        category: template.category as any,
+        category: template.category as ProductCategory,
         blocks: Array.isArray(template.blocks) ? template.blocks : [],
         createdAt: template.created_at,
         updatedAt: template.updated_at
@@ -57,7 +57,7 @@ export const createCRUDSlice: StateCreator<
         .insert({
           id: templateId,
           name: template.name,
-          category: template.category,
+          category: template.category as string,
           blocks: template.blocks,
           created_at: now,
           updated_at: now
@@ -73,7 +73,7 @@ export const createCRUDSlice: StateCreator<
       const newTemplate: Template = {
         id: data.id,
         name: data.name,
-        category: data.category,
+        category: data.category as ProductCategory,
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
         createdAt: data.created_at,
         updatedAt: data.updated_at
@@ -99,7 +99,7 @@ export const createCRUDSlice: StateCreator<
         .from('templates')
         .update({
           name: updates.name,
-          category: updates.category,
+          category: updates.category as string,
           blocks: updates.blocks,
           updated_at: new Date().toISOString()
         })
@@ -115,7 +115,7 @@ export const createCRUDSlice: StateCreator<
       const updatedTemplate: Template = {
         id: data.id,
         name: data.name,
-        category: data.category,
+        category: data.category as ProductCategory,
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
         createdAt: data.created_at,
         updatedAt: data.updated_at

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Users, ShoppingCart, FileText, RefreshCw } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
-import { adminService } from '@/services/admin';
+import { dashboardService } from '@/services/admin/dashboardService';
 
 // Demo data for charts that don't have backend data yet
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -41,7 +42,7 @@ const DashboardPanel: React.FC = () => {
     total: 0,
     recent: 0
   });
-  const [plansStats, setPlansStats] = useState({
+  const [subscribersStats, setSubscribersStats] = useState({
     total: 0,
     active: 0
   });
@@ -53,11 +54,11 @@ const DashboardPanel: React.FC = () => {
       setLoading(true);
       
       // Load dashboard stats from our admin service
-      const stats = await adminService.getDashboardStats();
+      const stats = await dashboardService.getDashboardStats();
       
       setUserStats(stats.userStats);
       setDescriptionsStats(stats.descriptions);
-      setPlansStats(stats.plans);
+      setSubscribersStats(stats.subscribers);
       
       // Create plan distribution data
       const planDistData = [];
@@ -128,13 +129,13 @@ const DashboardPanel: React.FC = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Planos Ativos</CardTitle>
+            <CardTitle className="text-sm font-medium">Assinantes Ativos</CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{plansStats.active}</div>
+            <div className="text-2xl font-bold">{subscribersStats.active}</div>
             <p className="text-xs text-muted-foreground">
-              De {plansStats.total} planos totais
+              De {subscribersStats.total} assinantes totais
             </p>
           </CardContent>
         </Card>
