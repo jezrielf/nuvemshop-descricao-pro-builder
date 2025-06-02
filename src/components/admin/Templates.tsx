@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -854,11 +855,11 @@ export const Templates: React.FC = () => {
         console.warn('Erro ao deletar templates existentes:', deleteError);
       }
 
-      // Inserir os novos templates premium
+      // Inserir os novos templates premium com tipo correto
       const templatesForInsert = premiumTemplates.map(template => ({
         name: template.name,
-        category: template.category,
-        blocks: template.blocks
+        category: template.category as string, // Explicit cast to string
+        blocks: template.blocks as any // Cast to match Json type expected by Supabase
       }));
 
       const { error: insertError } = await supabase
