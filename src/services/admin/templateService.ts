@@ -2,25 +2,43 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
 import { ProductCategory } from '@/types/editor/products';
+import { getAllTemplates } from '@/utils/templates';
 
 export const templateService = {
   getTemplates: async (): Promise<Template[]> => {
     try {
-      console.log('templateService.getTemplates() - Starting template fetch from Supabase');
+      console.log('Iniciando carregamento de templates do banco de dados');
       
-      // Get templates from Supabase
+      // Check if user is authenticated
+      const { data: authData } = await supabase.auth.getSession();
+      const userId = authData.session?.user.id;
+      console.log('Current user ID:', userId);
+      
+      // First try to get templates from database
       const { data, error } = await supabase
         .from('templates')
         .select('*')
         .order('updated_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching templates from Supabase:', error);
-        throw error;
+        console.warn('Erro ao carregar templates do banco de dados:', error);
+        // If there's an error, return local templates
+        const localTemplates = getAllTemplates();
+        console.log(`Fallback para ${localTemplates.length} templates locais devido a erro no banco`);
+        return localTemplates;
       }
       
-      // Convert database response to Template format
+      // If no data or empty array, return local templates
+      if (!data || data.length === 0) {
+        console.log('Nenhum template encontrado no banco de dados, usando templates locais');
+        const localTemplates = getAllTemplates();
+        console.log(`Carregados ${localTemplates.length} templates locais como fallback`);
+        return localTemplates;
+      }
+      
+      // Convert database response to Template format with proper type handling
       const templates: Template[] = (data || []).map((template) => {
+        // Convert string category to ProductCategory with validation
         let category: ProductCategory = 'other';
         
         if (template.category && typeof template.category === 'string') {
@@ -34,6 +52,7 @@ export const templateService = {
           }
         }
         
+        // Ensure blocks is always an array
         let blockData: any[] = [];
         
         if (Array.isArray(template.blocks)) {
@@ -47,124 +66,177 @@ export const templateService = {
           name: template.name,
           category: category,
           blocks: blockData,
-          thumbnail: '/placeholder.svg',
-          user_id: template.user_id
+          thumbnail: '/placeholder.svg', // Default thumbnail
+          user_id: template.user_id // Ensure we keep the user_id
         };
       });
       
-      console.log(`templateService.getTemplates() - Successfully fetched ${templates.length} templates`);
+      console.log(`Carregados ${templates.length} templates do banco de dados com sucesso`);
+      
+      // If we have database templates but they're few, combine with local ones
+      if (templates.length < 10) {
+        const localTemplates = getAllTemplates();
+        // Filter to avoid duplicate IDs
+        const localWithoutDuplicates = localTemplates.filter(
+          local => !templates.some(db => db.id === local.id)
+        );
+        const combined = [...templates, ...localWithoutDuplicates];
+        console.log(`Combinando ${templates.length} templates do banco com ${localWithoutDuplicates.length} templates locais`);
+        return combined;
+      }
+      
       return templates;
     } catch (error) {
-      console.error('Error in templateService.getTemplates:', error);
-      throw error;
+      console.error('Error in getTemplates:', error);
+      // In case of any error, return local templates as fallback
+      const localTemplates = getAllTemplates();
+      console.log(`Usando ${localTemplates.length} templates locais como fallback devido a erro geral`);
+      return localTemplates;
     }
   },
   
   createTemplate: async (templateData: Omit<Template, 'id'>): Promise<Template> => {
     try {
-      console.log('templateService.createTemplate() - Creating template');
-      
       // Get current authenticated user
       const { data: authData } = await supabase.auth.getSession();
       const userId = authData.session?.user.id;
       
       if (!userId) {
+        console.error('Error in createTemplate: Not authenticated');
         throw new Error('Authentication required');
       }
       
-      // Create template in Supabase - explicitly type the insert to exclude id
+      // Generate UUID for new template
+      const id = crypto.randomUUID();
+      
+      // Ensure blocks is serialized properly for storage
+      const blockData = templateData.blocks || [];
+      
+      // Always include user_id when creating a template
+      console.log('Creating template with user_id:', userId);
       const { data, error } = await supabase
         .from('templates')
         .insert({
+          id,
           name: templateData.name,
-          category: templateData.category as string,
-          blocks: templateData.blocks || [],
-          user_id: userId
-        } as any) // Use 'as any' to bypass the strict typing for insert
+          category: templateData.category,
+          blocks: blockData,
+          user_id: templateData.user_id || userId // Use provided user_id or current user
+        })
         .select()
         .single();
       
       if (error) {
-        console.error('Error creating template:', error);
+        console.error('Error in supabase insert:', error);
         throw error;
       }
       
-      // Convert to Template format
+      // Ensure blocks is always an array
+      let blocks: any[] = [];
+      
+      if (Array.isArray(data.blocks)) {
+        blocks = data.blocks;
+      } else if (typeof data.blocks === 'object' && data.blocks !== null) {
+        blocks = Object.values(data.blocks);
+      }
+      
+      // Convert returned data to Template format
       const template: Template = {
         id: data.id,
         name: data.name,
         category: data.category as ProductCategory,
-        blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        thumbnail: '/placeholder.svg',
-        user_id: data.user_id
+        blocks,
+        thumbnail: '/placeholder.svg', // Default thumbnail
+        user_id: data.user_id // Include user_id in returned object
       };
       
-      console.log('templateService.createTemplate() - Template created successfully:', template.id);
+      console.log('Template created successfully:', template.id);
       return template;
     } catch (error) {
-      console.error('Error in templateService.createTemplate:', error);
+      console.error('Error in createTemplate:', error);
       throw error;
     }
   },
   
   updateTemplate: async (templateId: string, templateData: Partial<Template>): Promise<Template> => {
     try {
-      console.log('templateService.updateTemplate() - Updating template:', templateId);
+      // Get current authenticated user
+      const { data: authData } = await supabase.auth.getSession();
+      const userId = authData.session?.user.id;
       
-      // Update template in Supabase
+      if (!userId) {
+        console.error('Error in updateTemplate: Not authenticated');
+        throw new Error('Authentication required');
+      }
+      
+      console.log('Updating template with ID:', templateId);
+      
+      // Prepare update data
+      const updateData: any = {};
+      
+      if (templateData.name) updateData.name = templateData.name;
+      if (templateData.category) updateData.category = templateData.category;
+      if (templateData.blocks) updateData.blocks = templateData.blocks;
+      if (templateData.user_id) updateData.user_id = templateData.user_id;
+      
+      updateData.updated_at = new Date().toISOString();
+      
       const { data, error } = await supabase
         .from('templates')
-        .update({
-          name: templateData.name,
-          category: templateData.category as string, // Cast to string for database
-          blocks: templateData.blocks,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', templateId)
         .select()
         .single();
       
       if (error) {
-        console.error('Error updating template:', error);
+        console.error('Error in supabase update:', error);
         throw error;
       }
       
-      // Convert to Template format
+      // Ensure blocks is always an array
+      let blocks: any[] = [];
+      
+      if (Array.isArray(data.blocks)) {
+        blocks = data.blocks;
+      } else if (typeof data.blocks === 'object' && data.blocks !== null) {
+        blocks = Object.values(data.blocks);
+      }
+      
+      // Convert returned data to Template format
       const template: Template = {
         id: data.id,
         name: data.name,
         category: data.category as ProductCategory,
-        blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        thumbnail: '/placeholder.svg',
-        user_id: data.user_id
+        blocks,
+        thumbnail: '/placeholder.svg', // Default thumbnail
+        user_id: data.user_id // Include user_id in returned object
       };
       
-      console.log('templateService.updateTemplate() - Template updated successfully');
+      console.log('Template updated successfully:', template.id);
       return template;
     } catch (error) {
-      console.error('Error in templateService.updateTemplate:', error);
+      console.error('Error in updateTemplate:', error);
       throw error;
     }
   },
   
   deleteTemplate: async (templateId: string): Promise<void> => {
     try {
-      console.log('templateService.deleteTemplate() - Deleting template:', templateId);
+      console.log('Deleting template with ID:', templateId);
       
-      // Delete template from Supabase
       const { error } = await supabase
         .from('templates')
         .delete()
         .eq('id', templateId);
       
       if (error) {
-        console.error('Error deleting template:', error);
+        console.error('Error in supabase delete:', error);
         throw error;
       }
       
-      console.log('templateService.deleteTemplate() - Template deleted successfully');
+      console.log('Template deleted successfully from database');
     } catch (error) {
-      console.error('Error in templateService.deleteTemplate:', error);
+      console.error('Error in deleteTemplate:', error);
       throw error;
     }
   }

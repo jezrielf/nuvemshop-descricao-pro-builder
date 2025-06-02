@@ -16,14 +16,14 @@ export function useTemplateDialogs() {
   const { toast } = useToast();
   
   const openNewDialog = () => {
-    console.log('useTemplateDialogs.openNewDialog() - Opening new template dialog');
+    console.log('Opening new template dialog');
     closeAllDialogs();
     setIsNewDialogOpen(true);
   };
   
   const openPreviewDialog = (template: Template) => {
     if (!template) {
-      console.error('useTemplateDialogs.openPreviewDialog() - No template provided');
+      console.error('Cannot open preview dialog: No template provided');
       toast({
         title: 'Erro',
         description: 'Não foi possível abrir a visualização do template',
@@ -32,7 +32,7 @@ export function useTemplateDialogs() {
       return;
     }
     
-    console.log('useTemplateDialogs.openPreviewDialog() - Opening preview for:', template.name);
+    console.log('Opening preview dialog for template:', template.id, template.name);
     closeAllDialogs();
     setPreviewTemplate(template);
     setIsPreviewDialogOpen(true);
@@ -40,7 +40,7 @@ export function useTemplateDialogs() {
   
   const openEditDialog = (template: Template) => {
     if (!template) {
-      console.error('useTemplateDialogs.openEditDialog() - No template provided');
+      console.error('Cannot open edit dialog: No template provided');
       toast({
         title: 'Erro',
         description: 'Não foi possível abrir a edição do template',
@@ -49,7 +49,7 @@ export function useTemplateDialogs() {
       return;
     }
     
-    console.log('useTemplateDialogs.openEditDialog() - Opening edit for:', template.name);
+    console.log('Opening edit dialog for template:', template.id, template.name);
     closeAllDialogs();
     setEditTemplate(template);
     setIsEditDialogOpen(true);
@@ -57,7 +57,7 @@ export function useTemplateDialogs() {
   
   const openDeleteDialog = (template: Template, onDeleted?: () => void) => {
     if (!template) {
-      console.error('useTemplateDialogs.openDeleteDialog() - No template provided');
+      console.error('Cannot open delete dialog: No template provided');
       toast({
         title: 'Erro',
         description: 'Não foi possível abrir a confirmação de exclusão',
@@ -66,7 +66,7 @@ export function useTemplateDialogs() {
       return;
     }
     
-    console.log('useTemplateDialogs.openDeleteDialog() - Opening delete confirmation for:', template.name);
+    console.log('Opening delete dialog for template:', template.id, template.name);
     closeAllDialogs();
     setDeleteTemplate(template);
     setDeleteCallback(() => onDeleted);
@@ -74,15 +74,11 @@ export function useTemplateDialogs() {
   };
   
   const closeAllDialogs = () => {
-    console.log('useTemplateDialogs.closeAllDialogs() - Closing all dialogs');
+    console.log('Closing all dialogs');
     setIsNewDialogOpen(false);
     setIsPreviewDialogOpen(false);
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
-    setPreviewTemplate(null);
-    setEditTemplate(null);
-    setDeleteTemplate(null);
-    setDeleteCallback(undefined);
   };
   
   return {

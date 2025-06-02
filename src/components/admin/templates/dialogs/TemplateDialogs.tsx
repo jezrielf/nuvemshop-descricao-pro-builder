@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { useTemplateDialogs } from '@/hooks/templates/useTemplateDialogs';
-import { useTemplateStore } from '@/store/templates';
+import { useTemplateStore } from '@/hooks/templates/useTemplateStore';
 import { NewTemplateDialog } from './NewTemplateDialog';
 import { EditTemplateDialog } from './EditTemplateDialog';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';
 import { PreviewTemplateDialog } from './PreviewTemplateDialog';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 export const TemplateDialogs: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -23,12 +24,13 @@ export const TemplateDialogs: React.FC = () => {
     closeAllDialogs
   } = useTemplateDialogs();
   
-  const { deleteTemplate: removeTemplate, loadTemplates } = useTemplateStore();
+  // Use the hook that already includes enhanced delete functionality
+  const { deleteTemplate: removeTemplate } = useTemplateStore();
   const { toast } = useToast();
 
   const handleDeleteTemplate = async () => {
     if (!deleteTemplate) {
-      console.error('TemplateDialogs.handleDeleteTemplate() - No template selected');
+      console.error('No template selected for deletion');
       toast({
         title: 'Erro',
         description: 'Nenhum template selecionado para exclusão',
@@ -38,9 +40,10 @@ export const TemplateDialogs: React.FC = () => {
     }
     
     setIsDeleting(true);
-    console.log('TemplateDialogs.handleDeleteTemplate() - Deleting:', deleteTemplate.name);
+    console.log('Starting deletion process for template:', deleteTemplate.id);
     
     try {
+      // Use the store's delete method instead of direct Supabase call
       const success = await removeTemplate(deleteTemplate.id);
       
       if (!success) {
@@ -60,17 +63,14 @@ export const TemplateDialogs: React.FC = () => {
       
       // Execute callback if provided
       if (deleteCallback) {
-        console.log('TemplateDialogs.handleDeleteTemplate() - Executing callback');
+        console.log('Executing delete callback');
         deleteCallback();
       }
-      
-      // Reload templates to ensure UI is in sync
-      await loadTemplates();
       
       // Close the dialog
       closeAllDialogs();
     } catch (error) {
-      console.error('TemplateDialogs.handleDeleteTemplate() - Error:', error);
+      console.error('Exception during template deletion:', error);
       toast({
         title: 'Erro ao deletar',
         description: 'Ocorreu um erro inesperado ao tentar excluir o template',
@@ -81,19 +81,12 @@ export const TemplateDialogs: React.FC = () => {
     }
   };
 
-  const handleDialogClose = async () => {
-    console.log('TemplateDialogs.handleDialogClose() - Refreshing templates');
-    closeAllDialogs();
-    // Refresh templates when closing dialogs to ensure UI is up to date
-    await loadTemplates();
-  };
-
   return (
     <>
       {isNewDialogOpen && (
         <NewTemplateDialog 
           open={isNewDialogOpen} 
-          onClose={handleDialogClose} 
+          onClose={closeAllDialogs} 
         />
       )}
       
@@ -108,7 +101,7 @@ export const TemplateDialogs: React.FC = () => {
       {isEditDialogOpen && editTemplate && (
         <EditTemplateDialog
           open={isEditDialogOpen}
-          onClose={handleDialogClose}
+          onClose={closeAllDialogs}
           template={editTemplate}
         />
       )}
