@@ -30,9 +30,7 @@ export const createCRUDSlice: StateCreator<
         id: template.id,
         name: template.name,
         category: template.category as ProductCategory,
-        blocks: Array.isArray(template.blocks) ? template.blocks : [],
-        createdAt: template.created_at,
-        updatedAt: template.updated_at
+        blocks: Array.isArray(template.blocks) ? template.blocks : []
       }));
 
       console.log('TemplateCRUDSlice: Templates loaded successfully:', templates.length);
@@ -45,7 +43,7 @@ export const createCRUDSlice: StateCreator<
   },
 
   // Criar template
-  createTemplate: async (template: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>) => {
+  createTemplate: async (template: Omit<Template, 'id'>) => {
     try {
       console.log('TemplateCRUDSlice: Creating template:', template);
       
@@ -74,9 +72,7 @@ export const createCRUDSlice: StateCreator<
         id: data.id,
         name: data.name,
         category: data.category as ProductCategory,
-        blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
+        blocks: Array.isArray(data.blocks) ? data.blocks : []
       };
 
       const { templates } = get();
@@ -116,9 +112,7 @@ export const createCRUDSlice: StateCreator<
         id: data.id,
         name: data.name,
         category: data.category as ProductCategory,
-        blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        createdAt: data.created_at,
-        updatedAt: data.updated_at
+        blocks: Array.isArray(data.blocks) ? data.blocks : []
       };
 
       const { templates } = get();
