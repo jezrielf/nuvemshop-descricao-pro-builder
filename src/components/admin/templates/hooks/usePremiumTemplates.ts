@@ -789,6 +789,11 @@ const premiumTemplates: Omit<Template, "id">[] = [
 ];
 
 export const usePremiumTemplates = () => {
+  console.log('📋 Premium templates loaded:', premiumTemplates.length);
+  premiumTemplates.forEach((template, index) => {
+    console.log(`${index + 1}. ${template.name} (${template.category}) - ${template.blocks.length} blocos`);
+  });
+  
   return {
     premiumTemplates
   };
