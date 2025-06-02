@@ -3,6 +3,7 @@ import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
 import { supabase } from '@/integrations/supabase/client';
+import { ProductCategory } from '@/types/editor/products';
 
 export const createCRUDSlice: StateCreator<
   TemplateState & TemplateCRUDSlice,
@@ -24,12 +25,12 @@ export const createCRUDSlice: StateCreator<
       const userId = sessionData.session.user.id;
       console.log('createTemplate() - Current user:', userId);
       
-      // Create template in Supabase
+      // Create template in Supabase - remove id from insert as it's auto-generated
       const { data, error } = await supabase
         .from('templates')
         .insert({
           name: templateData.name,
-          category: templateData.category,
+          category: templateData.category as string, // Cast to string for database
           blocks: templateData.blocks || [],
           user_id: userId
         })
@@ -45,7 +46,7 @@ export const createCRUDSlice: StateCreator<
       const newTemplate: Template = {
         id: data.id,
         name: data.name,
-        category: data.category,
+        category: data.category as ProductCategory, // Cast back to ProductCategory
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
         thumbnail: '/placeholder.svg',
         user_id: data.user_id
@@ -82,7 +83,7 @@ export const createCRUDSlice: StateCreator<
         .from('templates')
         .update({
           name: templateData.name,
-          category: templateData.category,
+          category: templateData.category as string, // Cast to string for database
           blocks: templateData.blocks,
           updated_at: new Date().toISOString()
         })
@@ -99,7 +100,7 @@ export const createCRUDSlice: StateCreator<
       const updatedTemplate: Template = {
         id: data.id,
         name: data.name,
-        category: data.category,
+        category: data.category as ProductCategory, // Cast back to ProductCategory
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
         thumbnail: '/placeholder.svg',
         user_id: data.user_id

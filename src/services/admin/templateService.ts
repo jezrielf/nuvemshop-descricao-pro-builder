@@ -72,12 +72,12 @@ export const templateService = {
         throw new Error('Authentication required');
       }
       
-      // Create template in Supabase
+      // Create template in Supabase - remove id from insert as it's auto-generated
       const { data, error } = await supabase
         .from('templates')
         .insert({
           name: templateData.name,
-          category: templateData.category,
+          category: templateData.category as string, // Cast to string for database
           blocks: templateData.blocks || [],
           user_id: userId
         })
@@ -116,7 +116,7 @@ export const templateService = {
         .from('templates')
         .update({
           name: templateData.name,
-          category: templateData.category,
+          category: templateData.category as string, // Cast to string for database
           blocks: templateData.blocks,
           updated_at: new Date().toISOString()
         })
