@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { TemplatesView } from './templates/TemplatesView';
+import { AdminTemplates } from './AdminTemplates';
 
 export const Templates: React.FC = () => {
-  return <TemplatesView />;
+  return <AdminTemplates />;
 };
