@@ -35,7 +35,10 @@ export const useTemplateOperations = () => {
         user_id: item.user_id
       }));
 
-      console.log('Formatted templates:', formattedTemplates.map(t => ({ name: t.name, blocks: t.blocks.length })));
+      console.log('Formatted templates:', formattedTemplates.map(t => ({ 
+        name: t.name, 
+        blocks: Array.isArray(t.blocks) ? t.blocks.length : 0 
+      })));
 
       return formattedTemplates;
     } catch (error) {
@@ -75,16 +78,12 @@ export const useTemplateOperations = () => {
       }
       console.log('✅ All existing templates deleted successfully');
 
-      // Preparar os templates para inserção (sem o campo id que será gerado automaticamente)
-      const templatesForInsert = premiumTemplates.map(template => {
-        const templateData = {
-          name: template.name,
-          category: template.category,
-          blocks: template.blocks || []
-        };
-        console.log(`Preparing template: ${templateData.name} with ${templateData.blocks.length} blocks`);
-        return templateData;
-      });
+      // Preparar os templates para inserção (removendo o campo id e user_id)
+      const templatesForInsert = premiumTemplates.map(template => ({
+        name: template.name,
+        category: template.category,
+        blocks: template.blocks as any // Cast para Json
+      }));
 
       console.log('📦 Inserting premium templates...');
       console.log('Templates data for insert:', templatesForInsert);
@@ -113,7 +112,8 @@ export const useTemplateOperations = () => {
       } else {
         console.log('📊 Verification - Templates in database:', verificationData?.length || 0);
         verificationData?.forEach(template => {
-          console.log(`- ${template.name} (${template.category}) - ${template.blocks?.length || 0} blocos`);
+          const blocksLength = Array.isArray(template.blocks) ? template.blocks.length : 0;
+          console.log(`- ${template.name} (${template.category}) - ${blocksLength} blocos`);
         });
       }
 
