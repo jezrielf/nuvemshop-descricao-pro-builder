@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
@@ -7,8 +8,9 @@ import { ConnectionCard } from '@/components/Nuvemshop/components/connect/Connec
 import { ProductsCard } from '@/components/Nuvemshop/components/connect/ProductsCard';
 import { useToast } from '@/hooks/use-toast';
 import { detectAuthCode, clearAuthCodeFromUrl } from '@/components/Nuvemshop/utils/authOperations';
+import NexoProviderWrapper from '@/components/Nuvemshop/NexoProviderWrapper';
 
-const NuvemshopConnect: React.FC = () => {
+const NuvemshopConnectContent: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -162,6 +164,14 @@ const NuvemshopConnect: React.FC = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const NuvemshopConnect: React.FC = () => {
+  return (
+    <NexoProviderWrapper>
+      <NuvemshopConnectContent />
+    </NexoProviderWrapper>
   );
 };
 
