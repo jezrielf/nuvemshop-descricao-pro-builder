@@ -18,18 +18,6 @@ export function useTemplateStore() {
   
   const { toast } = useToast();
 
-  // Carrega os templates quando o hook for montado
-  useEffect(() => {
-    loadTemplates().catch(error => {
-      console.error("Failed to load templates:", error);
-      toast({
-        title: "Erro ao carregar templates",
-        description: "Não foi possível carregar os templates. Por favor, tente novamente.",
-        variant: "destructive"
-      });
-    });
-  }, [loadTemplates, toast]);
-
   // Wrapper para criar um template com log e tratamento de erro
   const createTemplateWithLog = async (templateData: Omit<Template, "id">) => {
     try {

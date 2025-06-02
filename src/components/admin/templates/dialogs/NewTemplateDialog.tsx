@@ -136,6 +136,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
               <Label htmlFor="name">Nome</Label>
               <Input
                 id="name"
+                name="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Nome do template..."
@@ -147,6 +148,7 @@ export const NewTemplateDialog: React.FC<NewTemplateDialogProps> = ({ open, onCl
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
+                name="category"
               >
                 <SelectTrigger>
                   <SelectValue />
