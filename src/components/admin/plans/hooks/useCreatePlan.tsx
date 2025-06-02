@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { adminService } from '@/services/admin';
 
 export const useCreatePlan = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -18,21 +18,11 @@ export const useCreatePlan = (
       setLoading(true);
       
       console.log("Criando plano:", planData);
-      
-      // Use Stripe edge function to create plan
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { 
-          method: 'POST', 
-          action: 'create-product',
-          ...planData
-        }
-      });
-
-      if (error) throw error;
+      const newPlan = await adminService.createPlan(planData);
       
       toast({
         title: 'Plano criado',
-        description: `O plano "${planData.name}" foi criado com sucesso.`,
+        description: `O plano "${newPlan.name}" foi criado com sucesso.`,
       });
       
       // Refresh plans list
@@ -41,7 +31,7 @@ export const useCreatePlan = (
       // Close the dialog
       setIsCreateDialogOpen(false);
       
-      return data;
+      return newPlan;
     } catch (error: any) {
       console.error('Erro ao criar plano:', error);
       

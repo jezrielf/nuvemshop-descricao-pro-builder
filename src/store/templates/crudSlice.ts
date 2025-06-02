@@ -1,7 +1,7 @@
-
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
+import { adminService } from '@/services/admin';
 import { supabase } from '@/integrations/supabase/client';
 
 export const createCRUDSlice: StateCreator<
@@ -21,26 +21,15 @@ export const createCRUDSlice: StateCreator<
       
       const userId = sessionData.session.user.id;
       
-      const { data, error } = await supabase
-        .from('templates')
-        .insert({
-          name: templateData.name,
-          category: templateData.category as string,
-          blocks: templateData.blocks || [],
-          user_id: userId
-        } as any)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      const createdTemplate: Template = {
-        id: data.id,
-        name: data.name,
-        category: data.category as any,
-        blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        user_id: data.user_id
+      const newTemplate: Omit<Template, 'id'> = {
+        ...templateData,
+        blocks: templateData.blocks || [],
+        // Ensure user_id is explicitly set
+        user_id: userId
       };
+      
+      console.log('Creating template with user_id:', userId);
+      const createdTemplate = await adminService.createTemplate(newTemplate);
       
       set(state => ({
         templates: [...state.templates, createdTemplate]
@@ -65,26 +54,25 @@ export const createCRUDSlice: StateCreator<
       
       const existingTemplate = templates[templateIndex];
       
-      const { data, error } = await supabase
-        .from('templates')
-        .update({
-          name: templateData.name || existingTemplate.name,
-          category: (templateData.category as string) || (existingTemplate.category as string),
-          blocks: templateData.blocks || existingTemplate.blocks
-        })
-        .eq('id', id)
-        .select()
-        .single();
+      // Get current authenticated user
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user.id;
       
-      if (error) throw error;
+      if (!userId) {
+        console.error('Not authenticated for updateTemplate');
+        return null;
+      }
       
-      const updatedTemplate: Template = {
-        id: data.id,
-        name: data.name,
-        category: data.category as any,
-        blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        user_id: data.user_id
-      };
+      console.log('Updating template with user_id:', userId);
+      const updatedTemplate = await adminService.updateTemplate(id, {
+        ...templateData,
+        // Preserve user_id from existing template or set it to current user
+        user_id: existingTemplate.user_id || userId,
+        // Keep existing properties that aren't being updated
+        name: templateData.name || existingTemplate.name,
+        category: templateData.category || existingTemplate.category,
+        blocks: templateData.blocks || existingTemplate.blocks
+      });
       
       const newTemplates = [...templates];
       newTemplates[templateIndex] = updatedTemplate;
@@ -101,12 +89,12 @@ export const createCRUDSlice: StateCreator<
     try {
       console.log('Attempting to delete template:', id);
       
-      const { error } = await supabase
-        .from('templates')
-        .delete()
-        .eq('id', id);
+      // Get current authenticated user for logging purposes
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user.id;
+      console.log('Current user performing delete:', userId);
       
-      if (error) throw error;
+      await adminService.deleteTemplate(id);
       
       set(state => ({
         templates: state.templates.filter(template => template.id !== id)

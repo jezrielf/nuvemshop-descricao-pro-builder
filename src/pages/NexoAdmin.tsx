@@ -7,7 +7,6 @@ import { NimbusButton, NimbusAlert } from '@/components/Nuvemshop/NimbusProvider
 import { Spinner } from '@/components/ui/spinner';
 import { AlertCircle, RefreshCw, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import NexoProviderWrapper from '@/components/Nuvemshop/NexoProviderWrapper';
 
 // Menu modules available in Nexo
 const NEXO_MODULES = [
@@ -17,7 +16,7 @@ const NEXO_MODULES = [
   { id: 'settings', name: 'Configurações' },
 ];
 
-const NexoAdminContent: React.FC = () => {
+const NexoAdmin: React.FC = () => {
   const { 
     nexo, 
     isNexoLoaded, 
@@ -296,14 +295,6 @@ const NexoAdminContent: React.FC = () => {
         <div ref={containerRef} className="flex-1 overflow-hidden" />
       )}
     </div>
-  );
-};
-
-const NexoAdmin: React.FC = () => {
-  return (
-    <NexoProviderWrapper>
-      <NexoAdminContent />
-    </NexoProviderWrapper>
   );
 };
 

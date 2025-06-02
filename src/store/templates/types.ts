@@ -4,8 +4,6 @@ import { Template, ProductCategory } from '@/types/editor';
 // Base template state
 export interface TemplateState {
   templates: Template[];
-  categories: string[];
-  selectedCategory: string | null;
 }
 
 // Template loading actions
@@ -23,6 +21,8 @@ export interface TemplateCRUDSlice {
 
 // Template category management
 export interface TemplateCategorySlice {
+  categories: string[];
+  selectedCategory: string | null;
   customCategories: string[];
   getTemplatesByCategory: (category: string | null) => Template[];
   setSelectedCategory: (category: string | null) => void;

@@ -8,9 +8,8 @@ import { NimbusHeader } from '@/components/Nuvemshop/components/header/NimbusHea
 import { NimbusButton } from '@/components/Nuvemshop/NimbusProvider';
 import { NimbusNexoDocumentation } from '@/components/Nuvemshop/components/NimbusNexoDocumentation';
 import { logEmbeddedEnvironmentInfo, isEmbeddedInNuvemshop } from '@/components/Nuvemshop/utils/embedUtils';
-import NexoProviderWrapper from '@/components/Nuvemshop/NexoProviderWrapper';
 
-const NimbusNexoInfoContent: React.FC = () => {
+const NimbusNexoInfo: React.FC = () => {
   const navigate = useNavigate();
   const isEmbedded = isEmbeddedInNuvemshop();
   
@@ -134,14 +133,6 @@ const NimbusNexoInfoContent: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-const NimbusNexoInfo: React.FC = () => {
-  return (
-    <NexoProviderWrapper>
-      <NimbusNexoInfoContent />
-    </NexoProviderWrapper>
   );
 };
 

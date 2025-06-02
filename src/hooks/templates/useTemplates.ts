@@ -12,16 +12,9 @@ export function useTemplates() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        setIsLoading(true);
-        console.log('useTemplates - Iniciando carregamento de templates...');
-        const loadedTemplates = await loadTemplates();
-        console.log('useTemplates - Templates carregados:', loadedTemplates.length);
-        
-        if (loadedTemplates.length === 0) {
-          console.warn('useTemplates - Nenhum template encontrado no banco');
-        }
+        await loadTemplates();
       } catch (error) {
-        console.error('useTemplates - Erro ao carregar templates:', error);
+        console.error('Error loading templates:', error);
       } finally {
         setIsLoading(false);
       }
@@ -31,10 +24,6 @@ export function useTemplates() {
   }, [loadTemplates]);
 
   const filteredTemplates = searchTemplates(searchQuery, selectedCategory);
-
-  console.log('useTemplates - Templates filtrados:', filteredTemplates.length);
-  console.log('useTemplates - Categoria selecionada:', selectedCategory);
-  console.log('useTemplates - Query de busca:', searchQuery);
 
   return {
     templates,

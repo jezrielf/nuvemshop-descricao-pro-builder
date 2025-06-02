@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { adminService } from '@/services/admin';
 
 export const useUpdatePlan = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -18,22 +18,11 @@ export const useUpdatePlan = (
       setLoading(true);
       
       console.log("Atualizando plano:", planData.id, planData);
-      
-      // Use Stripe edge function to update plan
-      const { data, error } = await supabase.functions.invoke('manage-plans', {
-        body: { 
-          method: 'PUT', 
-          action: 'update-product',
-          id: planData.id,
-          ...planData
-        }
-      });
-
-      if (error) throw error;
+      const updatedPlan = await adminService.updatePlan(planData.id, planData);
       
       toast({
         title: 'Plano atualizado',
-        description: `O plano "${planData.name}" foi atualizado com sucesso.`,
+        description: `O plano "${updatedPlan.name}" foi atualizado com sucesso.`,
       });
       
       // Refresh plans list
@@ -42,7 +31,7 @@ export const useUpdatePlan = (
       // Close the dialog
       setIsEditDialogOpen(false);
       
-      return data;
+      return updatedPlan;
     } catch (error: any) {
       console.error('Erro ao atualizar plano:', error);
       
