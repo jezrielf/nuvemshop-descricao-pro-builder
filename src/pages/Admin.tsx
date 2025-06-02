@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from '@/components/admin/AdminLayout';
 import UsersPanel from '@/components/admin/UsersPanel';
 import DescriptionsPanel from '@/components/admin/DescriptionsPanel';
-import PlansPanel from '@/components/admin/PlansPanel';
 import DashboardPanel from '@/components/admin/DashboardPanel';
 import AccessDenied from '@/components/admin/AccessDenied';
 import { useToast } from '@/hooks/use-toast';
@@ -65,7 +64,6 @@ const Admin: React.FC = () => {
       {activeTab === 'dashboard' && <DashboardPanel />}
       {activeTab === 'users' && <UsersPanel />}
       {activeTab === 'descriptions' && <DescriptionsPanel />}
-      {activeTab === 'plans' && <PlansPanel />}
     </AdminLayout>
   );
 };

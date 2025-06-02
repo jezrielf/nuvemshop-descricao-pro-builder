@@ -2,148 +2,122 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
 
+interface ProfileUpdate {
+  nome?: string;
+  avatar_url?: string;
+}
+
 export const userService = {
+  // Buscar todos os usuários
   getUsers: async (): Promise<Profile[]> => {
     try {
-      console.log('UserService: Fetching users from admin-list-users edge function');
+      console.log('UserService: Fetching all users');
       
-      // Get users from auth.users through the admin API
-      const { data, error } = await supabase.functions.invoke('admin-list-users');
-      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('criado_em', { ascending: false });
+
       if (error) {
-        console.error('Error fetching users:', error);
-        throw error;
+        console.error('UserService: Error fetching users:', error);
+        throw new Error(`Erro ao buscar usuários: ${error.message}`);
       }
-      
-      if (!data?.users) {
-        console.warn('No users returned from admin-list-users');
-        return [];
-      }
-      
-      console.log(`UserService: Fetched ${data.users.length} users from admin API`);
-      
-      // Map the combined user data to profile format for compatibility
-      const enrichedProfiles: Profile[] = data.users.map((user: any) => {
-        // Get the profile from the user data, or construct a default one
-        const profile = user.profile || {
-          id: user.id,
-          nome: user.email?.split('@')[0] || 'Usuário',
-          avatar_url: null,
-          role: 'user',
-          criado_em: user.created_at,
-          atualizado_em: user.created_at
-        };
-        
-        // Ensure email is included and role is properly formatted
-        return {
-          ...profile,
-          email: user.email,
-          role: profile.role || 'user'
-        };
-      });
-      
-      return enrichedProfiles;
-    } catch (error) {
-      console.error('Error in getUsers:', error);
-      throw error;
+
+      console.log('UserService: Users fetched successfully:', data?.length || 0);
+      return data || [];
+    } catch (error: any) {
+      console.error('UserService: Unexpected error:', error);
+      throw new Error(`Erro inesperado: ${error.message}`);
     }
   },
-  
-  updateUserProfile: async (userId: string, data: Partial<Profile>): Promise<Profile> => {
+
+  // Atualizar perfil do usuário
+  updateUserProfile: async (userId: string, updates: ProfileUpdate): Promise<Profile> => {
     try {
-      console.log('UserService: Updating user profile:', userId, data);
+      console.log('UserService: Updating profile for user:', userId, updates);
       
-      // Handle base profile data update (nome, avatar_url, etc)
-      const updateData: Record<string, any> = { ...data };
-      
-      // Remove role from updateData as it's handled separately
-      delete updateData.role;
-      updateData.atualizado_em = new Date().toISOString();
-      
-      // Ensure we're only passing fields that are expected by the profiles table
-      const profileUpdateData = {
-        nome: updateData.nome,
-        avatar_url: updateData.avatar_url,
-        atualizado_em: updateData.atualizado_em
-      };
-      
-      const { data: updatedProfile, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .update(profileUpdateData)
+        .update({
+          ...updates,
+          atualizado_em: new Date().toISOString()
+        })
         .eq('id', userId)
         .select()
         .single();
-        
+
       if (error) {
-        console.error('Error updating user profile:', error);
-        throw error;
+        console.error('UserService: Error updating profile:', error);
+        throw new Error(`Erro ao atualizar perfil: ${error.message}`);
       }
-      
-      console.log('UserService: Profile updated successfully:', updatedProfile);
-      return updatedProfile;
-    } catch (error) {
-      console.error('Error in updateUserProfile:', error);
-      throw error;
+
+      console.log('UserService: Profile updated successfully:', data);
+      return data;
+    } catch (error: any) {
+      console.error('UserService: Unexpected error:', error);
+      throw new Error(`Erro inesperado: ${error.message}`);
     }
   },
-  
-  updateUserRole: async (userId: string, role: string | string[]): Promise<Profile> => {
+
+  // Atualizar role do usuário usando a edge function
+  updateUserRole: async (userId: string, newRole: string | string[]): Promise<Profile> => {
     try {
-      console.log('UserService: Updating role for user', userId, 'to', role);
+      console.log('UserService: Updating role for user:', userId, 'to:', newRole);
       
-      // Convert role to string format if it's an array
-      const roleValue = Array.isArray(role) ? role.join(',') : role;
-      
-      // Use edge function for role update to ensure proper permissions
+      // Chamar a edge function para atualizar o role
       const { data, error } = await supabase.functions.invoke('admin-update-role', {
-        body: { userId, role: roleValue }
-      });
-      
-      if (error) {
-        console.error('Error invoking admin-update-role function:', error);
-        throw new Error(`Erro ao atualizar role: ${error.message}`);
-      }
-      
-      if (!data?.data) {
-        throw new Error('Resposta inválida da função de atualização');
-      }
-      
-      console.log('UserService: Role updated successfully:', data.data);
-      return data.data;
-    } catch (error) {
-      console.error('Error in updateUserRole:', error);
-      throw error;
-    }
-  },
-  
-  createUser: async (email: string, password: string, userData: any): Promise<any> => {
-    try {
-      console.log('UserService: Creating new user:', email, userData);
-      
-      const { data, error } = await supabase.functions.invoke('admin-create-user', {
-        body: {
-          email,
-          password,
-          userData: {
-            nome: userData.nome || email.split('@')[0],
-            role: userData.role || 'user'
-          }
+        body: { 
+          userId, 
+          role: Array.isArray(newRole) ? newRole.join(',') : newRole 
         }
       });
-      
+
       if (error) {
-        console.error('Error invoking admin-create-user function:', error);
-        throw error;
+        console.error('UserService: Error calling edge function:', error);
+        throw new Error(`Erro ao atualizar papel: ${error.message}`);
       }
-      
-      console.log('UserService: User created successfully:', data);
-      return data;
-    } catch (error) {
-      console.error('Error in createUser:', error);
-      throw error;
+
+      if (data.error) {
+        console.error('UserService: Edge function returned error:', data.error);
+        throw new Error(`Erro na função: ${data.error}`);
+      }
+
+      console.log('UserService: Role updated successfully:', data.data);
+      return data.data;
+    } catch (error: any) {
+      console.error('UserService: Unexpected error:', error);
+      throw new Error(`Erro inesperado: ${error.message}`);
     }
   },
-  
+
+  // Criar novo usuário usando edge function
+  createUser: async (email: string, password: string, nome: string, role: string = 'user'): Promise<any> => {
+    try {
+      console.log('UserService: Creating user:', { email, nome, role });
+      
+      const { data, error } = await supabase.functions.invoke('admin-create-user', {
+        body: { email, password, nome, role }
+      });
+
+      if (error) {
+        console.error('UserService: Error calling create user function:', error);
+        throw new Error(`Erro ao criar usuário: ${error.message}`);
+      }
+
+      if (data.error) {
+        console.error('UserService: Create user function returned error:', data.error);
+        throw new Error(`Erro na criação: ${data.error}`);
+      }
+
+      console.log('UserService: User created successfully:', data);
+      return data;
+    } catch (error: any) {
+      console.error('UserService: Unexpected error:', error);
+      throw new Error(`Erro inesperado: ${error.message}`);
+    }
+  },
+
+  // Deletar usuário usando edge function
   deleteUser: async (userId: string): Promise<void> => {
     try {
       console.log('UserService: Deleting user:', userId);
@@ -151,16 +125,21 @@ export const userService = {
       const { data, error } = await supabase.functions.invoke('admin-delete-user', {
         body: { userId }
       });
-      
+
       if (error) {
-        console.error('Error invoking admin-delete-user function:', error);
-        throw error;
+        console.error('UserService: Error calling delete user function:', error);
+        throw new Error(`Erro ao deletar usuário: ${error.message}`);
       }
-      
-      console.log('UserService: User deleted successfully:', data);
-    } catch (error) {
-      console.error('Error in deleteUser:', error);
-      throw error;
+
+      if (data.error) {
+        console.error('UserService: Delete user function returned error:', data.error);
+        throw new Error(`Erro na exclusão: ${data.error}`);
+      }
+
+      console.log('UserService: User deleted successfully');
+    } catch (error: any) {
+      console.error('UserService: Unexpected error:', error);
+      throw new Error(`Erro inesperado: ${error.message}`);
     }
-  },
+  }
 };
