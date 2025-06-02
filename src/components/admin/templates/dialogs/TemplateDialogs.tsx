@@ -23,12 +23,12 @@ export const TemplateDialogs: React.FC = () => {
     closeAllDialogs
   } = useTemplateDialogs();
   
-  const { deleteTemplate: removeTemplate } = useTemplateStore();
+  const { deleteTemplate: removeTemplate, loadTemplates } = useTemplateStore();
   const { toast } = useToast();
 
   const handleDeleteTemplate = async () => {
     if (!deleteTemplate) {
-      console.error('No template selected for deletion');
+      console.error('TemplateDialogs.handleDeleteTemplate() - No template selected');
       toast({
         title: 'Erro',
         description: 'Nenhum template selecionado para exclusão',
@@ -38,7 +38,7 @@ export const TemplateDialogs: React.FC = () => {
     }
     
     setIsDeleting(true);
-    console.log('Starting deletion process for template:', deleteTemplate.id);
+    console.log('TemplateDialogs.handleDeleteTemplate() - Deleting:', deleteTemplate.name);
     
     try {
       const success = await removeTemplate(deleteTemplate.id);
@@ -60,14 +60,17 @@ export const TemplateDialogs: React.FC = () => {
       
       // Execute callback if provided
       if (deleteCallback) {
-        console.log('Executing delete callback');
+        console.log('TemplateDialogs.handleDeleteTemplate() - Executing callback');
         deleteCallback();
       }
+      
+      // Reload templates to ensure UI is in sync
+      await loadTemplates();
       
       // Close the dialog
       closeAllDialogs();
     } catch (error) {
-      console.error('Exception during template deletion:', error);
+      console.error('TemplateDialogs.handleDeleteTemplate() - Error:', error);
       toast({
         title: 'Erro ao deletar',
         description: 'Ocorreu um erro inesperado ao tentar excluir o template',
@@ -78,12 +81,19 @@ export const TemplateDialogs: React.FC = () => {
     }
   };
 
+  const handleDialogClose = async () => {
+    console.log('TemplateDialogs.handleDialogClose() - Refreshing templates');
+    closeAllDialogs();
+    // Refresh templates when closing dialogs to ensure UI is up to date
+    await loadTemplates();
+  };
+
   return (
     <>
       {isNewDialogOpen && (
         <NewTemplateDialog 
           open={isNewDialogOpen} 
-          onClose={closeAllDialogs} 
+          onClose={handleDialogClose} 
         />
       )}
       
@@ -98,7 +108,7 @@ export const TemplateDialogs: React.FC = () => {
       {isEditDialogOpen && editTemplate && (
         <EditTemplateDialog
           open={isEditDialogOpen}
-          onClose={closeAllDialogs}
+          onClose={handleDialogClose}
           template={editTemplate}
         />
       )}

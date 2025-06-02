@@ -1,7 +1,7 @@
+
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateCRUDSlice } from './types';
-import { adminService } from '@/services/admin';
 import { supabase } from '@/integrations/supabase/client';
 
 export const createCRUDSlice: StateCreator<
@@ -12,6 +12,8 @@ export const createCRUDSlice: StateCreator<
 > = (set, get) => ({
   createTemplate: async (templateData) => {
     try {
+      console.log('createTemplate() - Starting template creation');
+      
       // Get current authenticated user
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !sessionData.session) {
@@ -20,22 +22,42 @@ export const createCRUDSlice: StateCreator<
       }
       
       const userId = sessionData.session.user.id;
+      console.log('createTemplate() - Current user:', userId);
       
-      const newTemplate: Omit<Template, 'id'> = {
-        ...templateData,
-        blocks: templateData.blocks || [],
-        // Ensure user_id is explicitly set
-        user_id: userId
+      // Create template in Supabase
+      const { data, error } = await supabase
+        .from('templates')
+        .insert({
+          name: templateData.name,
+          category: templateData.category,
+          blocks: templateData.blocks || [],
+          user_id: userId
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating template in Supabase:', error);
+        throw error;
+      }
+      
+      // Convert to Template format
+      const newTemplate: Template = {
+        id: data.id,
+        name: data.name,
+        category: data.category,
+        blocks: Array.isArray(data.blocks) ? data.blocks : [],
+        thumbnail: '/placeholder.svg',
+        user_id: data.user_id
       };
       
-      console.log('Creating template with user_id:', userId);
-      const createdTemplate = await adminService.createTemplate(newTemplate);
-      
+      // Update local state
       set(state => ({
-        templates: [...state.templates, createdTemplate]
+        templates: [...state.templates, newTemplate]
       }));
       
-      return createdTemplate;
+      console.log('createTemplate() - Template created successfully:', newTemplate.id);
+      return newTemplate;
     } catch (error) {
       console.error('Error in createTemplate:', error);
       throw error;
@@ -44,15 +66,7 @@ export const createCRUDSlice: StateCreator<
   
   updateTemplate: async (id, templateData) => {
     try {
-      const { templates } = get();
-      const templateIndex = templates.findIndex(t => t.id === id);
-      
-      if (templateIndex === -1) {
-        console.error('Template not found for update:', id);
-        return null;
-      }
-      
-      const existingTemplate = templates[templateIndex];
+      console.log('updateTemplate() - Updating template:', id);
       
       // Get current authenticated user
       const { data: sessionData } = await supabase.auth.getSession();
@@ -60,51 +74,80 @@ export const createCRUDSlice: StateCreator<
       
       if (!userId) {
         console.error('Not authenticated for updateTemplate');
-        return null;
+        throw new Error('Authentication required');
       }
       
-      console.log('Updating template with user_id:', userId);
-      const updatedTemplate = await adminService.updateTemplate(id, {
-        ...templateData,
-        // Preserve user_id from existing template or set it to current user
-        user_id: existingTemplate.user_id || userId,
-        // Keep existing properties that aren't being updated
-        name: templateData.name || existingTemplate.name,
-        category: templateData.category || existingTemplate.category,
-        blocks: templateData.blocks || existingTemplate.blocks
-      });
+      // Update template in Supabase
+      const { data, error } = await supabase
+        .from('templates')
+        .update({
+          name: templateData.name,
+          category: templateData.category,
+          blocks: templateData.blocks,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
       
-      const newTemplates = [...templates];
-      newTemplates[templateIndex] = updatedTemplate;
-      set({ templates: newTemplates });
+      if (error) {
+        console.error('Error updating template in Supabase:', error);
+        throw error;
+      }
       
+      // Convert to Template format
+      const updatedTemplate: Template = {
+        id: data.id,
+        name: data.name,
+        category: data.category,
+        blocks: Array.isArray(data.blocks) ? data.blocks : [],
+        thumbnail: '/placeholder.svg',
+        user_id: data.user_id
+      };
+      
+      // Update local state
+      const { templates } = get();
+      const templateIndex = templates.findIndex(t => t.id === id);
+      
+      if (templateIndex !== -1) {
+        const newTemplates = [...templates];
+        newTemplates[templateIndex] = updatedTemplate;
+        set({ templates: newTemplates });
+      }
+      
+      console.log('updateTemplate() - Template updated successfully');
       return updatedTemplate;
     } catch (error) {
       console.error('Error in updateTemplate:', error);
-      return null;
+      throw error;
     }
   },
   
   deleteTemplate: async (id) => {
     try {
-      console.log('Attempting to delete template:', id);
+      console.log('deleteTemplate() - Deleting template:', id);
       
-      // Get current authenticated user for logging purposes
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user.id;
-      console.log('Current user performing delete:', userId);
+      // Delete template from Supabase
+      const { error } = await supabase
+        .from('templates')
+        .delete()
+        .eq('id', id);
       
-      await adminService.deleteTemplate(id);
+      if (error) {
+        console.error('Error deleting template from Supabase:', error);
+        throw error;
+      }
       
+      // Update local state
       set(state => ({
         templates: state.templates.filter(template => template.id !== id)
       }));
       
-      console.log('Template deleted successfully from state');
+      console.log('deleteTemplate() - Template deleted successfully');
       return true;
     } catch (error) {
       console.error('Error in deleteTemplate:', error);
-      return false;
+      throw error;
     }
   }
 });

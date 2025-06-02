@@ -2,21 +2,8 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import { getAllTemplates } from '@/utils/templates';
-
-// Mock service for templates
-const templateService = {
-  getTemplates: async (): Promise<Template[]> => {
-    console.log('templateService.getTemplates() - Starting template fetch');
-    // In a real implementation, this would fetch from an API
-    const templates = getAllTemplates();
-    console.log('templateService.getTemplates() - Fetched templates:', templates.length);
-    templates.forEach((template, index) => {
-      console.log(`  ${index + 1}. ${template.name} (category: ${template.category}, blocks: ${template.blocks.length})`);
-    });
-    return templates;
-  }
-};
+import { supabase } from '@/integrations/supabase/client';
+import { ProductCategory } from '@/types/editor/products';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -26,30 +13,61 @@ export const createLoadingSlice: StateCreator<
 > = (set, get) => ({
   loadTemplates: async () => {
     try {
-      console.log('loadTemplates() - Starting template loading process');
-      // Load templates from database, or use local templates if not available
-      const loadedTemplates = await templateService.getTemplates();
-      console.log(`loadTemplates() - Successfully loaded ${loadedTemplates.length} templates`);
+      console.log('loadTemplates() - Loading templates from Supabase');
       
-      // Verify each template has proper structure
-      loadedTemplates.forEach((template, index) => {
-        if (!template.id || !template.name || !template.category || !template.blocks) {
-          console.error(`Template ${index} has invalid structure:`, template);
-        } else {
-          console.log(`Template validated: ${template.name} - ${template.blocks.length} blocks`);
+      // Load templates from Supabase database
+      const { data, error } = await supabase
+        .from('templates')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error loading templates from Supabase:', error);
+        throw error;
+      }
+      
+      // Convert database response to Template format
+      const templates: Template[] = (data || []).map((template) => {
+        // Convert string category to ProductCategory with validation
+        let category: ProductCategory = 'other';
+        
+        if (template.category && typeof template.category === 'string') {
+          const validCategories: ProductCategory[] = [
+            'supplements', 'clothing', 'accessories', 'shoes', 
+            'electronics', 'energy', 'Casa e decoração', 'other'
+          ];
+          
+          if (validCategories.includes(template.category as ProductCategory)) {
+            category = template.category as ProductCategory;
+          }
         }
+        
+        // Ensure blocks is always an array
+        let blockData: any[] = [];
+        
+        if (Array.isArray(template.blocks)) {
+          blockData = template.blocks;
+        } else if (typeof template.blocks === 'object' && template.blocks !== null) {
+          blockData = Object.values(template.blocks);
+        }
+        
+        return {
+          id: template.id,
+          name: template.name,
+          category: category,
+          blocks: blockData,
+          thumbnail: '/placeholder.svg',
+          user_id: template.user_id
+        };
       });
       
-      set({ templates: loadedTemplates });
-      console.log('loadTemplates() - Templates stored in state successfully');
-      return loadedTemplates;
+      console.log(`loadTemplates() - Successfully loaded ${templates.length} templates from Supabase`);
+      set({ templates });
+      return templates;
     } catch (error) {
-      console.error('Error loading templates:', error);
-      // If there's an error, use local templates as fallback
-      const fallbackTemplates = getAllTemplates();
-      console.log(`loadTemplates() - Using ${fallbackTemplates.length} fallback templates`);
-      set({ templates: fallbackTemplates });
-      return fallbackTemplates;
+      console.error('Error in loadTemplates:', error);
+      set({ templates: [] });
+      throw error;
     }
   },
   
