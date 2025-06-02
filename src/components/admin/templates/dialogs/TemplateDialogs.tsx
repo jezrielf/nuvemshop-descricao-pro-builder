@@ -80,14 +80,12 @@ export const TemplateDialogs: React.FC = () => {
 
   return (
     <>
-      {isNewDialogOpen && (
-        <NewTemplateDialog 
-          open={isNewDialogOpen} 
-          onClose={closeAllDialogs} 
-        />
-      )}
+      <NewTemplateDialog 
+        open={isNewDialogOpen} 
+        onClose={closeAllDialogs} 
+      />
       
-      {isPreviewDialogOpen && previewTemplate && (
+      {previewTemplate && (
         <PreviewTemplateDialog
           open={isPreviewDialogOpen}
           onClose={closeAllDialogs}
@@ -95,7 +93,7 @@ export const TemplateDialogs: React.FC = () => {
         />
       )}
       
-      {isEditDialogOpen && editTemplate && (
+      {editTemplate && (
         <EditTemplateDialog
           open={isEditDialogOpen}
           onClose={closeAllDialogs}
@@ -103,7 +101,7 @@ export const TemplateDialogs: React.FC = () => {
         />
       )}
       
-      {isDeleteDialogOpen && deleteTemplate && (
+      {deleteTemplate && (
         <DeleteTemplateDialog
           open={isDeleteDialogOpen}
           onClose={closeAllDialogs}

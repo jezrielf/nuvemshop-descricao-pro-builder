@@ -2,21 +2,8 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
+import { supabase } from '@/integrations/supabase/client';
 import { getAllTemplates } from '@/utils/templates';
-
-// Mock service for templates
-const templateService = {
-  getTemplates: async (): Promise<Template[]> => {
-    console.log('templateService.getTemplates() - Starting template fetch');
-    // In a real implementation, this would fetch from an API
-    const templates = getAllTemplates();
-    console.log('templateService.getTemplates() - Fetched templates:', templates.length);
-    templates.forEach((template, index) => {
-      console.log(`  ${index + 1}. ${template.name} (category: ${template.category}, blocks: ${template.blocks.length})`);
-    });
-    return templates;
-  }
-};
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -26,13 +13,46 @@ export const createLoadingSlice: StateCreator<
 > = (set, get) => ({
   loadTemplates: async () => {
     try {
-      console.log('loadTemplates() - Starting template loading process');
-      // Load templates from database, or use local templates if not available
-      const loadedTemplates = await templateService.getTemplates();
-      console.log(`loadTemplates() - Successfully loaded ${loadedTemplates.length} templates`);
+      console.log('loadTemplates() - Starting template loading from Supabase');
+      
+      // Try to load templates from Supabase first
+      const { data, error } = await supabase
+        .from('templates')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error loading templates from Supabase:', error);
+        // Use local templates as fallback
+        const localTemplates = getAllTemplates();
+        console.log(`loadTemplates() - Using ${localTemplates.length} local templates as fallback`);
+        set({ templates: localTemplates });
+        return localTemplates;
+      }
+      
+      // If no data, use local templates
+      if (!data || data.length === 0) {
+        console.log('No templates found in Supabase, using local templates');
+        const localTemplates = getAllTemplates();
+        console.log(`loadTemplates() - Loaded ${localTemplates.length} local templates as fallback`);
+        set({ templates: localTemplates });
+        return localTemplates;
+      }
+      
+      // Convert Supabase data to Template format
+      const templates: Template[] = data.map((template) => ({
+        id: template.id,
+        name: template.name,
+        category: template.category as any,
+        blocks: Array.isArray(template.blocks) ? template.blocks : [],
+        thumbnail: '/placeholder.svg',
+        user_id: template.user_id
+      }));
+      
+      console.log(`loadTemplates() - Successfully loaded ${templates.length} templates from Supabase`);
       
       // Verify each template has proper structure
-      loadedTemplates.forEach((template, index) => {
+      templates.forEach((template, index) => {
         if (!template.id || !template.name || !template.category || !template.blocks) {
           console.error(`Template ${index} has invalid structure:`, template);
         } else {
@@ -40,11 +60,11 @@ export const createLoadingSlice: StateCreator<
         }
       });
       
-      set({ templates: loadedTemplates });
+      set({ templates });
       console.log('loadTemplates() - Templates stored in state successfully');
-      return loadedTemplates;
+      return templates;
     } catch (error) {
-      console.error('Error loading templates:', error);
+      console.error('Exception in loadTemplates:', error);
       // If there's an error, use local templates as fallback
       const fallbackTemplates = getAllTemplates();
       console.log(`loadTemplates() - Using ${fallbackTemplates.length} fallback templates`);
