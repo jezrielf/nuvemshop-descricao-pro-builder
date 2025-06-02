@@ -48,10 +48,7 @@ const UserPanelHeader: React.FC<UserPanelHeaderProps> = ({
                 Adicione um novo usuário ao sistema
               </SheetDescription>
             </SheetHeader>
-            <CreateUserForm 
-              onUserCreated={handleCreateUser} 
-              onClose={() => setIsCreateUserSheetOpen(false)}
-            />
+            <CreateUserForm onUserCreated={handleCreateUser} />
           </SheetContent>
         </Sheet>
         

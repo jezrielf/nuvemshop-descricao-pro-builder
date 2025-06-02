@@ -21,65 +21,45 @@ import {
   DialogFooter,
   DialogClose
 } from '@/components/ui/dialog';
-import { Eye, Trash, RefreshCw, User } from 'lucide-react';
+import { Eye, Trash, Copy, Edit, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-
-interface ExtendedProductDescription extends ProductDescription {
-  userId: string;
-  userEmail?: string;
-  userName?: string;
-}
 
 const DescriptionsPanel: React.FC = () => {
-  const [descriptions, setDescriptions] = useState<ExtendedProductDescription[]>([]);
-  const [selectedDescription, setSelectedDescription] = useState<ExtendedProductDescription | null>(null);
+  const [descriptions, setDescriptions] = useState<ProductDescription[]>([]);
+  const [selectedDescription, setSelectedDescription] = useState<ProductDescription | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  const loadDescriptions = async () => {
+  const loadDescriptions = () => {
     setLoading(true);
     
     try {
-      // Primeiro, buscar todos os perfis de usuários
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, nome');
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-      }
-
-      // Mapear perfis para facilitar o lookup
-      const profilesMap = new Map();
-      profiles?.forEach(profile => {
-        profilesMap.set(profile.id, profile.nome || 'Usuário sem nome');
-      });
-
-      // Buscar descrições do localStorage de todos os usuários
+      // Get all keys from localStorage
       const allStorageKeys = Object.keys(localStorage);
+      
+      // Filter for saved descriptions keys
       const descriptionKeys = allStorageKeys.filter(key => 
         key.startsWith('savedDescriptions_')
       );
       
-      const allDescriptions: ExtendedProductDescription[] = [];
+      // Get all descriptions from all users
+      const allDescriptions: ProductDescription[] = [];
       
       descriptionKeys.forEach(key => {
         try {
           const userDescriptions = JSON.parse(localStorage.getItem(key) || '[]');
           const userId = key.replace('savedDescriptions_', '');
-          const userName = profilesMap.get(userId) || 'Usuário desconhecido';
           
+          // Add user context to each description
           const descriptionsWithUser = userDescriptions.map((desc: ProductDescription) => ({
             ...desc,
             userId,
-            userName,
-            userEmail: userId
+            userEmail: userId // You might want to fetch actual email from profiles
           }));
           
           allDescriptions.push(...descriptionsWithUser);
@@ -88,7 +68,7 @@ const DescriptionsPanel: React.FC = () => {
         }
       });
       
-      // Ordenar por mais recente primeiro
+      // Sort by most recent first
       allDescriptions.sort((a, b) => 
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
@@ -115,12 +95,12 @@ const DescriptionsPanel: React.FC = () => {
     loadDescriptions();
   }, []);
 
-  const handleViewDescription = (description: ExtendedProductDescription) => {
+  const handleViewDescription = (description: ProductDescription) => {
     setSelectedDescription(description);
     setIsPreviewOpen(true);
   };
 
-  const handleDeleteClick = (description: ExtendedProductDescription) => {
+  const handleDeleteClick = (description: ProductDescription) => {
     setSelectedDescription(description);
     setIsDeleteDialogOpen(true);
   };
@@ -129,7 +109,7 @@ const DescriptionsPanel: React.FC = () => {
     if (!selectedDescription) return;
     
     try {
-      const userId = selectedDescription.userId;
+      const userId = (selectedDescription as any).userId;
       const storageKey = `savedDescriptions_${userId}`;
       const userDescriptions = JSON.parse(localStorage.getItem(storageKey) || '[]');
       
@@ -139,7 +119,7 @@ const DescriptionsPanel: React.FC = () => {
       
       localStorage.setItem(storageKey, JSON.stringify(updatedDescriptions));
       
-      // Atualizar estado local
+      // Update local state
       setDescriptions(descriptions.filter(d => d.id !== selectedDescription.id));
       
       toast({
@@ -164,28 +144,24 @@ const DescriptionsPanel: React.FC = () => {
     return text.substring(0, maxLength) + '...';
   };
 
-  // Filtrar descrições baseado no termo de busca
+  // Filter descriptions based on search term
   const filteredDescriptions = descriptions.filter(desc =>
     desc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     desc.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    desc.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    desc.userId.toLowerCase().includes(searchTerm.toLowerCase())
+    (desc as any).userId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Gerenciar Descrições</h2>
-          <p className="text-gray-600 mt-1">Visualize e gerencie todas as descrições criadas pelos usuários</p>
-        </div>
+        <h2 className="text-2xl font-bold">Gerenciar Descrições</h2>
         <div className="flex gap-2">
           <input
             type="text"
             placeholder="Buscar descrições..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-3 py-2 border rounded-md w-64"
+            className="px-3 py-2 border rounded-md"
           />
           <Button
             variant="outline"
@@ -212,7 +188,7 @@ const DescriptionsPanel: React.FC = () => {
             </TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome da Descrição</TableHead>
+                <TableHead>Nome</TableHead>
                 <TableHead>Usuário</TableHead>
                 <TableHead>Blocos</TableHead>
                 <TableHead>Criado em</TableHead>
@@ -222,16 +198,10 @@ const DescriptionsPanel: React.FC = () => {
             </TableHeader>
             <TableBody>
               {filteredDescriptions.map((description) => (
-                <TableRow key={`${description.userId}-${description.id}`}>
+                <TableRow key={description.id}>
                   <TableCell className="font-medium">{truncateText(description.name)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{description.userName}</span>
-                        <span className="text-xs text-gray-500">{truncateText(description.userId, 8)}</span>
-                      </div>
-                    </div>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {truncateText((description as any).userId || 'Desconhecido', 20)}
                   </TableCell>
                   <TableCell>{description.blocks.length}</TableCell>
                   <TableCell>
@@ -288,12 +258,9 @@ const DescriptionsPanel: React.FC = () => {
             <div className="mt-4">
               <div className="mb-4 p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-bold text-lg mb-2">{selectedDescription.name}</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                  <p><strong>ID:</strong> {selectedDescription.id}</p>
-                  <p><strong>Usuário:</strong> {selectedDescription.userName}</p>
-                  <p><strong>User ID:</strong> {selectedDescription.userId}</p>
-                  <p><strong>Blocos:</strong> {selectedDescription.blocks.length}</p>
-                </div>
+                <p className="text-sm text-gray-600">ID: {selectedDescription.id}</p>
+                <p className="text-sm text-gray-600">Usuário: {(selectedDescription as any).userId}</p>
+                <p className="text-sm text-gray-600">Blocos: {selectedDescription.blocks.length}</p>
               </div>
               <div className="space-y-4">
                 {selectedDescription.blocks.map((block, index) => (
@@ -319,8 +286,8 @@ const DescriptionsPanel: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir a descrição "{selectedDescription?.name}" 
-              do usuário {selectedDescription?.userName}? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir a descrição "{selectedDescription?.name}"? 
+              Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
