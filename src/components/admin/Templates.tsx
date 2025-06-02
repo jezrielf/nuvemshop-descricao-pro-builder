@@ -858,13 +858,14 @@ export const Templates: React.FC = () => {
       // Inserir os novos templates premium com tipo correto
       const templatesForInsert = premiumTemplates.map(template => ({
         name: template.name,
-        category: template.category as string, // Explicit cast to string
-        blocks: template.blocks as any // Cast to match Json type expected by Supabase
+        category: template.category,
+        blocks: template.blocks
       }));
 
+      // Type assertion to match Supabase expected type (without id field)
       const { error: insertError } = await supabase
         .from('templates')
-        .insert(templatesForInsert);
+        .insert(templatesForInsert as any);
 
       if (insertError) throw insertError;
 
