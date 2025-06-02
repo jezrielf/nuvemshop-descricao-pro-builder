@@ -78,11 +78,13 @@ export const useTemplateOperations = () => {
       }
       console.log('✅ All existing templates deleted successfully');
 
-      // Preparar os templates para inserção (removendo o campo id e user_id)
+      // Preparar os templates para inserção com id gerado
       const templatesForInsert = premiumTemplates.map(template => ({
+        id: crypto.randomUUID(),
         name: template.name,
-        category: template.category,
-        blocks: template.blocks as any // Cast para Json
+        category: template.category as string,
+        blocks: template.blocks as any,
+        user_id: null
       }));
 
       console.log('📦 Inserting premium templates...');
