@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { adminService } from '@/services/admin';
+import { supabase } from '@/integrations/supabase/client';
 
 // Import mockData for fallback
 import { mockPlans } from '../mockData';
@@ -17,18 +17,35 @@ export const usePlansData = () => {
       setLoading(true);
       console.log("Buscando planos...");
       
-      const plansData = await adminService.getPlans();
+      // Use Stripe edge function to get plans
+      const { data: plansData, error } = await supabase.functions.invoke('manage-plans', {
+        body: { method: 'GET', action: 'list-products' }
+      });
+
+      if (error) throw error;
       
       // If we have no products, fallback to mock data
-      if (!plansData || plansData.length === 0) {
+      if (!plansData?.products || plansData.products.length === 0) {
         console.log("Nenhum plano encontrado, usando dados mockados");
         setPlans(mockPlans);
         return;
       }
       
-      console.log("Planos buscados com sucesso:", plansData.length);
-      // Importante: não estamos filtrando por isActive aqui, mostrar todos os planos
-      setPlans(plansData);
+      console.log("Planos buscados com sucesso:", plansData.products.length);
+      
+      // Format plans data
+      const formattedPlans = plansData.products.map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        description: product.description || '',
+        price: product.price || 0,
+        priceId: product.priceId,
+        isActive: product.isActive || false,
+        isDefault: false,
+        features: product.features || []
+      }));
+      
+      setPlans(formattedPlans);
     } catch (error: any) {
       console.error("Erro ao buscar planos:", error);
       

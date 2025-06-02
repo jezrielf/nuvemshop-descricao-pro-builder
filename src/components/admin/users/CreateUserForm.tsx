@@ -1,54 +1,59 @@
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { CreateUserFormValues } from './types';
-import CreateUserRoleSelector from './CreateUserRoleSelector';
-import { adminService } from '@/services/admin';
 
 interface CreateUserFormProps {
-  onUserCreated: () => void;
+  onUserCreated: () => Promise<void>;
 }
 
 const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const form = useForm<CreateUserFormValues>({
-    defaultValues: {
-      email: '',
-      password: '',
-      nome: '',
-      role: 'user'
-    }
+  const [formData, setFormData] = useState<CreateUserFormValues>({
+    nome: '',
+    email: '',
+    password: '',
+    role: 'user'
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = async (values: CreateUserFormValues) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
     try {
-      setLoading(true);
-      console.log('Creating user with values:', values);
-      
-      // Prepare user data
-      const userData = {
-        nome: values.nome,
-        role: values.role
-      };
-      
-      // Create the user using the admin service
-      const data = await adminService.createUser(values.email, values.password, userData);
-      
-      console.log('User created successfully:', data);
-      
-      toast({
-        title: 'Usuário criado com sucesso',
-        description: `Usuário ${values.nome} foi criado com email ${values.email}`,
+      // Use edge function to create user
+      const { data, error } = await supabase.functions.invoke('admin-create-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
+          nome: formData.nome,
+          role: formData.role
+        }
       });
-      
-      onUserCreated();
-      form.reset();
+
+      if (error) throw error;
+
+      toast({
+        title: 'Usuário criado',
+        description: `Usuário ${formData.nome} criado com sucesso`,
+      });
+
+      // Reset form
+      setFormData({
+        nome: '',
+        email: '',
+        password: '',
+        role: 'user'
+      });
+
+      // Refresh user list
+      await onUserCreated();
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
@@ -57,56 +62,65 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onUserCreated }) => {
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 mt-6">
-      <div className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+      <div>
+        <Label htmlFor="nome">Nome</Label>
+        <Input
+          id="nome"
+          type="text"
+          value={formData.nome}
+          onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+          required
+        />
+      </div>
+
+      <div>
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           type="email"
-          placeholder="email@example.com"
-          {...form.register('email', { required: true })}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
         />
       </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="nome">Nome</Label>
-        <Input
-          id="nome"
-          placeholder="Nome do usuário"
-          {...form.register('nome', { required: true })}
-        />
-      </div>
-      
-      <div className="space-y-2">
+
+      <div>
         <Label htmlFor="password">Senha</Label>
         <Input
           id="password"
           type="password"
-          placeholder="********"
-          {...form.register('password', { required: true })}
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+          minLength={6}
         />
       </div>
-      
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium">Tipo de Usuário</h3>
-        <CreateUserRoleSelector 
-          watch={form.watch} 
-          setValue={form.setValue} 
-        />
+
+      <div>
+        <Label htmlFor="role">Role</Label>
+        <Select
+          value={formData.role}
+          onValueChange={(value) => setFormData({ ...formData, role: value })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="user">User</SelectItem>
+            <SelectItem value="premium">Premium</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full mt-6" 
-        disabled={loading}
-      >
-        {loading ? <Spinner className="mr-2" /> : null}
-        Criar Usuário
+
+      <Button type="submit" disabled={isLoading} className="w-full">
+        {isLoading ? 'Criando...' : 'Criar Usuário'}
       </Button>
     </form>
   );

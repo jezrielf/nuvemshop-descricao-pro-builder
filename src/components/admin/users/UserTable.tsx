@@ -1,119 +1,43 @@
 
 import React, { useState } from 'react';
-import { Profile } from '@/types/auth';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableHead, 
-  TableHeader, 
-  TableRow,
-  TableCell 
-} from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { UserTableProps, UserFormValues } from './types';
+import { supabase } from '@/integrations/supabase/client';
 import UserTableRow from './table/UserTableRow';
-import UserEditSheet from './edit/UserEditSheet';
-import { adminService } from '@/services/admin';
-import { Spinner } from '@/components/ui/spinner';
+import { UserTableProps } from './types';
 
 const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) => {
-  const { toast } = useToast();
-  const [editingUser, setEditingUser] = useState<Profile | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const openEditSheet = (profile: Profile) => {
-    setEditingUser(profile);
-    setIsSheetOpen(true);
+  const handleEdit = async (profile: any) => {
+    // Implementation for editing user
+    console.log('Edit user:', profile);
   };
 
-  const updateUserProfile = async (values: UserFormValues) => {
-    if (!editingUser) return;
-    
+  const handleDelete = async (profileId: string) => {
+    setUpdatingUser(profileId);
     try {
-      setUpdatingUser(editingUser.id);
-      
-      console.log('Updating profile with values:', values);
-      
-      // Update profile basic data
-      await adminService.updateUserProfile(editingUser.id, {
-        nome: values.nome
+      // Use edge function to delete user
+      const { error } = await supabase.functions.invoke('admin-delete-user', {
+        body: { userId: profileId }
       });
-      
-      // Update user role if provided
-      if (values.role) {
-        await adminService.updateUserRole(editingUser.id, values.role);
-      }
-      
-      toast({
-        title: 'Perfil atualizado',
-        description: 'Os dados do usuário foram atualizados com sucesso.',
-      });
-      
-      // Close modal and refresh data
-      setIsSheetOpen(false);
-      setEditingUser(null);
-      onRefresh();
-    } catch (error: any) {
-      console.error('Complete error object:', error);
-      toast({
-        title: 'Erro ao atualizar perfil',
-        description: error.message || "Ocorreu um erro ao atualizar o perfil",
-        variant: 'destructive',
-      });
-    } finally {
-      setUpdatingUser(null);
-    }
-  };
 
-  const updateUserRole = async (userId: string, newRole: string | string[]) => {
-    try {
-      setUpdatingUser(userId);
-      
-      console.log('Atualizando papel do usuário:', userId, 'para:', newRole);
-      
-      await adminService.updateUserRole(userId, newRole);
-      
-      toast({
-        title: 'Papel atualizado',
-        description: 'O papel do usuário foi atualizado com sucesso.',
-        duration: 5000,
-      });
-      
-      onRefresh();
-    } catch (error: any) {
-      console.error('Erro completo:', error);
-      toast({
-        title: 'Erro ao atualizar papel',
-        description: error.message || "Ocorreu um erro ao atualizar o papel",
-        variant: 'destructive',
-      });
-    } finally {
-      setUpdatingUser(null);
-    }
-  };
+      if (error) throw error;
 
-  const deleteUser = async (profileId: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
-      return;
-    }
-
-    try {
-      setUpdatingUser(profileId);
-      
-      await adminService.deleteUser(profileId);
-      
       toast({
         title: 'Usuário excluído',
-        description: 'O usuário foi excluído com sucesso.',
+        description: 'Usuário excluído com sucesso',
       });
-      
+
       onRefresh();
     } catch (error: any) {
+      console.error('Error deleting user:', error);
       toast({
-        title: 'Erro ao excluir usuário',
-        description: error.message || "Ocorreu um erro ao excluir o usuário",
+        title: 'Erro',
+        description: error.message || 'Erro ao excluir usuário',
         variant: 'destructive',
       });
     } finally {
@@ -121,57 +45,41 @@ const UserTable: React.FC<UserTableProps> = ({ profiles, loading, onRefresh }) =
     }
   };
 
-  if (loading) {
+  if (profiles.length === 0 && !loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Spinner /> 
-        <span className="ml-2">Carregando usuários...</span>
+      <div className="text-center py-8">
+        <p className="text-muted-foreground mb-4">Nenhum usuário encontrado</p>
+        <Button onClick={onRefresh} variant="outline">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Atualizar
+        </Button>
       </div>
     );
   }
 
   return (
-    <>
-      <Table>
-        <TableCaption>Lista de todos os usuários registrados no sistema</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Papel</TableHead>
-            <TableHead>Data de Registro</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {profiles.length > 0 ? (
-            profiles.map((profile) => (
-              <UserTableRow
-                key={profile.id}
-                profile={profile}
-                updatingUser={updatingUser}
-                onEdit={openEditSheet}
-                onDelete={deleteUser}
-              />
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                Nenhum usuário encontrado
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-
-      <UserEditSheet
-        isOpen={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        editingUser={editingUser}
-        onUpdateProfile={updateUserProfile}
-        onUpdateRole={updateUserRole}
-      />
-    </>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Criado em</TableHead>
+          <TableHead>Ações</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {profiles.map((profile) => (
+          <UserTableRow
+            key={profile.id}
+            profile={profile}
+            updatingUser={updatingUser}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

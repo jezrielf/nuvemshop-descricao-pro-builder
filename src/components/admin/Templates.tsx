@@ -38,6 +38,7 @@ interface Template {
   blocks: any[];
   user_id?: string;
   created_at: string;
+  updated_at: string;
 }
 
 export const Templates: React.FC = () => {
@@ -51,8 +52,7 @@ export const Templates: React.FC = () => {
 
   const [newTemplate, setNewTemplate] = useState({
     name: '',
-    category: 'other',
-    htmlContent: ''
+    category: 'other'
   });
 
   const loadTemplates = async () => {
@@ -65,8 +65,19 @@ export const Templates: React.FC = () => {
 
       if (error) throw error;
 
-      setTemplates(data || []);
-      setFilteredTemplates(data || []);
+      // Convert the data to match our Template interface
+      const templatesData: Template[] = (data || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        blocks: Array.isArray(item.blocks) ? item.blocks : [],
+        user_id: item.user_id,
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      }));
+
+      setTemplates(templatesData);
+      setFilteredTemplates(templatesData);
     } catch (error) {
       console.error('Error loading templates:', error);
       toast({
@@ -81,15 +92,15 @@ export const Templates: React.FC = () => {
 
   const createTemplate = async () => {
     try {
-      const templateData = {
-        name: newTemplate.name,
-        category: newTemplate.category,
-        blocks: [], // For now, empty blocks - could parse HTML later
-      };
-
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('templates')
-        .insert(templateData);
+        .insert({
+          name: newTemplate.name,
+          category: newTemplate.category,
+          blocks: []
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
@@ -99,7 +110,7 @@ export const Templates: React.FC = () => {
       });
 
       setIsCreateOpen(false);
-      setNewTemplate({ name: '', category: 'other', htmlContent: '' });
+      setNewTemplate({ name: '', category: 'other' });
       loadTemplates();
     } catch (error) {
       console.error('Error creating template:', error);

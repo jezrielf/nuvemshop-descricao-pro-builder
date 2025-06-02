@@ -6,8 +6,6 @@ import Auth from './pages/Auth';
 import EmailConfirmation from './pages/EmailConfirmation';
 import DescriptionAnalysis from './pages/DescriptionAnalysis';
 import Admin from './pages/Admin';
-import AdminAuth from './pages/AdminAuth';
-import AdminTemplates from './pages/AdminTemplates';
 import Plans from './pages/Plans';
 import NuvemshopConnect from './pages/NuvemshopConnect';
 import NexoAdmin from './pages/NexoAdmin';
@@ -68,8 +66,6 @@ const App: React.FC = () => {
                 <Route path="/confirmar-email" element={<EmailConfirmation />} />
                 <Route path="/description-analysis" element={<DescriptionAnalysis />} />
                 <Route path="/admin" element={<Admin />} />
-                <Route path="/admin-auth" element={<AdminAuth />} />
-                <Route path="/admin-templates" element={<AdminTemplates />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
                 <Route path="/nexo-admin" element={<NexoAdmin />} />

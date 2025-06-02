@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Plan } from '../types';
 import { useToast } from '@/hooks/use-toast';
-import { adminService } from '@/services/admin';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useDeletePlan = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -29,7 +29,17 @@ export const useDeletePlan = (
       }
       
       console.log("Excluindo plano:", planToDelete.id);
-      await adminService.deletePlan(planToDelete.id);
+      
+      // Use Stripe edge function to delete plan
+      const { error } = await supabase.functions.invoke('manage-plans', {
+        body: { 
+          method: 'DELETE', 
+          action: 'delete-product',
+          id: planToDelete.id
+        }
+      });
+
+      if (error) throw error;
       
       toast({
         title: 'Plano excluído',
