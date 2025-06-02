@@ -1,5 +1,6 @@
 
 import { StateCreator } from 'zustand';
+import { Template } from '@/types/editor';
 import { TemplateState, TemplateCategorySlice } from './types';
 
 export const createCategorySlice: StateCreator<
@@ -10,28 +11,28 @@ export const createCategorySlice: StateCreator<
 > = (set, get) => ({
   categories: [
     'supplements',
+    'electronics', 
     'clothing',
-    'accessories',
     'shoes',
-    'electronics',
+    'accessories',
     'energy',
     'Casa e decoração',
     'other'
   ],
   selectedCategory: null,
   customCategories: [],
-  
-  getTemplatesByCategory: (category) => {
+
+  getTemplatesByCategory: (category: string | null) => {
     const { templates } = get();
     
-    if (!category) {
+    if (!category || category === 'all') {
       return templates;
     }
     
     return templates.filter(template => template.category === category);
   },
-  
-  setSelectedCategory: (category) => {
+
+  setSelectedCategory: (category: string | null) => {
     set({ selectedCategory: category });
   }
 });

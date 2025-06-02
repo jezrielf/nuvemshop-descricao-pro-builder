@@ -1,85 +1,72 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Users, FileText, CreditCard, TrendingUp, RefreshCw } from 'lucide-react';
+import { Users, FileText, ShoppingCart, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardStats {
   totalUsers: number;
   premiumUsers: number;
-  totalDescriptions: number;
   totalTemplates: number;
-  activeSubscriptions: number;
+  totalDescriptions: number;
 }
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     premiumUsers: 0,
-    totalDescriptions: 0,
     totalTemplates: 0,
-    activeSubscriptions: 0
+    totalDescriptions: 0
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const loadStats = async () => {
-    setLoading(true);
+  useEffect(() => {
+    loadDashboardStats();
+  }, []);
+
+  const loadDashboardStats = async () => {
     try {
-      // Get users count
-      const { count: totalUsers } = await supabase
+      setLoading(true);
+      
+      // Load total users
+      const { count: totalUsers, error: usersError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
-
-      // Get premium users count
-      const { count: premiumUsers } = await supabase
+      
+      if (usersError) throw usersError;
+      
+      // Load premium users
+      const { count: premiumUsers, error: premiumError } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .or('role.ilike.%premium%,role.ilike.%admin%');
-
-      // Get templates count
-      const { count: totalTemplates } = await supabase
+        .in('role', ['premium', 'admin']);
+      
+      if (premiumError) throw premiumError;
+      
+      // Load total templates
+      const { count: totalTemplates, error: templatesError } = await supabase
         .from('templates')
         .select('*', { count: 'exact', head: true });
-
-      // Get active subscriptions
-      const { count: activeSubscriptions } = await supabase
-        .from('subscribers')
-        .select('*', { count: 'exact', head: true })
-        .eq('subscribed', true);
-
-      // Count descriptions from localStorage
-      let totalDescriptions = 0;
-      try {
-        const allKeys = Object.keys(localStorage);
-        const descriptionKeys = allKeys.filter(key => key.startsWith('savedDescriptions_'));
-        descriptionKeys.forEach(key => {
-          const descriptions = JSON.parse(localStorage.getItem(key) || '[]');
-          totalDescriptions += descriptions.length;
-        });
-      } catch (error) {
-        console.error('Error counting descriptions:', error);
-      }
-
+      
+      if (templatesError) throw templatesError;
+      
+      // For descriptions, we'll use a placeholder since we need to identify the correct table
+      const totalDescriptions = 0; // TODO: Connect to correct descriptions table
+      
       setStats({
         totalUsers: totalUsers || 0,
         premiumUsers: premiumUsers || 0,
-        totalDescriptions,
         totalTemplates: totalTemplates || 0,
-        activeSubscriptions: activeSubscriptions || 0
+        totalDescriptions
       });
-
-      toast({
-        title: 'Dashboard atualizado',
-        description: 'Estatísticas carregadas com sucesso'
-      });
+      
     } catch (error) {
-      console.error('Error loading stats:', error);
+      console.error('Error loading dashboard stats:', error);
       toast({
         title: 'Erro',
-        description: 'Falha ao carregar estatísticas',
+        description: 'Falha ao carregar estatísticas do dashboard',
         variant: 'destructive'
       });
     } finally {
@@ -87,70 +74,133 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+  const dashboardCards = [
+    {
+      title: 'Total de Usuários',
+      value: stats.totalUsers,
+      description: 'Usuários cadastrados',
+      icon: Users,
+      color: 'text-blue-600'
+    },
+    {
+      title: 'Usuários Premium',
+      value: stats.premiumUsers,
+      description: 'Usuários com planos pagos',
+      icon: TrendingUp,
+      color: 'text-green-600'
+    },
+    {
+      title: 'Templates',
+      value: stats.totalTemplates,
+      description: 'Templates disponíveis',
+      icon: FileText,
+      color: 'text-purple-600'
+    },
+    {
+      title: 'Descrições',
+      value: stats.totalDescriptions,
+      description: 'Descrições criadas',
+      icon: ShoppingCart,
+      color: 'text-orange-600'
+    }
+  ];
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Carregando...</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">-</div>
+                <p className="text-xs text-muted-foreground">-</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Dashboard</h2>
-        <Button onClick={loadStats} disabled={loading} variant="outline">
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+        <button
+          onClick={loadDashboardStats}
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
           Atualizar
-        </Button>
+        </button>
       </div>
-
+      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {dashboardCards.map((card, index) => {
+          const Icon = card.icon;
+          return (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                <Icon className={`h-4 w-4 ${card.color}`} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{card.value}</div>
+                <p className="text-xs text-muted-foreground">{card.description}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+          <CardHeader>
+            <CardTitle>Estatísticas Recentes</CardTitle>
+            <CardDescription>
+              Atividade dos últimos 30 dias
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.premiumUsers} premium
-            </p>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Taxa de conversão:</span>
+                <span className="text-sm font-medium">
+                  {stats.totalUsers > 0 ? ((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1) : 0}%
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm">Templates por usuário:</span>
+                <span className="text-sm font-medium">
+                  {stats.totalUsers > 0 ? (stats.totalTemplates / stats.totalUsers).toFixed(1) : 0}
+                </span>
+              </div>
+            </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Assinantes Ativos</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          <CardHeader>
+            <CardTitle>Ações Rápidas</CardTitle>
+            <CardDescription>
+              Links úteis para administração
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeSubscriptions}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.totalUsers > 0 ? ((stats.activeSubscriptions / stats.totalUsers) * 100).toFixed(1) : 0}% do total
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Descrições Geradas</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalDescriptions}</div>
-            <p className="text-xs text-muted-foreground">
-              Total no sistema
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Templates</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTemplates}</div>
-            <p className="text-xs text-muted-foreground">
-              Disponíveis
-            </p>
+            <div className="space-y-2">
+              <button className="text-sm text-blue-600 hover:underline block">
+                Ver todos os usuários
+              </button>
+              <button className="text-sm text-blue-600 hover:underline block">
+                Gerenciar templates
+              </button>
+              <button className="text-sm text-blue-600 hover:underline block">
+                Configurações do sistema
+              </button>
+            </div>
           </CardContent>
         </Card>
       </div>

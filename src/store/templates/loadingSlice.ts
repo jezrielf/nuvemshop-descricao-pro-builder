@@ -2,21 +2,7 @@
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
 import { TemplateState, TemplateLoadingSlice } from './types';
-import { getAllTemplates } from '@/utils/templates';
-
-// Mock service for templates
-const templateService = {
-  getTemplates: async (): Promise<Template[]> => {
-    console.log('templateService.getTemplates() - Starting template fetch');
-    // In a real implementation, this would fetch from an API
-    const templates = getAllTemplates();
-    console.log('templateService.getTemplates() - Fetched templates:', templates.length);
-    templates.forEach((template, index) => {
-      console.log(`  ${index + 1}. ${template.name} (category: ${template.category}, blocks: ${template.blocks.length})`);
-    });
-    return templates;
-  }
-};
+import { supabase } from '@/integrations/supabase/client';
 
 export const createLoadingSlice: StateCreator<
   TemplateState & TemplateLoadingSlice,
@@ -26,54 +12,60 @@ export const createLoadingSlice: StateCreator<
 > = (set, get) => ({
   loadTemplates: async () => {
     try {
-      console.log('loadTemplates() - Starting template loading process');
-      // Load templates from database, or use local templates if not available
-      const loadedTemplates = await templateService.getTemplates();
-      console.log(`loadTemplates() - Successfully loaded ${loadedTemplates.length} templates`);
+      console.log('Loading templates from Supabase...');
       
-      // Verify each template has proper structure
-      loadedTemplates.forEach((template, index) => {
-        if (!template.id || !template.name || !template.category || !template.blocks) {
-          console.error(`Template ${index} has invalid structure:`, template);
-        } else {
-          console.log(`Template validated: ${template.name} - ${template.blocks.length} blocks`);
-        }
-      });
+      const { data, error } = await supabase
+        .from('templates')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading templates:', error);
+        throw error;
+      }
+
+      const templates: Template[] = (data || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category as any,
+        blocks: Array.isArray(item.blocks) ? item.blocks : [],
+        user_id: item.user_id
+      }));
+
+      console.log('Templates loaded successfully:', templates.length);
       
-      set({ templates: loadedTemplates });
-      console.log('loadTemplates() - Templates stored in state successfully');
-      return loadedTemplates;
+      set({ templates });
+      return templates;
     } catch (error) {
-      console.error('Error loading templates:', error);
-      // If there's an error, use local templates as fallback
-      const fallbackTemplates = getAllTemplates();
-      console.log(`loadTemplates() - Using ${fallbackTemplates.length} fallback templates`);
-      set({ templates: fallbackTemplates });
-      return fallbackTemplates;
+      console.error('Error in loadTemplates:', error);
+      set({ templates: [] });
+      throw error;
     }
   },
-  
-  searchTemplates: (query, category) => {
+
+  searchTemplates: (query: string, category: string | null) => {
     const { templates } = get();
     
-    console.log(`searchTemplates() - Searching in ${templates.length} templates with query: "${query}", category: "${category}"`);
-    
-    if (!query && !category) {
-      console.log('searchTemplates() - No filters, returning all templates');
-      return templates;
+    if (!templates || templates.length === 0) {
+      return [];
     }
-    
-    const filtered = templates.filter(template => {
-      const matchesQuery = !query || 
-        template.name.toLowerCase().includes(query.toLowerCase());
-      
-      const matchesCategory = !category || 
-        template.category === category;
-      
-      return matchesQuery && matchesCategory;
-    });
-    
-    console.log(`searchTemplates() - Filtered to ${filtered.length} templates`);
+
+    let filtered = [...templates];
+
+    // Filter by category
+    if (category && category !== 'all') {
+      filtered = filtered.filter(template => template.category === category);
+    }
+
+    // Filter by search query
+    if (query && query.trim() !== '') {
+      const searchTerm = query.toLowerCase();
+      filtered = filtered.filter(template =>
+        template.name.toLowerCase().includes(searchTerm) ||
+        template.category.toLowerCase().includes(searchTerm)
+      );
+    }
+
     return filtered;
   }
 });
