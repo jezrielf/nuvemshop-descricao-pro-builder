@@ -1,11 +1,11 @@
 
 import { StateCreator } from 'zustand';
 import { Template } from '@/types/editor';
-import { TemplateState, TemplateLoadingSlice } from './types';
+import { TemplateState, TemplateLoadingSlice, TemplateCRUDSlice, TemplateCategorySlice } from './types';
 import { supabase } from '@/integrations/supabase/client';
 
 export const createLoadingSlice: StateCreator<
-  TemplateState & TemplateLoadingSlice,
+  TemplateState & TemplateLoadingSlice & TemplateCRUDSlice & TemplateCategorySlice,
   [],
   [],
   TemplateLoadingSlice
@@ -56,12 +56,14 @@ export const createLoadingSlice: StateCreator<
         console.log(`loadingSlice - Template ${index + 1}: ${template.name} (${template.category}) - ${template.blocks.length} blocos`);
       });
       
-      set({ templates });
-      
       // Extrair categorias únicas
       const uniqueCategories = [...new Set(templates.map(t => t.category))];
       console.log('loadingSlice - Categorias encontradas:', uniqueCategories);
-      set({ categories: uniqueCategories });
+      
+      set({ 
+        templates,
+        categories: uniqueCategories 
+      });
       
       return templates;
     } catch (error) {
