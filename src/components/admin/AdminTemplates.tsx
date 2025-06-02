@@ -144,7 +144,7 @@ export const AdminTemplates: React.FC = () => {
         .from('templates')
         .insert({
           name: formData.name,
-          category: formData.category,
+          category: formData.category as string, // Convert to string for Supabase
           blocks: blocks,
           user_id: user.id
         })
