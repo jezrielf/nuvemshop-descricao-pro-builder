@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -167,14 +166,15 @@ export const Templates: React.FC = () => {
         }
       }
 
+      // Usar type assertion para contornar a tipagem estrita do Supabase
       const { data, error } = await supabase
         .from('templates')
         .insert({
           name: formName.trim(),
           category: formCategory,
-          blocks: blocks,
+          blocks: blocks as any,
           user_id: sessionData.session.user.id
-        })
+        } as any)
         .select()
         .single();
 
