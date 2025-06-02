@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/types/editor';
@@ -12,8 +13,13 @@ import { ViewTemplateDialog } from './templates/ViewTemplateDialog';
 import { DeleteTemplateDialog } from './templates/DeleteTemplateDialog';
 import { Plus, RefreshCw } from 'lucide-react';
 
+interface TemplatesByCategory {
+  [category: string]: Template[];
+}
+
 export const Templates: React.FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [templatesByCategory, setTemplatesByCategory] = useState<TemplatesByCategory>({});
   const [loading, setLoading] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -25,12 +31,19 @@ export const Templates: React.FC = () => {
   const loadTemplates = async () => {
     try {
       setLoading(true);
+      console.log('Carregando templates do Supabase...');
+      
       const { data, error } = await supabase
         .from('templates')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao carregar templates:', error);
+        throw error;
+      }
+
+      console.log('Templates carregados:', data?.length || 0);
 
       const formattedTemplates: Template[] = (data || []).map(item => ({
         id: item.id,
@@ -41,8 +54,21 @@ export const Templates: React.FC = () => {
       }));
 
       setTemplates(formattedTemplates);
+
+      // Agrupar templates por categoria
+      const grouped = formattedTemplates.reduce((acc: TemplatesByCategory, template) => {
+        const category = template.category || 'other';
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(template);
+        return acc;
+      }, {});
+
+      setTemplatesByCategory(grouped);
+      console.log('Templates agrupados por categoria:', grouped);
     } catch (error) {
-      console.error('Error loading templates:', error);
+      console.error('Erro ao carregar templates:', error);
       toast({
         title: "Erro",
         description: "Erro ao carregar templates",
@@ -56,6 +82,23 @@ export const Templates: React.FC = () => {
   useEffect(() => {
     loadTemplates();
   }, []);
+
+  const getCategoryLabel = (category: string) => {
+    const labels: { [key: string]: string } = {
+      'supplements': 'Suplementos',
+      'clothing': 'Roupas',
+      'accessories': 'Acessórios',
+      'shoes': 'Calçados',
+      'electronics': 'Eletrônicos',
+      'energy': 'Energia',
+      'casa-decoracao': 'Casa e Decoração',
+      'health': 'Saúde',
+      'luxury': 'Luxo',
+      'adult': 'Adulto',
+      'other': 'Outros'
+    };
+    return labels[category] || category;
+  };
 
   const handleEdit = (template: Template) => {
     setSelectedTemplate(template);
@@ -101,13 +144,16 @@ export const Templates: React.FC = () => {
     });
   };
 
+  const totalTemplates = templates.length;
+  const categoriesCount = Object.keys(templatesByCategory).length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Templates</h1>
           <p className="text-muted-foreground">
-            Gerencie os templates do sistema
+            Gerencie os templates do sistema ({totalTemplates} templates em {categoriesCount} categorias)
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -126,23 +172,52 @@ export const Templates: React.FC = () => {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Templates</CardTitle>
-          <CardDescription>
-            Total de {templates.length} templates cadastrados
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <TemplatesList
-            templates={templates}
-            loading={loading}
-            onEdit={handleEdit}
-            onView={handleView}
-            onDelete={handleDelete}
-          />
-        </CardContent>
-      </Card>
+      {loading ? (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p>Carregando templates...</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : totalTemplates === 0 ? (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-muted-foreground">Nenhum template encontrado</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          {Object.entries(templatesByCategory).map(([category, categoryTemplates]) => (
+            <Card key={category}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center space-x-2">
+                      <span>{getCategoryLabel(category)}</span>
+                      <Badge variant="secondary">{categoryTemplates.length}</Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      Templates da categoria {getCategoryLabel(category)}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <TemplatesList
+                  templates={categoryTemplates}
+                  loading={false}
+                  onEdit={handleEdit}
+                  onView={handleView}
+                  onDelete={handleDelete}
+                />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <CreateTemplateDialog
         open={createDialogOpen}
