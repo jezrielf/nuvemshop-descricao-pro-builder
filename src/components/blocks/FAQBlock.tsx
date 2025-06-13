@@ -95,7 +95,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
           
           {questions.length > 0 ? (
             questions.map((item, index) => (
-              <div key={`faq-container-${item.id}-${index}`} className="p-3 border rounded-md bg-gray-50">
+              <div key={item.id} className="p-3 border rounded-md bg-gray-50">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Pergunta {index + 1}</span>
                   <Button
@@ -111,6 +111,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
                   <div>
                     <label className="block text-xs mb-1">Pergunta</label>
                     <Input
+                      key={`question-${item.id}`}
                       value={item.question}
                       onChange={(e) => handleUpdateQuestion(item.id, 'question', e.target.value)}
                       placeholder="Digite a pergunta"
@@ -120,6 +121,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
                   <div>
                     <label className="block text-xs mb-1">Resposta</label>
                     <Textarea
+                      key={`answer-${item.id}`}
                       value={item.answer}
                       onChange={(e) => handleUpdateQuestion(item.id, 'answer', e.target.value)}
                       placeholder="Digite a resposta"
