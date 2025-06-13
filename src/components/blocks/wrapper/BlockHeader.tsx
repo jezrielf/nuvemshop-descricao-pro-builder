@@ -2,8 +2,15 @@
 import React from 'react';
 import { BlockBase } from '@/types/editor';
 import { getBlockTypeDisplayName, blockTypeInfo } from '@/utils/blockTypeInfo';
+import { extractBlockTitle, formatBlockTitle } from '@/utils/blockTitleExtractor';
 import * as LucideIcons from 'lucide-react';
 import { Eye, EyeOff } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface BlockHeaderProps {
   block: BlockBase;
@@ -44,15 +51,35 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({ block }) => {
   const blockTypeDisplay = getBlockTypeDisplayName(block.type);
   const blockIcon = blockTypeInfo[block.type].icon;
   
+  // Extract block title and format it
+  const blockTitle = extractBlockTitle(block as any);
+  const displayTitle = formatBlockTitle(blockTypeDisplay, blockTitle);
+  const hasLongTitle = blockTitle && blockTitle.length > 25;
+  
   return (
     <div className="flex items-center">
-      <div className="flex items-center mr-3">
-        <span className="mr-1.5">
+      <div className="flex items-center mr-3 flex-1 min-w-0">
+        <span className="mr-1.5 flex-shrink-0">
           {renderBlockTypeIcon(blockIcon)}
         </span>
-        <span className="text-sm font-medium">{blockTypeDisplay}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-sm font-medium truncate">
+                {displayTitle}
+              </span>
+            </TooltipTrigger>
+            {hasLongTitle && (
+              <TooltipContent side="bottom" align="start" className="max-w-xs">
+                <p className="break-words">
+                  {blockTypeDisplay} - {blockTitle}
+                </p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex-shrink-0">
         {block.visible ? (
           <Eye size={14} className="text-gray-500" />
         ) : (
