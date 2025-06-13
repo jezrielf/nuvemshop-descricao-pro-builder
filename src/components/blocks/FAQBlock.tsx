@@ -36,6 +36,8 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
   };
   
   const handleUpdateQuestion = (questionId: string, field: 'question' | 'answer', value: string) => {
+    console.log('Updating question:', questionId, field, value); // Debug log
+    
     const updatedQuestions = (block.questions || []).map(q => {
       if (q.id === questionId) {
         return { ...q, [field]: value };
@@ -43,6 +45,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
       return q;
     });
     
+    console.log('Updated questions:', updatedQuestions); // Debug log
     updateBlock(block.id, { questions: updatedQuestions });
   };
   
@@ -53,6 +56,9 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
   
   // Garante que temos um array válido de perguntas
   const questions = block.questions || [];
+  
+  // Debug: log dos IDs para verificar unicidade
+  console.log('FAQ Questions IDs:', questions.map(q => ({ id: q.id, question: q.question.substring(0, 20) })));
   
   // Preview mode
   if (isPreview) {
@@ -111,7 +117,6 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
                   <div>
                     <label className="block text-xs mb-1">Pergunta</label>
                     <Input
-                      key={`question-${item.id}`}
                       value={item.question}
                       onChange={(e) => handleUpdateQuestion(item.id, 'question', e.target.value)}
                       placeholder="Digite a pergunta"
@@ -121,7 +126,6 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
                   <div>
                     <label className="block text-xs mb-1">Resposta</label>
                     <Textarea
-                      key={`answer-${item.id}`}
                       value={item.answer}
                       onChange={(e) => handleUpdateQuestion(item.id, 'answer', e.target.value)}
                       placeholder="Digite a resposta"
