@@ -6,6 +6,7 @@ import { useEditorStore } from '@/store/editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { deepClone } from '@/utils/deepClone';
 
 interface CTABlockProps {
   block: CTABlockType;

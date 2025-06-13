@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Trash2, PlusCircle, Image } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import ImageLibrary from '@/components/ImageLibrary/ImageLibrary';
+import { deepClone } from '@/utils/deepClone';
 
 interface GalleryBlockProps {
   block: GalleryBlockType;
@@ -30,13 +31,18 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
       caption: 'Legenda da imagem'
     };
     
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
     updateBlock(block.id, {
-      images: [...(block.images || []), newImage]
+      images: [...currentImages, newImage]
     });
   };
   
   const handleUpdateImage = (imageId: string, field: 'src' | 'alt' | 'caption', value: string) => {
-    const updatedImages = block.images.map(img => {
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    
+    const updatedImages = currentImages.map(img => {
       if (img.id === imageId) {
         return { ...img, [field]: value };
       }
@@ -47,12 +53,17 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   };
   
   const handleRemoveImage = (imageId: string) => {
-    const updatedImages = block.images.filter(img => img.id !== imageId);
+    // Create deep copy and filter to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    const updatedImages = currentImages.filter(img => img.id !== imageId);
     updateBlock(block.id, { images: updatedImages });
   };
   
   const handleSelectFromLibrary = (imageId: string, imageUrl: string, alt: string) => {
-    const updatedImages = block.images.map(img => {
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    
+    const updatedImages = currentImages.map(img => {
       if (img.id === imageId) {
         return { 
           ...img,

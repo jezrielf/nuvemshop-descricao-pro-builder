@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { deepClone } from '@/utils/deepClone';
 
 interface HeroBlockProps {
   block: HeroBlockType;
@@ -18,7 +19,23 @@ export const HeroBlock: React.FC<HeroBlockProps> = ({ block, isPreview = false }
   const isEditing = selectedBlockId === block.id && !isPreview;
   
   const handleUpdate = (updates: Partial<HeroBlockType>) => {
-    updateBlock(block.id, updates);
+    // Create deep copy of updates to prevent reference sharing
+    const clonedUpdates = deepClone(updates);
+    updateBlock(block.id, clonedUpdates);
+  };
+  
+  const handleImageUpdate = (imageUpdates: Partial<HeroBlockType['image']>) => {
+    // Create deep copy of current image and apply updates
+    const currentImage = deepClone(block.image || { src: '', alt: '' });
+    const updatedImage = { ...currentImage, ...imageUpdates };
+    updateBlock(block.id, { image: updatedImage });
+  };
+  
+  const handleStyleUpdate = (styleUpdates: Partial<HeroBlockType['style']>) => {
+    // Create deep copy of current style and apply updates
+    const currentStyle = deepClone(block.style || {});
+    const updatedStyle = { ...currentStyle, ...styleUpdates };
+    updateBlock(block.id, { style: updatedStyle });
   };
   
   // Versão de visualização

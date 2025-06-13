@@ -1,11 +1,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Block, ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export const createHeroBlock = (columns: ColumnLayout): Block => {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'hero',
+    type: 'hero' as const,
     title: 'Banner Principal',
     columns,
     visible: true,
@@ -18,5 +19,8 @@ export const createHeroBlock = (columns: ColumnLayout): Block => {
       alt: 'Imagem do banner'
     },
     style: {}
-  } as Block;
+  };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock) as Block;
 };

@@ -1,11 +1,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Block, ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export const createTextImageBlock = (columns: ColumnLayout): Block => {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'textImage',
+    type: 'textImage' as const,
     title: 'Texto + Imagem',
     columns,
     visible: true,
@@ -15,5 +16,8 @@ export const createTextImageBlock = (columns: ColumnLayout): Block => {
     },
     heading: 'Título da Seção',
     content: 'Texto da seção. Adicione aqui detalhes sobre seu produto.'
-  } as Block;
+  };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock) as Block;
 };

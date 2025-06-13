@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TextImageBlock as TextImageBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
@@ -13,6 +12,7 @@ import { useImageUploadFallback } from './image/hooks/useImageUploadFallback';
 import ImageLibrary from '@/components/ImageLibrary/ImageLibrary';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { deepClone } from '@/utils/deepClone';
 
 interface TextImageBlockProps {
   block: TextImageBlockType;
@@ -27,11 +27,15 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
   const [useFallback, setUseFallback] = useState(false);
   
   const handleUpdateImageSrc = (src: string) => {
-    updateBlock(block.id, { image: { ...block.image, src } });
+    // Create deep copy of current image and update src
+    const currentImage = deepClone(block.image);
+    updateBlock(block.id, { image: { ...currentImage, src } });
   };
   
   const handleUpdateImageAlt = (alt: string) => {
-    updateBlock(block.id, { image: { ...block.image, alt } });
+    // Create deep copy of current image and update alt
+    const currentImage = deepClone(block.image);
+    updateBlock(block.id, { image: { ...currentImage, alt } });
   };
   
   const handleUpdateHeading = (heading: string) => {
@@ -43,7 +47,8 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
   };
   
   const handleImageFitChange = (value: string) => {
-    const currentStyle = block.style || {};
+    // Create deep copy of current style and update imageFit
+    const currentStyle = deepClone(block.style || {});
     updateBlock(block.id, { 
       style: {
         ...currentStyle, 
@@ -53,8 +58,11 @@ const TextImageBlock: React.FC<TextImageBlockProps> = ({ block, isPreview = fals
   };
   
   const handleSelectFromLibrary = (imageUrl: string, alt: string) => {
+    // Create deep copy of current image and update both src and alt
+    const currentImage = deepClone(block.image);
     updateBlock(block.id, { 
       image: {
+        ...currentImage,
         src: imageUrl,
         alt: alt
       }

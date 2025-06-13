@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Trash2, PlusCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { deepClone } from '@/utils/deepClone';
 
 interface FAQBlockProps {
   block: FAQBlockType;
@@ -30,8 +31,8 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
       answer: 'Resposta para a pergunta.'
     };
     
-    // Deep copy das perguntas existentes
-    const currentQuestions = JSON.parse(JSON.stringify(block.questions || []));
+    // Create deep copy of current questions to prevent reference sharing
+    const currentQuestions = deepClone(block.questions || []);
     
     updateBlock(block.id, {
       questions: [...currentQuestions, newQuestion]
@@ -41,13 +42,13 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
   const handleUpdateQuestion = (questionId: string, field: 'question' | 'answer', value: string) => {
     console.log('Updating question:', questionId, field, value);
     
-    // Deep copy completo do array de perguntas
-    const currentQuestions = JSON.parse(JSON.stringify(block.questions || []));
+    // Create deep copy of current questions to prevent reference sharing
+    const currentQuestions = deepClone(block.questions || []);
     
-    // Encontrar e atualizar a pergunta específica
+    // Find and update the specific question with deep cloning
     const updatedQuestions = currentQuestions.map((q: any) => {
       if (q.id === questionId) {
-        // Criar um novo objeto completamente independente
+        // Create a completely new object to avoid reference sharing
         return {
           ...q,
           [field]: value
@@ -63,16 +64,16 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
   };
   
   const handleRemoveQuestion = (questionId: string) => {
-    // Deep copy das perguntas e filtrar
-    const currentQuestions = JSON.parse(JSON.stringify(block.questions || []));
+    // Create deep copy of current questions and filter
+    const currentQuestions = deepClone(block.questions || []);
     const updatedQuestions = currentQuestions.filter((q: any) => q.id !== questionId);
     updateBlock(block.id, { questions: updatedQuestions });
   };
   
-  // Garante que temos um array válido de perguntas
+  // Ensure we have a valid array of questions
   const questions = block.questions || [];
   
-  // Debug: log dos IDs para verificar unicidade
+  // Debug: log IDs to verify uniqueness
   console.log('FAQ Questions IDs:', questions.map(q => ({ id: q.id, question: q.question.substring(0, 20) })));
   
   // Preview mode

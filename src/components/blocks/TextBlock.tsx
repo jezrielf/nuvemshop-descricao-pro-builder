@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import AIContentGenerator from '../AIGenerator/AIContentGenerator';
 import { sanitizeHtmlContent } from '@/utils/htmlParsers/analyzers/utils';
+import { deepClone } from '@/utils/deepClone';
 
 interface TextBlockProps {
   block: TextBlockType;
@@ -42,7 +43,9 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
       // Apply updates if any property was missing
       if (hasUpdates) {
         console.log(`Corrigindo propriedades ausentes no bloco de texto ${block.id}:`, updates);
-        updateBlock(block.id, updates);
+        // Create deep copy of updates to prevent reference sharing
+        const clonedUpdates = deepClone(updates);
+        updateBlock(block.id, clonedUpdates);
       }
     }
   }, [block?.id, block.heading, block.content, block.style, description, updateBlock]);
@@ -71,6 +74,13 @@ const TextBlock: React.FC<TextBlockProps> = ({ block, isPreview = false }) => {
     }
     
     updateBlock(block.id, { content });
+  };
+  
+  const handleStyleUpdate = (styleUpdates: Partial<TextBlockType['style']>) => {
+    // Create deep copy of current style and apply updates
+    const currentStyle = deepClone(block.style || {});
+    const updatedStyle = { ...currentStyle, ...styleUpdates };
+    updateBlock(block.id, { style: updatedStyle });
   };
   
   // Convert HTML to plain text for editing, preserving line breaks

@@ -1,11 +1,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Block, ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export const createCTABlock = (columns: ColumnLayout): Block => {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'cta',
+    type: 'cta' as const,
     title: 'Chamada para Ação',
     columns,
     visible: true,
@@ -13,5 +14,8 @@ export const createCTABlock = (columns: ColumnLayout): Block => {
     content: 'Experimente nosso produto agora mesmo e descubra a diferença.',
     buttonText: 'Comprar Agora',
     buttonUrl: '#'
-  } as Block;
+  };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock) as Block;
 };

@@ -8,6 +8,7 @@ import { useImageUploadFallback } from './image/hooks/useImageUploadFallback';
 import ImageEditForm from './image/components/ImageEditForm';
 import ImagePreview from './image/components/ImagePreview';
 import { useToast } from '@/hooks/use-toast';
+import { deepClone } from '@/utils/deepClone';
 
 interface ImageBlockProps {
   block: ImageBlockType;

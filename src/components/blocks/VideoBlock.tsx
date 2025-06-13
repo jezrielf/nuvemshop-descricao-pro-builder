@@ -11,6 +11,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } fr
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { deepClone } from '@/utils/deepClone';
 
 interface VideoBlockProps {
   block: VideoBlockType;
@@ -44,10 +45,20 @@ const VideoBlock: React.FC<VideoBlockProps> = ({ block, isPreview = false }) => 
     }
   });
 
-  // Update block when form values change
+  // Update block when form values change with deep copy
   const onValueChange = (field: keyof FormValues, value: any) => {
     console.log(`Updating ${field} to:`, value);
-    updateBlock(block.id, { [field]: value });
+    const updateData = { [field]: value };
+    // Create deep copy of update data to prevent reference sharing
+    const clonedUpdateData = deepClone(updateData);
+    updateBlock(block.id, clonedUpdateData);
+  };
+  
+  const handleStyleUpdate = (styleUpdates: Partial<VideoBlockType['style']>) => {
+    // Create deep copy of current style and apply updates
+    const currentStyle = deepClone(block.style || {});
+    const updatedStyle = { ...currentStyle, ...styleUpdates };
+    updateBlock(block.id, { style: updatedStyle });
   };
   
   useEffect(() => {

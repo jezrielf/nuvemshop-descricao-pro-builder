@@ -2,14 +2,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import { VideoBlock } from '@/types/editor/blocks/video';
 import { ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export function createVideoBlock(columns: ColumnLayout = 'full'): VideoBlock {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'video',
+    type: 'video' as const,
     title: 'Vídeo do Produto',
     videoUrl: '',
-    aspectRatio: '16:9',
+    aspectRatio: '16:9' as const,
     autoplay: false,
     muteAudio: true,
     columns,
@@ -19,4 +20,7 @@ export function createVideoBlock(columns: ColumnLayout = 'full'): VideoBlock {
       padding: '40px 20px'
     }
   };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock);
 }
