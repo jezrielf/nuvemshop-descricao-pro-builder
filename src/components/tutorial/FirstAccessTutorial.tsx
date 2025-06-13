@@ -1,21 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, X, FileText, Edit3, Eye, Settings, Save } from 'lucide-react';
+import { ArrowRight, X, FileText, Sparkles, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-interface TutorialStep {
-  title: string;
-  description: string;
-  image?: string;
-  icon: React.ReactNode;
-}
+import VisualTutorialManager from './VisualTutorialManager';
+
 const FirstAccessTutorial: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [showVisualTutorial, setShowVisualTutorial] = useState(false);
   const [tutorialCompleted, setTutorialCompleted] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
 
   // Check if this is the first time the user is accessing the app
   useEffect(() => {
@@ -25,107 +20,110 @@ const FirstAccessTutorial: React.FC = () => {
     }
   }, []);
 
-  // Tutorial steps
-  const steps: TutorialStep[] = [{
-    title: "Bem-vindo ao DescriçãoPro!",
-    description: "Vamos te guiar pelos principais recursos da nossa ferramenta para você começar a criar descrições incríveis.",
-    icon: <FileText className="h-8 w-8 text-primary" />
-  }, {
-    title: "Editor de descrições",
-    description: "Use nosso editor intuitivo para criar e personalizar suas descrições. Arraste blocos prontos e edite conforme sua necessidade.",
-    image: "/assets/tutorial/editor.png",
-    icon: <Edit3 className="h-8 w-8 text-primary" />
-  }, {
-    title: "Visualização em tempo real",
-    description: "Veja em tempo real como sua descrição ficará na sua loja. Toda alteração é imediatamente refletida na visualização.",
-    image: "/assets/tutorial/preview.png",
-    icon: <Eye className="h-8 w-8 text-primary" />
-  }, {
-    title: "Configurações e personalização",
-    description: "Ajuste as configurações da sua descrição, como cores, fontes e estilos para combinar com a sua marca.",
-    image: "/assets/tutorial/settings.png",
-    icon: <Settings className="h-8 w-8 text-primary" />
-  }, {
-    title: "Salvar e exportar",
-    description: "Quando terminar, salve sua descrição e exporte para sua loja online com apenas um clique.",
-    image: "/assets/tutorial/export.png",
-    icon: <Save className="h-8 w-8 text-primary" />
-  }];
   const completeTutorial = () => {
     localStorage.setItem('hasSeenTutorial', 'true');
     setTutorialCompleted(true);
     setOpen(false);
     toast({
-      title: "Tutorial completo!",
-      description: "Você pode acessá-lo novamente pelo menu de ajuda se precisar."
+      title: "Bem-vindo ao DescriçãoPro! ✨",
+      description: "Você pode acessar a ajuda e tutoriais a qualquer momento pelo menu."
     });
   };
+
   const handleSkip = () => {
     completeTutorial();
   };
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      completeTutorial();
-    }
-  };
-  const resetTutorial = () => {
-    localStorage.removeItem('hasSeenTutorial');
-    setCurrentStep(0);
-    setTutorialCompleted(false);
-    setOpen(true);
+
+  const handleStartVisualTutorial = () => {
+    setOpen(false);
+    setShowVisualTutorial(true);
   };
 
-  // Render placeholder image if the image doesn't load
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    const target = e.target as HTMLImageElement;
-    target.src = "https://via.placeholder.com/600x400?text=Tutorial+Step";
+  const handleVisualTutorialClose = () => {
+    setShowVisualTutorial(false);
+    completeTutorial();
   };
+
   if (tutorialCompleted) return null;
-  return <>
+
+  return (
+    <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md md:max-w-xl">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2 text-xl">
-                {steps[currentStep].icon}
-                {steps[currentStep].title}
+              <DialogTitle className="flex items-center gap-2 text-2xl">
+                <Sparkles className="h-6 w-6 text-primary" />
+                Bem-vindo ao DescriçãoPro!
               </DialogTitle>
               <Button variant="ghost" size="icon" onClick={handleSkip} className="h-8 w-8 rounded-full">
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <DialogDescription>
-              {steps[currentStep].description}
+            <DialogDescription className="text-base">
+              Crie descrições profissionais para seus produtos em poucos minutos com nossa ferramenta completa.
             </DialogDescription>
           </DialogHeader>
 
-          {steps[currentStep].image && <div className="relative w-full h-64 my-4 rounded-md overflow-hidden bg-gray-100">
-              <img src={steps[currentStep].image} alt={steps[currentStep].title} className="w-full h-full object-cover" onError={handleImageError} />
-            </div>}
-
-          <div className="flex justify-between items-center mt-4">
-            <div className="flex gap-1">
-              {steps.map((_, index) => <div key={index} className={`h-2 w-6 rounded-full ${currentStep === index ? 'bg-primary' : 'bg-gray-200'}`} />)}
+          <div className="space-y-6 py-4">
+            {/* Welcome image */}
+            <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <FileText className="h-16 w-16 text-primary mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-800">Editor Profissional</h3>
+                  <p className="text-sm text-gray-600">Templates, blocos personalizáveis e muito mais</p>
+                </div>
+              </div>
             </div>
-            
-            <div className="space-x-2">
-              <Button variant="outline" onClick={handleSkip}>
-                Pular tutorial
-              </Button>
-              <Button onClick={handleNext}>
-                {currentStep < steps.length - 1 ? <>Próximo <ArrowRight className="ml-2 h-4 w-4" /></> : 'Concluir'}
-              </Button>
+
+            {/* Feature highlights */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                <Zap className="h-5 w-5 text-green-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-green-800">Rápido e Fácil</h4>
+                  <p className="text-sm text-green-700">Crie descrições profissionais em minutos</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                <FileText className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-blue-800">Templates Prontos</h4>
+                  <p className="text-sm text-blue-700">Centenas de templates por categoria</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                <Sparkles className="h-5 w-5 text-purple-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-purple-800">Integração Nuvemshop</h4>
+                  <p className="text-sm text-purple-700">Publique direto na sua loja</p>
+                </div>
+              </div>
             </div>
           </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" onClick={handleSkip} className="order-2 sm:order-1">
+              Pular tutorial
+            </Button>
+            <Button onClick={handleStartVisualTutorial} className="order-1 sm:order-2 flex items-center gap-2">
+              Começar Tour Interativo
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Botão flutuante para reabrir o tutorial */}
-      <div className="fixed bottom-4 right-4 z-50">
-        
-      </div>
-    </>;
+      <VisualTutorialManager
+        type="first-access"
+        isOpen={showVisualTutorial}
+        onClose={handleVisualTutorialClose}
+      />
+    </>
+  );
 };
+
 export default FirstAccessTutorial;
