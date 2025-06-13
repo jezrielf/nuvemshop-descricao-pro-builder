@@ -197,6 +197,7 @@ const Index = () => {
                 variant="secondary" 
                 size="small" 
                 onClick={() => handleConnectNuvemshop()}
+                data-action="connect-nuvemshop"
               >
                 Conectar Nuvemshop
               </NimbusButton>
@@ -209,6 +210,7 @@ const Index = () => {
                   handleConnectNuvemshop();
                 }}
                 className="text-green-600 border-green-300 hover:bg-green-50 h-8"
+                data-action="connect-nuvemshop"
               >
                 Conectar Nuvemshop
               </Button>

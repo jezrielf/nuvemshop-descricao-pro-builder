@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +10,7 @@ import SaveDescriptionButton from './header/SaveDescriptionButton';
 import SavedDescriptionsDialog from './header/SavedDescriptionsDialog';
 import HtmlOutputDialog from './header/HtmlOutputDialog';
 import TutorialManager from './tutorial/TutorialManager';
+import HelpCenter from './help/HelpCenter';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useNuvemshopAuth } from './Nuvemshop/hooks/useNuvemshopAuth';
@@ -32,6 +32,7 @@ const Header: React.FC = () => {
   } = auth;
   const isMobile = useIsMobile();
   const { success: isNuvemshopConnected } = useNuvemshopAuth();
+  const [helpCenterOpen, setHelpCenterOpen] = React.useState(false);
   
   // Log para debug dos papéis e status
   useEffect(() => {
@@ -150,12 +151,14 @@ const Header: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
             <NewDescriptionDialog 
+              data-action="new-description"
               isPremium={isPremium} 
               descriptionCount={descriptionCount}
               canCreateMoreDescriptions={canCreateMoreDescriptions}
             />
             
             <SaveDescriptionButton 
+              data-action="save-description"
               isPremium={isPremium}
               isSubscribed={isSubscribed}
               hasDescription={!!description}
@@ -163,6 +166,7 @@ const Header: React.FC = () => {
             />
             
             <SavedDescriptionsDialog 
+              data-action="saved-descriptions"
               isPremium={isPremium}
               descriptionCount={descriptionCount}
               savedDescriptions={savedDescriptions}
@@ -181,12 +185,23 @@ const Header: React.FC = () => {
             )}
             
             <div className="flex items-center gap-2">
-              <TutorialManager />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setHelpCenterOpen(true)}
+                className="flex items-center text-xs"
+                data-action="start-tutorial"
+              >
+                <HelpCircle className="h-4 w-4 mr-1" />
+                <span className="hidden md:inline">Ajuda</span>
+              </Button>
               <UserButton />
             </div>
           </div>
         </div>
       </div>
+      
+      <HelpCenter open={helpCenterOpen} onOpenChange={setHelpCenterOpen} />
     </header>
   );
 };
