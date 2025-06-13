@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createBlock } from '../blockCreators/createBlock';
 import { analyzeDocument } from './analyzers/documentAnalyzer';
 import { sanitizeHtmlContent } from './analyzers/utils';
+import { validateTemplateBlocks } from '../templates/faqValidator';
 
 export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCategory): Template => {
   const parsedBlocks = [];
@@ -31,11 +32,14 @@ export const analyzeHtmlForTemplate = (htmlInput: string, category: ProductCateg
     parsedBlocks.push(textBlock);
   }
 
+  // Validar e garantir que todos os FAQs tenham IDs únicos
+  const validatedBlocks = validateTemplateBlocks(parsedBlocks);
+
   return {
     id: uuidv4(),
     name: 'Template from HTML',
     category,
-    blocks: parsedBlocks,
+    blocks: validatedBlocks,
     thumbnail: '/placeholder.svg' // Add default thumbnail
   };
 };
@@ -80,9 +84,12 @@ export const customizeBlockTypes = (
     return block;
   });
   
+  // Validar blocos atualizados para garantir IDs únicos nos FAQs
+  const validatedBlocks = validateTemplateBlocks(updatedBlocks);
+  
   return {
     ...template,
-    blocks: updatedBlocks as Block[],
+    blocks: validatedBlocks as Block[],
     thumbnail: template.thumbnail
   };
 };

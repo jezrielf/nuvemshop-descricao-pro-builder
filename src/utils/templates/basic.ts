@@ -1,5 +1,6 @@
 
 import { Template } from '@/types/editor';
+import { v4 as uuidv4 } from 'uuid';
 
 // Simple, minimalist templates that can be used as starting points
 export const basicTemplates: Template[] = [
@@ -105,6 +106,35 @@ export const basicTemplates: Template[] = [
         src: '',
         alt: 'Imagem do produto',
         caption: ''
+      },
+      {
+        id: 'faq-1',
+        type: 'faq',
+        title: 'Perguntas Frequentes',
+        visible: true,
+        columns: 'full',
+        style: {
+          padding: '20px',
+          backgroundColor: '#ffffff'
+        },
+        heading: 'Perguntas Frequentes',
+        questions: [
+          {
+            id: uuidv4(),
+            question: 'Como usar este produto?',
+            answer: 'Instruções detalhadas de uso do produto.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Qual é a garantia?',
+            answer: 'Este produto possui garantia de 12 meses.'
+          },
+          {
+            id: uuidv4(),
+            question: 'Posso trocar se não gostar?',
+            answer: 'Sim, você tem 7 dias para trocar ou devolver.'
+          }
+        ]
       }
     ]
   }

@@ -1,3 +1,4 @@
+
 import { Template } from '@/types/editor';
 import { supplementsTemplates } from './supplements';
 import { fashionTemplates } from './fashion';
@@ -13,6 +14,7 @@ import { vestuarioTemplates } from './vestuario';
 import { acessoriosLuxoTemplates } from './acessorios-luxo';
 import { modaLuxoTemplates } from './moda-luxo';
 import { produtosIntimosTemplates } from './produtos-intimos';
+import { validateTemplateBlocks } from './faqValidator';
 
 // Debug logging for template loading
 console.log('Loading templates from individual files:');
@@ -31,33 +33,48 @@ console.log('- Acessórios Luxo templates:', acessoriosLuxoTemplates.length);
 console.log('- Moda Luxo templates:', modaLuxoTemplates.length);
 console.log('- Produtos Íntimos templates:', produtosIntimosTemplates.length);
 
-// Combining all templates including the new ones
+// Função para validar todos os templates e garantir IDs únicos nos FAQs
+const validateTemplate = (template: Template): Template => {
+  return {
+    ...template,
+    blocks: validateTemplateBlocks(template.blocks)
+  };
+};
+
+// Combining all templates including the new ones and validating them
 export const allTemplates: Template[] = [
-  ...supplementsTemplates,
-  ...fashionTemplates,
-  ...accessoriesTemplates,
-  gemBlendTemplate,
-  ...shoesTemplates,
-  ...casaDecoracaoTemplates,
-  ...eletronicoTemplates,
-  ...belezaTemplates,
-  ...petShopTemplates,
-  ...saudeTemplates,
-  ...vestuarioTemplates,
-  ...acessoriosLuxoTemplates,
-  ...modaLuxoTemplates,
-  ...produtosIntimosTemplates
+  ...supplementsTemplates.map(validateTemplate),
+  ...fashionTemplates.map(validateTemplate),
+  ...accessoriesTemplates.map(validateTemplate),
+  validateTemplate(gemBlendTemplate),
+  ...shoesTemplates.map(validateTemplate),
+  ...casaDecoracaoTemplates.map(validateTemplate),
+  ...eletronicoTemplates.map(validateTemplate),
+  ...belezaTemplates.map(validateTemplate),
+  ...petShopTemplates.map(validateTemplate),
+  ...saudeTemplates.map(validateTemplate),
+  ...vestuarioTemplates.map(validateTemplate),
+  ...acessoriosLuxoTemplates.map(validateTemplate),
+  ...modaLuxoTemplates.map(validateTemplate),
+  ...produtosIntimosTemplates.map(validateTemplate)
 ];
 
 console.log('Total templates combined:', allTemplates.length);
 console.log('Template names:', allTemplates.map(t => t.name));
 
-// Enhanced getAllTemplates function with error handling
+// Enhanced getAllTemplates function with error handling and validation
 export const getAllTemplates = (): Template[] => {
   try {
     console.log(`getAllTemplates() - Successfully loaded ${allTemplates.length} templates`);
     allTemplates.forEach((template, index) => {
       console.log(`Template ${index + 1}: ${template.name} (${template.category}) - ${template.blocks.length} blocks`);
+      
+      // Log any FAQ blocks to verify they have IDs
+      template.blocks.forEach(block => {
+        if (block.type === 'faq') {
+          console.log(`FAQ block in ${template.name}: ${(block as any).questions?.length || 0} questions with IDs`);
+        }
+      });
     });
     return allTemplates;
   } catch (error) {
@@ -81,3 +98,4 @@ export * from './vestuario';
 export * from './acessorios-luxo';
 export * from './moda-luxo';
 export * from './produtos-intimos';
+export * from './faqValidator';
