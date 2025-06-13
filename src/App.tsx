@@ -11,7 +11,7 @@ import AdminTemplates from './pages/AdminTemplates';
 import Plans from './pages/Plans';
 import NuvemshopConnect from './pages/NuvemshopConnect';
 import NexoAdmin from './pages/NexoAdmin';
-import NimbusNexoInfo from './pages/NimbusNexoInfo';
+// import NimbusNexoInfo from './pages/NimbusNexoInfo'; // Página desativada
 import Success from './pages/Success';
 import Landing from './pages/Landing';
 import { AuthProvider } from './contexts/AuthContext';
@@ -73,7 +73,7 @@ const App: React.FC = () => {
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
                 <Route path="/nexo-admin" element={<NexoAdmin />} />
-                <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} />
+                {/* Rota desativada: <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} /> */}
                 <Route path="/success" element={<Success />} />
               </Routes>
             </NexoProvider>
