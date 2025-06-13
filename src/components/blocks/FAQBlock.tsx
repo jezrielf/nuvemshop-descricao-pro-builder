@@ -36,13 +36,18 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
   };
   
   const handleUpdateQuestion = (questionId: string, field: 'question' | 'answer', value: string) => {
+    console.log(`Updating question ${questionId}, field: ${field}, value: ${value}`);
+    
+    // Fazer uma cópia profunda do array de perguntas
     const updatedQuestions = (block.questions || []).map(q => {
       if (q.id === questionId) {
+        console.log(`Found matching question, updating ${field}`);
         return { ...q, [field]: value };
       }
-      return q;
+      return { ...q }; // Garantir que retornamos uma nova referência
     });
     
+    console.log('Updated questions:', updatedQuestions);
     updateBlock(block.id, { questions: updatedQuestions });
   };
   
@@ -95,7 +100,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
           
           {questions.length > 0 ? (
             questions.map((item, index) => (
-              <div key={item.id} className="p-3 border rounded-md bg-gray-50">
+              <div key={`faq-question-${item.id}`} className="p-3 border rounded-md bg-gray-50">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Pergunta {index + 1}</span>
                   <Button
@@ -111,6 +116,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
                   <div>
                     <label className="block text-xs mb-1">Pergunta</label>
                     <Input
+                      key={`question-input-${item.id}`}
                       value={item.question}
                       onChange={(e) => handleUpdateQuestion(item.id, 'question', e.target.value)}
                       placeholder="Digite a pergunta"
@@ -120,6 +126,7 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
                   <div>
                     <label className="block text-xs mb-1">Resposta</label>
                     <Textarea
+                      key={`answer-textarea-${item.id}`}
                       value={item.answer}
                       onChange={(e) => handleUpdateQuestion(item.id, 'answer', e.target.value)}
                       placeholder="Digite a resposta"
