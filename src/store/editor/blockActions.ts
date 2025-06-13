@@ -45,19 +45,20 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
           const mergedBlock = { ...clonedBlock, ...clonedUpdates };
           
           // Special handling for nested array properties to prevent reference sharing
-          if (clonedUpdates.questions && Array.isArray(clonedUpdates.questions)) {
+          // Use type-safe property access with 'in' operator
+          if ('questions' in clonedUpdates && clonedUpdates.questions && Array.isArray(clonedUpdates.questions)) {
             mergedBlock.questions = deepClone(clonedUpdates.questions);
           }
-          if (clonedUpdates.benefits && Array.isArray(clonedUpdates.benefits)) {
+          if ('benefits' in clonedUpdates && clonedUpdates.benefits && Array.isArray(clonedUpdates.benefits)) {
             mergedBlock.benefits = deepClone(clonedUpdates.benefits);
           }
-          if (clonedUpdates.features && Array.isArray(clonedUpdates.features)) {
+          if ('features' in clonedUpdates && clonedUpdates.features && Array.isArray(clonedUpdates.features)) {
             mergedBlock.features = deepClone(clonedUpdates.features);
           }
-          if (clonedUpdates.specs && Array.isArray(clonedUpdates.specs)) {
+          if ('specs' in clonedUpdates && clonedUpdates.specs && Array.isArray(clonedUpdates.specs)) {
             mergedBlock.specs = deepClone(clonedUpdates.specs);
           }
-          if (clonedUpdates.images && Array.isArray(clonedUpdates.images)) {
+          if ('images' in clonedUpdates && clonedUpdates.images && Array.isArray(clonedUpdates.images)) {
             mergedBlock.images = deepClone(clonedUpdates.images);
           }
           
@@ -87,20 +88,20 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
     const blockCopy = deepClone(blockToDuplicate);
     blockCopy.id = uuidv4();
     
-    // Ensure unique IDs for all nested items
-    if (blockCopy.questions && Array.isArray(blockCopy.questions)) {
+    // Ensure unique IDs for all nested items using type-safe access
+    if ('questions' in blockCopy && blockCopy.questions && Array.isArray(blockCopy.questions)) {
       blockCopy.questions = blockCopy.questions.map((q: any) => ({ ...q, id: uuidv4() }));
     }
-    if (blockCopy.benefits && Array.isArray(blockCopy.benefits)) {
+    if ('benefits' in blockCopy && blockCopy.benefits && Array.isArray(blockCopy.benefits)) {
       blockCopy.benefits = blockCopy.benefits.map((b: any) => ({ ...b, id: uuidv4() }));
     }
-    if (blockCopy.features && Array.isArray(blockCopy.features)) {
+    if ('features' in blockCopy && blockCopy.features && Array.isArray(blockCopy.features)) {
       blockCopy.features = blockCopy.features.map((f: any) => ({ ...f, id: uuidv4() }));
     }
-    if (blockCopy.specs && Array.isArray(blockCopy.specs)) {
+    if ('specs' in blockCopy && blockCopy.specs && Array.isArray(blockCopy.specs)) {
       blockCopy.specs = blockCopy.specs.map((s: any) => ({ ...s, id: uuidv4() }));
     }
-    if (blockCopy.images && Array.isArray(blockCopy.images)) {
+    if ('images' in blockCopy && blockCopy.images && Array.isArray(blockCopy.images)) {
       blockCopy.images = blockCopy.images.map((i: any) => ({ ...i, id: uuidv4() }));
     }
     
