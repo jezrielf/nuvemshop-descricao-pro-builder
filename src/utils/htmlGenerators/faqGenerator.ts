@@ -15,10 +15,10 @@ export const generateFAQHtml = (block: FAQBlock): string => {
         return `
           <div class="faq-item" style="${itemBottomStyle}border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;">
             <div class="faq-question" 
-                 onclick="document.getElementById('faq-${block.id}-${index}').classList.toggle('active');document.getElementById('faq-icon-${block.id}-${index}').style.transform = document.getElementById('faq-icon-${block.id}-${index}').style.transform === 'rotate(45deg)' ? 'rotate(0)' : 'rotate(45deg';"
-                 style="padding:12px 16px;background-color:#f9fafb;font-weight:500;cursor:pointer;position:relative;display:block;">
+                 data-faq-id="faq-${block.id}-${index}"
+                 style="padding:12px 16px;background-color:#f9fafb;font-weight:500;cursor:pointer;position:relative;display:block;user-select:none;">
               ${item.question}
-              <span id="faq-icon-${block.id}-${index}" style="position:absolute;right:16px;top:12px;font-size:18px;transition:transform 0.3s ease;">+</span>
+              <span class="faq-icon" id="faq-icon-${block.id}-${index}" style="position:absolute;right:16px;top:12px;font-size:18px;transition:transform 0.3s ease;transform:rotate(0deg);">+</span>
             </div>
             <div id="faq-${block.id}-${index}" class="faq-answer" style="max-height:0;overflow:hidden;background-color:white;transition:max-height 0.3s ease;padding:0 16px;">
               <div style="padding:16px 0;">${item.answer}</div>
@@ -28,28 +28,54 @@ export const generateFAQHtml = (block: FAQBlock): string => {
       }).join('')
     : '';
   
-  // JavaScript to handle the FAQ toggle behavior inline
+  // JavaScript to handle the FAQ toggle behavior with proper event handling
   const faqScript = `
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var faqItems = document.querySelectorAll('.faq-question');
-        faqItems.forEach(function(item) {
-          item.addEventListener('click', function() {
-            var answer = this.nextElementSibling;
-            var icon = this.querySelector('span');
+      (function() {
+        function initializeFAQ() {
+          // Find all FAQ questions in this specific block
+          var faqQuestions = document.querySelectorAll('[data-faq-id^="faq-${block.id}"]');
+          
+          faqQuestions.forEach(function(questionElement) {
+            // Remove any existing event listeners to prevent duplicates
+            var newElement = questionElement.cloneNode(true);
+            questionElement.parentNode.replaceChild(newElement, questionElement);
             
-            if (answer.style.maxHeight === '0px' || !answer.style.maxHeight) {
-              answer.style.maxHeight = '1000px';
-              answer.style.padding = '0 16px';
-              if (icon) icon.style.transform = 'rotate(45deg)';
-            } else {
-              answer.style.maxHeight = '0px';
-              answer.style.padding = '0 16px';
-              if (icon) icon.style.transform = 'rotate(0)';
-            }
+            // Add click event listener to the new element
+            newElement.addEventListener('click', function() {
+              var faqId = this.getAttribute('data-faq-id');
+              var answerElement = document.getElementById(faqId);
+              var iconElement = document.getElementById(faqId.replace('faq-', 'faq-icon-'));
+              
+              if (answerElement && iconElement) {
+                var isOpen = answerElement.style.maxHeight && answerElement.style.maxHeight !== '0px';
+                
+                if (isOpen) {
+                  // Close the FAQ
+                  answerElement.style.maxHeight = '0px';
+                  iconElement.style.transform = 'rotate(0deg)';
+                  iconElement.textContent = '+';
+                } else {
+                  // Open the FAQ
+                  answerElement.style.maxHeight = answerElement.scrollHeight + 'px';
+                  iconElement.style.transform = 'rotate(45deg)';
+                  iconElement.textContent = '×';
+                }
+              }
+            });
           });
-        });
-      });
+        }
+        
+        // Initialize immediately if DOM is ready
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeFAQ);
+        } else {
+          initializeFAQ();
+        }
+        
+        // Also initialize after a short delay to handle dynamic content
+        setTimeout(initializeFAQ, 100);
+      })();
     </script>
   `;
   
