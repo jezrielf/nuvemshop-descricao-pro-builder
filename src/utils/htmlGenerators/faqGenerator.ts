@@ -31,35 +31,26 @@ export const generateFAQHtml = (block: FAQBlock): string => {
   const faqStyles = `
     <style>
       /* FAQ accordion styles */
-      .faq-checkbox:checked + .faq-question .faq-icon {
+      .faq-checkbox:checked ~ .faq-question .faq-icon {
         transform: translateY(-50%) rotate(45deg);
       }
       
-      .faq-checkbox:checked + .faq-question .faq-icon:before {
-        content: '×';
-      }
-      
-      .faq-checkbox:checked + .faq-question + .faq-answer {
+      .faq-checkbox:checked ~ .faq-answer {
         max-height: 1000px;
-        transition: max-height 0.5s ease;
+        transition: max-height 0.4s ease-in;
       }
       
       .faq-question:hover {
         background-color: #f3f4f6 !important;
       }
       
-      /* Ensure the icon changes */
-      .faq-checkbox:checked + .faq-question .faq-icon {
-        content: '×';
-      }
-      
-      /* Better animation for opening/closing */
+      /* Smooth animations */
       .faq-answer {
         transition: max-height 0.4s ease-out;
       }
       
-      .faq-checkbox:checked + .faq-question + .faq-answer {
-        transition: max-height 0.4s ease-in;
+      .faq-icon {
+        transition: transform 0.3s ease;
       }
     </style>
   `;
