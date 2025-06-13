@@ -1,6 +1,4 @@
 
-import { TutorialStep } from './TutorialOverlay';
-
 export interface TutorialStep {
   id: string;
   title: string;

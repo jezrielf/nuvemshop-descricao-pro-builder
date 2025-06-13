@@ -4,18 +4,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { X, ArrowLeft, ArrowRight } from 'lucide-react';
-
-interface TutorialStep {
-  id: string;
-  title: string;
-  description: string;
-  targetSelector: string;
-  position: 'top' | 'bottom' | 'left' | 'right';
-  image?: string;
-  video?: string;
-  actionText?: string;
-  onAction?: () => void;
-}
+import { TutorialStep } from './tutorialSteps';
 
 interface TutorialOverlayProps {
   steps: TutorialStep[];

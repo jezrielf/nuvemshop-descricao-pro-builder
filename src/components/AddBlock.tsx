@@ -4,12 +4,19 @@ import { useEditorStore } from '@/store/editor';
 import BlockTypeSelector from './BlockTypeSelector';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { BlockType } from '@/types/editor';
 
 const AddBlock: React.FC = () => {
+  const { addBlock } = useEditorStore();
+
+  const handleSelectType = (type: BlockType) => {
+    addBlock(type);
+  };
+
   return (
     <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
       <div className="text-center">
-        <BlockTypeSelector>
+        <BlockTypeSelector onSelectType={handleSelectType}>
           <Button 
             variant="outline" 
             className="w-full"
