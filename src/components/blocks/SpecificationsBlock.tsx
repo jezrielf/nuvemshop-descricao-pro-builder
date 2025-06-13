@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SpecificationsBlock as SpecBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Trash2, PlusCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { deepClone } from '@/utils/deepClone';
 
 interface SpecificationsBlockProps {
   block: SpecBlockType;
@@ -28,13 +28,18 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
       value: 'Valor'
     };
     
+    // Create deep copy of current specs to prevent reference sharing
+    const currentSpecs = deepClone(block.specs || []);
     updateBlock(block.id, {
-      specs: [...(block.specs || []), newSpec]
+      specs: [...currentSpecs, newSpec]
     });
   };
   
   const handleUpdateSpec = (specId: string, field: 'name' | 'value', value: string) => {
-    const updatedSpecs = block.specs.map(spec => {
+    // Create deep copy of current specs to prevent reference sharing
+    const currentSpecs = deepClone(block.specs || []);
+    
+    const updatedSpecs = currentSpecs.map(spec => {
       if (spec.id === specId) {
         return { ...spec, [field]: value };
       }
@@ -45,19 +50,18 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
   };
   
   const handleRemoveSpec = (specId: string) => {
-    const updatedSpecs = block.specs.filter(spec => spec.id !== specId);
+    // Create deep copy and filter to prevent reference sharing
+    const currentSpecs = deepClone(block.specs || []);
+    const updatedSpecs = currentSpecs.filter(spec => spec.id !== specId);
     updateBlock(block.id, { specs: updatedSpecs });
   };
   
-  // Create responsive column classes for two-column layout on desktop
   const getColumnsClass = () => {
     if (typeof block.columns === 'number' || typeof block.columns === 'string') {
-      // Convert to number if it's a string number or already a number
       const columnsNumber = typeof block.columns === 'string' 
         ? parseInt(block.columns, 10) 
         : block.columns;
       
-      // Check if columnsNumber is NaN or less than or equal to 1
       if (isNaN(columnsNumber) || columnsNumber <= 1) {
         return '';
       }
@@ -66,9 +70,7 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
     return '';
   };
   
-  // Preview mode
   if (isPreview) {
-    // Check if columns is a number or can be converted to a number
     const columnsNumber = typeof block.columns === 'number' 
       ? block.columns 
       : typeof block.columns === 'string' && !isNaN(parseInt(block.columns, 10))
@@ -76,7 +78,6 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
         : 1;
     
     if (columnsNumber > 1) {
-      // Two-column layout for specifications
       return (
         <div className="w-full p-4">
           <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
@@ -91,7 +92,6 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
         </div>
       );
     } else {
-      // Traditional table layout for single column
       return (
         <div className="w-full p-4">
           <h2 className="text-2xl font-bold mb-4">{block.heading}</h2>
@@ -112,7 +112,6 @@ const SpecificationsBlock: React.FC<SpecificationsBlockProps> = ({ block, isPrev
     }
   }
   
-  // Edit mode
   return (
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">

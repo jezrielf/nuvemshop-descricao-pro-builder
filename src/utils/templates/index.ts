@@ -1,4 +1,3 @@
-
 import { Template } from '@/types/editor';
 import { supplementsTemplates } from './supplements';
 import { fashionTemplates } from './fashion';
@@ -15,6 +14,7 @@ import { acessoriosLuxoTemplates } from './acessorios-luxo';
 import { modaLuxoTemplates } from './moda-luxo';
 import { produtosIntimosTemplates } from './produtos-intimos';
 import { validateTemplateBlocks } from './faqValidator';
+import { deepClone } from '@/utils/deepClone';
 
 // Debug logging for template loading
 console.log('Loading templates from individual files:');
@@ -33,11 +33,14 @@ console.log('- Acessórios Luxo templates:', acessoriosLuxoTemplates.length);
 console.log('- Moda Luxo templates:', modaLuxoTemplates.length);
 console.log('- Produtos Íntimos templates:', produtosIntimosTemplates.length);
 
-// Função para validar todos os templates e garantir IDs únicos nos FAQs
+// Enhanced validation function that also creates deep copies
 const validateTemplate = (template: Template): Template => {
+  // Create deep copy to prevent reference sharing between template instances
+  const clonedTemplate = deepClone(template);
+  
   return {
-    ...template,
-    blocks: validateTemplateBlocks(template.blocks)
+    ...clonedTemplate,
+    blocks: validateTemplateBlocks(clonedTemplate.blocks)
   };
 };
 
@@ -62,28 +65,27 @@ export const allTemplates: Template[] = [
 console.log('Total templates combined:', allTemplates.length);
 console.log('Template names:', allTemplates.map(t => t.name));
 
-// Enhanced getAllTemplates function with error handling and validation
 export const getAllTemplates = (): Template[] => {
   try {
     console.log(`getAllTemplates() - Successfully loaded ${allTemplates.length} templates`);
     allTemplates.forEach((template, index) => {
       console.log(`Template ${index + 1}: ${template.name} (${template.category}) - ${template.blocks.length} blocks`);
       
-      // Log any FAQ blocks to verify they have IDs
       template.blocks.forEach(block => {
         if (block.type === 'faq') {
           console.log(`FAQ block in ${template.name}: ${(block as any).questions?.length || 0} questions with IDs`);
         }
       });
     });
-    return allTemplates;
+    
+    // Return deep copies to ensure each usage gets independent instances
+    return allTemplates.map(template => deepClone(template));
   } catch (error) {
     console.error('Error loading templates:', error);
     return [];
   }
 };
 
-// Export individual template collections for granular access
 export * from './supplements';
 export * from './fashion';
 export * from './accessories';

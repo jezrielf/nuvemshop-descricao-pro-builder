@@ -1,14 +1,14 @@
-
 import { Block, BlockType, ColumnLayout } from '@/types/editor';
 import { EditorState } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { deepClone } from '@/utils/deepClone';
 
 export const createBlockActions = (get: () => EditorState, set: any) => ({
   addBlock: (blockData: Partial<Block> & { type: BlockType, title: string, columns: ColumnLayout, visible: boolean }) => {
     if (!get().description) return;
     
-    // Ensure the block is properly typed
-    const block = { ...blockData, id: uuidv4() } as Block;
+    // Ensure the block is properly typed and deeply cloned
+    const block = deepClone({ ...blockData, id: uuidv4() }) as Block;
     
     set((state: EditorState) => {
       if (!state.description) return state;
@@ -31,10 +31,16 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
     set((state: EditorState) => {
       if (!state.description) return state;
       
-      // Create a new array with the updated block
-      const updatedBlocks = state.description.blocks.map((block) => {
+      // Create a deep copy of the current blocks to prevent reference sharing
+      const currentBlocks = deepClone(state.description.blocks);
+      
+      // Update the specific block with deep cloned updates
+      const updatedBlocks = currentBlocks.map((block) => {
         if (block.id === id) {
-          return { ...block, ...updates } as Block;
+          // Deep clone both the block and updates to ensure no reference sharing
+          const clonedBlock = deepClone(block);
+          const clonedUpdates = deepClone(updates);
+          return { ...clonedBlock, ...clonedUpdates } as Block;
         }
         return block;
       });
@@ -57,7 +63,7 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
     if (!blockToDuplicate) return;
     
     // Create a deep copy to prevent reference issues
-    const blockCopy = JSON.parse(JSON.stringify(blockToDuplicate));
+    const blockCopy = deepClone(blockToDuplicate);
     blockCopy.id = uuidv4();
     
     // Ensure the blockCopy is properly typed as Block
@@ -170,7 +176,7 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
   selectBlock: (id: string | null) => {
     set({ 
       selectedBlockId: id,
-      focusedBlockId: id // Quando seleciona um bloco, também foca nele na preview
+      focusedBlockId: id
     });
   },
 

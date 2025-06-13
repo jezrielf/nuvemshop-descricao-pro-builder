@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { GalleryBlock as GalleryBlockType } from '@/types/editor';
 import BlockWrapper from '../BlockWrapper';
@@ -10,6 +9,7 @@ import GalleryPreview from './components/GalleryPreview';
 import GalleryImageForm from './components/GalleryImageForm';
 import GallerySettings from './components/GallerySettings';
 import { useGalleryUpload } from '@/hooks/useGalleryUpload';
+import { deepClone } from '@/utils/deepClone';
 
 interface GalleryBlockProps {
   block: GalleryBlockType;
@@ -29,13 +29,18 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
       caption: ''
     };
     
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
     updateBlock(block.id, {
-      images: [...(block.images || []), newImage]
+      images: [...currentImages, newImage]
     });
   };
   
   const handleUpdateImage = (imageId: string, field: 'src' | 'alt' | 'caption', value: string) => {
-    const updatedImages = block.images.map(image => {
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    
+    const updatedImages = currentImages.map(image => {
       if (image.id === imageId) {
         return { ...image, [field]: value };
       }
@@ -46,23 +51,27 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   };
   
   const handleRemoveImage = (imageId: string) => {
-    const updatedImages = block.images.filter(image => image.id !== imageId);
+    // Create deep copy and filter to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    const updatedImages = currentImages.filter(image => image.id !== imageId);
     updateBlock(block.id, { images: updatedImages });
   };
   
   const handleMoveImage = (imageId: string, direction: 'left' | 'right') => {
-    const currentIndex = block.images.findIndex(img => img.id === imageId);
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    const currentIndex = currentImages.findIndex(img => img.id === imageId);
+    
     if (
       (direction === 'left' && currentIndex <= 0) || 
-      (direction === 'right' && currentIndex >= block.images.length - 1)
+      (direction === 'right' && currentIndex >= currentImages.length - 1)
     ) {
       return;
     }
     
-    const newImages = [...block.images];
+    const newImages = [...currentImages];
     const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
     
-    // Trocar posições
     [newImages[currentIndex], newImages[targetIndex]] = [newImages[targetIndex], newImages[currentIndex]];
     
     updateBlock(block.id, { images: newImages });
@@ -82,7 +91,6 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
     try {
       const result = await handleFileChange(e, imageId);
       if (result) {
-        // Atualizar a imagem da galeria com URL e alt retornados
         handleUpdateImage(imageId, 'src', result.url);
         handleUpdateImage(imageId, 'alt', result.alt || 'Imagem da galeria');
         console.log("Upload concluído, imagem atualizada:", result);
@@ -94,8 +102,10 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   
   const handleSelectImageFromLibrary = (imageId: string, imageUrl: string, alt: string) => {
     console.log("Selecionada imagem da biblioteca:", { imageId, imageUrl, alt });
-    // Atualizar a imagem específica na galeria
-    const updatedImages = block.images.map(image => {
+    
+    // Create deep copy of current images to prevent reference sharing
+    const currentImages = deepClone(block.images || []);
+    const updatedImages = currentImages.map(image => {
       if (image.id === imageId) {
         return { ...image, src: imageUrl, alt: alt || 'Imagem da galeria' };
       }
@@ -108,12 +118,10 @@ const GalleryBlock: React.FC<GalleryBlockProps> = ({ block, isPreview = false })
   const imageFitValue = block.style?.imageFit || 'contain';
   const imageObjectFit = imageFitValue === 'cover' ? 'object-cover' : 'object-contain';
   
-  // Modo de pré-visualização
   if (isPreview) {
     return <GalleryPreview block={block} />;
   }
   
-  // Modo de edição
   return (
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">

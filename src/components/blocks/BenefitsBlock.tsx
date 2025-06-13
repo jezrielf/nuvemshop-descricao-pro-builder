@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BenefitsBlock as BenefitsBlockType } from '@/types/editor/blocks/benefits';
 import BlockWrapper from './BlockWrapper';
@@ -9,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import AIContentGenerator from '../AIGenerator/AIContentGenerator';
 import { v4 as uuidv4 } from 'uuid';
+import { deepClone } from '@/utils/deepClone';
 
 interface BenefitsBlockProps {
   block: BenefitsBlockType;
@@ -24,46 +24,51 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
   };
   
   const handleAddBenefit = () => {
-    // Ensure icon is included when adding a new benefit
-    const newBenefits = [...(block.benefits || []), { 
+    // Create deep copy of current benefits to prevent reference sharing
+    const currentBenefits = deepClone(block.benefits || []);
+    const newBenefit = { 
       id: uuidv4(), 
       title: 'Novo Benefício', 
       description: 'Descrição do benefício', 
       icon: '✓' 
-    }];
-    updateBlock(block.id, { benefits: newBenefits });
+    };
+    updateBlock(block.id, { benefits: [...currentBenefits, newBenefit] });
   };
   
   const handleRemoveBenefit = (index: number) => {
-    const newBenefits = [...(block.benefits || [])];
+    // Create deep copy of current benefits to prevent reference sharing
+    const currentBenefits = deepClone(block.benefits || []);
+    const newBenefits = [...currentBenefits];
     newBenefits.splice(index, 1);
     updateBlock(block.id, { benefits: newBenefits });
   };
   
   const handleUpdateBenefitTitle = (index: number, title: string) => {
-    const newBenefits = [...(block.benefits || [])];
+    // Create deep copy of current benefits to prevent reference sharing
+    const currentBenefits = deepClone(block.benefits || []);
+    const newBenefits = [...currentBenefits];
     newBenefits[index] = { ...newBenefits[index], title };
     updateBlock(block.id, { benefits: newBenefits });
   };
   
   const handleUpdateBenefitDescription = (index: number, description: string) => {
-    const newBenefits = [...(block.benefits || [])];
+    // Create deep copy of current benefits to prevent reference sharing
+    const currentBenefits = deepClone(block.benefits || []);
+    const newBenefits = [...currentBenefits];
     newBenefits[index] = { ...newBenefits[index], description };
     updateBlock(block.id, { benefits: newBenefits });
   };
   
-  // Handler for benefícios gerados por IA
   const handleGeneratedBenefits = (content: string) => {
     try {
       let benefitsArray = JSON.parse(content);
       
-      // Garantir que cada benefício tem um ID e um icon (padrão) se não tiver
       benefitsArray = benefitsArray.map((benefit: any) => {
         return { 
           id: benefit.id || uuidv4(), 
           title: benefit.title,
           description: benefit.description,
-          icon: benefit.icon || '✓'  // Ensure icon is always provided
+          icon: benefit.icon || '✓'
         };
       });
       
@@ -73,7 +78,6 @@ const BenefitsBlock: React.FC<BenefitsBlockProps> = ({ block, isPreview = false 
     }
   };
   
-  // Classes de grid responsivas baseadas no número de colunas
   const getGridClasses = () => {
     if (!isPreview) return 'grid-cols-1';
     

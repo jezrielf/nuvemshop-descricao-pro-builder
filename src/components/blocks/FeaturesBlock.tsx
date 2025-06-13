@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FeaturesBlock as FeaturesBlockType } from '@/types/editor';
 import BlockWrapper from './BlockWrapper';
@@ -8,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, PlusCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { deepClone } from '@/utils/deepClone';
 
 interface FeaturesBlockProps {
   block: FeaturesBlockType;
@@ -30,13 +30,18 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
       icon: '✓'
     };
     
+    // Create deep copy of current features to prevent reference sharing
+    const currentFeatures = deepClone(block.features || []);
     updateBlock(block.id, {
-      features: [...(block.features || []), newFeature]
+      features: [...currentFeatures, newFeature]
     });
   };
   
   const handleUpdateFeature = (featureId: string, field: 'title' | 'description' | 'icon', value: string) => {
-    const updatedFeatures = block.features.map(feature => {
+    // Create deep copy of current features to prevent reference sharing
+    const currentFeatures = deepClone(block.features || []);
+    
+    const updatedFeatures = currentFeatures.map(feature => {
       if (feature.id === featureId) {
         return { ...feature, [field]: value };
       }
@@ -47,31 +52,29 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
   };
   
   const handleRemoveFeature = (featureId: string) => {
-    const updatedFeatures = block.features.filter(feature => feature.id !== featureId);
+    // Create deep copy and filter to prevent reference sharing
+    const currentFeatures = deepClone(block.features || []);
+    const updatedFeatures = currentFeatures.filter(feature => feature.id !== featureId);
     updateBlock(block.id, { features: updatedFeatures });
   };
   
-  // Create responsive column classes for the preview
   const getColumnsClass = () => {
-    // Convert columns from ColumnLayout to a number for grid display
     if (typeof block.columns === 'number') {
       const cols = Math.min(Math.max(block.columns, 1), 4);
       return `md:grid-cols-${cols}`;
     }
     
-    // Handle string-based column layouts
     switch(block.columns) {
-      case 'full': return ''; // Single column
+      case 'full': return '';
       case '1/2': return 'md:grid-cols-2';
       case '1/3': return 'md:grid-cols-3';
       case '2/3': return 'md:grid-cols-2';
       case '1/4': return 'md:grid-cols-4';
       case '3/4': return '';
-      default: return ''; // Default to single column
+      default: return '';
     }
   };
   
-  // Preview mode
   if (isPreview) {
     return (
       <div className="w-full p-4">
@@ -97,7 +100,6 @@ const FeaturesBlock: React.FC<FeaturesBlockProps> = ({ block, isPreview = false 
     );
   }
   
-  // Edit mode
   return (
     <BlockWrapper block={block} isEditing={isEditing}>
       <div className="p-4 border rounded-md">
