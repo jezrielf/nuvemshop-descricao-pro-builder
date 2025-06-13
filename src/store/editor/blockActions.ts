@@ -40,7 +40,28 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
           // Deep clone both the block and updates to ensure no reference sharing
           const clonedBlock = deepClone(block);
           const clonedUpdates = deepClone(updates);
-          return { ...clonedBlock, ...clonedUpdates } as Block;
+          
+          // For blocks with array properties, ensure proper deep cloning
+          const mergedBlock = { ...clonedBlock, ...clonedUpdates };
+          
+          // Special handling for nested array properties to prevent reference sharing
+          if (clonedUpdates.questions && Array.isArray(clonedUpdates.questions)) {
+            mergedBlock.questions = deepClone(clonedUpdates.questions);
+          }
+          if (clonedUpdates.benefits && Array.isArray(clonedUpdates.benefits)) {
+            mergedBlock.benefits = deepClone(clonedUpdates.benefits);
+          }
+          if (clonedUpdates.features && Array.isArray(clonedUpdates.features)) {
+            mergedBlock.features = deepClone(clonedUpdates.features);
+          }
+          if (clonedUpdates.specs && Array.isArray(clonedUpdates.specs)) {
+            mergedBlock.specs = deepClone(clonedUpdates.specs);
+          }
+          if (clonedUpdates.images && Array.isArray(clonedUpdates.images)) {
+            mergedBlock.images = deepClone(clonedUpdates.images);
+          }
+          
+          return mergedBlock as Block;
         }
         return block;
       });
@@ -65,6 +86,23 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
     // Create a deep copy to prevent reference issues
     const blockCopy = deepClone(blockToDuplicate);
     blockCopy.id = uuidv4();
+    
+    // Ensure unique IDs for all nested items
+    if (blockCopy.questions && Array.isArray(blockCopy.questions)) {
+      blockCopy.questions = blockCopy.questions.map((q: any) => ({ ...q, id: uuidv4() }));
+    }
+    if (blockCopy.benefits && Array.isArray(blockCopy.benefits)) {
+      blockCopy.benefits = blockCopy.benefits.map((b: any) => ({ ...b, id: uuidv4() }));
+    }
+    if (blockCopy.features && Array.isArray(blockCopy.features)) {
+      blockCopy.features = blockCopy.features.map((f: any) => ({ ...f, id: uuidv4() }));
+    }
+    if (blockCopy.specs && Array.isArray(blockCopy.specs)) {
+      blockCopy.specs = blockCopy.specs.map((s: any) => ({ ...s, id: uuidv4() }));
+    }
+    if (blockCopy.images && Array.isArray(blockCopy.images)) {
+      blockCopy.images = blockCopy.images.map((i: any) => ({ ...i, id: uuidv4() }));
+    }
     
     // Ensure the blockCopy is properly typed as Block
     const typedBlockCopy = blockCopy as Block;

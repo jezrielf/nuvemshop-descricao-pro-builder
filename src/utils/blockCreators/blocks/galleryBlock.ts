@@ -1,11 +1,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Block, ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export const createGalleryBlock = (columns: ColumnLayout): Block => {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'gallery',
+    type: 'gallery' as const,
     title: 'Galeria',
     columns,
     visible: true,
@@ -24,5 +25,8 @@ export const createGalleryBlock = (columns: ColumnLayout): Block => {
       }
     ],
     style: {}
-  } as Block;
+  };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock) as Block;
 };

@@ -1,11 +1,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Block, ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export const createFAQBlock = (columns: ColumnLayout): Block => {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'faq',
+    type: 'faq' as const,
     title: 'Perguntas Frequentes',
     columns,
     visible: true,
@@ -26,6 +27,10 @@ export const createFAQBlock = (columns: ColumnLayout): Block => {
         question: 'Posso trocar o produto?',
         answer: 'Sim, você tem até 7 dias após o recebimento para solicitar a troca.'
       }
-    ]
-  } as Block;
+    ],
+    style: {}
+  };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock) as Block;
 };

@@ -1,11 +1,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { Block, ColumnLayout } from '@/types/editor';
+import { deepClone } from '@/utils/deepClone';
 
 export const createFeaturesBlock = (columns: ColumnLayout): Block => {
-  return {
+  const baseBlock = {
     id: uuidv4(),
-    type: 'features',
+    type: 'features' as const,
     title: 'Recursos',
     columns,
     visible: true,
@@ -29,6 +30,10 @@ export const createFeaturesBlock = (columns: ColumnLayout): Block => {
         description: 'Descrição do recurso 3',
         icon: '✓'
       }
-    ]
-  } as Block;
+    ],
+    style: {}
+  };
+  
+  // Return a deep copy to ensure no reference sharing
+  return deepClone(baseBlock) as Block;
 };
