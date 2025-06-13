@@ -42,7 +42,7 @@ export function extractBlockTitle(block: Block): string | null {
       return block.alt || block.caption || null;
     
     case 'video':
-      return block.title || block.caption || null;
+      return block.heading || block.description || null;
     
     default:
       return null;
