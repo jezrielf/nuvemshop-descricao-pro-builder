@@ -30,27 +30,42 @@ const FAQBlock: React.FC<FAQBlockProps> = ({ block, isPreview = false }) => {
       answer: 'Resposta para a pergunta.'
     };
     
+    // Deep copy das perguntas existentes
+    const currentQuestions = JSON.parse(JSON.stringify(block.questions || []));
+    
     updateBlock(block.id, {
-      questions: [...(block.questions || []), newQuestion]
+      questions: [...currentQuestions, newQuestion]
     });
   };
   
   const handleUpdateQuestion = (questionId: string, field: 'question' | 'answer', value: string) => {
-    console.log('Updating question:', questionId, field, value); // Debug log
+    console.log('Updating question:', questionId, field, value);
     
-    const updatedQuestions = (block.questions || []).map(q => {
+    // Deep copy completo do array de perguntas
+    const currentQuestions = JSON.parse(JSON.stringify(block.questions || []));
+    
+    // Encontrar e atualizar a pergunta específica
+    const updatedQuestions = currentQuestions.map((q: any) => {
       if (q.id === questionId) {
-        return { ...q, [field]: value };
+        // Criar um novo objeto completamente independente
+        return {
+          ...q,
+          [field]: value
+        };
       }
       return q;
     });
     
-    console.log('Updated questions:', updatedQuestions); // Debug log
+    console.log('Updated questions array:', updatedQuestions);
+    console.log('Specific question updated:', updatedQuestions.find((q: any) => q.id === questionId));
+    
     updateBlock(block.id, { questions: updatedQuestions });
   };
   
   const handleRemoveQuestion = (questionId: string) => {
-    const updatedQuestions = (block.questions || []).filter(q => q.id !== questionId);
+    // Deep copy das perguntas e filtrar
+    const currentQuestions = JSON.parse(JSON.stringify(block.questions || []));
+    const updatedQuestions = currentQuestions.filter((q: any) => q.id !== questionId);
     updateBlock(block.id, { questions: updatedQuestions });
   };
   
