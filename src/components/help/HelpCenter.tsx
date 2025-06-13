@@ -56,23 +56,23 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ open, onOpenChange }) => {
     switch (action) {
       case 'new-description':
         // Trigger new description dialog
-        document.querySelector('[data-action="new-description"]')?.click();
+        (document.querySelector('[data-action="new-description"]') as HTMLElement)?.click();
         break;
       case 'save-description':
         // Trigger save description
-        document.querySelector('[data-action="save-description"]')?.click();
+        (document.querySelector('[data-action="save-description"]') as HTMLElement)?.click();
         break;
       case 'saved-descriptions':
         // Trigger saved descriptions dialog
-        document.querySelector('[data-action="saved-descriptions"]')?.click();
+        (document.querySelector('[data-action="saved-descriptions"]') as HTMLElement)?.click();
         break;
       case 'connect-nuvemshop':
         // Trigger Nuvemshop connection
-        document.querySelector('[data-action="connect-nuvemshop"]')?.click();
+        (document.querySelector('[data-action="connect-nuvemshop"]') as HTMLElement)?.click();
         break;
       case 'save-to-nuvemshop':
         // Trigger save to Nuvemshop
-        document.querySelector('[data-action="save-to-nuvemshop"]')?.click();
+        (document.querySelector('[data-action="save-to-nuvemshop"]') as HTMLElement)?.click();
         break;
       default:
         toast({
@@ -243,7 +243,7 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ open, onOpenChange }) => {
                   // Trigger the existing tutorial
                   onOpenChange(false);
                   setTimeout(() => {
-                    document.querySelector('[data-action="start-tutorial"]')?.click();
+                    (document.querySelector('[data-action="start-tutorial"]') as HTMLElement)?.click();
                   }, 100);
                 }}
                 className="mx-auto"
