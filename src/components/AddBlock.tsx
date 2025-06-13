@@ -15,7 +15,7 @@ const AddBlock: React.FC = () => {
     addBlock({
       type,
       title: info.name,
-      columns: 'single' as const,
+      columns: 'full' as const,
       visible: true
     });
   };
