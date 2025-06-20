@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
@@ -137,7 +136,6 @@ const Header: React.FC = () => {
             </Link>
           )}
           
-          {/* Botão de ajuda Nuvemshop removido/desativado
           {isNuvemshopConnected && (
             <>
               <Link to="/nimbus-nexo-info">
@@ -148,7 +146,6 @@ const Header: React.FC = () => {
               </Link>
             </>
           )}
-          */}
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
