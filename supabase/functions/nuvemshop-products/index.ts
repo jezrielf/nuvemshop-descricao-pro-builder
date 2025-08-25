@@ -61,6 +61,37 @@ serve(async (req) => {
     console.log('Total products in store:', totalCount);
     console.log('Link header:', linkHeader);
     
+    // Parse Link header into object
+    const parseLinks = (linkHeader: string | null) => {
+      const links: {
+        next?: { url: string; page: number };
+        prev?: { url: string; page: number };
+        first?: { url: string; page: number };
+        last?: { url: string; page: number };
+      } = {};
+      
+      if (!linkHeader) return links;
+      
+      const linkRegex = /<([^>]+)>;\s*rel="([^"]+)"/g;
+      let match;
+      
+      while ((match = linkRegex.exec(linkHeader)) !== null) {
+        const url = match[1];
+        const rel = match[2];
+        const pageMatch = url.match(/[?&]page=(\d+)/);
+        const pageNum = pageMatch ? parseInt(pageMatch[1]) : 1;
+        
+        if (rel === 'next' || rel === 'prev' || rel === 'first' || rel === 'last') {
+          links[rel as keyof typeof links] = { url, page: pageNum };
+        }
+      }
+      
+      return links;
+    };
+    
+    const links = parseLinks(linkHeader);
+    console.log('Parsed links:', JSON.stringify(links, null, 2));
+    
     const responseText = await response.text();
     console.log('Response preview:', responseText.substring(0, 200) + '...');
 
@@ -85,19 +116,18 @@ serve(async (req) => {
 
       // Calculate pagination metadata
       const totalPages = Math.ceil(totalCount / perPage);
-      const hasNextPage = page < totalPages;
-      const hasPrevPage = page > 1;
+      const hasNext = !!(links.next || (page < totalPages));
+      const hasPrev = !!(links.prev || (page > 1));
 
       const paginationResponse = {
-        products,
-        pagination: {
-          currentPage: page,
-          perPage,
-          totalProducts: totalCount,
-          totalPages,
-          hasNextPage,
-          hasPrevPage
-        }
+        items: products,
+        page,
+        perPage,
+        total: totalCount,
+        totalPages,
+        hasNext,
+        hasPrev,
+        links
       };
 
       console.log('Pagination info:', paginationResponse.pagination);

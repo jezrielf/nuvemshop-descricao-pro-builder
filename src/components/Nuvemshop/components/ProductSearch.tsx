@@ -29,7 +29,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const {
     products,
     loadingProducts,
-    productError,
+    error,
     fetchProducts,
     currentPage,
     totalPages,
@@ -42,7 +42,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   // Fetch products when dialog opens
   useEffect(() => {
     if (isOpen && accessToken && userId && products.length === 0) {
-      fetchProducts();
+      fetchProducts(1);
     }
   }, [isOpen, accessToken, userId, fetchProducts, products.length]);
 
@@ -202,9 +202,9 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
             </div>
 
             {/* Error state */}
-            {productError && (
+            {error && (
               <div className="text-center p-4 text-red-600 bg-red-50 rounded-md">
-                <p>Erro ao carregar produtos: {productError}</p>
+                <p>Erro ao carregar produtos: {error}</p>
                 <Button variant="outline" onClick={handleRefresh} className="mt-2">
                   Tentar novamente
                 </Button>
@@ -266,7 +266,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
             )}
 
             {/* No products */}
-            {!loadingProducts && products.length === 0 && !productError && (
+            {!loadingProducts && products.length === 0 && !error && (
               <div className="text-center p-8 text-gray-500">
                 <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Nenhum produto encontrado na sua loja</p>

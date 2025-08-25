@@ -41,13 +41,16 @@ const NuvemshopConnect: React.FC = () => {
     currentPage,
     totalProducts,
     totalPages,
+    hasNext,
+    hasPrev,
     fetchProducts,
     updateProductDescription,
     handleNextPage,
     handlePrevPage,
     resetProducts,
-    loadAllProducts,
-    loadingAllProducts
+    fetchAllProducts,
+    loadingAll,
+    allProgress
   } = useNuvemshopProducts(accessToken, userId);
 
   // Criando a função antes de usá-la
@@ -157,11 +160,14 @@ const NuvemshopConnect: React.FC = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             totalProducts={totalProducts}
+            hasNext={hasNext}
+            hasPrev={hasPrev}
             handlePrevPage={handlePrevPage}
             handleNextPage={handleNextPage}
             handleUpdateDescription={handleUpdateDescription}
-            loadAllProducts={loadAllProducts}
-            loadingAllProducts={loadingAllProducts}
+            loadAllProducts={fetchAllProducts}
+            loadingAllProducts={loadingAll}
+            allProgress={allProgress}
           />
         )}
       </div>

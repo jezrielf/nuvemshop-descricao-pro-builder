@@ -48,7 +48,7 @@ const StoreProductsList: React.FC = () => {
   // Fetch products on mount
   useEffect(() => {
     if (accessToken && userId && !products.length) {
-      fetchProducts();
+      fetchProducts(1);
     }
   }, [accessToken, userId, fetchProducts, products.length]);
 

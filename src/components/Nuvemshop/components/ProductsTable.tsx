@@ -23,6 +23,8 @@ interface ProductsTableProps {
   currentPage: number;
   totalPages: number;
   totalProducts: number;
+  hasNext: boolean;
+  hasPrev: boolean;
   onPrevPage: () => void;
   onNextPage: () => void;
   onUpdateDescription?: (productId: number, description: string) => Promise<boolean>;
@@ -35,6 +37,8 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
   currentPage,
   totalPages,
   totalProducts,
+  hasNext,
+  hasPrev,
   onPrevPage,
   onNextPage,
   onUpdateDescription
@@ -215,7 +219,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                 variant="secondary" 
                 size="small" 
                 onClick={onPrevPage} 
-                disabled={currentPage <= 1 || loadingProducts}
+                disabled={!hasPrev || loadingProducts}
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Anterior
@@ -227,7 +231,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                 variant="secondary" 
                 size="small" 
                 onClick={onNextPage} 
-                disabled={currentPage >= totalPages || loadingProducts}
+                disabled={!hasNext || loadingProducts}
               >
                 Próxima
                 <ChevronRight className="h-4 w-4 ml-1" />
@@ -239,7 +243,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={onPrevPage} 
-                disabled={currentPage <= 1 || loadingProducts}
+                disabled={!hasPrev || loadingProducts}
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Anterior
@@ -251,7 +255,7 @@ export const ProductsTable: React.FC<ProductsTableProps> = ({
                 variant="outline" 
                 size="sm" 
                 onClick={onNextPage} 
-                disabled={currentPage >= totalPages || loadingProducts}
+                disabled={!hasNext || loadingProducts}
               >
                 Próxima
                 <ChevronRight className="h-4 w-4 ml-1" />
