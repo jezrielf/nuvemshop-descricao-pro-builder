@@ -13,23 +13,44 @@ interface BlockContentEditorProps {
 }
 
 export const BlockContentEditor: React.FC<BlockContentEditorProps> = ({ block, onUpdate }) => {
-  const handleAddItem = () => {
-    const currentItems = (block as any).items || [];
-    const newItems = [...currentItems, ''];
-    onUpdate({ items: newItems } as any);
+  const handleAddItem = (arrayType: string) => {
+    const currentItems = (block as any)[arrayType] || [];
+    let newItem: any;
+    
+    switch (arrayType) {
+      case 'features':
+      case 'benefits':
+        newItem = { id: crypto.randomUUID(), title: '', description: '', icon: '' };
+        break;
+      case 'specs':
+        newItem = { id: crypto.randomUUID(), name: '', value: '' };
+        break;
+      case 'questions':
+        newItem = { id: crypto.randomUUID(), question: '', answer: '' };
+        break;
+      default:
+        newItem = '';
+    }
+    
+    const newItems = [...currentItems, newItem];
+    onUpdate({ [arrayType]: newItems } as any);
   };
 
-  const handleUpdateItem = (index: number, value: string) => {
-    const currentItems = (block as any).items || [];
+  const handleUpdateItem = (arrayType: string, index: number, field: string, value: string) => {
+    const currentItems = (block as any)[arrayType] || [];
     const newItems = [...currentItems];
-    newItems[index] = value;
-    onUpdate({ items: newItems } as any);
+    if (typeof newItems[index] === 'object') {
+      newItems[index] = { ...newItems[index], [field]: value };
+    } else {
+      newItems[index] = value;
+    }
+    onUpdate({ [arrayType]: newItems } as any);
   };
 
-  const handleRemoveItem = (index: number) => {
-    const currentItems = (block as any).items || [];
+  const handleRemoveItem = (arrayType: string, index: number) => {
+    const currentItems = (block as any)[arrayType] || [];
     const newItems = currentItems.filter((_: any, i: number) => i !== index);
-    onUpdate({ items: newItems } as any);
+    onUpdate({ [arrayType]: newItems } as any);
   };
 
   const renderContentFields = () => {
@@ -107,17 +128,117 @@ export const BlockContentEditor: React.FC<BlockContentEditorProps> = ({ block, o
         );
 
       case 'features':
-      case 'benefits':
-      case 'specifications':
-        const items = (block as any).items || [];
+        const features = (block as any).features || [];
         return (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label>Itens</Label>
+              <Label>Características</Label>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleAddItem}
+                onClick={() => handleAddItem('features')}
+                className="flex items-center gap-1"
+              >
+                <Plus className="h-3 w-3" />
+                Adicionar
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {features.map((feature: any, index: number) => (
+                <div key={feature.id || index} className="p-3 border rounded-md space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={feature.title || ''}
+                      onChange={(e) => handleUpdateItem('features', index, 'title', e.target.value)}
+                      placeholder="Título da característica..."
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveItem('features', index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <Input
+                    value={feature.description || ''}
+                    onChange={(e) => handleUpdateItem('features', index, 'description', e.target.value)}
+                    placeholder="Descrição..."
+                  />
+                  <Input
+                    value={feature.icon || ''}
+                    onChange={(e) => handleUpdateItem('features', index, 'icon', e.target.value)}
+                    placeholder="Ícone (ex: check, star, etc)..."
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'benefits':
+        const benefits = (block as any).benefits || [];
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Benefícios</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleAddItem('benefits')}
+                className="flex items-center gap-1"
+              >
+                <Plus className="h-3 w-3" />
+                Adicionar
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {benefits.map((benefit: any, index: number) => (
+                <div key={benefit.id || index} className="p-3 border rounded-md space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={benefit.title || ''}
+                      onChange={(e) => handleUpdateItem('benefits', index, 'title', e.target.value)}
+                      placeholder="Título do benefício..."
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveItem('benefits', index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <Input
+                    value={benefit.description || ''}
+                    onChange={(e) => handleUpdateItem('benefits', index, 'description', e.target.value)}
+                    placeholder="Descrição..."
+                  />
+                  <Input
+                    value={benefit.icon || ''}
+                    onChange={(e) => handleUpdateItem('benefits', index, 'icon', e.target.value)}
+                    placeholder="Ícone (ex: check, star, etc)..."
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'specifications':
+        const specs = (block as any).specs || [];
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Especificações</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleAddItem('specs')}
                 className="flex items-center gap-1"
               >
                 <Plus className="h-3 w-3" />
@@ -125,22 +246,75 @@ export const BlockContentEditor: React.FC<BlockContentEditorProps> = ({ block, o
               </Button>
             </div>
             <div className="space-y-2">
-              {items.map((item: string, index: number) => (
-                <div key={index} className="flex items-center gap-2">
+              {specs.map((spec: any, index: number) => (
+                <div key={spec.id || index} className="flex items-center gap-2">
                   <Input
-                    value={item}
-                    onChange={(e) => handleUpdateItem(index, e.target.value)}
-                    placeholder={`Item ${index + 1}...`}
+                    value={spec.name || ''}
+                    onChange={(e) => handleUpdateItem('specs', index, 'name', e.target.value)}
+                    placeholder="Nome..."
+                    className="flex-1"
+                  />
+                  <Input
+                    value={spec.value || ''}
+                    onChange={(e) => handleUpdateItem('specs', index, 'value', e.target.value)}
+                    placeholder="Valor..."
                     className="flex-1"
                   />
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleRemoveItem(index)}
+                    onClick={() => handleRemoveItem('specs', index)}
                     className="text-destructive hover:text-destructive"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'faq':
+        const questions = (block as any).questions || [];
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Perguntas Frequentes</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleAddItem('questions')}
+                className="flex items-center gap-1"
+              >
+                <Plus className="h-3 w-3" />
+                Adicionar
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {questions.map((faq: any, index: number) => (
+                <div key={faq.id || index} className="p-3 border rounded-md space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={faq.question || ''}
+                      onChange={(e) => handleUpdateItem('questions', index, 'question', e.target.value)}
+                      placeholder="Pergunta..."
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveItem('questions', index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={faq.answer || ''}
+                    onChange={(e) => handleUpdateItem('questions', index, 'answer', e.target.value)}
+                    placeholder="Resposta..."
+                    className="min-h-20"
+                  />
                 </div>
               ))}
             </div>
@@ -154,8 +328,8 @@ export const BlockContentEditor: React.FC<BlockContentEditorProps> = ({ block, o
               <Label htmlFor="imageUrl">URL da Imagem</Label>
               <Input
                 id="imageUrl"
-                value={(block as any).image || ''}
-                onChange={(e) => onUpdate({ image: e.target.value } as any)}
+                value={(block as any).src || ''}
+                onChange={(e) => onUpdate({ src: e.target.value } as any)}
                 placeholder="https://..."
               />
             </div>

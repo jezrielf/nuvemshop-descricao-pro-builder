@@ -34,23 +34,122 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
   };
 
   const handleAddBlock = (blockType: string) => {
-    const newBlock: Block = {
+    const baseBlock = {
       id: generateUniqueId(),
       type: blockType as any,
       title: `Novo ${blockType}`,
       visible: true,
-      columns: 'full',
-      style: {},
-      content: blockType === 'text' ? 'Adicione seu conteúdo aqui...' : undefined,
-      heading: blockType === 'hero' ? 'Título Principal' : undefined,
-      subheading: blockType === 'hero' ? 'Subtítulo opcional' : undefined,
-      items: ['hero', 'features', 'benefits', 'specifications', 'faq'].includes(blockType) ? [] : undefined,
-      images: ['gallery', 'image'].includes(blockType) ? [] : undefined,
-      image: ['imageText', 'textImage'].includes(blockType) ? { src: '', alt: '' } : undefined,
-      buttonText: ['hero', 'cta'].includes(blockType) ? 'Clique aqui' : undefined,
-      buttonUrl: ['hero', 'cta'].includes(blockType) ? '#' : undefined,
-      videoUrl: blockType === 'video' ? '' : undefined
+      columns: 'full' as const,
+      style: {}
     };
+
+    let newBlock: Block;
+
+    switch (blockType) {
+      case 'text':
+        newBlock = {
+          ...baseBlock,
+          type: 'text',
+          heading: 'Título do Texto',
+          content: 'Adicione seu conteúdo aqui...'
+        };
+        break;
+      case 'hero':
+        newBlock = {
+          ...baseBlock,
+          type: 'hero',
+          heading: 'Título Principal',
+          subheading: 'Subtítulo opcional',
+          buttonText: 'Clique aqui',
+          buttonUrl: '#'
+        };
+        break;
+      case 'features':
+        newBlock = {
+          ...baseBlock,
+          type: 'features',
+          heading: 'Características',
+          features: []
+        };
+        break;
+      case 'benefits':
+        newBlock = {
+          ...baseBlock,
+          type: 'benefits',
+          heading: 'Benefícios',
+          benefits: []
+        };
+        break;
+      case 'specifications':
+        newBlock = {
+          ...baseBlock,
+          type: 'specifications',
+          heading: 'Especificações',
+          specs: []
+        };
+        break;
+      case 'faq':
+        newBlock = {
+          ...baseBlock,
+          type: 'faq',
+          heading: 'Perguntas Frequentes',
+          questions: []
+        };
+        break;
+      case 'image':
+        newBlock = {
+          ...baseBlock,
+          type: 'image',
+          src: '',
+          alt: ''
+        };
+        break;
+      case 'gallery':
+        newBlock = {
+          ...baseBlock,
+          type: 'gallery',
+          heading: 'Galeria',
+          images: []
+        };
+        break;
+      case 'imageText':
+        newBlock = {
+          ...baseBlock,
+          type: 'imageText',
+          heading: 'Imagem e Texto',
+          content: 'Adicione seu conteúdo aqui...',
+          image: { src: '', alt: '' }
+        };
+        break;
+      case 'textImage':
+        newBlock = {
+          ...baseBlock,
+          type: 'textImage',
+          heading: 'Texto e Imagem',
+          content: 'Adicione seu conteúdo aqui...',
+          image: { src: '', alt: '' }
+        };
+        break;
+      case 'video':
+        newBlock = {
+          ...baseBlock,
+          type: 'video',
+          videoUrl: ''
+        };
+        break;
+      case 'cta':
+        newBlock = {
+          ...baseBlock,
+          type: 'cta',
+          heading: 'Call to Action',
+          content: 'Descrição do CTA',
+          buttonText: 'Clique aqui',
+          buttonUrl: '#'
+        };
+        break;
+      default:
+        newBlock = baseBlock as Block;
+    }
 
     const updatedTemplate = {
       ...currentTemplate,
