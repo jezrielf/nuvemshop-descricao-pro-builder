@@ -57,11 +57,11 @@ const Header: React.FC = () => {
   const isSubscribedUser = isSubscribed();
   const canCreateMore = canCreateMoreDescriptions();
   
-  // Set auth context in the store when component mounts or auth changes
+  // Set auth context in the store when component mounts or user changes
   useEffect(() => {
     setAuthContext(auth);
     console.log('Auth context set in store');
-  }, [auth, setAuthContext]);
+  }, [user?.id, setAuthContext]);
   
   // Load saved descriptions when component mounts or user changes
   useEffect(() => {
@@ -71,7 +71,7 @@ const Header: React.FC = () => {
       console.log('Loading saved descriptions for anonymous user');
     }
     loadSavedDescriptions();
-  }, [loadSavedDescriptions, user, auth]);
+  }, [user?.id, loadSavedDescriptions]);
 
   // Debug saved descriptions count
   useEffect(() => {

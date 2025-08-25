@@ -8,13 +8,22 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
 
   // Function to set the auth context from components
   const setAuthContext = (context: ReturnType<typeof useAuth>) => {
-    authContext = context;
+    const previousUserId = authContext?.user?.id;
+    const newUserId = context?.user?.id;
     
-    // Update user information in the store
-    if (context && context.user) {
-      set({ user: { id: context.user.id } });
+    // Only update if user ID has actually changed
+    if (previousUserId !== newUserId) {
+      authContext = context;
+      
+      // Update user information in the store
+      if (context && context.user) {
+        set({ user: { id: context.user.id } });
+      } else {
+        set({ user: null });
+      }
     } else {
-      set({ user: null });
+      // Just update the reference without triggering state changes
+      authContext = context;
     }
   };
 
@@ -115,14 +124,23 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           try {
             const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
             console.log(`Found ${parsedDescriptions.length} saved descriptions`);
-            set({ savedDescriptions: parsedDescriptions });
+            
+            // Only update state if descriptions have actually changed
+            const currentDescriptions = get().savedDescriptions;
+            if (JSON.stringify(currentDescriptions) !== JSON.stringify(parsedDescriptions)) {
+              set({ savedDescriptions: parsedDescriptions });
+            }
           } catch (e) {
             console.error('Error parsing saved descriptions:', e);
             set({ savedDescriptions: [] });
           }
         } else {
           console.log('No saved descriptions found in storage');
-          set({ savedDescriptions: [] });
+          // Only set empty array if current state is not already empty
+          const currentDescriptions = get().savedDescriptions;
+          if (currentDescriptions.length > 0) {
+            set({ savedDescriptions: [] });
+          }
         }
       } catch (error) {
         console.error('Error loading saved descriptions:', error);
