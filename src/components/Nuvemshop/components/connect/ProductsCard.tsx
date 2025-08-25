@@ -14,6 +14,8 @@ interface ProductsCardProps {
   handlePrevPage: () => void;
   handleNextPage: () => void;
   handleUpdateDescription: (productId: number, description: string) => Promise<boolean>;
+  loadAllProducts?: () => void;
+  loadingAllProducts?: boolean;
 }
 
 export const ProductsCard: React.FC<ProductsCardProps> = ({
@@ -25,7 +27,9 @@ export const ProductsCard: React.FC<ProductsCardProps> = ({
   totalProducts,
   handlePrevPage,
   handleNextPage,
-  handleUpdateDescription
+  handleUpdateDescription,
+  loadAllProducts,
+  loadingAllProducts
 }) => {
   if (products.length === 0) {
     return null;
@@ -34,11 +38,24 @@ export const ProductsCard: React.FC<ProductsCardProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Produtos da Loja</CardTitle>
-        <CardDescription>
-          Página {currentPage} - Exibindo {products.length} produtos 
-          {totalProducts > 0 ? ` de aproximadamente ${totalProducts}` : ''}
-        </CardDescription>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle>Produtos da Loja</CardTitle>
+            <CardDescription>
+              Página {currentPage} de {totalPages} - Exibindo {products.length} produtos 
+              {totalProducts > 0 ? ` de ${totalProducts} total` : ''}
+            </CardDescription>
+          </div>
+          {loadAllProducts && totalProducts > products.length && (
+            <button
+              onClick={loadAllProducts}
+              disabled={loadingAllProducts}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+            >
+              {loadingAllProducts ? 'Carregando...' : 'Carregar Todos'}
+            </button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <ProductsTable

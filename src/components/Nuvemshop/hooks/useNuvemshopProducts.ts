@@ -12,6 +12,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
+  const [loadingAllProducts, setLoadingAllProducts] = useState(false);
   const { toast } = useToast();
 
   // Reset products
@@ -66,17 +67,17 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
         return [];
       }
 
-      if (Array.isArray(data)) {
-        console.log(`Loaded ${data.length} products from Nuvemshop`);
-        setProducts(data);
+      if (data && data.products && Array.isArray(data.products)) {
+        console.log(`Loaded ${data.products.length} products from Nuvemshop`);
+        setProducts(data.products);
         
-        // Estimate total pages based on product count
-        // Nuvemshop API doesn't provide exact count, so we estimate
-        const estimatedTotal = data.length === perPage ? perPage * 2 : data.length;
-        setTotalProducts(estimatedTotal);
-        setTotalPages(Math.ceil(estimatedTotal / perPage));
+        // Use actual pagination data from API
+        if (data.pagination) {
+          setTotalProducts(data.pagination.totalProducts);
+          setTotalPages(data.pagination.totalPages);
+        }
         
-        return data;
+        return data.products;
       } else {
         console.error('Unexpected response format:', data);
         setProductError('Formato de resposta inesperado');
@@ -163,6 +164,63 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     }
   }, [accessToken, userId, toast]);
 
+  // Load all products by fetching all pages
+  const loadAllProducts = useCallback(async () => {
+    if (!accessToken || !userId) return;
+
+    try {
+      setLoadingAllProducts(true);
+      const allProducts: NuvemshopProduct[] = [];
+      let currentPageNum = 1;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
+          body: { accessToken, userId, page: currentPageNum, perPage: 200 }
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (data && data.products && Array.isArray(data.products)) {
+          allProducts.push(...data.products);
+          
+          if (data.pagination) {
+            hasMore = data.pagination.hasNextPage;
+            setTotalProducts(data.pagination.totalProducts);
+            setTotalPages(data.pagination.totalPages);
+          } else {
+            hasMore = data.products.length === 200; // If we got 200, there might be more
+          }
+          
+          currentPageNum++;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      setProducts(allProducts);
+      setCurrentPage(1);
+      
+      toast({
+        title: 'Todos os produtos carregados',
+        description: `${allProducts.length} produtos carregados com sucesso!`,
+      });
+
+    } catch (err) {
+      console.error('Error loading all products:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao carregar todos os produtos',
+        description: errorMessage,
+      });
+    } finally {
+      setLoadingAllProducts(false);
+    }
+  }, [accessToken, userId, toast]);
+
   return {
     products,
     loadingProducts,
@@ -175,6 +233,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     resetProducts,
     updateProductDescription,
     handleNextPage,
-    handlePrevPage
+    handlePrevPage,
+    loadAllProducts,
+    loadingAllProducts
   };
 };

@@ -53,6 +53,14 @@ serve(async (req) => {
 
     // Log response details for debugging
     console.log('Response status:', response.status);
+    
+    // Extract pagination info from headers
+    const totalCount = parseInt(response.headers.get('X-Total-Count') || '0');
+    const linkHeader = response.headers.get('Link');
+    
+    console.log('Total products in store:', totalCount);
+    console.log('Link header:', linkHeader);
+    
     const responseText = await response.text();
     console.log('Response preview:', responseText.substring(0, 200) + '...');
 
@@ -71,11 +79,30 @@ serve(async (req) => {
 
     try {
       // Parse JSON response
-      const data = JSON.parse(responseText);
+      const products = JSON.parse(responseText);
       console.log('Successfully fetched products from Nuvemshop');
-      console.log('Number of products:', Array.isArray(data) ? data.length : 'not an array');
+      console.log('Number of products:', Array.isArray(products) ? products.length : 'not an array');
 
-      return new Response(JSON.stringify(data), { 
+      // Calculate pagination metadata
+      const totalPages = Math.ceil(totalCount / perPage);
+      const hasNextPage = page < totalPages;
+      const hasPrevPage = page > 1;
+
+      const paginationResponse = {
+        products,
+        pagination: {
+          currentPage: page,
+          perPage,
+          totalProducts: totalCount,
+          totalPages,
+          hasNextPage,
+          hasPrevPage
+        }
+      };
+
+      console.log('Pagination info:', paginationResponse.pagination);
+
+      return new Response(JSON.stringify(paginationResponse), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });
     } catch (parseError) {
