@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
 import TutorialOverlay from './TutorialOverlay';
-import { firstAccessTutorialSteps, advancedTutorialSteps, nuvemshopTutorialSteps, quickTutorialSteps } from './tutorialSteps';
+import { firstAccessTutorialSteps, advancedTutorialSteps, nuvemshopTutorialSteps } from './tutorialSteps';
 import { useToast } from '@/hooks/use-toast';
 
-export type TutorialType = 'first-access' | 'advanced' | 'nuvemshop' | 'quick';
+export type TutorialType = 'first-access' | 'advanced' | 'nuvemshop';
 
 interface VisualTutorialManagerProps {
   type: TutorialType;
@@ -19,7 +19,6 @@ const VisualTutorialManager: React.FC<VisualTutorialManagerProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
-  const [startTime] = useState(Date.now());
   const { toast } = useToast();
 
   const getTutorialSteps = () => {
@@ -30,8 +29,6 @@ const VisualTutorialManager: React.FC<VisualTutorialManagerProps> = ({
         return advancedTutorialSteps;
       case 'nuvemshop':
         return nuvemshopTutorialSteps;
-      case 'quick':
-        return quickTutorialSteps;
       default:
         return firstAccessTutorialSteps;
     }
@@ -58,35 +55,13 @@ const VisualTutorialManager: React.FC<VisualTutorialManagerProps> = ({
   };
 
   const handleComplete = () => {
-    const endTime = Date.now();
-    const duration = Math.round((endTime - startTime) / 1000);
-    
-    // Save tutorial completion status with more details
-    const completionData = {
-      type,
-      completedAt: new Date().toISOString(),
-      duration,
-      stepsCompleted: completedSteps.size,
-      totalSteps: steps.length
-    };
-    
+    // Save tutorial completion status
     localStorage.setItem(`tutorial_${type}_completed`, 'true');
-    localStorage.setItem(`tutorial_${type}_completion_data`, JSON.stringify(completionData));
-    
-    // Show completion message based on tutorial type
-    const getTutorialName = () => {
-      switch (type) {
-        case 'quick': return 'Tour Rápido';
-        case 'first-access': return 'Tutorial Completo';
-        case 'nuvemshop': return 'Tutorial Nuvemshop';
-        case 'advanced': return 'Tutorial Avançado';
-        default: return 'Tutorial';
-      }
-    };
+    localStorage.setItem(`tutorial_${type}_completed_at`, new Date().toISOString());
     
     toast({
-      title: `${getTutorialName()} Concluído! 🎉`,
-      description: `Parabéns! Você completou o tutorial em ${Math.floor(duration / 60)}min ${duration % 60}s. Agora você já sabe usar as principais funcionalidades!`,
+      title: 'Tutorial Concluído! 🎉',
+      description: 'Parabéns! Agora você já sabe usar todas as funcionalidades principais.',
     });
     
     onClose();
@@ -95,18 +70,6 @@ const VisualTutorialManager: React.FC<VisualTutorialManagerProps> = ({
   };
 
   const handleClose = () => {
-    // Track partial completion
-    if (completedSteps.size > 0) {
-      const partialData = {
-        type,
-        stepsCompleted: completedSteps.size,
-        totalSteps: steps.length,
-        lastStep: currentStep,
-        closedAt: new Date().toISOString()
-      };
-      localStorage.setItem(`tutorial_${type}_partial`, JSON.stringify(partialData));
-    }
-    
     onClose();
     setCurrentStep(0);
     setCompletedSteps(new Set());

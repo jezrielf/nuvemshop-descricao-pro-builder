@@ -1,3 +1,4 @@
+
 import { Block, BlockType, ColumnLayout } from '@/types/editor';
 import { EditorState } from './types';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,8 +8,19 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
   addBlock: (blockData: Partial<Block> & { type: BlockType, title: string, columns: ColumnLayout, visible: boolean }) => {
     if (!get().description) return;
     
+    // Ensure the block has all required properties with proper defaults
+    const blockWithDefaults = {
+      id: uuidv4(),
+      style: {},
+      visible: true,
+      columns: 'full' as ColumnLayout,
+      ...blockData
+    };
+    
     // Ensure the block is properly typed and deeply cloned
-    const block = deepClone({ ...blockData, id: uuidv4() }) as Block;
+    const block = deepClone(blockWithDefaults) as Block;
+    
+    console.log('Adding block to store:', block);
     
     set((state: EditorState) => {
       if (!state.description) return state;
@@ -40,6 +52,11 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
           // Deep clone both the block and updates to ensure no reference sharing
           const clonedBlock = deepClone(block);
           const clonedUpdates = deepClone(updates);
+          
+          // Ensure style exists
+          if (!clonedBlock.style) {
+            clonedBlock.style = {};
+          }
           
           // For blocks with array properties, ensure proper deep cloning
           const mergedBlock = { ...clonedBlock, ...clonedUpdates };
@@ -87,6 +104,11 @@ export const createBlockActions = (get: () => EditorState, set: any) => ({
     // Create a deep copy to prevent reference issues
     const blockCopy = deepClone(blockToDuplicate);
     blockCopy.id = uuidv4();
+    
+    // Ensure style exists
+    if (!blockCopy.style) {
+      blockCopy.style = {};
+    }
     
     // Ensure unique IDs for all nested items using type-safe access
     if ('questions' in blockCopy && blockCopy.questions && Array.isArray(blockCopy.questions)) {

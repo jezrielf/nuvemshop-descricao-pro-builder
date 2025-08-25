@@ -20,13 +20,17 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
   const { selectedBlockId, selectBlock } = useEditorStore();
   const { isMinimized, toggleMinimize } = useBlockMinimization(block.id);
   
-  // Ensure block has all required properties
+  // Relaxed validation - ensure block has minimal required properties
   const isValid = block && 
                   block.id && 
                   block.type && 
                   typeof block.visible === 'boolean' && 
-                  block.columns &&
-                  block.style && typeof block.style === 'object';
+                  block.columns !== undefined;
+  
+  // Initialize style if it doesn't exist
+  if (!block.style) {
+    block.style = {};
+  }
   
   const isSelected = selectedBlockId === block.id;
   
@@ -39,13 +43,14 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
     }
   };
   
-  // If the block is invalid, show an error state
+  // If the block is invalid, show an error state but be more forgiving
   if (!isValid) {
     console.error('Invalid block in BlockWrapper:', block);
     return (
       <div className="border border-red-300 bg-red-50 rounded-md p-4 mb-4">
         <p className="text-red-600 font-medium">Bloco inválido</p>
         <p className="text-sm text-red-500">Este bloco está com problemas e precisa ser substituído.</p>
+        <pre className="text-xs mt-2 bg-white p-2 rounded">{JSON.stringify(block, null, 2)}</pre>
       </div>
     );
   }
@@ -53,7 +58,7 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
   return (
     <div 
       className={cn(
-        "relative group mb-4 block-panel transition-all duration-200 ease-in-out",
+        "relative group mb-4 block-panel transition-all duration-200 ease-in-out block-wrapper",
         isSelected && "block-selected ring-2 ring-blue-500",
         !block.visible && "opacity-50",
         isMinimized && "h-14 overflow-hidden cursor-pointer hover:bg-gray-50"
