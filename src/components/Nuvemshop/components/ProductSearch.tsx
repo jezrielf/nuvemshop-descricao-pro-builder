@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Package, RefreshCw, Users } from 'lucide-react';
-import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
+
 import { useNuvemshopProducts } from '../hooks/useNuvemshopProducts';
 import { useProductDescriptionSaver } from '../hooks/useProductDescriptionSaver';
 import { NuvemshopProduct } from '../types';
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 import MultipleProductSelection from './MultipleProductSelection';
 import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductSearchProps {
   onProductSelect: (product: NuvemshopProduct) => void;
@@ -25,8 +26,12 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
-  const { activeStoreId } = useNuvemshopStore();
+  const { activeStoreId, stores, refetch } = useNuvemshopStore();
+  
+  // Check if Nuvemshop is connected via localStorage
+  const isNuvemshopConnected = Boolean(localStorage.getItem('nuvemshop_access_token'));
   
   const {
     products,
@@ -144,10 +149,35 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     return 'Produto sem nome';
   };
 
-  if (!activeStoreId) {
+  if (!isNuvemshopConnected) {
     return (
-      <div className="text-sm text-gray-500">
-        Conecte sua conta Nuvemshop para buscar produtos
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={() => navigate('/nuvemshop-connect')}
+        className="flex items-center"
+      >
+        <Search className="h-4 w-4 mr-2" />
+        Conectar Nuvemshop
+      </Button>
+    );
+  }
+
+  if (!activeStoreId && isNuvemshopConnected) {
+    return (
+      <div className="space-y-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/nuvemshop-connect')}
+          className="flex items-center"
+        >
+          <Search className="h-4 w-4 mr-2" />
+          Sincronizar Loja
+        </Button>
+        <div className="text-xs text-amber-600">
+          Loja conectada mas não sincronizada
+        </div>
       </div>
     );
   }
