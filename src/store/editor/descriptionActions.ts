@@ -57,11 +57,26 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
       console.log('Created temporary description:', tempDescription.id);
     }
     
-    // Create a proper typed copy of each block
+    // Normalize and create a proper typed copy of each block
     const updatedBlocks = template.blocks.map(templateBlock => {
       const blockCopy = JSON.parse(JSON.stringify(templateBlock));
-      blockCopy.id = uuidv4();
-      return blockCopy;
+      
+      // Ensure all required properties with defaults
+      const normalizedBlock = {
+        ...blockCopy,
+        id: uuidv4(),
+        visible: blockCopy.visible !== undefined ? blockCopy.visible : true,
+        columns: blockCopy.columns || 'full',
+        style: blockCopy.style || {},
+        // Deep clone arrays to prevent reference sharing
+        ...(blockCopy.questions && { questions: [...blockCopy.questions] }),
+        ...(blockCopy.features && { features: [...blockCopy.features] }),
+        ...(blockCopy.benefits && { benefits: [...blockCopy.benefits] }),
+        ...(blockCopy.specifications && { specifications: [...blockCopy.specifications] }),
+        ...(blockCopy.images && { images: [...blockCopy.images] }),
+      };
+      
+      return normalizedBlock;
     });
     
     // Update the state with properly typed blocks
@@ -79,6 +94,6 @@ export const createDescriptionActions = (get: () => EditorState, set: any) => ({
       };
     });
     
-    console.log('Template loaded with blocks:', updatedBlocks.length);
+    console.log('Template loaded with normalized blocks:', updatedBlocks.length);
   },
 });

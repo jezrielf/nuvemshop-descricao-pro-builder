@@ -27,19 +27,17 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
       if (!description) return false;
       
       try {
-        // Check if auth context is available
-        if (!authContext) {
-          console.warn('Auth context not available for saving description');
-          return false;
-        }
+        // Use fallback if auth context not available yet
+        const { user } = get();
+        const currentUser = authContext?.user || user;
         
         // Check limits only for NEW descriptions
-        if (isNewDescription && !authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
+        if (isNewDescription && authContext && !authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
           return false;
         }
         
         // Increment description count only for NEW descriptions for free users
-        if (isNewDescription && !authContext.isPremium()) {
+        if (isNewDescription && authContext && !authContext.isPremium()) {
           authContext.incrementDescriptionCount();
         }
         
@@ -60,9 +58,15 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           savedDescriptions = [...savedDescriptions, updatedDescription];
         }
         
-        // Save to localStorage
-        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
-        localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
+        // Save to localStorage with fallback user handling
+        const storageKey = currentUser ? `savedDescriptions_${currentUser.id}` : 'savedDescriptions_anonymous';
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
+          console.log(`Description saved to ${storageKey}, total: ${savedDescriptions.length}`);
+        } catch (storageError) {
+          console.error('Error saving to localStorage:', storageError);
+          return false;
+        }
         
         // Update state
         set({ 

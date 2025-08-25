@@ -128,13 +128,23 @@ const TemplateSelector: React.FC = () => {
   }, [templates, selectedCategory, searchQuery, searchTemplates]);
 
   const handleSelectTemplate = (template: TemplateType) => {
-    loadTemplate(template);
-    setDialogOpen(false);
-    
-    toast({
-      title: "Template aplicado",
-      description: `O template "${template.name}" foi aplicado com sucesso.`,
-    });
+    try {
+      console.log('Applying template:', template.name, 'with', template.blocks.length, 'blocks');
+      loadTemplate(template);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Template aplicado",
+        description: `O template "${template.name}" foi aplicado com sucesso.`,
+      });
+    } catch (error) {
+      console.error('Error applying template:', error);
+      toast({
+        title: "Erro ao aplicar template",
+        description: `Não foi possível aplicar o template "${template.name}". Tente novamente.`,
+        variant: "destructive",
+      });
+    }
   };
 
   return (

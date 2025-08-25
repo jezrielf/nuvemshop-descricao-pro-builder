@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Save, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -26,12 +26,18 @@ const SaveDescriptionButton: React.FC<SaveDescriptionButtonProps> = ({
     description,
     savedDescriptions,
     saveCurrentDescription,
-    updateDescription
+    updateDescription,
+    loadSavedDescriptions
   } = useEditorStore();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [descriptionName, setDescriptionName] = useState(description?.name || '');
+
+  // Sync description name when description changes
+  useEffect(() => {
+    setDescriptionName(description?.name || '');
+  }, [description?.name]);
 
   // Check if this description already exists in saved descriptions (is an update)
   const isExistingDescription = description && savedDescriptions.some(saved => saved.id === description.id);
@@ -96,6 +102,8 @@ const SaveDescriptionButton: React.FC<SaveDescriptionButtonProps> = ({
         description: `Sua descrição foi ${actionText} com sucesso!`
       });
       setIsDialogOpen(false);
+      // Refresh the saved descriptions list to ensure consistency
+      loadSavedDescriptions();
     } else {
       toast({
         title: "Erro ao salvar",

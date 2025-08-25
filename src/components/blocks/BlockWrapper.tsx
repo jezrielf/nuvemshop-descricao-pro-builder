@@ -27,10 +27,8 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
                   typeof block.visible === 'boolean' && 
                   block.columns !== undefined;
   
-  // Initialize style if it doesn't exist
-  if (!block.style) {
-    block.style = {};
-  }
+  // Use local style reference without mutating the original block
+  const blockStyle = block.style || {};
   
   const isSelected = selectedBlockId === block.id;
   
@@ -65,7 +63,7 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, children, isEditing 
       )}
       onClick={isMinimized ? handleSelectBlock : undefined}
       data-block-id={block.id}
-      data-has-custom-style={!!block.style}
+      data-has-custom-style={!!blockStyle}
       data-minimized={isMinimized}
     >
       <div className="flex items-center justify-between p-2 bg-gray-50 border-b">
