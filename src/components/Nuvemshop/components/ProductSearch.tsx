@@ -22,7 +22,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
-  const { accessToken, userId } = useNuvemshopAuth();
+  const { accessToken, userId, clearAuthCache, handleConnect } = useNuvemshopAuth();
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
   
@@ -205,9 +205,22 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
             {error && (
               <div className="text-center p-4 text-red-600 bg-red-50 rounded-md">
                 <p>Erro ao carregar produtos: {error}</p>
-                <Button variant="outline" onClick={handleRefresh} className="mt-2">
-                  Tentar novamente
-                </Button>
+                <div className="flex gap-2 justify-center mt-2">
+                  <Button variant="outline" onClick={handleRefresh}>
+                    Tentar novamente
+                  </Button>
+                  {(error.includes('Token inválido') || error.includes('Unauthorized') || error.includes('Invalid access token')) && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        clearAuthCache(false);
+                        handleConnect();
+                      }}
+                    >
+                      Reconectar loja
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
 

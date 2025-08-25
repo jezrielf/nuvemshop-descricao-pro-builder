@@ -70,30 +70,8 @@ const NuvemshopConnect: React.FC = () => {
     handleTestCode: handleTestCodeClick
   });
 
-  // Auto authentication effect
-  useEffect(() => {
-    const attemptAutoAuth = async () => {
-      // Check for auth code in URL or referrer
-      const authCode = detectAuthCode();
-      if (authCode && !success && !authenticating) {
-        console.log("Tentando autenticação automática no carregamento da página");
-        setTestCode(authCode);
-        const authResult = await handleTestCode(authCode);
-        clearAuthCodeFromUrl();
-        
-        // Se a autenticação foi bem-sucedida e estamos na página de conexão, redireciona para o editor
-        if (authResult && window.location.pathname.includes('nuvemshop-connect')) {
-          setTimeout(() => {
-            navigate('/editor');
-          }, 2000);
-        }
-      } else if (!success) {
-        console.log("Nenhum código de autorização encontrado para autenticação automática");
-      }
-    };
-    
-    attemptAutoAuth();
-  }, []);
+  // Auto authentication effect - removed to prevent duplicate calls
+  // The useNuvemshopAuth hook now handles auto-authentication centrally
 
   const handleDisconnectClick = () => {
     handleDisconnect();

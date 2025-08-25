@@ -74,6 +74,18 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       if (data.error) {
         console.error('API Error:', data.error, data.details);
         
+        // Special handling for 401 Unauthorized / Invalid token
+        if (data.details?.includes('401') || data.error.includes('Unauthorized') || data.error.includes('Invalid access token')) {
+          const errorMsg = "Token inválido ou expirado. Reconecte sua loja.";
+          setError(errorMsg);
+          toast({
+            title: "Autenticação necessária",
+            description: errorMsg,
+            variant: "destructive",
+          });
+          throw new Error(errorMsg);
+        }
+        
         // Special handling for rate limit
         if (data.details?.includes('429') || data.error.includes('rate limit')) {
           toast({

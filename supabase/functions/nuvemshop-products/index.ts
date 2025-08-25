@@ -130,7 +130,7 @@ serve(async (req) => {
         links
       };
 
-      console.log('Pagination info:', paginationResponse.pagination);
+      console.log('Pagination response info:', JSON.stringify({ page, perPage, total: totalCount, totalPages, hasNext, hasPrev }, null, 2));
 
       return new Response(JSON.stringify(paginationResponse), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

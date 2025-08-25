@@ -67,6 +67,12 @@ export function useNuvemshopAuth() {
   };
 
   const processAuthCode = async (authCode: string) => {
+    // Prevent duplicate token exchanges
+    if (authenticating || success) {
+      console.log("Ignorando processamento duplicado - já autenticando ou autenticado");
+      return false;
+    }
+
     try {
       setAuthenticating(true);
       setError(null);
@@ -120,12 +126,15 @@ export function useNuvemshopAuth() {
   };
   
   const handleTestCode = async (code: string) => {
-    if (code) {
-      // Limpar cache antes de testar um novo código
-      clearAuthCache(false);
-      return await processAuthCode(code);
+    // Prevent duplicate processing
+    if (!code || authenticating || success) {
+      console.log("Ignorando handleTestCode - sem código, já autenticando ou autenticado");
+      return false;
     }
-    return false;
+
+    // Limpar cache antes de testar um novo código
+    clearAuthCache(false);
+    return await processAuthCode(code);
   };
   
   const handleDisconnect = () => {
