@@ -324,7 +324,7 @@ export type Database = {
         }[]
       }
       get_user_roles: {
-        Args: Record<PropertyKey, never> | { user_id: string }
+        Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"][]
       }
       get_user_stores: {
@@ -341,10 +341,10 @@ export type Database = {
         }[]
       }
       has_role: {
-        Args:
-          | { role: Database["public"]["Enums"]["user_role"]; user_id: string }
-          | { role_name: string }
-          | { role_name: string; user_id: number }
+        Args: {
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
         Returns: boolean
       }
       is_admin: {
