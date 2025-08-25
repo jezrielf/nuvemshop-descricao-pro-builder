@@ -15,6 +15,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   const [updatingProduct, setUpdatingProduct] = useState(false);
   const [loadingAll, setLoadingAll] = useState(false);
   const [allProgress, setAllProgress] = useState({ loaded: 0, total: 0 });
+  const [pageSize, setPageSize] = useState(200);
   const { toast } = useToast();
 
   const resetProducts = () => {
@@ -28,6 +29,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     setLoadingProducts(false);
     setLoadingAll(false);
     setAllProgress({ loaded: 0, total: 0 });
+    setPageSize(200);
   };
 
   // Handle pagination
@@ -45,7 +47,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     }
   };
 
-  const fetchProducts = async (page: number, perPage: number = 200) => {
+  const fetchProducts = async (page: number, perPage?: number) => {
+    const effectivePerPage = perPage || pageSize;
     if (!accessToken || !userId) {
       console.log('No access token or user ID available');
       return;
@@ -55,14 +58,14 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     setError(null);
     
     try {
-      console.log(`Fetching page ${page} with ${perPage} products per page`);
+      console.log(`Fetching page ${page} with ${effectivePerPage} products per page`);
       
       const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
         body: {
           accessToken,
           userId,
           page,
-          perPage
+          perPage: effectivePerPage
         }
       });
 
@@ -271,8 +274,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
           
           console.log(`Loaded ${pageProducts.length} products from page ${currentFetchPage}. Total so far: ${allProducts.length}`);
 
-          // Check if there are more pages
-          hasMorePages = data.hasNext && currentFetchPage < data.totalPages;
+          // Check if there are more pages using robust criteria
+          hasMorePages = data.hasNext && (pageProducts.length === 200 || currentFetchPage < data.totalPages);
           
           if (hasMorePages) {
             currentFetchPage++;
@@ -320,6 +323,18 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     }
   };
 
+  // Helper functions for pagination control
+  const setPageSizeAndRefetch = (size: 50 | 100 | 200) => {
+    setPageSize(size);
+    fetchProducts(1, size);
+  };
+
+  const goToPage = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      fetchProducts(pageNumber);
+    }
+  };
+
   // Alias for backward compatibility
   const loadAllProducts = fetchAllProducts;
 
@@ -333,6 +348,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     totalPages,
     hasNext,
     hasPrev,
+    pageSize,
     fetchProducts,
     updateProductDescription,
     handleNextPage,
@@ -342,6 +358,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     loadAllProducts, // alias
     loadingAll,
     loadingAllProducts: loadingAll, // alias for backward compatibility
-    allProgress
+    allProgress,
+    setPageSizeAndRefetch,
+    goToPage
   };
 };

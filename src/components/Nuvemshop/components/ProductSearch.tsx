@@ -22,6 +22,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
+  const [goToPageValue, setGoToPageValue] = useState('');
   const { accessToken, userId, clearAuthCache, handleConnect } = useNuvemshopAuth();
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
@@ -33,8 +34,14 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     fetchProducts,
     currentPage,
     totalPages,
+    totalProducts,
+    hasNext,
+    hasPrev,
+    pageSize,
     handleNextPage,
-    handlePrevPage
+    handlePrevPage,
+    setPageSizeAndRefetch,
+    goToPage
   } = useNuvemshopProducts(accessToken, userId);
 
   const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
@@ -166,7 +173,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
                 <Package className="h-5 w-5" />
                 Produtos da Loja
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Button
                   variant="outline"
                   size="sm"
@@ -176,6 +183,49 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
                   <RefreshCw className={`h-4 w-4 mr-2 ${loadingProducts ? 'animate-spin' : ''}`} />
                   Atualizar
                 </Button>
+                
+                <div className="flex items-center gap-1">
+                  <label className="text-sm font-medium">Por página:</label>
+                  <select 
+                    value={pageSize} 
+                    onChange={(e) => setPageSizeAndRefetch(Number(e.target.value) as 50 | 100 | 200)}
+                    className="text-sm border border-input rounded px-2 py-1 bg-background"
+                    disabled={loadingProducts}
+                  >
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value={200}>200</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <label className="text-sm font-medium">Ir para:</label>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max={totalPages}
+                    value={goToPageValue}
+                    onChange={(e) => setGoToPageValue(e.target.value)}
+                    className="text-sm border border-input rounded px-2 py-1 bg-background w-16"
+                    placeholder="1"
+                    disabled={loadingProducts}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const pageNum = parseInt(goToPageValue);
+                      if (pageNum && pageNum >= 1 && pageNum <= totalPages) {
+                        goToPage(pageNum);
+                        setGoToPageValue('');
+                      }
+                    }}
+                    disabled={loadingProducts || !goToPageValue}
+                  >
+                    Ir
+                  </Button>
+                </div>
+                
                 <Button
                   variant="outline"
                   size="sm"
@@ -289,13 +339,20 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
               </div>
             )}
 
+            {/* Products count and pagination info */}
+            {!loadingProducts && products.length > 0 && (
+              <div className="text-center text-sm text-gray-500">
+                Mostrando {products.length} de {totalProducts} produtos (Página {currentPage} de {totalPages})
+              </div>
+            )}
+
             {/* Pagination */}
             {!loadingProducts && products.length > 0 && totalPages > 1 && (
               <div className="flex justify-between items-center">
                 <Button 
                   variant="outline" 
                   onClick={handlePrevPage}
-                  disabled={currentPage === 1}
+                  disabled={!hasPrev}
                 >
                   Anterior
                 </Button>
@@ -305,7 +362,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
                 <Button 
                   variant="outline" 
                   onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
+                  disabled={!hasNext}
                 >
                   Próxima
                 </Button>

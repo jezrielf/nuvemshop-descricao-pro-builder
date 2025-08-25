@@ -58,8 +58,11 @@ serve(async (req) => {
     const totalCount = parseInt(response.headers.get('X-Total-Count') || '0');
     const linkHeader = response.headers.get('Link');
     
+    console.log('Raw headers:', {
+      'X-Total-Count': response.headers.get('X-Total-Count'),
+      'Link': linkHeader
+    });
     console.log('Total products in store:', totalCount);
-    console.log('Link header:', linkHeader);
     
     // Parse Link header into object
     const parseLinks = (linkHeader: string | null) => {
@@ -114,23 +117,53 @@ serve(async (req) => {
       console.log('Successfully fetched products from Nuvemshop');
       console.log('Number of products:', Array.isArray(products) ? products.length : 'not an array');
 
-      // Calculate pagination metadata
-      const totalPages = Math.ceil(totalCount / perPage);
-      const hasNext = !!(links.next || (page < totalPages));
+      // Calculate pagination metadata with robust fallbacks
+      let calculatedTotalPages: number;
+      let calculatedTotal: number;
+      
+      if (totalCount > 0) {
+        calculatedTotalPages = Math.ceil(totalCount / perPage);
+        calculatedTotal = totalCount;
+      } else if (links.last) {
+        calculatedTotalPages = links.last.page;
+        calculatedTotal = (links.last.page - 1) * perPage + (Array.isArray(products) ? products.length : 0);
+      } else if (links.next) {
+        calculatedTotalPages = page + 1; // At least one more page
+        calculatedTotal = page * perPage + (Array.isArray(products) ? products.length : 0);
+      } else {
+        calculatedTotalPages = page;
+        calculatedTotal = (page - 1) * perPage + (Array.isArray(products) ? products.length : 0);
+      }
+
+      // Calculate hasNext and hasPrev with multiple fallback strategies
+      const hasNext = !!(
+        links.next || 
+        (page < calculatedTotalPages) || 
+        (Array.isArray(products) && products.length === perPage)
+      );
+      
       const hasPrev = !!(links.prev || (page > 1));
 
       const paginationResponse = {
         items: products,
         page,
         perPage,
-        total: totalCount,
-        totalPages,
+        total: calculatedTotal,
+        totalPages: calculatedTotalPages,
         hasNext,
         hasPrev,
         links
       };
 
-      console.log('Pagination response info:', JSON.stringify({ page, perPage, total: totalCount, totalPages, hasNext, hasPrev }, null, 2));
+      console.log('Calculated pagination:', {
+        page,
+        perPage,
+        total: calculatedTotal,
+        totalPages: calculatedTotalPages,
+        hasNext,
+        hasPrev,
+        itemsReturned: Array.isArray(products) ? products.length : 0
+      });
 
       return new Response(JSON.stringify(paginationResponse), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
