@@ -1,11 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Package, RefreshCw, Users } from 'lucide-react';
+import { Search, Package, RefreshCw, Users, Globe } from 'lucide-react';
 import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '../hooks/useNuvemshopProducts';
 import { useProductDescriptionSaver } from '../hooks/useProductDescriptionSaver';
@@ -23,6 +23,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
   const [goToPageValue, setGoToPageValue] = useState('');
+  const [isGlobalSearchActive, setIsGlobalSearchActive] = useState(false);
   const { accessToken, userId, clearAuthCache, handleConnect } = useNuvemshopAuth();
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
@@ -41,7 +42,10 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     handleNextPage,
     handlePrevPage,
     setPageSizeAndRefetch,
-    goToPage
+    goToPage,
+    searchAllProducts,
+    searchingAll,
+    allProductsForSearch
   } = useNuvemshopProducts(accessToken, userId);
 
   const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
@@ -64,15 +68,59 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     }
   };
 
-  // Filter products based on search term
-  const filteredProducts = products.filter(product => {
-    const productName = typeof product.name === 'string' 
-      ? product.name 
-      : (product.name?.pt || '');
+  // Enhanced search that includes all products when needed
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm) {
+      return isGlobalSearchActive ? allProductsForSearch : products;
+    }
+
+    const searchProducts = isGlobalSearchActive ? allProductsForSearch : products;
+    const term = searchTerm.toLowerCase();
+
+    return searchProducts.filter(product => {
+      const productName = typeof product.name === 'string' 
+        ? product.name 
+        : (product.name?.pt || '');
+      
+      // Search in product name
+      if (productName.toLowerCase().includes(term)) return true;
+      
+      // Search in product SKU
+      if (product.sku && product.sku.toLowerCase().includes(term)) return true;
+      
+      // Search in product ID
+      if (product.id.toString().includes(term)) return true;
+      
+      // Search in variant SKUs
+      if (product.variants) {
+        const hasVariantMatch = product.variants.some(variant => 
+          variant.sku && variant.sku.toLowerCase().includes(term)
+        );
+        if (hasVariantMatch) return true;
+      }
+      
+      return false;
+    });
+  }, [searchTerm, products, allProductsForSearch, isGlobalSearchActive]);
+
+  // Auto-trigger global search when typing 3+ characters
+  useEffect(() => {
+    if (searchTerm.length >= 3 && !isGlobalSearchActive && allProductsForSearch.length === 0) {
+      handleGlobalSearch();
+    }
+  }, [searchTerm, isGlobalSearchActive, allProductsForSearch.length]);
+
+  const handleGlobalSearch = async () => {
+    if (searchingAll) return;
     
-    return productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase()));
-  });
+    setIsGlobalSearchActive(true);
+    await searchAllProducts();
+    
+    toast({
+      title: "Busca global ativada",
+      description: "Agora você pode buscar em todos os produtos da loja",
+    });
+  };
 
   const handleProductClick = (product: NuvemshopProduct) => {
     onProductSelect(product);
@@ -235,6 +283,18 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
                   <Users className="h-4 w-4 mr-2" />
                   Seleção Múltipla
                 </Button>
+                
+                {!isGlobalSearchActive && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGlobalSearch}
+                    disabled={searchingAll || loadingProducts}
+                  >
+                    <Globe className={`h-4 w-4 mr-2 ${searchingAll ? 'animate-spin' : ''}`} />
+                    Buscar em Todos
+                  </Button>
+                )}
               </div>
             </DialogTitle>
           </DialogHeader>
@@ -244,12 +304,34 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Buscar por nome ou SKU..."
+                placeholder={isGlobalSearchActive ? "Buscar em todos os produtos..." : "Buscar por nome ou SKU..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
+              {isGlobalSearchActive && (
+                <Badge variant="secondary" className="absolute right-2 top-2">
+                  <Globe className="h-3 w-3 mr-1" />
+                  Global
+                </Badge>
+              )}
             </div>
+
+            {/* Search status */}
+            {searchingAll && (
+              <div className="text-center p-4 bg-blue-50 rounded-md">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                <p className="text-sm text-blue-600">Carregando todos os produtos para busca...</p>
+              </div>
+            )}
+
+            {isGlobalSearchActive && !searchingAll && (
+              <div className="text-center p-2 bg-green-50 rounded-md">
+                <p className="text-sm text-green-600">
+                  Buscando em {allProductsForSearch.length} produtos • Inclui variantes e SKUs
+                </p>
+              </div>
+            )}
 
             {/* Error state */}
             {error && (
@@ -321,10 +403,16 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
             )}
 
             {/* Empty state */}
-            {!loadingProducts && filteredProducts.length === 0 && products.length > 0 && (
+            {!loadingProducts && !searchingAll && filteredProducts.length === 0 && (products.length > 0 || allProductsForSearch.length > 0) && (
               <div className="text-center p-8 text-gray-500">
                 <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Nenhum produto encontrado para "{searchTerm}"</p>
+                {!isGlobalSearchActive && searchTerm.length >= 3 && (
+                  <Button variant="outline" onClick={handleGlobalSearch} className="mt-2">
+                    <Globe className="h-4 w-4 mr-2" />
+                    Buscar em todos os produtos
+                  </Button>
+                )}
               </div>
             )}
 
@@ -340,14 +428,18 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
             )}
 
             {/* Products count and pagination info */}
-            {!loadingProducts && products.length > 0 && (
+            {!loadingProducts && !searchingAll && (
               <div className="text-center text-sm text-gray-500">
-                Mostrando {products.length} de {totalProducts} produtos (Página {currentPage} de {totalPages})
+                {isGlobalSearchActive ? (
+                  <>Mostrando {filteredProducts.length} de {allProductsForSearch.length} produtos (Busca Global)</>
+                ) : (
+                  <>Mostrando {products.length} de {totalProducts} produtos (Página {currentPage} de {totalPages})</>
+                )}
               </div>
             )}
 
-            {/* Pagination */}
-            {!loadingProducts && products.length > 0 && totalPages > 1 && (
+            {/* Pagination - only show when not in global search mode */}
+            {!loadingProducts && !searchingAll && !isGlobalSearchActive && products.length > 0 && totalPages > 1 && (
               <div className="flex justify-between items-center">
                 <Button 
                   variant="outline" 
@@ -365,6 +457,21 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
                   disabled={!hasNext}
                 >
                   Próxima
+                </Button>
+              </div>
+            )}
+
+            {/* Global search controls */}
+            {isGlobalSearchActive && !searchingAll && (
+              <div className="flex justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsGlobalSearchActive(false);
+                    setSearchTerm('');
+                  }}
+                >
+                  Voltar à navegação por páginas
                 </Button>
               </div>
             )}

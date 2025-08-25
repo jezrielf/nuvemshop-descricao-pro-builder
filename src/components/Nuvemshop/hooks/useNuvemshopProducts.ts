@@ -16,6 +16,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   const [loadingAll, setLoadingAll] = useState(false);
   const [allProgress, setAllProgress] = useState({ loaded: 0, total: 0 });
   const [pageSize, setPageSize] = useState(200);
+  const [searchingAll, setSearchingAll] = useState(false);
+  const [allProductsForSearch, setAllProductsForSearch] = useState<NuvemshopProduct[]>([]);
   const { toast } = useToast();
 
   const resetProducts = () => {
@@ -30,6 +32,8 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     setLoadingAll(false);
     setAllProgress({ loaded: 0, total: 0 });
     setPageSize(200);
+    setSearchingAll(false);
+    setAllProductsForSearch([]);
   };
 
   // Handle pagination
@@ -335,6 +339,95 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     }
   };
 
+  // Function to search across all products
+  const searchAllProducts = async () => {
+    if (!accessToken || !userId || searchingAll) {
+      return [];
+    }
+
+    setSearchingAll(true);
+    setError(null);
+
+    try {
+      let allProducts: NuvemshopProduct[] = [];
+      let currentFetchPage = 1;
+      let hasMorePages = true;
+      let retryCount = 0;
+      const maxRetries = 3;
+      let backoffDelay = 1000;
+
+      console.log('Loading all products for search...');
+
+      while (hasMorePages) {
+        try {
+          const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
+            body: {
+              accessToken,
+              userId,
+              page: currentFetchPage,
+              perPage: 200
+            }
+          });
+
+          if (error) {
+            throw new Error(`Edge function error: ${error.message}`);
+          }
+
+          if (data.error) {
+            if (data.details?.includes('429') || data.error.includes('rate limit')) {
+              if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`Rate limited during search. Retrying in ${backoffDelay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, backoffDelay));
+                backoffDelay *= 2;
+                continue;
+              }
+            }
+            throw new Error(`API Error: ${data.error}`);
+          }
+
+          retryCount = 0;
+          backoffDelay = 1000;
+
+          const pageProducts = data.items || [];
+          allProducts = [...allProducts, ...pageProducts];
+
+          hasMorePages = data.hasNext && (pageProducts.length === 200 || currentFetchPage < data.totalPages);
+          
+          if (hasMorePages) {
+            currentFetchPage++;
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
+        } catch (pageError) {
+          if (retryCount < maxRetries) {
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+            backoffDelay *= 2;
+            continue;
+          } else {
+            throw pageError;
+          }
+        }
+      }
+
+      console.log(`Loaded ${allProducts.length} products for search`);
+      setAllProductsForSearch(allProducts);
+      return allProducts;
+
+    } catch (err) {
+      console.error('Error loading products for search:', err);
+      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      toast({
+        title: "Erro ao carregar produtos para busca",
+        description: err instanceof Error ? err.message : 'Erro desconhecido',
+        variant: "destructive",
+      });
+      return [];
+    } finally {
+      setSearchingAll(false);
+    }
+  };
+
   // Alias for backward compatibility
   const loadAllProducts = fetchAllProducts;
 
@@ -360,6 +453,9 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     loadingAllProducts: loadingAll, // alias for backward compatibility
     allProgress,
     setPageSizeAndRefetch,
-    goToPage
+    goToPage,
+    searchAllProducts,
+    searchingAll,
+    allProductsForSearch
   };
 };

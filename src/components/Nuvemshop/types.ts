@@ -5,6 +5,12 @@ export interface NuvemshopProduct {
   sku: string | null;
   price: string | number;
   description?: string | { pt?: string; [key: string]: string | undefined };
+  variants?: Array<{
+    id: number;
+    sku: string | null;
+    price: string | number;
+    [key: string]: any;
+  }>;
 }
 
 export interface NuvemshopAuthResponse {
