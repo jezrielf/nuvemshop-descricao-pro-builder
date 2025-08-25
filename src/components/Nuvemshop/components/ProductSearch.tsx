@@ -22,9 +22,11 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
-  const { accessToken, userId } = useNuvemshopAuth();
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
+  
+  // We need to get the store ID from connected stores - placeholder for now
+  const storeId = "placeholder-store-id";
   
   const {
     products,
@@ -35,20 +37,20 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     totalPages,
     handleNextPage,
     handlePrevPage
-  } = useNuvemshopProducts(accessToken, userId);
+  } = useNuvemshopProducts(storeId);
 
-  const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
+  const { handleSaveToNuvemshop } = useProductDescriptionSaver(storeId);
 
   // Fetch products when dialog opens
   useEffect(() => {
-    if (isOpen && accessToken && userId && products.length === 0) {
+    if (isOpen && storeId && products.length === 0) {
       fetchProducts();
     }
-  }, [isOpen, accessToken, userId, fetchProducts, products.length]);
+  }, [isOpen, storeId, fetchProducts, products.length]);
 
   // Manual refresh function
   const handleRefresh = () => {
-    if (accessToken && userId) {
+    if (storeId) {
       fetchProducts(1); // Reset to first page
       toast({
         title: 'Lista atualizada',
@@ -142,7 +144,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     return 'Produto sem nome';
   };
 
-  if (!accessToken || !userId) {
+  if (!storeId) {
     return (
       <div className="text-sm text-gray-500">
         Conecte sua conta Nuvemshop para buscar produtos

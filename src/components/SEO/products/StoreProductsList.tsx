@@ -23,7 +23,7 @@ import { useProductsSEOAnalysis } from './hooks/useProductsSEOAnalysis';
 const StoreProductsList: React.FC = () => {
   const navigate = useNavigate();
   const { loadDescription } = useEditorStore();
-  const { accessToken, userId } = useNuvemshopAuth();
+  const storeId = "placeholder-store-id"; // This should come from connected stores
   
   const {
     products,
@@ -33,7 +33,7 @@ const StoreProductsList: React.FC = () => {
     totalPages,
     handleNextPage,
     handlePrevPage
-  } = useNuvemshopProducts(accessToken, userId);
+  } = useNuvemshopProducts(storeId);
 
   const {
     sortedProducts,
@@ -47,10 +47,10 @@ const StoreProductsList: React.FC = () => {
 
   // Fetch products on mount
   useEffect(() => {
-    if (accessToken && userId && !products.length) {
+    if (storeId && !products.length) {
       fetchProducts();
     }
-  }, [accessToken, userId, fetchProducts, products.length]);
+  }, [storeId, fetchProducts, products.length]);
 
   // Handle edit product
   const handleEditProduct = (product: any) => {
@@ -92,7 +92,7 @@ const StoreProductsList: React.FC = () => {
   };
 
   // Main render
-  if (!accessToken || !userId) {
+  if (!storeId) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-muted-foreground mb-4">

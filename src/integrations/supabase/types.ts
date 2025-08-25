@@ -314,9 +314,31 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_store_for_api_call: {
+        Args: { store_uuid: string }
+        Returns: {
+          access_token: string
+          platform: string
+          store_id: number
+          url: string
+        }[]
+      }
       get_user_roles: {
         Args: Record<PropertyKey, never> | { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"][]
+      }
+      get_user_stores: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          connected_at: string
+          id: string
+          name: string
+          platform: string
+          scope: string
+          store_id: number
+          url: string
+          user_id: string
+        }[]
       }
       has_role: {
         Args:

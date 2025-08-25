@@ -34,6 +34,9 @@ const NuvemshopConnect: React.FC = () => {
     console.log('NuvemshopConnect - Store name:', storeName);
   }, [storeName]);
 
+  // Use a placeholder store ID for now - this would come from connected stores
+  const storeId = success && userId ? `nuvemshop-${userId}` : undefined;
+  
   const {
     products,
     loadingProducts,
@@ -46,7 +49,7 @@ const NuvemshopConnect: React.FC = () => {
     handleNextPage,
     handlePrevPage,
     resetProducts
-  } = useNuvemshopProducts(accessToken, userId);
+  } = useNuvemshopProducts(storeId);
 
   // Criando a função antes de usá-la
   const handleTestCodeClick = () => {

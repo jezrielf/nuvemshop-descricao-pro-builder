@@ -18,8 +18,11 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   product
 }) => {
   const [hasCustomBlocks, setHasCustomBlocks] = useState(false);
-  const { accessToken, userId } = useNuvemshopAuth();
   const { description } = useEditorStore();
+  
+  // We need to get the store ID from somewhere - for now using a placeholder
+  // This would typically come from a connected store context or prop
+  const storeId = "placeholder-store-id";
   
   const {
     isImporting,
@@ -31,7 +34,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const {
     isSaving,
     handleSaveToNuvemshop
-  } = useProductDescriptionSaver(accessToken, userId);
+  } = useProductDescriptionSaver(storeId);
 
   const productName = typeof product.name === 'string'
     ? product.name

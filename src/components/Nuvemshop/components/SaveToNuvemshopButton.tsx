@@ -21,8 +21,8 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
 }) => {
   const { toast } = useToast();
   const { description } = useEditorStore();
-  const { accessToken, userId } = useNuvemshopAuth();
-  const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
+  const storeId = "placeholder-store-id"; // This should come from context
+  const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(storeId);
   const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   const [saveSuccess, setSaveSuccess] = useState(false);
   

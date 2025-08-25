@@ -4,7 +4,7 @@ import { NuvemshopProduct, NuvemshopProductUpdatePayload } from '../types';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useNuvemshopProducts = (accessToken?: string, userId?: string | number) => {
+export const useNuvemshopProducts = (storeId?: string) => {
   const [products, setProducts] = useState<NuvemshopProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [productError, setProductError] = useState<string | null>(null);
@@ -39,10 +39,10 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     }
   }, [currentPage]);
 
-  // Fetch products from Nuvemshop
+  // Fetch products from Nuvemshop via secure Edge Function
   const fetchProducts = useCallback(async (page: number = 1, perPage: number = 200) => {
-    if (!accessToken || !userId) {
-      setProductError('Access token or user ID not available');
+    if (!storeId) {
+      setProductError('Store ID not available');
       return [];
     }
 
@@ -51,8 +51,22 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       setProductError(null);
       setCurrentPage(page);
 
-      const { data, error } = await supabase.functions.invoke('nuvemshop-products', {
-        body: { accessToken, userId, page, perPage }
+      // Get current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('User not authenticated');
+      }
+
+      const { data, error } = await supabase.functions.invoke('nuvemshop-api', {
+        body: { 
+          action: 'get_products',
+          storeId: storeId,
+          page, 
+          perPage 
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) {
@@ -71,7 +85,6 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
         setProducts(data);
         
         // Estimate total pages based on product count
-        // Nuvemshop API doesn't provide exact count, so we estimate
         const estimatedTotal = data.length === perPage ? perPage * 2 : data.length;
         setTotalProducts(estimatedTotal);
         setTotalPages(Math.ceil(estimatedTotal / perPage));
@@ -100,12 +113,12 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     } finally {
       setLoadingProducts(false);
     }
-  }, [accessToken, userId, toast]);
+  }, [storeId, toast]);
 
-  // Update product description in Nuvemshop
+  // Update product description via secure Edge Function
   const updateProductDescription = useCallback(async (productId: number, description: string) => {
-    if (!accessToken || !userId) {
-      setProductError('Access token or user ID not available');
+    if (!storeId) {
+      setProductError('Store ID not available');
       return false;
     }
 
@@ -113,13 +126,24 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       console.log(`Updating description for product ID: ${productId}`);
       setUpdatingProduct(true);
       
-      const { data, error } = await supabase.functions.invoke('nuvemshop-update-product', {
+      // Get current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('User not authenticated');
+      }
+      
+      const { data, error } = await supabase.functions.invoke('nuvemshop-api', {
         body: { 
-          accessToken, 
-          userId, 
-          productId, 
-          description 
-        }
+          action: 'update_product',
+          storeId: storeId,
+          body: {
+            productId, 
+            description 
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) {
@@ -161,7 +185,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     } finally {
       setUpdatingProduct(false);
     }
-  }, [accessToken, userId, toast]);
+  }, [storeId, toast]);
 
   return {
     products,

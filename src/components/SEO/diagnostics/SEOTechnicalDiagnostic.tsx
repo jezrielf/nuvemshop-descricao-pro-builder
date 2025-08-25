@@ -27,8 +27,8 @@ export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ 
   const description = propDescription || storeDescription;
   
   const [activeTab, setActiveTab] = useState('structure');
-  const { success: isNuvemshopConnected, userId, accessToken } = useNuvemshopAuth();
-  const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
+  const storeId = "placeholder-store-id"; // This should come from context
+  const { handleSaveToNuvemshop } = useProductDescriptionSaver(storeId);
 
   if (!description) {
     return (
