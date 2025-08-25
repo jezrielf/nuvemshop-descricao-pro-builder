@@ -8,6 +8,7 @@ import DescriptionAnalysis from './pages/DescriptionAnalysis';
 import Admin from './pages/Admin';
 import AdminAuth from './pages/AdminAuth';
 import AdminTemplates from './pages/AdminTemplates';
+import AdminTemplateBuilder from './pages/AdminTemplateBuilder';
 import Plans from './pages/Plans';
 import NuvemshopConnect from './pages/NuvemshopConnect';
 import NexoAdmin from './pages/NexoAdmin';
@@ -70,6 +71,7 @@ const App: React.FC = () => {
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin-auth" element={<AdminAuth />} />
                 <Route path="/admin-templates" element={<AdminTemplates />} />
+                <Route path="/admin-template-builder/:templateId?" element={<AdminTemplateBuilder />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
                 <Route path="/nexo-admin" element={<NexoAdmin />} />
