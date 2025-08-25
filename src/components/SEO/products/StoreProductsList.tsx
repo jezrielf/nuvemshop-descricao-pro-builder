@@ -19,11 +19,12 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ProductAnalysisDialog } from './components/ProductAnalysisDialog';
 import { useProductsSEOAnalysis } from './hooks/useProductsSEOAnalysis';
+import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 const StoreProductsList: React.FC = () => {
   const navigate = useNavigate();
   const { loadDescription } = useEditorStore();
-  const storeId = "placeholder-store-id"; // This should come from connected stores
+  const { activeStoreId } = useNuvemshopStore();
   
   const {
     products,
@@ -33,7 +34,7 @@ const StoreProductsList: React.FC = () => {
     totalPages,
     handleNextPage,
     handlePrevPage
-  } = useNuvemshopProducts(storeId);
+  } = useNuvemshopProducts(activeStoreId);
 
   const {
     sortedProducts,
@@ -47,10 +48,10 @@ const StoreProductsList: React.FC = () => {
 
   // Fetch products on mount
   useEffect(() => {
-    if (storeId && !products.length) {
+    if (activeStoreId && !products.length) {
       fetchProducts();
     }
-  }, [storeId, fetchProducts, products.length]);
+  }, [activeStoreId, fetchProducts, products.length]);
 
   // Handle edit product
   const handleEditProduct = (product: any) => {
@@ -92,7 +93,7 @@ const StoreProductsList: React.FC = () => {
   };
 
   // Main render
-  if (!storeId) {
+  if (!activeStoreId) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-muted-foreground mb-4">

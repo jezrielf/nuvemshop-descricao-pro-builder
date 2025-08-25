@@ -17,6 +17,7 @@ import { useProductDescriptionSaver } from '@/components/Nuvemshop/hooks/useProd
 import { HeadingStructure, HeadingSuggestion } from './types/headingTypes';
 import { useHeadingsUpdater } from '@/components/Nuvemshop/hooks/useHeadingsUpdater';
 import { ProductDescription } from '@/types/editor';
+import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 interface SEOTechnicalDiagnosticProps {
   description?: ProductDescription;
@@ -27,8 +28,8 @@ export const SEOTechnicalDiagnostic: React.FC<SEOTechnicalDiagnosticProps> = ({ 
   const description = propDescription || storeDescription;
   
   const [activeTab, setActiveTab] = useState('structure');
-  const storeId = "placeholder-store-id"; // This should come from context
-  const { handleSaveToNuvemshop } = useProductDescriptionSaver(storeId);
+  const { activeStoreId } = useNuvemshopStore();
+  const { handleSaveToNuvemshop } = useProductDescriptionSaver(activeStoreId);
 
   if (!description) {
     return (

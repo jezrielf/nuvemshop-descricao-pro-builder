@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
 import { useNuvemshopCodeExtractor } from '@/components/Nuvemshop/hooks/useNuvemshopCodeExtractor';
+import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 import { ConnectionCard } from '@/components/Nuvemshop/components/connect/ConnectionCard';
 import { ProductsCard } from '@/components/Nuvemshop/components/connect/ProductsCard';
 import { useToast } from '@/hooks/use-toast';
@@ -34,8 +35,8 @@ const NuvemshopConnect: React.FC = () => {
     console.log('NuvemshopConnect - Store name:', storeName);
   }, [storeName]);
 
-  // Use a placeholder store ID for now - this would come from connected stores
-  const storeId = success && userId ? `nuvemshop-${userId}` : undefined;
+  const { activeStoreId } = useNuvemshopStore();
+  const storeId = activeStoreId;
   
   const {
     products,

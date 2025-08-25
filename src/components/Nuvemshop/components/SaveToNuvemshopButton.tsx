@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 import { useNimbusUI } from '../NimbusProvider';
 import { NimbusButton } from '../NimbusProvider';
+import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 interface SaveToNuvemshopButtonProps {
   product: NuvemshopProduct;
@@ -21,8 +22,8 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
 }) => {
   const { toast } = useToast();
   const { description } = useEditorStore();
-  const storeId = "placeholder-store-id"; // This should come from context
-  const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(storeId);
+  const { activeStoreId } = useNuvemshopStore();
+  const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(activeStoreId);
   const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   const [saveSuccess, setSaveSuccess] = useState(false);
   

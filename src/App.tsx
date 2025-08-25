@@ -18,6 +18,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NimbusProvider } from './components/Nuvemshop/NimbusProvider';
 import NexoProvider from './components/Nuvemshop/NexoProvider';
+import { NuvemshopStoreProvider } from './contexts/NuvemshopStoreContext';
 import { 
   isEmbeddedInNuvemshop, 
   registerWithNuvemshopRouter, 
@@ -54,30 +55,32 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <NimbusProvider>
-            <NexoProvider>
-              <Routes>
-                {/* Redirect to NexoAdmin directly when embedded in Nuvemshop */}
-                {isEmbedded && <Route path="/" element={<Navigate to="/nexo-admin" replace />} />}
-                {isEmbedded && <Route path="/editor" element={<Navigate to="/nexo-admin" replace />} />}
-                
-                {/* Regular routes */}
-                {!isEmbedded && <Route path="/" element={<Landing />} />}
-                {!isEmbedded && <Route path="/editor" element={<Index />} />}
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/confirmar-email" element={<EmailConfirmation />} />
-                <Route path="/description-analysis" element={<DescriptionAnalysis />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin-auth" element={<AdminAuth />} />
-                <Route path="/admin-templates" element={<AdminTemplates />} />
-                <Route path="/plans" element={<Plans />} />
-                <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-                <Route path="/nexo-admin" element={<NexoAdmin />} />
-                <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} />
-                <Route path="/success" element={<Success />} />
-              </Routes>
-            </NexoProvider>
-          </NimbusProvider>
+          <NuvemshopStoreProvider>
+            <NimbusProvider>
+              <NexoProvider>
+                <Routes>
+                  {/* Redirect to NexoAdmin directly when embedded in Nuvemshop */}
+                  {isEmbedded && <Route path="/" element={<Navigate to="/nexo-admin" replace />} />}
+                  {isEmbedded && <Route path="/editor" element={<Navigate to="/nexo-admin" replace />} />}
+                  
+                  {/* Regular routes */}
+                  {!isEmbedded && <Route path="/" element={<Landing />} />}
+                  {!isEmbedded && <Route path="/editor" element={<Index />} />}
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/confirmar-email" element={<EmailConfirmation />} />
+                  <Route path="/description-analysis" element={<DescriptionAnalysis />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin-auth" element={<AdminAuth />} />
+                  <Route path="/admin-templates" element={<AdminTemplates />} />
+                  <Route path="/plans" element={<Plans />} />
+                  <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+                  <Route path="/nexo-admin" element={<NexoAdmin />} />
+                  <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} />
+                  <Route path="/success" element={<Success />} />
+                </Routes>
+              </NexoProvider>
+            </NimbusProvider>
+          </NuvemshopStoreProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>

@@ -7,6 +7,7 @@ import { useProductDescriptionLoader } from '../hooks/useProductDescriptionLoade
 import { useProductDescriptionSaver } from '../hooks/useProductDescriptionSaver';
 import { ProductStatusBadges } from './editor/ProductStatusBadges';
 import { ProductActionButtons } from './editor/ProductActionButtons';
+import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 interface ProductEditorControllerProps {
   className?: string;
@@ -19,10 +20,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
 }) => {
   const [hasCustomBlocks, setHasCustomBlocks] = useState(false);
   const { description } = useEditorStore();
-  
-  // We need to get the store ID from somewhere - for now using a placeholder
-  // This would typically come from a connected store context or prop
-  const storeId = "placeholder-store-id";
+  const { activeStoreId } = useNuvemshopStore();
   
   const {
     isImporting,
@@ -34,7 +32,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const {
     isSaving,
     handleSaveToNuvemshop
-  } = useProductDescriptionSaver(storeId);
+  } = useProductDescriptionSaver(activeStoreId);
 
   const productName = typeof product.name === 'string'
     ? product.name

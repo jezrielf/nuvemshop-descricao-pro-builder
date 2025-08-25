@@ -13,6 +13,7 @@ import { NuvemshopProduct } from '../types';
 import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 import MultipleProductSelection from './MultipleProductSelection';
+import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 interface ProductSearchProps {
   onProductSelect: (product: NuvemshopProduct) => void;
@@ -25,8 +26,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
   
-  // We need to get the store ID from connected stores - placeholder for now
-  const storeId = "placeholder-store-id";
+  const { activeStoreId } = useNuvemshopStore();
   
   const {
     products,
@@ -37,20 +37,20 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     totalPages,
     handleNextPage,
     handlePrevPage
-  } = useNuvemshopProducts(storeId);
+  } = useNuvemshopProducts(activeStoreId);
 
-  const { handleSaveToNuvemshop } = useProductDescriptionSaver(storeId);
+  const { handleSaveToNuvemshop } = useProductDescriptionSaver(activeStoreId);
 
   // Fetch products when dialog opens
   useEffect(() => {
-    if (isOpen && storeId && products.length === 0) {
+    if (isOpen && activeStoreId && products.length === 0) {
       fetchProducts();
     }
-  }, [isOpen, storeId, fetchProducts, products.length]);
+  }, [isOpen, activeStoreId, fetchProducts, products.length]);
 
   // Manual refresh function
   const handleRefresh = () => {
-    if (storeId) {
+    if (activeStoreId) {
       fetchProducts(1); // Reset to first page
       toast({
         title: 'Lista atualizada',
@@ -144,7 +144,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     return 'Produto sem nome';
   };
 
-  if (!storeId) {
+  if (!activeStoreId) {
     return (
       <div className="text-sm text-gray-500">
         Conecte sua conta Nuvemshop para buscar produtos
