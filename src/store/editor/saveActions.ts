@@ -1,6 +1,8 @@
+
 import { ProductDescription } from '@/types/editor';
 import { EditorState } from './types';
 import { useAuth } from '@/contexts/AuthContext';
+import { DescriptionsService } from '@/services/descriptionsService';
 
 export const createSaveActions = (get: () => EditorState, set: any) => {
   // We'll store the auth context reference globally
@@ -18,11 +20,48 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     }
   };
 
+  // Migration helper: moves localStorage data to Supabase
+  const migrateLocalStorageToSupabase = async (userId: string) => {
+    try {
+      const localKeys = [`savedDescriptions_${userId}`, 'savedDescriptions_anonymous'];
+      const allLocalDescriptions: ProductDescription[] = [];
+
+      // Collect descriptions from all possible local storage keys
+      for (const key of localKeys) {
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          try {
+            const descriptions = JSON.parse(saved) as ProductDescription[];
+            allLocalDescriptions.push(...descriptions);
+          } catch (e) {
+            console.error(`Error parsing localStorage key ${key}:`, e);
+          }
+        }
+      }
+
+      if (allLocalDescriptions.length > 0) {
+        console.log(`Migrating ${allLocalDescriptions.length} descriptions to Supabase...`);
+        
+        const success = await DescriptionsService.batchUpsert(allLocalDescriptions);
+        
+        if (success) {
+          // Clear localStorage after successful migration
+          localKeys.forEach(key => localStorage.removeItem(key));
+          console.log('Migration completed successfully');
+        } else {
+          console.warn('Migration failed, keeping localStorage data');
+        }
+      }
+    } catch (error) {
+      console.error('Error during migration:', error);
+    }
+  };
+
   return {
     // Add the setter function for auth context
     setAuthContext,
     
-    saveCurrentDescription: (isNewDescription: boolean = true) => {
+    saveCurrentDescription: async (isNewDescription: boolean = true) => {
       const description = get().description;
       if (!description) return false;
       
@@ -49,80 +88,114 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           updatedAt: new Date().toISOString()
         };
         
-        // Get existing saved descriptions
-        let savedDescriptions = get().savedDescriptions;
-        
-        // Check if this description already exists, if so update it
-        const existingIndex = savedDescriptions.findIndex(d => d.id === description.id);
-        if (existingIndex >= 0) {
-          savedDescriptions[existingIndex] = updatedDescription;
+        // Save to Supabase if user is authenticated
+        if (authContext.user) {
+          const success = await DescriptionsService.upsert(updatedDescription);
+          
+          if (success) {
+            // Update local state
+            const savedDescriptions = await DescriptionsService.list();
+            set({ 
+              savedDescriptions,
+              description: updatedDescription
+            });
+            return true;
+          } else {
+            console.error('Failed to save description to Supabase');
+            return false;
+          }
         } else {
-          savedDescriptions = [...savedDescriptions, updatedDescription];
+          // Fallback: save to localStorage for anonymous users
+          let savedDescriptions = get().savedDescriptions;
+          
+          const existingIndex = savedDescriptions.findIndex(d => d.id === description.id);
+          if (existingIndex >= 0) {
+            savedDescriptions[existingIndex] = updatedDescription;
+          } else {
+            savedDescriptions = [...savedDescriptions, updatedDescription];
+          }
+          
+          localStorage.setItem('savedDescriptions_anonymous', JSON.stringify(savedDescriptions));
+          
+          set({ 
+            savedDescriptions,
+            description: updatedDescription
+          });
+          
+          return true;
         }
-        
-        // Save to localStorage
-        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
-        localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
-        
-        // Update state
-        set({ 
-          savedDescriptions,
-          description: updatedDescription
-        });
-        
-        return true;
       } catch (error) {
         console.error('Error saving description:', error);
         return false;
       }
     },
     
-    loadSavedDescriptions: () => {
+    loadSavedDescriptions: async () => {
       try {
-        // Check if auth context is available
-        if (!authContext) {
-          console.log('Auth context not available for loading descriptions, using fallback');
-          // Fallback to load from anonymous storage or user ID from store
-          const { user } = get();
-          const userId = user?.id;
-          const fallbackKey = userId ? `savedDescriptions_${userId}` : 'savedDescriptions_anonymous';
-          const fallbackSaved = localStorage.getItem(fallbackKey);
+        // Check if auth context is available and user is authenticated
+        if (authContext && authContext.user) {
+          console.log('Loading descriptions from Supabase for authenticated user');
           
-          if (fallbackSaved) {
+          // First, attempt migration from localStorage
+          await migrateLocalStorageToSupabase(authContext.user.id);
+          
+          // Load from Supabase
+          const descriptions = await DescriptionsService.list();
+          set({ savedDescriptions: descriptions });
+          console.log(`Loaded ${descriptions.length} descriptions from Supabase`);
+        } else {
+          // Fallback to localStorage for anonymous users
+          console.log('Loading descriptions from localStorage for anonymous user');
+          const saved = localStorage.getItem('savedDescriptions_anonymous');
+          
+          if (saved) {
             try {
-              const parsedDescriptions = JSON.parse(fallbackSaved) as ProductDescription[];
+              const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
               set({ savedDescriptions: parsedDescriptions });
-              console.log(`Loaded ${parsedDescriptions.length} descriptions from fallback storage`);
+              console.log(`Loaded ${parsedDescriptions.length} descriptions from localStorage`);
             } catch (e) {
-              console.error('Error parsing saved descriptions from fallback storage:', e);
+              console.error('Error parsing saved descriptions from localStorage:', e);
               set({ savedDescriptions: [] });
             }
-          }
-          return;
-        }
-        
-        // Get all saved descriptions for the current user
-        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
-        const saved = localStorage.getItem(storageKey);
-        
-        console.log(`Loading descriptions from storage key: ${storageKey}`);
-        
-        if (saved) {
-          try {
-            const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
-            console.log(`Found ${parsedDescriptions.length} saved descriptions`);
-            set({ savedDescriptions: parsedDescriptions });
-          } catch (e) {
-            console.error('Error parsing saved descriptions:', e);
+          } else {
             set({ savedDescriptions: [] });
           }
-        } else {
-          console.log('No saved descriptions found in storage');
-          set({ savedDescriptions: [] });
         }
       } catch (error) {
         console.error('Error loading saved descriptions:', error);
         set({ savedDescriptions: [] });
+      }
+    },
+    
+    deleteSavedDescription: async (descriptionId: string) => {
+      try {
+        if (authContext && authContext.user) {
+          // Delete from Supabase
+          const success = await DescriptionsService.delete(descriptionId);
+          
+          if (success) {
+            // Reload descriptions after deletion
+            const descriptions = await DescriptionsService.list();
+            set({ savedDescriptions: descriptions });
+            return true;
+          } else {
+            console.error('Failed to delete description from Supabase');
+            return false;
+          }
+        } else {
+          // Delete from localStorage for anonymous users
+          const saved = localStorage.getItem('savedDescriptions_anonymous');
+          if (saved) {
+            const descriptions = JSON.parse(saved) as ProductDescription[];
+            const updatedDescriptions = descriptions.filter(d => d.id !== descriptionId);
+            localStorage.setItem('savedDescriptions_anonymous', JSON.stringify(updatedDescriptions));
+            set({ savedDescriptions: updatedDescriptions });
+          }
+          return true;
+        }
+      } catch (error) {
+        console.error('Error deleting saved description:', error);
+        return false;
       }
     },
     
