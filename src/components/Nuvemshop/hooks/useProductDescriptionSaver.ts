@@ -11,7 +11,7 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
   const { updateProductDescription } = useNuvemshopProducts(accessToken, userId);
   const { toast } = useToast();
 
-  const handleSaveToNuvemshop = async (product: NuvemshopProduct) => {
+  const handleSaveToNuvemshop = async (product: NuvemshopProduct, validateFirst: boolean = true) => {
     if (!product || !description) {
       toast({
         variant: 'destructive',
@@ -23,6 +23,29 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
 
     try {
       setIsSaving(true);
+
+      // Validate credentials first if requested
+      if (validateFirst && accessToken && userId) {
+        const { validateCredentials } = useNuvemshopProducts(accessToken, userId);
+        const validation = await validateCredentials();
+        if (!validation.ok) {
+          if (validation.kind === 'AUTH_INVALID') {
+            toast({
+              variant: 'destructive',
+              title: 'Token Expirado',
+              description: 'Seu token de acesso expirou. Reconecte sua loja para continuar.',
+            });
+          } else {
+            toast({
+              variant: 'destructive',
+              title: 'Erro de Validação',
+              description: validation.message || 'Não foi possível validar suas credenciais.',
+            });
+          }
+          return false;
+        }
+      }
+      
       // Get product title from the selected product
       const productTitle = product.name && typeof product.name === 'object' && product.name.pt 
         ? product.name.pt 
@@ -42,11 +65,21 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
       return success;
     } catch (error) {
       console.error('Erro ao salvar na Nuvemshop:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Erro ao salvar',
-        description: 'Não foi possível salvar a descrição na Nuvemshop.',
-      });
+      
+      // Check if it's an auth error
+      if (error instanceof Error && error.message.includes('AUTH_INVALID')) {
+        toast({
+          variant: 'destructive',
+          title: 'Token Expirado',
+          description: 'Seu token de acesso expirou. Reconecte sua loja para continuar.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao salvar',
+          description: 'Não foi possível salvar a descrição na Nuvemshop.',
+        });
+      }
       return false;
     } finally {
       setIsSaving(false);

@@ -456,6 +456,27 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     goToPage,
     searchAllProducts,
     searchingAll,
-    allProductsForSearch
+    allProductsForSearch,
+    validateCredentials: async () => {
+      if (!accessToken || !userId) {
+        return { ok: false, kind: 'NO_AUTH', message: 'Token de acesso não encontrado' };
+      }
+
+      try {
+        const response = await supabase.functions.invoke('nuvemshop-validate-credentials', {
+          body: { accessToken, userId }
+        });
+
+        if (response.error) {
+          console.error('Error validating credentials:', response.error);
+          return { ok: false, kind: 'VALIDATION_ERROR', message: 'Erro ao validar credenciais' };
+        }
+
+        return response.data;
+      } catch (error) {
+        console.error('Error in validateCredentials:', error);
+        return { ok: false, kind: 'NETWORK_ERROR', message: 'Erro de conexão' };
+      }
+    }
   };
 };

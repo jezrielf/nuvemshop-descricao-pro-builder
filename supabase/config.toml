@@ -43,3 +43,12 @@ verify_jwt = true
 [functions.send-email-confirmation]
 verify_jwt = false
 
+[functions.nuvemshop-validate-credentials]
+verify_jwt = false
+
+[functions.nuvemshop-products]
+verify_jwt = false
+
+[functions.nuvemshop-update-product]
+verify_jwt = false
+

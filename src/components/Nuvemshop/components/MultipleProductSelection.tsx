@@ -13,6 +13,7 @@ interface MultipleProductSelectionProps {
   isOpen: boolean;
   onClose: () => void;
   onApplyToProducts: (productIds: number[]) => Promise<void>;
+  onReconnect?: () => void;
 }
 
 interface ProductUpdateStatus {
@@ -25,7 +26,8 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
   products,
   isOpen,
   onClose,
-  onApplyToProducts
+  onApplyToProducts,
+  onReconnect
 }) => {
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -116,19 +118,41 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     } catch (error) {
       console.error('Erro ao aplicar descrições:', error);
       
-      // Mark all as error
-      const errorStatuses = selectedProducts.map(id => ({ 
-        id, 
-        status: 'error' as const,
-        message: error instanceof Error ? error.message : 'Erro ao atualizar descrição'
-      }));
-      setUpdateStatuses(errorStatuses);
+      // Check if it's an auth error
+      const isAuthError = error instanceof Error && 
+        (error.message.includes('AUTH_INVALID') || error.message.includes('Token Expirado'));
       
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: error instanceof Error ? error.message : 'Ocorreu um erro ao aplicar as descrições. Tente novamente.',
-      });
+      if (isAuthError) {
+        // Mark all as error with auth message
+        const errorStatuses = selectedProducts.map(id => ({ 
+          id, 
+          status: 'error' as const,
+          message: 'Token expirado - reconecte sua loja'
+        }));
+        setUpdateStatuses(errorStatuses);
+        
+        toast({
+          variant: 'destructive',
+          title: 'Token Expirado',
+          description: onReconnect 
+            ? 'Seu token de acesso expirou. Clique em "Reconectar Loja" para continuar.'
+            : 'Seu token de acesso expirou. Reconecte sua loja para continuar.',
+        });
+      } else {
+        // Mark all as error
+        const errorStatuses = selectedProducts.map(id => ({ 
+          id, 
+          status: 'error' as const,
+          message: error instanceof Error ? error.message : 'Erro ao atualizar descrição'
+        }));
+        setUpdateStatuses(errorStatuses);
+        
+        toast({
+          variant: 'destructive',
+          title: 'Erro',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao aplicar as descrições. Tente novamente.',
+        });
+      }
       
       // Reset updating state but keep the dialog open to show errors
       setIsUpdating(false);

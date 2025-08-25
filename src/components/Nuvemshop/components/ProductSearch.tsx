@@ -45,7 +45,8 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     goToPage,
     searchAllProducts,
     searchingAll,
-    allProductsForSearch
+    allProductsForSearch,
+    validateCredentials
   } = useNuvemshopProducts(accessToken, userId);
 
   const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
@@ -129,62 +130,87 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
 
   // Handle applying description to multiple products with improved error handling and progress tracking
   const handleApplyToMultipleProducts = async (productIds: number[]) => {
-    if (!description) {
-      throw new Error('Nenhuma descrição ativa para aplicar');
-    }
-
-    console.log('Iniciando aplicação para produtos:', productIds);
-    console.log('Descrição atual:', description);
-
-    const errors: Array<{ productId: number; error: string }> = [];
+    console.log('Aplicando descrição aos produtos:', productIds);
     
-    for (let i = 0; i < productIds.length; i++) {
-      const productId = productIds[i];
-      const product = products.find(p => p.id === productId);
-      
-      if (!product) {
-        console.error(`Produto não encontrado para ID: ${productId}`);
-        errors.push({ productId, error: 'Produto não encontrado' });
-        continue;
-      }
-      
-      try {
-        console.log(`Processando produto ${i + 1}/${productIds.length}: ${productId}`);
-        
-        // Get product title for HTML generation
-        const productTitle = product.name && typeof product.name === 'object' && product.name.pt 
-          ? product.name.pt 
-          : (typeof product.name === 'string' ? product.name : '');
+    if (!productIds.length) {
+      console.log('Nenhum produto ID fornecido');
+      return;
+    }
 
-        console.log(`Título do produto: ${productTitle}`);
+    if (!products.length) {
+      console.log('Lista de produtos vazia');
+      throw new Error('Lista de produtos não carregada');
+    }
+
+    // Validate credentials before starting the batch update
+    const validation = await validateCredentials();
+    if (!validation.ok) {
+      if (validation.kind === 'AUTH_INVALID') {
+        throw new Error('AUTH_INVALID: Token de acesso expirado. Reconecte sua loja para continuar.');
+      } else {
+        throw new Error(validation.message || 'Erro ao validar credenciais');
+      }
+    }
+
+    console.log('Produtos disponíveis:', products.map(p => ({ id: p.id, name: p.name })));
+
+    try {
+      let hasError = false;
+      let errorMessage = '';
+      let authErrorDetected = false;
+      
+      for (const productId of productIds) {
+        console.log(`Processando produto ID: ${productId}`);
         
-        // Generate HTML output with product title
-        const htmlOutput = getHtmlOutput(productTitle);
-        console.log(`HTML gerado (primeiros 100 chars): ${htmlOutput.substring(0, 100)}...`);
-        
-        const success = await handleSaveToNuvemshop(product);
-        
-        if (!success) {
-          console.error(`Falha ao salvar produto ${productId}`);
-          errors.push({ productId, error: 'Falha ao salvar na Nuvemshop' });
-        } else {
-          console.log(`Produto ${productId} atualizado com sucesso`);
+        // Find the product in the current products list
+        const product = products.find(p => p.id === productId);
+        if (!product) {
+          console.error(`Produto com ID ${productId} não encontrado na lista atual`);
+          hasError = true;
+          errorMessage = `Produto com ID ${productId} não encontrado`;
+          continue;
         }
-      } catch (error) {
-        console.error(`Erro ao processar produto ${productId}:`, error);
-        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-        errors.push({ productId, error: errorMessage });
+        
+        console.log(`Encontrado produto:`, { id: product.id, name: product.name });
+        
+        try {
+          // Call the save function without additional validation (we already validated)
+          const success = await handleSaveToNuvemshop(product, false);
+          console.log(`Resultado para produto ${productId}:`, success);
+          
+          if (!success) {
+            console.error(`Falha ao salvar produto ${productId}`);
+            hasError = true;
+            errorMessage = `Falha ao salvar produto ${productId}`;
+          }
+        } catch (productError) {
+          console.error(`Erro ao processar produto ${productId}:`, productError);
+          
+          // Check if it's an auth error - if so, stop the whole batch
+          if (productError instanceof Error && productError.message.includes('AUTH_INVALID')) {
+            authErrorDetected = true;
+            break;
+          }
+          
+          hasError = true;
+          errorMessage = `Erro ao processar produto ${productId}: ${productError instanceof Error ? productError.message : 'Erro desconhecido'}`;
+        }
       }
+      
+      if (authErrorDetected) {
+        throw new Error('AUTH_INVALID: Token de acesso expirado durante o processamento. Reconecte sua loja.');
+      }
+      
+      if (hasError) {
+        console.error('Erros encontrados durante o processamento:', errorMessage);
+        throw new Error(errorMessage);
+      }
+      
+      console.log('Todos os produtos processados com sucesso');
+    } catch (error) {
+      console.error('Erro no handleApplyToMultipleProducts:', error);
+      throw error;
     }
-
-    // If there were errors, throw an error with details
-    if (errors.length > 0) {
-      const errorMessage = `Falha ao atualizar ${errors.length} de ${productIds.length} produto(s)`;
-      console.error('Erros encontrados:', errors);
-      throw new Error(errorMessage);
-    }
-
-    console.log(`Todos os ${productIds.length} produtos foram atualizados com sucesso`);
   };
 
   // Helper to render product name
@@ -485,6 +511,10 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
         isOpen={isMultipleSelectionOpen}
         onClose={() => setIsMultipleSelectionOpen(false)}
         onApplyToProducts={handleApplyToMultipleProducts}
+        onReconnect={() => {
+          clearAuthCache(false);
+          setTimeout(() => handleConnect(), 100);
+        }}
       />
     </>
   );

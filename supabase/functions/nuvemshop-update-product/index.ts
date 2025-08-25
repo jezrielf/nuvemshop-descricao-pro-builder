@@ -48,9 +48,10 @@ serve(async (req) => {
     const response = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
-        'Authentication': `bearer ${accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
         'User-Agent': 'DescricaoPro comercial@weethub.com',
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
         description: descriptionData
@@ -65,10 +66,18 @@ serve(async (req) => {
     if (!response.ok) {
       console.error('Error response from Nuvemshop API:', responseText);
       
+      let errorKind = 'UNKNOWN_ERROR';
+      if (response.status === 401) {
+        errorKind = 'AUTH_INVALID';
+      } else if (response.status === 429) {
+        errorKind = 'RATE_LIMIT';
+      }
+      
       return new Response(JSON.stringify({ 
         error: 'Failed to update product in Nuvemshop', 
         details: responseText,
-        status: response.status
+        status: response.status,
+        kind: errorKind
       }), { 
         status: response.status, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
