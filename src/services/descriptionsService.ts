@@ -1,14 +1,14 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { ProductDescription } from '@/types/editor';
+import { ProductDescription, ProductCategory } from '@/types/editor';
 
 export interface SavedDescriptionRow {
   id: string;
   user_id: string;
   name: string;
-  blocks: any[];
-  product_name?: string;
-  category?: string;
+  blocks: any;
+  product_name?: string | null;
+  category?: string | null;
   metadata?: any;
   created_at: string;
   updated_at: string;
@@ -18,9 +18,9 @@ export interface SavedDescriptionRow {
 const mapRowToDescription = (row: SavedDescriptionRow): ProductDescription => ({
   id: row.id,
   name: row.name,
-  blocks: row.blocks,
-  productName: row.product_name,
-  category: row.category,
+  blocks: Array.isArray(row.blocks) ? row.blocks : [],
+  productName: row.product_name || undefined,
+  category: (row.category as ProductCategory) || undefined,
   metadata: row.metadata,
   createdAt: row.created_at,
   updatedAt: row.updated_at

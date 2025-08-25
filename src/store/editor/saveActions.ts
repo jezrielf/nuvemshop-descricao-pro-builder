@@ -61,7 +61,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
     // Add the setter function for auth context
     setAuthContext,
     
-    saveCurrentDescription: async (isNewDescription: boolean = true) => {
+    saveCurrentDescription: async (isNewDescription: boolean = true): Promise<boolean> => {
       const description = get().description;
       if (!description) return false;
       
@@ -130,7 +130,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
       }
     },
     
-    loadSavedDescriptions: async () => {
+    loadSavedDescriptions: async (): Promise<void> => {
       try {
         // Check if auth context is available and user is authenticated
         if (authContext && authContext.user) {
@@ -167,7 +167,7 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
       }
     },
     
-    deleteSavedDescription: async (descriptionId: string) => {
+    deleteSavedDescription: async (descriptionId: string): Promise<boolean> => {
       try {
         if (authContext && authContext.user) {
           // Delete from Supabase

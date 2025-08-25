@@ -31,8 +31,9 @@ export interface EditorState {
   focusBlock: (id: string | null) => void; // Nova ação para focar bloco na preview
   getHtmlOutput: (productTitle?: string) => string; // Updated to accept optional parameter
   getPlainTextOutput: () => string; // Added missing method
-  saveCurrentDescription: (isNewDescription?: boolean) => boolean;
-  loadSavedDescriptions: () => void;
+  saveCurrentDescription: (isNewDescription?: boolean) => Promise<boolean>; // Changed to async
+  loadSavedDescriptions: () => Promise<void>; // Changed to async
+  deleteSavedDescription: (id: string) => Promise<boolean>; // Added missing method
   getSavedDescriptions: () => ProductDescription[];
   setAuthContext: (authContext: ReturnType<typeof useAuth>) => void;
   updateDescription: (updates: Partial<ProductDescription>) => void;
