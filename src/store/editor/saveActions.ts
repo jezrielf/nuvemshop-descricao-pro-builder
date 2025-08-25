@@ -8,22 +8,13 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
 
   // Function to set the auth context from components
   const setAuthContext = (context: ReturnType<typeof useAuth>) => {
-    const previousUserId = authContext?.user?.id;
-    const newUserId = context?.user?.id;
+    authContext = context;
     
-    // Only update if user ID has actually changed
-    if (previousUserId !== newUserId) {
-      authContext = context;
-      
-      // Update user information in the store
-      if (context && context.user) {
-        set({ user: { id: context.user.id } });
-      } else {
-        set({ user: null });
-      }
+    // Update user information in the store
+    if (context && context.user) {
+      set({ user: { id: context.user.id } });
     } else {
-      // Just update the reference without triggering state changes
-      authContext = context;
+      set({ user: null });
     }
   };
 
@@ -36,17 +27,19 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
       if (!description) return false;
       
       try {
-        // Use fallback if auth context not available yet
-        const { user } = get();
-        const currentUser = authContext?.user || user;
+        // Check if auth context is available
+        if (!authContext) {
+          console.warn('Auth context not available for saving description');
+          return false;
+        }
         
         // Check limits only for NEW descriptions
-        if (isNewDescription && authContext && !authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
+        if (isNewDescription && !authContext.isPremium() && !authContext.canCreateMoreDescriptions()) {
           return false;
         }
         
         // Increment description count only for NEW descriptions for free users
-        if (isNewDescription && authContext && !authContext.isPremium()) {
+        if (isNewDescription && !authContext.isPremium()) {
           authContext.incrementDescriptionCount();
         }
         
@@ -67,15 +60,9 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           savedDescriptions = [...savedDescriptions, updatedDescription];
         }
         
-        // Save to localStorage with fallback user handling
-        const storageKey = currentUser ? `savedDescriptions_${currentUser.id}` : 'savedDescriptions_anonymous';
-        try {
-          localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
-          console.log(`Description saved to ${storageKey}, total: ${savedDescriptions.length}`);
-        } catch (storageError) {
-          console.error('Error saving to localStorage:', storageError);
-          return false;
-        }
+        // Save to localStorage
+        const storageKey = authContext.user ? `savedDescriptions_${authContext.user.id}` : 'savedDescriptions_anonymous';
+        localStorage.setItem(storageKey, JSON.stringify(savedDescriptions));
         
         // Update state
         set({ 
@@ -124,23 +111,14 @@ export const createSaveActions = (get: () => EditorState, set: any) => {
           try {
             const parsedDescriptions = JSON.parse(saved) as ProductDescription[];
             console.log(`Found ${parsedDescriptions.length} saved descriptions`);
-            
-            // Only update state if descriptions have actually changed
-            const currentDescriptions = get().savedDescriptions;
-            if (JSON.stringify(currentDescriptions) !== JSON.stringify(parsedDescriptions)) {
-              set({ savedDescriptions: parsedDescriptions });
-            }
+            set({ savedDescriptions: parsedDescriptions });
           } catch (e) {
             console.error('Error parsing saved descriptions:', e);
             set({ savedDescriptions: [] });
           }
         } else {
           console.log('No saved descriptions found in storage');
-          // Only set empty array if current state is not already empty
-          const currentDescriptions = get().savedDescriptions;
-          if (currentDescriptions.length > 0) {
-            set({ savedDescriptions: [] });
-          }
+          set({ savedDescriptions: [] });
         }
       } catch (error) {
         console.error('Error loading saved descriptions:', error);

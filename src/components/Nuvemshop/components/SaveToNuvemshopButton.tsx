@@ -9,7 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 import { useNimbusUI } from '../NimbusProvider';
 import { NimbusButton } from '../NimbusProvider';
-import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 interface SaveToNuvemshopButtonProps {
   product: NuvemshopProduct;
@@ -22,8 +21,8 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
 }) => {
   const { toast } = useToast();
   const { description } = useEditorStore();
-  const { activeStoreId } = useNuvemshopStore();
-  const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(activeStoreId);
+  const { accessToken, userId } = useNuvemshopAuth();
+  const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
   const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
   const [saveSuccess, setSaveSuccess] = useState(false);
   

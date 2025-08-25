@@ -23,12 +23,8 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
     toast
   } = useToast();
   const {
-    loadSavedDescriptions,
-    savedDescriptions: storeSavedDescriptions
+    loadSavedDescriptions
   } = useEditorStore();
-  
-  // Use store descriptions directly instead of props to avoid stale data
-  const currentSavedDescriptions = storeSavedDescriptions || savedDescriptions;
 
   // Load descriptions when the dialog opens
   useEffect(() => {
@@ -56,14 +52,8 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
         const updatedDescriptions = descriptions.filter(d => d.id !== selectedDescription.id);
         localStorage.setItem(key, JSON.stringify(updatedDescriptions));
 
-        // Update the store immediately with the new list
-        const store = useEditorStore.getState();
-        // Manually update the saved descriptions in the store
-        useEditorStore.setState({ savedDescriptions: updatedDescriptions });
-        
-        // Also reload from storage for consistency
+        // Update the store
         useEditorStore.getState().loadSavedDescriptions();
-        
         toast({
           title: "Descrição excluída",
           description: "A descrição foi removida com sucesso."
@@ -93,8 +83,8 @@ const SavedDescriptionsDialog: React.FC<SavedDescriptionsDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            {currentSavedDescriptions && currentSavedDescriptions.length > 0 ? <div className="space-y-2">
-                {currentSavedDescriptions.map(desc => <div key={desc.id} className="p-3 border rounded-md hover:bg-gray-50 cursor-pointer flex justify-between items-center group" onClick={() => {
+            {savedDescriptions && savedDescriptions.length > 0 ? <div className="space-y-2">
+                {savedDescriptions.map(desc => <div key={desc.id} className="p-3 border rounded-md hover:bg-gray-50 cursor-pointer flex justify-between items-center group" onClick={() => {
               useEditorStore.getState().loadDescription(desc);
               setOpen(false);
             }}>

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useNuvemshopAuth } from '@/components/Nuvemshop/hooks/useNuvemshopAuth';
 import { useNuvemshopProducts } from '@/components/Nuvemshop/hooks/useNuvemshopProducts';
 import { useNuvemshopCodeExtractor } from '@/components/Nuvemshop/hooks/useNuvemshopCodeExtractor';
-import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 import { ConnectionCard } from '@/components/Nuvemshop/components/connect/ConnectionCard';
 import { ProductsCard } from '@/components/Nuvemshop/components/connect/ProductsCard';
 import { useToast } from '@/hooks/use-toast';
@@ -35,9 +34,6 @@ const NuvemshopConnect: React.FC = () => {
     console.log('NuvemshopConnect - Store name:', storeName);
   }, [storeName]);
 
-  const { activeStoreId, stores, refetch } = useNuvemshopStore();
-  const storeId = activeStoreId;
-  
   const {
     products,
     loadingProducts,
@@ -50,7 +46,7 @@ const NuvemshopConnect: React.FC = () => {
     handleNextPage,
     handlePrevPage,
     resetProducts
-  } = useNuvemshopProducts(storeId);
+  } = useNuvemshopProducts(accessToken, userId);
 
   // Criando a função antes de usá-la
   const handleTestCodeClick = () => {
@@ -94,19 +90,6 @@ const NuvemshopConnect: React.FC = () => {
     attemptAutoAuth();
   }, []);
 
-  // Auto-refetch stores after successful authentication
-  useEffect(() => {
-    if (success && stores.length === 0) {
-      toast({
-        title: 'Sincronizando lojas...',
-        description: 'Carregando dados da sua loja Nuvemshop.',
-      });
-      setTimeout(() => {
-        refetch();
-      }, 1000);
-    }
-  }, [success, stores.length, refetch, toast]);
-
   const handleDisconnectClick = () => {
     handleDisconnect();
     resetProducts();
@@ -138,58 +121,9 @@ const NuvemshopConnect: React.FC = () => {
     }
   };
 
-  const handleSyncStores = async () => {
-    toast({
-      title: 'Sincronizando...',
-      description: 'Recarregando dados das lojas.',
-    });
-    await refetch();
-    
-    if (stores.length === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'Nenhuma loja encontrada',
-        description: 'Tente reconectar sua conta Nuvemshop.',
-      });
-    } else {
-      toast({
-        title: 'Sincronização concluída',
-        description: `${stores.length} loja(s) encontrada(s).`,
-      });
-    }
-  };
-
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Integração com Nuvemshop</h1>
-      
-      {/* Show sync warning if connected but no stores */}
-      {success && stores.length === 0 && !loading && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-amber-800 font-medium">Loja não sincronizada</h3>
-              <p className="text-amber-700 text-sm">
-                Sua conta está conectada, mas os dados da loja não foram carregados.
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleSyncStores}
-                className="px-3 py-1 bg-amber-100 text-amber-800 rounded text-sm hover:bg-amber-200"
-              >
-                Sincronizar
-              </button>
-              <button
-                onClick={handleDirectConnect}
-                className="px-3 py-1 bg-amber-600 text-white rounded text-sm hover:bg-amber-700"
-              >
-                Reconectar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       
       <div className="grid gap-6">
         <ConnectionCard

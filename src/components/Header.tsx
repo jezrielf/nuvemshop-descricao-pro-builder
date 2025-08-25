@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/store/editor';
 import { useAuth } from '@/contexts/AuthContext';
@@ -57,11 +58,11 @@ const Header: React.FC = () => {
   const isSubscribedUser = isSubscribed();
   const canCreateMore = canCreateMoreDescriptions();
   
-  // Set auth context in the store when component mounts or user changes
+  // Set auth context in the store when component mounts or auth changes
   useEffect(() => {
     setAuthContext(auth);
     console.log('Auth context set in store');
-  }, [user?.id, setAuthContext]);
+  }, [auth, setAuthContext]);
   
   // Load saved descriptions when component mounts or user changes
   useEffect(() => {
@@ -71,7 +72,7 @@ const Header: React.FC = () => {
       console.log('Loading saved descriptions for anonymous user');
     }
     loadSavedDescriptions();
-  }, [user?.id, loadSavedDescriptions]);
+  }, [loadSavedDescriptions, user, auth]);
 
   // Debug saved descriptions count
   useEffect(() => {
@@ -136,6 +137,7 @@ const Header: React.FC = () => {
             </Link>
           )}
           
+          {/* Botão de ajuda Nuvemshop removido/desativado
           {isNuvemshopConnected && (
             <>
               <Link to="/nimbus-nexo-info">
@@ -146,6 +148,7 @@ const Header: React.FC = () => {
               </Link>
             </>
           )}
+          */}
         </div>
         
         <div className="flex flex-wrap items-center gap-2">

@@ -7,7 +7,6 @@ import { useProductDescriptionLoader } from '../hooks/useProductDescriptionLoade
 import { useProductDescriptionSaver } from '../hooks/useProductDescriptionSaver';
 import { ProductStatusBadges } from './editor/ProductStatusBadges';
 import { ProductActionButtons } from './editor/ProductActionButtons';
-import { useNuvemshopStore } from '@/contexts/NuvemshopStoreContext';
 
 interface ProductEditorControllerProps {
   className?: string;
@@ -19,8 +18,8 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   product
 }) => {
   const [hasCustomBlocks, setHasCustomBlocks] = useState(false);
+  const { accessToken, userId } = useNuvemshopAuth();
   const { description } = useEditorStore();
-  const { activeStoreId } = useNuvemshopStore();
   
   const {
     isImporting,
@@ -32,7 +31,7 @@ const ProductEditorController: React.FC<ProductEditorControllerProps> = ({
   const {
     isSaving,
     handleSaveToNuvemshop
-  } = useProductDescriptionSaver(activeStoreId);
+  } = useProductDescriptionSaver(accessToken, userId);
 
   const productName = typeof product.name === 'string'
     ? product.name

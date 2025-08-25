@@ -11,14 +11,13 @@ import AdminTemplates from './pages/AdminTemplates';
 import Plans from './pages/Plans';
 import NuvemshopConnect from './pages/NuvemshopConnect';
 import NexoAdmin from './pages/NexoAdmin';
-import NimbusNexoInfo from './pages/NimbusNexoInfo';
+// import NimbusNexoInfo from './pages/NimbusNexoInfo'; // Página desativada
 import Success from './pages/Success';
 import Landing from './pages/Landing';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NimbusProvider } from './components/Nuvemshop/NimbusProvider';
 import NexoProvider from './components/Nuvemshop/NexoProvider';
-import { NuvemshopStoreProvider } from './contexts/NuvemshopStoreContext';
 import { 
   isEmbeddedInNuvemshop, 
   registerWithNuvemshopRouter, 
@@ -55,32 +54,30 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <NuvemshopStoreProvider>
-            <NimbusProvider>
-              <NexoProvider>
-                <Routes>
-                  {/* Redirect to NexoAdmin directly when embedded in Nuvemshop */}
-                  {isEmbedded && <Route path="/" element={<Navigate to="/nexo-admin" replace />} />}
-                  {isEmbedded && <Route path="/editor" element={<Navigate to="/nexo-admin" replace />} />}
-                  
-                  {/* Regular routes */}
-                  {!isEmbedded && <Route path="/" element={<Landing />} />}
-                  {!isEmbedded && <Route path="/editor" element={<Index />} />}
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/confirmar-email" element={<EmailConfirmation />} />
-                  <Route path="/description-analysis" element={<DescriptionAnalysis />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/admin-auth" element={<AdminAuth />} />
-                  <Route path="/admin-templates" element={<AdminTemplates />} />
-                  <Route path="/plans" element={<Plans />} />
-                  <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
-                  <Route path="/nexo-admin" element={<NexoAdmin />} />
-                  <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} />
-                  <Route path="/success" element={<Success />} />
-                </Routes>
-              </NexoProvider>
-            </NimbusProvider>
-          </NuvemshopStoreProvider>
+          <NimbusProvider>
+            <NexoProvider>
+              <Routes>
+                {/* Redirect to NexoAdmin directly when embedded in Nuvemshop */}
+                {isEmbedded && <Route path="/" element={<Navigate to="/nexo-admin" replace />} />}
+                {isEmbedded && <Route path="/editor" element={<Navigate to="/nexo-admin" replace />} />}
+                
+                {/* Regular routes */}
+                {!isEmbedded && <Route path="/" element={<Landing />} />}
+                {!isEmbedded && <Route path="/editor" element={<Index />} />}
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/confirmar-email" element={<EmailConfirmation />} />
+                <Route path="/description-analysis" element={<DescriptionAnalysis />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin-auth" element={<AdminAuth />} />
+                <Route path="/admin-templates" element={<AdminTemplates />} />
+                <Route path="/plans" element={<Plans />} />
+                <Route path="/nuvemshop-connect" element={<NuvemshopConnect />} />
+                <Route path="/nexo-admin" element={<NexoAdmin />} />
+                {/* Rota desativada: <Route path="/nimbus-nexo-info" element={<NimbusNexoInfo />} /> */}
+                <Route path="/success" element={<Success />} />
+              </Routes>
+            </NexoProvider>
+          </NimbusProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>

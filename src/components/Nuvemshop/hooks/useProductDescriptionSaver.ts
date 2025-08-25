@@ -5,10 +5,10 @@ import { useEditorStore } from '@/store/editor';
 import { useNuvemshopProducts } from './useNuvemshopProducts';
 import { NuvemshopProduct } from '../types';
 
-export const useProductDescriptionSaver = (storeId?: string) => {
+export const useProductDescriptionSaver = (accessToken?: string, userId?: string | number) => {
   const [isSaving, setIsSaving] = useState(false);
   const { description, getHtmlOutput } = useEditorStore();
-  const { updateProductDescription } = useNuvemshopProducts(storeId);
+  const { updateProductDescription } = useNuvemshopProducts(accessToken, userId);
   const { toast } = useToast();
 
   const handleSaveToNuvemshop = async (product: NuvemshopProduct) => {
