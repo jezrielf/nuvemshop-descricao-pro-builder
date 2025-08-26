@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Package, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, Package, CheckCircle2, XCircle, AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { NuvemshopProduct } from '../types';
 import { useToast } from '@/hooks/use-toast';
@@ -39,6 +40,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
   const [updateStatuses, setUpdateStatuses] = useState<ProductUpdateStatus[]>([]);
   const [progress, setProgress] = useState(0);
   const [authInvalid, setAuthInvalid] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   
   // Reset dialog state when opening
@@ -56,11 +58,31 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     );
   };
 
+  // Filter products based on search query
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return products;
+    
+    const query = searchQuery.toLowerCase();
+    return products.filter(product => {
+      const name = getProductName(product).toLowerCase();
+      const sku = product.sku?.toLowerCase() || '';
+      const id = product.id.toString();
+      
+      return name.includes(query) || sku.includes(query) || id.includes(query);
+    });
+  }, [products, searchQuery]);
+
   const handleSelectAll = () => {
-    if (selectedProducts.length === products.length) {
-      setSelectedProducts([]);
+    const currentProducts = filteredProducts;
+    const currentProductIds = currentProducts.map(p => p.id);
+    const allCurrentSelected = currentProductIds.every(id => selectedProducts.includes(id));
+    
+    if (allCurrentSelected) {
+      // Remove all current filtered products from selection
+      setSelectedProducts(prev => prev.filter(id => !currentProductIds.includes(id)));
     } else {
-      setSelectedProducts(products.map(p => p.id));
+      // Add all current filtered products to selection
+      setSelectedProducts(prev => [...new Set([...prev, ...currentProductIds])]);
     }
   };
 
@@ -70,6 +92,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     setProgress(0);
     setIsUpdating(false);
     setAuthInvalid(false);
+    setSearchQuery('');
   };
 
   const handleClose = () => {
@@ -306,23 +329,49 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
             </div>
           )}
           
+          {/* Search input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar produtos por nome, SKU ou ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              disabled={isUpdating}
+              className="pl-10"
+            />
+          </div>
+
           {/* Select all button */}
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
               onClick={handleSelectAll}
-              disabled={isUpdating}
+              disabled={isUpdating || filteredProducts.length === 0}
             >
-              {selectedProducts.length === products.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+              {filteredProducts.length > 0 && filteredProducts.every(p => selectedProducts.includes(p.id)) 
+                ? 'Desmarcar Filtrados' 
+                : 'Selecionar Filtrados'}
             </Button>
-            <Badge variant="outline">
-              {selectedProducts.length} de {products.length} selecionados
-            </Badge>
+            <div className="flex items-center gap-2">
+              {searchQuery && (
+                <Badge variant="secondary">
+                  {filteredProducts.length} encontrados
+                </Badge>
+              )}
+              <Badge variant="outline">
+                {selectedProducts.length} de {products.length} selecionados
+              </Badge>
+            </div>
           </div>
           
           {/* Product list */}
           <div className="space-y-2 max-h-96 overflow-y-auto border rounded-md p-2">
-            {products.map((product) => {
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? 'Nenhum produto encontrado para a pesquisa.' : 'Nenhum produto disponível.'}
+              </div>
+            ) : (
+              filteredProducts.map((product) => {
               const status = getProductStatus(product.id);
               
               return (
@@ -375,7 +424,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
                   )}
                 </div>
               );
-            })}
+            }))}
           </div>
           
           {/* Action buttons */}
