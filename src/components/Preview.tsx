@@ -69,7 +69,7 @@ const Preview: React.FC = () => {
   useEffect(() => {
     console.log('Preview: useEffect executado', { hasDescription: !!description });
     generatePreview();
-  }, [description, getHtmlOutput, focusedBlockId]);
+  }, [description, focusedBlockId]); // Removed getHtmlOutput to prevent infinite loop
   
   const handleRefresh = () => {
     console.log('Preview: Refresh manual solicitado');
