@@ -79,6 +79,20 @@ serve(async (req) => {
     try {
       // Parse JSON response
       const data = JSON.parse(responseText);
+      
+      // Check if the response contains an error (like invalid_grant)
+      if (data.error) {
+        console.error('OAuth error in response:', data);
+        return new Response(JSON.stringify({ 
+          error: 'Failed to authenticate with Nuvemshop', 
+          details: data.error_description || data.error,
+          status: 400
+        }), { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        });
+      }
+      
       console.log('Successfully authenticated with Nuvemshop');
       
       // Add store name to the response data
@@ -86,7 +100,7 @@ serve(async (req) => {
       const storeInfoResponse = await fetch(`https://api.tiendanube.com/v1/${data.user_id}/store`, {
         method: 'GET',
         headers: {
-          'Authentication': `bearer ${data.access_token}`,
+          'Authorization': `Bearer ${data.access_token}`,
           'User-Agent': 'DescricaoPro comercial@weethub.com',
           'Content-Type': 'application/json',
         },
@@ -96,9 +110,13 @@ serve(async (req) => {
       if (storeInfoResponse.ok) {
         const storeInfo = await storeInfoResponse.json();
         console.log('Store info:', storeInfo);
-        // Extract name from store info and ensure it's a string
-        if (storeInfo && storeInfo.name && typeof storeInfo.name === 'string') {
-          storeName = storeInfo.name;
+        // Extract name from store info and normalize to string
+        if (storeInfo && storeInfo.name) {
+          if (typeof storeInfo.name === 'string') {
+            storeName = storeInfo.name;
+          } else if (typeof storeInfo.name === 'object' && storeInfo.name.pt) {
+            storeName = storeInfo.name.pt;
+          }
         }
       } else {
         console.log('Failed to fetch store info, using default name');

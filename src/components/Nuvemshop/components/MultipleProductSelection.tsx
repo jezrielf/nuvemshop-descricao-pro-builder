@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Package, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, Package, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { NuvemshopProduct } from '../types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -37,7 +38,15 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateStatuses, setUpdateStatuses] = useState<ProductUpdateStatus[]>([]);
   const [progress, setProgress] = useState(0);
+  const [authInvalid, setAuthInvalid] = useState(false);
   const { toast } = useToast();
+  
+  // Reset dialog state when opening
+  useEffect(() => {
+    if (isOpen) {
+      resetDialogState();
+    }
+  }, [isOpen]);
 
   const handleProductToggle = (productId: number) => {
     setSelectedProducts(prev => 
@@ -60,6 +69,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     setUpdateStatuses([]);
     setProgress(0);
     setIsUpdating(false);
+    setAuthInvalid(false);
   };
 
   const handleClose = () => {
@@ -143,13 +153,12 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
           message: 'Token expirado - reconecte sua loja'
         }));
         setUpdateStatuses(errorStatuses);
+        setAuthInvalid(true);
         
         toast({
           variant: 'destructive',
           title: 'Token Expirado',
-          description: onReconnect 
-            ? 'Seu token de acesso expirou. Clique em "Reconectar Loja" para continuar.'
-            : 'Seu token de acesso expirou. Reconecte sua loja para continuar.',
+          description: 'Sua sessão com a Nuvemshop expirou. Reconecte a loja para continuar.',
         });
       } else {
         // Mark all as error
@@ -193,6 +202,26 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
+          {/* Auth invalid alert */}
+          {authInvalid && onReconnect && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>Sua sessão com a Nuvemshop expirou.</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    onReconnect();
+                    handleClose();
+                  }}
+                >
+                  Reconectar loja
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Progress bar when updating */}
           {isUpdating && (
             <div className="space-y-2">
@@ -287,9 +316,11 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
             </Button>
             <Button 
               onClick={handleApplyDescriptions}
-              disabled={selectedProducts.length === 0 || isUpdating || (!description && !getHtmlOutput?.())}
+              disabled={selectedProducts.length === 0 || isUpdating || (!description && !getHtmlOutput?.()) || authInvalid}
             >
-              {isUpdating ? (
+              {authInvalid ? (
+                'Reconecte para continuar'
+              ) : isUpdating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Aplicando...

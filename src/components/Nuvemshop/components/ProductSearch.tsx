@@ -24,7 +24,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   const [isMultipleSelectionOpen, setIsMultipleSelectionOpen] = useState(false);
   const [goToPageValue, setGoToPageValue] = useState('');
   const [isGlobalSearchActive, setIsGlobalSearchActive] = useState(false);
-  const { accessToken, userId, clearAuthCache, handleConnect } = useNuvemshopAuth();
+  const { accessToken, userId, clearAuthCache, handleConnect, success } = useNuvemshopAuth();
   const { description, getHtmlOutput } = useEditorStore();
   const { toast } = useToast();
   
@@ -50,6 +50,27 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
   } = useNuvemshopProducts(accessToken, userId);
 
   const { handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
+
+  // Handle reopening modal after reconnection
+  useEffect(() => {
+    if (success && sessionStorage.getItem('nuvemshop_reopen_selection') === '1') {
+      sessionStorage.removeItem('nuvemshop_reopen_selection');
+      setIsMultipleSelectionOpen(true);
+      
+      // Optional: validate credentials when reopening
+      if (validateCredentials) {
+        validateCredentials().then(result => {
+          if (!result.ok) {
+            toast({
+              variant: 'destructive',
+              title: 'Erro de autenticação',
+              description: 'Verifique sua conexão com a Nuvemshop.',
+            });
+          }
+        });
+      }
+    }
+  }, [success, validateCredentials, toast]);
 
   // Fetch products when dialog opens
   useEffect(() => {
@@ -146,7 +167,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     const validation = await validateCredentials();
     if (!validation.ok) {
       if (validation.kind === 'AUTH_INVALID') {
-        throw new Error('AUTH_INVALID: Token de acesso expirado. Reconecte sua loja para continuar.');
+        throw new Error('AUTH_INVALID');
       } else {
         throw new Error(validation.message || 'Erro ao validar credenciais');
       }
@@ -198,7 +219,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
       }
       
       if (authErrorDetected) {
-        throw new Error('AUTH_INVALID: Token de acesso expirado durante o processamento. Reconecte sua loja.');
+        throw new Error('AUTH_INVALID');
       }
       
       if (hasError) {
@@ -512,8 +533,10 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
         onClose={() => setIsMultipleSelectionOpen(false)}
         onApplyToProducts={handleApplyToMultipleProducts}
         onReconnect={() => {
+          sessionStorage.setItem('nuvemshop_reopen_selection', '1');
+          setIsMultipleSelectionOpen(false);
           clearAuthCache(false);
-          setTimeout(() => handleConnect(), 100);
+          handleConnect();
         }}
         description={description ? getHtmlOutput() : ''}
         getHtmlOutput={getHtmlOutput}

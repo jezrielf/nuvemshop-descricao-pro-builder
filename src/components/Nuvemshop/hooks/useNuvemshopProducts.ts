@@ -167,12 +167,23 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
 
       if (error) {
         console.error('Error updating product description:', error);
+        
+        // Check if it's an auth error
+        if (error.message.includes('401') || error.message.includes('AUTH_INVALID')) {
+          throw new Error('AUTH_INVALID');
+        }
+        
         toast({
           variant: 'destructive',
           title: 'Erro ao atualizar descrição',
           description: error.message,
         });
         return false;
+      }
+      
+      // Check if response data contains error
+      if (data && data.error && data.kind === 'AUTH_INVALID') {
+        throw new Error('AUTH_INVALID');
       }
 
       console.log('Product description updated successfully:', data);
