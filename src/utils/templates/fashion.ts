@@ -9,7 +9,7 @@ export const fashionTemplates: Template[] = [
     category: 'clothing',
     thumbnail: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
     blocks: [
-      // Banner Principal
+      // Banner Principal Moderno
       {
         id: uuidv4(),
         type: 'hero',
@@ -17,20 +17,23 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 9%, 93%) 100%)',
-          padding: '120px 40px',
+          background: 'linear-gradient(135deg, hsl(260, 50%, 12%) 0%, hsl(280, 60%, 20%) 50%, hsl(300, 40%, 8%) 100%)',
+          padding: '140px 60px',
           textAlign: 'center',
-          borderRadius: '24px',
-          boxShadow: '0 24px 80px hsl(220, 13%, 69% / 0.18)',
-          border: '1px solid hsl(220, 13%, 89%)'
+          borderRadius: '32px',
+          boxShadow: '0 32px 120px hsl(260, 50%, 8% / 0.4), 0 0 60px hsl(280, 60%, 20% / 0.3)',
+          border: '1px solid hsl(280, 40%, 25%)',
+          color: 'hsl(0, 0%, 98%)',
+          position: 'relative',
+          overflow: 'hidden'
         },
-        heading: 'Elegância Atemporal',
-        subheading: 'Nova coleção de roupas premium com design exclusivo e materiais sustentáveis que definem o futuro da moda',
-        buttonText: 'Ver Coleção',
+        heading: 'Luxo Contemporâneo',
+        subheading: 'Coleção exclusiva que redefine elegância através de design inovador, materiais premium e sustentabilidade consciente',
+        buttonText: 'Explorar Coleção',
         buttonUrl: '#'
       },
       
-      // Galeria em 3 colunas
+      // Galeria Moderna
       {
         id: uuidv4(),
         type: 'gallery',
@@ -38,13 +41,14 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: '3',
         style: {
-          padding: '80px 40px',
-          backgroundColor: 'hsl(0, 0%, 100%)',
-          borderRadius: '16px',
-          margin: '40px 0',
-          boxShadow: '0 8px 32px hsl(220, 13%, 69% / 0.08)'
+          padding: '100px 60px',
+          background: 'linear-gradient(180deg, hsl(0, 0%, 99%) 0%, hsl(260, 20%, 97%) 100%)',
+          borderRadius: '24px',
+          margin: '80px 0',
+          boxShadow: '0 24px 80px hsl(260, 30%, 85% / 0.2)',
+          border: '1px solid hsl(260, 20%, 90%)'
         },
-        heading: 'Destaques da Nova Coleção',
+        heading: 'Peças de Destaque',
         images: [
           {
             id: uuidv4(),
@@ -67,7 +71,7 @@ export const fashionTemplates: Template[] = [
         ]
       },
       
-      // Benefícios em 3 colunas
+      // Benefícios Premium
       {
         id: uuidv4(),
         type: 'benefits',
@@ -75,36 +79,38 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: '3',
         style: {
-          padding: '80px 40px',
-          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 13%, 95%) 100%)',
-          borderRadius: '16px',
-          margin: '40px 0',
-          border: '1px solid hsl(220, 13%, 89%)'
+          padding: '120px 60px',
+          background: 'linear-gradient(135deg, hsl(260, 40%, 8%) 0%, hsl(280, 50%, 15%) 50%, hsl(300, 30%, 6%) 100%)',
+          borderRadius: '28px',
+          margin: '80px 0',
+          border: '1px solid hsl(280, 30%, 20%)',
+          color: 'hsl(0, 0%, 95%)',
+          boxShadow: '0 32px 100px hsl(260, 40%, 5% / 0.5)'
         },
-        heading: 'Por Que Escolher Nossa Marca',
+        heading: 'Excelência em Cada Detalhe',
         benefits: [
           {
             id: uuidv4(),
-            icon: '✨',
-            title: 'Design Exclusivo',
-            description: 'Peças desenvolvidas por estilistas renomados com atenção aos mínimos detalhes'
+            icon: '💎',
+            title: 'Criação Exclusiva',
+            description: 'Peças únicas desenvolvidas por designers premiados internacionalmente com técnicas inovadoras'
           },
           {
             id: uuidv4(),
-            icon: '🧵',
-            title: 'Materiais Premium',
-            description: 'Utilizamos apenas tecidos de alta qualidade que garantem conforto e durabilidade'
+            icon: '🏆',
+            title: 'Qualidade Superior',
+            description: 'Materiais importados de origem controlada e processos de fabricação que garantem durabilidade excepcional'
           },
           {
             id: uuidv4(),
-            icon: '🌿',
-            title: 'Sustentabilidade',
-            description: 'Produção consciente com materiais eco-friendly e processos responsáveis'
+            icon: '🌍',
+            title: 'Sustentabilidade Avançada',
+            description: 'Compromisso com o futuro através de práticas eco-conscientes e cadeia de produção carbono neutro'
           }
         ]
       },
       
-      // Imagem + Texto
+      // Seção Materiais Premium
       {
         id: uuidv4(),
         type: 'imageText',
@@ -112,11 +118,15 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff'
+          padding: '100px 60px',
+          background: 'linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(260, 30%, 98%) 100%)',
+          borderRadius: '24px',
+          margin: '80px 0',
+          border: '1px solid hsl(260, 20%, 92%)',
+          boxShadow: '0 20px 60px hsl(260, 20%, 80% / 0.15)'
         },
-        heading: 'Tecidos Exclusivos de Origem Controlada',
-        content: 'Selecionamos cuidadosamente os melhores tecidos do mundo para criar peças que não apenas parecem premium, mas também proporcionam conforto e durabilidade excepcionais. Do algodão egípcio à seda italiana, cada material é escolhido pela sua qualidade superior e características únicas que fazem toda a diferença no resultado final.',
+        heading: 'Tecidos de Origem Controlada',
+        content: '<p style="font-size: 20px; line-height: 1.8; color: hsl(260, 15%, 25%); margin-bottom: 32px;">Selecionamos exclusivamente os mais refinados tecidos do mundo, cada um escolhido por suas propriedades únicas e qualidade excepcional. Nossa curadoria inclui sedas italianas, cashmere mongol, algodão egípcio de fibra extra-longa e linhos irlandeses.</p><p style="font-size: 18px; line-height: 1.7; color: hsl(260, 10%, 35%);">Cada material passa por rigorosos testes de qualidade e certificações de sustentabilidade, garantindo que você vista não apenas beleza, mas também responsabilidade ambiental.</p>',
         image: {
           src: 'https://images.unsplash.com/photo-1464699511458-87e156ad3a97',
           alt: 'Tecido premium de alta qualidade'
