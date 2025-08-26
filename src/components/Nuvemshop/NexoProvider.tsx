@@ -9,6 +9,10 @@ import {
   logEmbeddedEnvironmentInfo
 } from './utils/embedUtils';
 
+// Global flags to prevent multiple loading attempts
+let globalLoadingBlocked = false;
+let globalCertificateError = false;
+
 // Define the Nexo global object type
 declare global {
   interface Window {
@@ -48,6 +52,7 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [embeddedStoreId, setEmbeddedStoreId] = useState<string | null>(null);
   const [hasCertificateError, setHasCertificateError] = useState(false);
+  const [isLoadingBlocked, setIsLoadingBlocked] = useState(false); // New flag to block loading
   
   const { accessToken, userId } = useNuvemshopAuth();
   const { toast } = useToast();
@@ -74,17 +79,25 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Function to detect certificate errors in error message
+  // Function to detect certificate errors in error message or URL
   const isCertificateError = (error: any): boolean => {
-    const errorString = String(error);
-    return errorString.includes('ERR_CERT_DATE_INVALID') || 
-           errorString.includes('NET::ERR_CERT_AUTHORITY_INVALID') || 
-           errorString.includes('SSL_ERROR_BAD_CERT_DOMAIN');
+    // Check for certificate error in various forms
+    return error?.type === 'error' || 
+           String(error).includes('ERR_CERT_DATE_INVALID') || 
+           String(error).includes('NET::ERR_CERT_AUTHORITY_INVALID') || 
+           String(error).includes('SSL_ERROR_BAD_CERT_DOMAIN') ||
+           (error?.target?.src && error.target.src.includes('storefronts.nuvemshop.com.br'));
   };
 
   // Load Nexo SDK via script tag
   const loadNexoScript = () => {
     try {
+      // Block loading if already failed or blocked (check both local and global states)
+      if (isLoadingBlocked || hasCertificateError || globalLoadingBlocked || globalCertificateError) {
+        console.log('⛔ Carregamento do Nexo SDK bloqueado devido a erro anterior');
+        return;
+      }
+      
       setIsInitializing(true);
       
       // Check if script already exists
@@ -122,13 +135,24 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setHasCertificateError(certError);
         
         if (certError) {
+          // Block all future loading attempts for certificate errors (both locally and globally)
+          setIsLoadingBlocked(true);
+          setHasCertificateError(true);
+          globalLoadingBlocked = true;
+          globalCertificateError = true;
+          console.log('🚫 Bloqueando carregamento do Nexo SDK globalmente devido a erro de certificado');
+          
           // Special handling for certificate errors
           setNexoError(new Error('Erro de certificado SSL ao carregar o SDK da Nuvemshop. O certificado do servidor pode estar expirado ou inválido.'));
-          toast({
-            variant: 'destructive',
-            title: 'Erro de certificado SSL',
-            description: 'Não foi possível carregar o SDK da Nuvemshop devido a um problema com o certificado SSL do servidor.',
-          });
+          
+          // Show toast only once for certificate errors
+          if (!hasCertificateError) {
+            toast({
+              variant: 'destructive',
+              title: 'Erro de certificado SSL',
+              description: 'Não foi possível carregar o SDK da Nuvemshop devido a um problema com o certificado SSL do servidor.',
+            });
+          }
         } else {
           setNexoError(new Error('Failed to load Nexo SDK'));
         }
@@ -136,7 +160,7 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsInitializing(false);
         
         // Auto-retry logic with exponential backoff (only for non-certificate errors)
-        if (retryCount < MAX_RETRIES && !certError) {
+        if (retryCount < MAX_RETRIES && !certError && !isLoadingBlocked) {
           console.log(`🔄 Tentativa ${retryCount + 1}/${MAX_RETRIES} de carregar Nexo SDK`);
           
           setTimeout(() => {
@@ -144,7 +168,9 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
             retryLoading();
           }, RETRY_DELAY * Math.pow(2, retryCount)); // Exponential backoff
         } else {
-          console.log('❌ Máximo de tentativas atingido ou erro de certificado - parando tentativas');
+          console.log('❌ Máximo de tentativas atingido, erro de certificado ou carregamento bloqueado - parando tentativas');
+          setIsLoadingBlocked(true); // Block future attempts
+          globalLoadingBlocked = true; // Block globally as well
         }
       };
       
@@ -228,9 +254,9 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Function to retry loading the SDK
   const retryLoading = () => {
-    // Don't retry if we've reached max retries or if there's a certificate error
-    if (retryCount >= MAX_RETRIES || hasCertificateError) {
-      console.log('❌ Não é possível tentar novamente - limite atingido ou erro de certificado');
+    // Don't retry if we've reached max retries, if there's a certificate error, or if loading is blocked
+    if (retryCount >= MAX_RETRIES || hasCertificateError || isLoadingBlocked) {
+      console.log('❌ Não é possível tentar novamente - limite atingido, erro de certificado ou carregamento bloqueado');
       return;
     }
     
@@ -247,9 +273,13 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadNexoScript();
   };
 
-  // Load the SDK on mount
+  // Load the SDK on mount (only if not blocked globally or locally)
   useEffect(() => {
-    loadNexoScript();
+    if (!isLoadingBlocked && !hasCertificateError && !globalLoadingBlocked && !globalCertificateError) {
+      loadNexoScript();
+    } else {
+      console.log('⛔ Não carregando Nexo SDK - bloqueado por erro anterior');
+    }
   }, []);
 
   // Handle authentication changes
