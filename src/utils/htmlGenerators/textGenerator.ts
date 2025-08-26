@@ -3,7 +3,7 @@ import { TextBlock } from '@/types/editor';
 import { getStylesFromBlock } from '../styleConverter';
 
 export const generateTextHtml = (block: TextBlock): string => {
-  console.log('generateTextHtml: Gerando HTML para bloco de texto', { id: block.id, hasHeading: !!block.heading, hasContent: !!block.content });
+  // Reduced logging for better performance
   
   try {
     // Get properly formatted style attributes
@@ -118,11 +118,7 @@ export const generateTextHtml = (block: TextBlock): string => {
       </div>
     `;
     
-    console.log('generateTextHtml: HTML gerado com sucesso', { 
-      id: block.id, 
-      htmlLength: finalHtml.length,
-      preview: finalHtml.substring(0, 100) + '...' 
-    });
+    // HTML generated successfully
     
     return finalHtml;
   } catch (error) {

@@ -151,15 +151,26 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
       
       console.log('🎉 onApplyToProducts executado com sucesso');
       
+      // Wait a bit to ensure all status updates are processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Check final status to determine if we should show success or partial success
       const finalStatuses = updateStatuses.filter(s => selectedProducts.includes(s.id));
       const successCount = finalStatuses.filter(s => s.status === 'success').length;
       const errorCount = finalStatuses.filter(s => s.status === 'error').length;
       
+      console.log(`📊 Status final: ${successCount} sucessos, ${errorCount} erros de ${selectedProducts.length} produtos`);
+      
       setProgress(100);
+      setIsUpdating(false);
       
       if (successCount === selectedProducts.length) {
         console.log('🎉 Todos os produtos atualizados com sucesso');
+        
+        toast({
+          title: '✅ Sucesso total!',
+          description: `Todos os ${successCount} produtos foram atualizados com sucesso.`,
+        });
         
         // Auto-close dialog after 3 seconds if all successful
         setTimeout(() => {
@@ -168,11 +179,22 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
         }, 3000);
       } else if (successCount > 0) {
         console.log(`⚠️ Processamento parcial: ${successCount}/${selectedProducts.length} produtos`);
+        
+        toast({
+          variant: 'default',
+          title: '⚠️ Atualização parcial',
+          description: `${successCount} de ${selectedProducts.length} produtos foram atualizados com sucesso.`,
+        });
+        
         // Keep dialog open to show results
-        setIsUpdating(false);
       } else {
-        // All failed - this should be handled in the catch block
-        throw new Error('Nenhum produto foi atualizado com sucesso');
+        console.log('❌ Nenhum produto foi atualizado');
+        
+        toast({
+          variant: 'destructive',
+          title: '❌ Falha total',
+          description: 'Nenhum produto foi atualizado. Verifique sua conexão e tente novamente.',
+        });
       }
       
     } catch (error) {

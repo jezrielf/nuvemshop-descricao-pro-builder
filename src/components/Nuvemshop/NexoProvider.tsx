@@ -137,15 +137,14 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Auto-retry logic with exponential backoff (only for non-certificate errors)
         if (retryCount < MAX_RETRIES && !certError) {
-          toast({
-            title: 'Problemas ao carregar Nexo SDK',
-            description: `Tentando novamente em ${RETRY_DELAY/1000} segundos...`,
-          });
+          console.log(`🔄 Tentativa ${retryCount + 1}/${MAX_RETRIES} de carregar Nexo SDK`);
           
           setTimeout(() => {
             setRetryCount(prev => prev + 1);
             retryLoading();
-          }, RETRY_DELAY);
+          }, RETRY_DELAY * Math.pow(2, retryCount)); // Exponential backoff
+        } else {
+          console.log('❌ Máximo de tentativas atingido ou erro de certificado - parando tentativas');
         }
       };
       
@@ -229,9 +228,14 @@ export const NexoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Function to retry loading the SDK
   const retryLoading = () => {
+    // Don't retry if we've reached max retries or if there's a certificate error
+    if (retryCount >= MAX_RETRIES || hasCertificateError) {
+      console.log('❌ Não é possível tentar novamente - limite atingido ou erro de certificado');
+      return;
+    }
+    
     setNexoError(null);
     setIsNexoLoaded(false);
-    setHasCertificateError(false);
     
     // Remove the existing script if any
     const existingScript = document.getElementById('nexo-sdk');

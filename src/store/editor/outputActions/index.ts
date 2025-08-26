@@ -7,11 +7,10 @@ export const createOutputActions = (get: any) => ({
     try {
       const { description } = get();
       
-      console.log('getHtmlOutput chamado:', { 
-        productTitle, 
-        hasDescription: !!description, 
-        blocksCount: description?.blocks?.length || 0 
-      });
+      // Only log when productTitle is provided (for actual saves)
+      if (productTitle) {
+        console.log('🔄 Gerando HTML para produto:', productTitle);
+      }
       
       if (!description) {
         console.warn('Nenhuma descrição ativa encontrada');
@@ -31,17 +30,21 @@ export const createOutputActions = (get: any) => ({
         return '<p>Nenhum bloco visível para exibir</p>';
       }
       
-      console.log(`Gerando HTML para ${visibleBlocks.length} blocos visíveis`);
+      // Only log when productTitle is provided (for actual saves)
+      if (productTitle) {
+        console.log(`📦 Gerando HTML para ${visibleBlocks.length} blocos visíveis`);
+      }
       
       const blocksHtml = visibleBlocks
         .map((block: Block, index: number) => {
           try {
-            console.log(`Processando bloco ${index + 1}: ${block.type} (${block.id})`);
+            if (productTitle) {
+              console.log(`📝 Processando bloco ${index + 1}: ${block.type} (${block.id})`);
+            }
             const html = generateBlockHtml(block);
-            console.log(`HTML gerado para bloco ${block.type}:`, html.substring(0, 100) + '...');
             return html;
           } catch (blockError) {
-            console.error(`Erro ao gerar HTML para bloco ${block.type}:`, blockError);
+            console.error(`❌ Erro ao gerar HTML para bloco ${block.type}:`, blockError);
             return `<div class="error-block">Erro no bloco ${block.type}</div>`;
           }
         })
@@ -49,11 +52,13 @@ export const createOutputActions = (get: any) => ({
         .join('\n\n');
       
       if (!blocksHtml.trim()) {
-        console.warn('Nenhum HTML válido gerado dos blocos');
+        console.warn('⚠️ Nenhum HTML válido gerado dos blocos');
         return '<p>Erro ao gerar conteúdo dos blocos</p>';
       }
       
-      console.log(`HTML final gerado com sucesso (${blocksHtml.length} caracteres)`);
+      if (productTitle) {
+        console.log(`✅ HTML final gerado com sucesso (${blocksHtml.length} caracteres)`);
+      }
       return blocksHtml;
     } catch (error) {
       console.error('Erro geral em getHtmlOutput:', error);
