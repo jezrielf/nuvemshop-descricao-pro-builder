@@ -148,25 +148,40 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
   // Update product description in Nuvemshop with enhanced error handling
   const updateProductDescription = async (productId: number, description: string) => {
     if (!accessToken || !userId) {
+      console.error('❌ Access token or user ID not available');
       setError('Access token or user ID not available');
       return false;
     }
 
+    if (!description || description.trim() === '') {
+      console.error('❌ Description is empty');
+      setError('Description cannot be empty');
+      return false;
+    }
+
     try {
-      console.log(`Updating description for product ID: ${productId}`);
+      console.log(`🔄 Updating description for product ID: ${productId}`);
+      console.log(`📝 Description length: ${description.length} characters`);
+      console.log(`🔑 Using token: ${accessToken.substring(0, 10)}...`);
+      console.log(`👤 User ID: ${userId}`);
+      
       setUpdatingProduct(true);
+      
+      console.log('🚀 Calling nuvemshop-update-product edge function...');
       
       const { data, error } = await supabase.functions.invoke('nuvemshop-update-product', {
         body: { 
           accessToken, 
-          userId, 
-          productId, 
+          userId: String(userId), // Ensure userId is string
+          productId: Number(productId), // Ensure productId is number
           description 
         }
       });
 
+      console.log('📡 Edge function response received:', { data, error });
+
       if (error) {
-        console.error('Error updating product description:', error);
+        console.error('💥 Edge function error:', error);
         
         // Parse error to determine specific type
         const errorType = error.message.includes('401') || error.message.includes('AUTH_INVALID') ? 'AUTH_INVALID' 
@@ -174,22 +189,24 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
           : error.message.includes('422') || error.message.includes('400') ? 'VALIDATION_ERROR'
           : 'UNKNOWN_ERROR';
         
+        console.error(`🔍 Mapped error type: ${errorType}`);
         throw new Error(errorType);
       }
       
       // Check if response data contains error and map to specific error types
       if (data?.error) {
-        console.error('API error response:', data);
+        console.error('⚠️ API error response:', data);
         
         const errorType = data.kind === 'AUTH_INVALID' ? 'AUTH_INVALID'
           : data.kind === 'RATE_LIMIT' ? 'RATE_LIMIT'
           : data.status === 422 || data.status === 400 ? 'VALIDATION_ERROR'
           : 'UNKNOWN_ERROR';
         
+        console.error(`🔍 Mapped API error type: ${errorType}`);
         throw new Error(errorType);
       }
 
-      console.log('Product description updated successfully:', data);
+      console.log('✅ Product description updated successfully:', data);
       
       // Update the local product data if available
       setProducts(prevProducts => 
@@ -207,14 +224,17 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       
       return true;
     } catch (err) {
-      console.error('Error in updateProductDescription:', err);
+      console.error('💥 Error in updateProductDescription:', err);
       
       // Re-throw specific error types, otherwise wrap in generic error
       if (err instanceof Error && ['AUTH_INVALID', 'RATE_LIMIT', 'VALIDATION_ERROR'].includes(err.message)) {
+        console.error(`🔄 Re-throwing specific error: ${err.message}`);
         throw err;
       }
       
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+      console.error(`❌ Final error message: ${errorMessage}`);
+      
       toast({
         variant: 'destructive',
         title: 'Erro ao atualizar descrição',
@@ -223,6 +243,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       return false;
     } finally {
       setUpdatingProduct(false);
+      console.log('🏁 updateProductDescription finished');
     }
   };
 
