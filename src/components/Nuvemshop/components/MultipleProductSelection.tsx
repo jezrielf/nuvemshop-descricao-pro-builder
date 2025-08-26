@@ -82,7 +82,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
       toast({
         variant: 'destructive',
         title: 'Nenhum produto selecionado',
-        description: 'Selecione pelo menos um produto para aplicar a descrição.',
+        description: 'Selecione pelo menos um produto para atualizar.',
       });
       return;
     }
@@ -90,32 +90,40 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     if (!description && !getHtmlOutput?.()) {
       toast({
         variant: 'destructive',
-        title: 'Nenhuma descrição disponível',
-        description: 'Crie uma descrição no editor antes de aplicar aos produtos.',
+        title: 'Descrição necessária',
+        description: 'É necessário ter uma descrição para aplicar aos produtos.',
       });
       return;
     }
 
     const confirmed = window.confirm(
-      `Tem certeza que deseja aplicar a descrição atual a ${selectedProducts.length} produto(s)? Esta ação irá sobrescrever as descrições existentes.`
+      `🚀 PROCESSAMENTO SEQUENCIAL 🚀\n\nAplicar descrição a ${selectedProducts.length} produto(s)?\n\n⚠️ Os produtos serão processados um por vez para máxima confiabilidade.\n⏱️ Tempo estimado: ${Math.ceil(selectedProducts.length * 2)} segundos.\n\n✅ Esta ação sobrescreverá as descrições existentes.`
     );
 
     if (!confirmed) return;
 
-    console.log('Iniciando aplicação em múltiplos produtos:', selectedProducts);
+    console.log('=== INICIANDO PROCESSO DE ATUALIZAÇÃO MÚLTIPLA SEQUENCIAL ===');
+    console.log('📦 Produtos selecionados:', selectedProducts);
     
     setIsUpdating(true);
+    setAuthInvalid(false);
     setProgress(0);
     
-    // Initialize status for all selected products
-    const initialStatuses = selectedProducts.map(id => ({ id, status: 'pending' as const }));
+    // Initialize status for all selected products with detailed info
+    const initialStatuses = selectedProducts.map(id => ({ 
+      id, 
+      status: 'pending' as const,
+      message: 'Aguardando processamento...'
+    }));
     setUpdateStatuses(initialStatuses);
 
     try {
-      console.log('Chamando onApplyToProducts com IDs:', selectedProducts);
+      console.log('🚀 Chamando onApplyToProducts com processamento sequencial...');
       
       // Real-time status callback to track individual product progress
       const handleStatusChange = (productId: number, status: 'pending' | 'success' | 'error', message?: string) => {
+        console.log(`📊 Status update - Produto ${productId}: ${status} - ${message || 'Sem mensagem'}`);
+        
         setUpdateStatuses(prev => {
           const updated = [...prev];
           const index = updated.findIndex(s => s.id === productId);
@@ -124,6 +132,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
           } else {
             updated.push({ id: productId, status, message });
           }
+          console.log(`✅ Status atualizado para produto ${productId}:`, updated[index] || updated[updated.length - 1]);
           return updated;
         });
         
@@ -132,6 +141,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
           const completedCount = currentStatuses.filter(s => s.status === 'success' || s.status === 'error').length;
           const progressPercent = Math.round((completedCount / selectedProducts.length) * 100);
           setProgress(progressPercent);
+          console.log(`📈 Progresso: ${completedCount}/${selectedProducts.length} (${progressPercent}%)`);
           return currentStatuses;
         });
       };
@@ -139,7 +149,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
       // Call the parent function to handle the updates with status tracking
       await onApplyToProducts(selectedProducts, handleStatusChange);
       
-      console.log('onApplyToProducts executado com sucesso');
+      console.log('🎉 onApplyToProducts executado com sucesso');
       
       // Check final status to determine if we should show success or partial success
       const finalStatuses = updateStatuses.filter(s => selectedProducts.includes(s.id));
@@ -149,22 +159,15 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
       setProgress(100);
       
       if (successCount === selectedProducts.length) {
-        toast({
-          title: 'Sucesso',
-          description: `Descrições aplicadas a ${selectedProducts.length} produto(s) com sucesso!`,
-        });
+        console.log('🎉 Todos os produtos atualizados com sucesso');
         
-        // Close dialog after success with a small delay to show the success state
+        // Auto-close dialog after 3 seconds if all successful
         setTimeout(() => {
+          console.log('🔄 Fechando dialog automaticamente após sucesso total');
           handleClose();
-        }, 1500);
+        }, 3000);
       } else if (successCount > 0) {
-        toast({
-          title: 'Processamento Parcial',
-          description: `${successCount} de ${selectedProducts.length} produtos atualizados com sucesso.`,
-          variant: 'default',
-        });
-        
+        console.log(`⚠️ Processamento parcial: ${successCount}/${selectedProducts.length} produtos`);
         // Keep dialog open to show results
         setIsUpdating(false);
       } else {
@@ -173,13 +176,14 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
       }
       
     } catch (error) {
-      console.error('Erro ao aplicar descrições:', error);
+      console.error('💥 Erro ao aplicar descrições:', error);
       
       // Check if it's an auth error
       const isAuthError = error instanceof Error && 
         (error.message.includes('AUTH_INVALID') || error.message.includes('Token Expirado'));
       
       if (isAuthError) {
+        console.log('🔐 Erro de autenticação detectado');
         // Mark all as error with auth message
         const errorStatuses = selectedProducts.map(id => ({ 
           id, 
@@ -191,10 +195,11 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
         
         toast({
           variant: 'destructive',
-          title: 'Token Expirado',
+          title: '🔑 Token Expirado',
           description: 'Sua sessão com a Nuvemshop expirou. Reconecte a loja para continuar.',
         });
       } else {
+        console.error('⚠️ Erro genérico:', error);
         // Mark all as error
         const errorStatuses = selectedProducts.map(id => ({ 
           id, 
@@ -205,13 +210,16 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
         
         toast({
           variant: 'destructive',
-          title: 'Erro',
+          title: '❌ Erro na atualização',
           description: error instanceof Error ? error.message : 'Ocorreu um erro ao aplicar as descrições. Tente novamente.',
         });
       }
       
       // Reset updating state but keep the dialog open to show errors
       setIsUpdating(false);
+    } finally {
+      setProgress(100);
+      console.log('🏁 Processo finalizado');
     }
   };
 
