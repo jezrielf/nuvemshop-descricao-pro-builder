@@ -136,14 +136,16 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
           return updated;
         });
         
-        // Update progress based on completed items (success or error)
-        setUpdateStatuses(currentStatuses => {
-          const completedCount = currentStatuses.filter(s => s.status === 'success' || s.status === 'error').length;
-          const progressPercent = Math.round((completedCount / selectedProducts.length) * 100);
-          setProgress(progressPercent);
-          console.log(`📈 Progresso: ${completedCount}/${selectedProducts.length} (${progressPercent}%)`);
-          return currentStatuses;
-        });
+        // Update progress based on completed items (success or error) - using most current state
+        setTimeout(() => {
+          setUpdateStatuses(currentStatuses => {
+            const completedCount = currentStatuses.filter(s => s.status === 'success' || s.status === 'error').length;
+            const progressPercent = Math.round((completedCount / selectedProducts.length) * 100);
+            setProgress(progressPercent);
+            console.log(`📈 Progresso: ${completedCount}/${selectedProducts.length} (${progressPercent}%)`);
+            return currentStatuses;
+          });
+        }, 50); // Small delay to ensure the status update above has been processed
       };
       
       // Call the parent function to handle the updates with status tracking
@@ -152,24 +154,31 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
       console.log('🎉 onApplyToProducts executado com sucesso');
       
       // Wait a bit to ensure all status updates are processed
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Check final status to determine if we should show success or partial success
-      const finalStatuses = updateStatuses.filter(s => selectedProducts.includes(s.id));
-      const successCount = finalStatuses.filter(s => s.status === 'success').length;
-      const errorCount = finalStatuses.filter(s => s.status === 'error').length;
+      // Get the most up-to-date statuses by using a callback that returns the current state
+      let finalSuccessCount = 0;
+      let finalErrorCount = 0;
       
-      console.log(`📊 Status final: ${successCount} sucessos, ${errorCount} erros de ${selectedProducts.length} produtos`);
+      setUpdateStatuses(currentStatuses => {
+        const finalStatuses = currentStatuses.filter(s => selectedProducts.includes(s.id));
+        finalSuccessCount = finalStatuses.filter(s => s.status === 'success').length;
+        finalErrorCount = finalStatuses.filter(s => s.status === 'error').length;
+        
+        console.log(`📊 Status final verificado: ${finalSuccessCount} sucessos, ${finalErrorCount} erros de ${selectedProducts.length} produtos`);
+        return currentStatuses; // Don't change state, just read it
+      });
       
       setProgress(100);
       setIsUpdating(false);
       
-      if (successCount === selectedProducts.length) {
+      if (finalSuccessCount === selectedProducts.length) {
         console.log('🎉 Todos os produtos atualizados com sucesso');
         
         toast({
           title: '✅ Sucesso total!',
-          description: `Todos os ${successCount} produtos foram atualizados com sucesso.`,
+          description: `Todos os ${finalSuccessCount} produtos foram atualizados com sucesso.`,
         });
         
         // Auto-close dialog after 3 seconds if all successful
@@ -177,13 +186,13 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
           console.log('🔄 Fechando dialog automaticamente após sucesso total');
           handleClose();
         }, 3000);
-      } else if (successCount > 0) {
-        console.log(`⚠️ Processamento parcial: ${successCount}/${selectedProducts.length} produtos`);
+      } else if (finalSuccessCount > 0) {
+        console.log(`⚠️ Processamento parcial: ${finalSuccessCount}/${selectedProducts.length} produtos`);
         
         toast({
           variant: 'default',
           title: '⚠️ Atualização parcial',
-          description: `${successCount} de ${selectedProducts.length} produtos foram atualizados com sucesso.`,
+          description: `${finalSuccessCount} de ${selectedProducts.length} produtos foram atualizados com sucesso.`,
         });
         
         // Keep dialog open to show results

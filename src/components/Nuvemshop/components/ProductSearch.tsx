@@ -279,27 +279,10 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
       console.log('📋 Detalhes dos erros:', errors);
     }
 
-    // Show final toast
-    if (successCount > 0 && errorCount === 0) {
-      toast({
-        title: '🎉 Atualização concluída!',
-        description: `Todos os ${successCount} produtos foram atualizados com sucesso.`,
-      });
-    } else if (successCount > 0 && errorCount > 0) {
-      toast({
-        title: '⚠️ Atualização parcial',
-        description: `${successCount} produtos atualizados, ${errorCount} com erro.`,
-        variant: 'default',
-      });
-    } else if (successCount === 0 && errorCount > 0) {
-      toast({
-        title: '❌ Atualização falhou',
-        description: `Nenhum produto foi atualizado. ${errorCount} erros encontrados.`,
-        variant: 'destructive',
-      });
-    }
-
     console.log('🏁 Atualização múltipla finalizada');
+    
+    // CRITICAL: Do not throw errors based on results, let the UI handle it
+    // The MultipleProductSelection component will handle the final status check and user feedback
   };
 
   // Helper to render product name
