@@ -304,7 +304,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsMultipleSelectionOpen(true)}
-                  disabled={!description || products.length === 0}
+                  disabled={loadingProducts || products.length === 0}
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Seleção Múltipla
@@ -507,7 +507,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
 
       {/* Multiple product selection dialog */}
       <MultipleProductSelection
-        products={products}
+        products={isGlobalSearchActive ? allProductsForSearch : products}
         isOpen={isMultipleSelectionOpen}
         onClose={() => setIsMultipleSelectionOpen(false)}
         onApplyToProducts={handleApplyToMultipleProducts}
@@ -515,6 +515,8 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
           clearAuthCache(false);
           setTimeout(() => handleConnect(), 100);
         }}
+        description={description ? getHtmlOutput() : ''}
+        getHtmlOutput={getHtmlOutput}
       />
     </>
   );

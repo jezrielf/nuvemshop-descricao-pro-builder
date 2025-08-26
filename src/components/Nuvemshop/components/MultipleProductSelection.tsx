@@ -14,6 +14,8 @@ interface MultipleProductSelectionProps {
   onClose: () => void;
   onApplyToProducts: (productIds: number[]) => Promise<void>;
   onReconnect?: () => void;
+  description?: string;
+  getHtmlOutput?: () => string;
 }
 
 interface ProductUpdateStatus {
@@ -27,7 +29,9 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
   isOpen,
   onClose,
   onApplyToProducts,
-  onReconnect
+  onReconnect,
+  description,
+  getHtmlOutput
 }) => {
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -69,6 +73,15 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
         variant: 'destructive',
         title: 'Nenhum produto selecionado',
         description: 'Selecione pelo menos um produto para aplicar a descrição.',
+      });
+      return;
+    }
+
+    if (!description && !getHtmlOutput?.()) {
+      toast({
+        variant: 'destructive',
+        title: 'Nenhuma descrição disponível',
+        description: 'Crie uma descrição no editor antes de aplicar aos produtos.',
       });
       return;
     }
@@ -274,7 +287,7 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
             </Button>
             <Button 
               onClick={handleApplyDescriptions}
-              disabled={selectedProducts.length === 0 || isUpdating}
+              disabled={selectedProducts.length === 0 || isUpdating || (!description && !getHtmlOutput?.())}
             >
               {isUpdating ? (
                 <>
