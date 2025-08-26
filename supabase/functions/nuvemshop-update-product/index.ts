@@ -67,14 +67,24 @@ serve(async (req) => {
       console.error('Error response from Nuvemshop API:', responseText);
       
       let errorKind = 'UNKNOWN_ERROR';
+      let userMessage = 'Erro ao atualizar produto na Nuvemshop';
+      
       if (response.status === 401) {
         errorKind = 'AUTH_INVALID';
+        userMessage = 'Token de acesso inválido ou expirado';
       } else if (response.status === 429) {
         errorKind = 'RATE_LIMIT';
+        userMessage = 'Limite de requisições atingido';
+      } else if (response.status === 422) {
+        errorKind = 'VALIDATION_ERROR';
+        userMessage = 'Erro de validação dos dados do produto';
+      } else if (response.status === 400) {
+        errorKind = 'VALIDATION_ERROR';
+        userMessage = 'Dados do produto inválidos';
       }
       
       return new Response(JSON.stringify({ 
-        error: 'Failed to update product in Nuvemshop', 
+        error: userMessage, 
         details: responseText,
         status: response.status,
         kind: errorKind

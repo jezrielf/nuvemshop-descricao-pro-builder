@@ -13,7 +13,7 @@ interface MultipleProductSelectionProps {
   products: NuvemshopProduct[];
   isOpen: boolean;
   onClose: () => void;
-  onApplyToProducts: (productIds: number[]) => Promise<void>;
+  onApplyToProducts: (productIds: number[], onStatusChange?: (productId: number, status: 'pending' | 'success' | 'error', message?: string) => void) => Promise<void>;
   onReconnect?: () => void;
   description?: string;
   getHtmlOutput?: () => string;
@@ -114,29 +114,63 @@ const MultipleProductSelection: React.FC<MultipleProductSelectionProps> = ({
     try {
       console.log('Chamando onApplyToProducts com IDs:', selectedProducts);
       
-      // Call the parent function to handle the updates
-      await onApplyToProducts(selectedProducts);
+      // Real-time status callback to track individual product progress
+      const handleStatusChange = (productId: number, status: 'pending' | 'success' | 'error', message?: string) => {
+        setUpdateStatuses(prev => {
+          const updated = [...prev];
+          const index = updated.findIndex(s => s.id === productId);
+          if (index >= 0) {
+            updated[index] = { id: productId, status, message };
+          } else {
+            updated.push({ id: productId, status, message });
+          }
+          return updated;
+        });
+        
+        // Update progress based on completed items (success or error)
+        setUpdateStatuses(currentStatuses => {
+          const completedCount = currentStatuses.filter(s => s.status === 'success' || s.status === 'error').length;
+          const progressPercent = Math.round((completedCount / selectedProducts.length) * 100);
+          setProgress(progressPercent);
+          return currentStatuses;
+        });
+      };
+      
+      // Call the parent function to handle the updates with status tracking
+      await onApplyToProducts(selectedProducts, handleStatusChange);
       
       console.log('onApplyToProducts executado com sucesso');
       
-      // Mark all as successful if no error was thrown
-      const successStatuses = selectedProducts.map(id => ({ 
-        id, 
-        status: 'success' as const,
-        message: 'Descrição atualizada com sucesso'
-      }));
-      setUpdateStatuses(successStatuses);
+      // Check final status to determine if we should show success or partial success
+      const finalStatuses = updateStatuses.filter(s => selectedProducts.includes(s.id));
+      const successCount = finalStatuses.filter(s => s.status === 'success').length;
+      const errorCount = finalStatuses.filter(s => s.status === 'error').length;
+      
       setProgress(100);
       
-      toast({
-        title: 'Sucesso',
-        description: `Descrições aplicadas a ${selectedProducts.length} produto(s) com sucesso!`,
-      });
-      
-      // Close dialog after success with a small delay to show the success state
-      setTimeout(() => {
-        handleClose();
-      }, 1500);
+      if (successCount === selectedProducts.length) {
+        toast({
+          title: 'Sucesso',
+          description: `Descrições aplicadas a ${selectedProducts.length} produto(s) com sucesso!`,
+        });
+        
+        // Close dialog after success with a small delay to show the success state
+        setTimeout(() => {
+          handleClose();
+        }, 1500);
+      } else if (successCount > 0) {
+        toast({
+          title: 'Processamento Parcial',
+          description: `${successCount} de ${selectedProducts.length} produtos atualizados com sucesso.`,
+          variant: 'default',
+        });
+        
+        // Keep dialog open to show results
+        setIsUpdating(false);
+      } else {
+        // All failed - this should be handled in the catch block
+        throw new Error('Nenhum produto foi atualizado com sucesso');
+      }
       
     } catch (error) {
       console.error('Erro ao aplicar descrições:', error);

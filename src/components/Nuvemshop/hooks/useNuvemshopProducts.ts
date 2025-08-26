@@ -145,7 +145,7 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
     }
   };
 
-  // Update product description in Nuvemshop
+  // Update product description in Nuvemshop with enhanced error handling
   const updateProductDescription = async (productId: number, description: string) => {
     if (!accessToken || !userId) {
       setError('Access token or user ID not available');
@@ -168,22 +168,25 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       if (error) {
         console.error('Error updating product description:', error);
         
-        // Check if it's an auth error
-        if (error.message.includes('401') || error.message.includes('AUTH_INVALID')) {
-          throw new Error('AUTH_INVALID');
-        }
+        // Parse error to determine specific type
+        const errorType = error.message.includes('401') || error.message.includes('AUTH_INVALID') ? 'AUTH_INVALID' 
+          : error.message.includes('429') ? 'RATE_LIMIT'
+          : error.message.includes('422') || error.message.includes('400') ? 'VALIDATION_ERROR'
+          : 'UNKNOWN_ERROR';
         
-        toast({
-          variant: 'destructive',
-          title: 'Erro ao atualizar descrição',
-          description: error.message,
-        });
-        return false;
+        throw new Error(errorType);
       }
       
-      // Check if response data contains error
-      if (data && data.error && data.kind === 'AUTH_INVALID') {
-        throw new Error('AUTH_INVALID');
+      // Check if response data contains error and map to specific error types
+      if (data?.error) {
+        console.error('API error response:', data);
+        
+        const errorType = data.kind === 'AUTH_INVALID' ? 'AUTH_INVALID'
+          : data.kind === 'RATE_LIMIT' ? 'RATE_LIMIT'
+          : data.status === 422 || data.status === 400 ? 'VALIDATION_ERROR'
+          : 'UNKNOWN_ERROR';
+        
+        throw new Error(errorType);
       }
 
       console.log('Product description updated successfully:', data);
@@ -205,6 +208,12 @@ export const useNuvemshopProducts = (accessToken?: string, userId?: string | num
       return true;
     } catch (err) {
       console.error('Error in updateProductDescription:', err);
+      
+      // Re-throw specific error types, otherwise wrap in generic error
+      if (err instanceof Error && ['AUTH_INVALID', 'RATE_LIMIT', 'VALIDATION_ERROR'].includes(err.message)) {
+        throw err;
+      }
+      
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       toast({
         variant: 'destructive',

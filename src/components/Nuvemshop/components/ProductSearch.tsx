@@ -149,8 +149,8 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
     setIsOpen(false);
   };
 
-  // Handle applying description to multiple products with improved error handling and progress tracking
-  const handleApplyToMultipleProducts = async (productIds: number[]) => {
+  // Handle applying description to multiple products with enhanced error handling, retries, and progress tracking
+  const handleApplyToMultipleProducts = async (productIds: number[], onStatusChange?: (productId: number, status: 'pending' | 'success' | 'error', message?: string) => void) => {
     console.log('Aplicando descrição aos produtos:', productIds);
     
     if (!productIds.length) {
@@ -175,46 +175,121 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
 
     console.log('Produtos disponíveis:', products.map(p => ({ id: p.id, name: p.name })));
 
+    // Helper function for retrying with exponential backoff
+    const retryWithBackoff = async (productId: number, operation: () => Promise<boolean>, maxRetries = 3) => {
+      let attempt = 0;
+      let baseDelay = 300;
+      
+      while (attempt < maxRetries) {
+        try {
+          onStatusChange?.(productId, 'pending', attempt > 0 ? `Tentativa ${attempt + 1}...` : undefined);
+          return await operation();
+        } catch (error) {
+          attempt++;
+          
+          if (error instanceof Error) {
+            if (error.message === 'AUTH_INVALID') {
+              throw error; // Don't retry auth errors
+            }
+            
+            if (error.message === 'RATE_LIMIT' && attempt < maxRetries) {
+              const delay = baseDelay * Math.pow(2, attempt - 1);
+              console.log(`Rate limit hit for product ${productId}. Retrying in ${delay}ms...`);
+              onStatusChange?.(productId, 'pending', `Aguardando ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+            
+            if (error.message === 'VALIDATION_ERROR') {
+              onStatusChange?.(productId, 'error', 'Erro de validação da Nuvemshop');
+              throw error; // Don't retry validation errors
+            }
+          }
+          
+          if (attempt >= maxRetries) {
+            throw error;
+          }
+          
+          // General retry delay
+          const delay = baseDelay * Math.pow(2, attempt - 1);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+      
+      return false;
+    };
+
     try {
       let hasError = false;
-      let errorMessage = '';
+      let errorMessages: string[] = [];
       let authErrorDetected = false;
+      let successCount = 0;
       
-      for (const productId of productIds) {
-        console.log(`Processando produto ID: ${productId}`);
+      for (let i = 0; i < productIds.length; i++) {
+        const productId = productIds[i];
+        console.log(`Processando produto ${i + 1}/${productIds.length}: ID ${productId}`);
         
         // Find the product in the current products list
         const product = products.find(p => p.id === productId);
         if (!product) {
           console.error(`Produto com ID ${productId} não encontrado na lista atual`);
+          onStatusChange?.(productId, 'error', 'Produto não encontrado');
           hasError = true;
-          errorMessage = `Produto com ID ${productId} não encontrado`;
+          errorMessages.push(`Produto com ID ${productId} não encontrado`);
           continue;
         }
         
         console.log(`Encontrado produto:`, { id: product.id, name: product.name });
         
         try {
-          // Call the save function without additional validation (we already validated)
-          const success = await handleSaveToNuvemshop(product, false);
-          console.log(`Resultado para produto ${productId}:`, success);
+          onStatusChange?.(productId, 'pending');
           
-          if (!success) {
+          const success = await retryWithBackoff(productId, async () => {
+            return await handleSaveToNuvemshop(product, false);
+          });
+          
+          if (success) {
+            console.log(`Produto ${productId} processado com sucesso`);
+            onStatusChange?.(productId, 'success', 'Descrição atualizada com sucesso');
+            successCount++;
+          } else {
             console.error(`Falha ao salvar produto ${productId}`);
+            onStatusChange?.(productId, 'error', 'Falha ao salvar produto');
             hasError = true;
-            errorMessage = `Falha ao salvar produto ${productId}`;
+            errorMessages.push(`Falha ao salvar produto ${productId}`);
           }
         } catch (productError) {
           console.error(`Erro ao processar produto ${productId}:`, productError);
           
           // Check if it's an auth error - if so, stop the whole batch
-          if (productError instanceof Error && productError.message.includes('AUTH_INVALID')) {
+          if (productError instanceof Error && productError.message === 'AUTH_INVALID') {
+            onStatusChange?.(productId, 'error', 'Token expirado - reconecte sua loja');
             authErrorDetected = true;
             break;
           }
           
+          let errorMsg = 'Erro desconhecido';
+          if (productError instanceof Error) {
+            switch (productError.message) {
+              case 'RATE_LIMIT':
+                errorMsg = 'Limite de requisições atingido';
+                break;
+              case 'VALIDATION_ERROR':
+                errorMsg = 'Erro de validação da Nuvemshop';
+                break;
+              default:
+                errorMsg = productError.message;
+            }
+          }
+          
+          onStatusChange?.(productId, 'error', errorMsg);
           hasError = true;
-          errorMessage = `Erro ao processar produto ${productId}: ${productError instanceof Error ? productError.message : 'Erro desconhecido'}`;
+          errorMessages.push(`Produto ${productId}: ${errorMsg}`);
+        }
+        
+        // Small delay between products to avoid overwhelming the API
+        if (i < productIds.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
       }
       
@@ -222,12 +297,17 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ onProductSelect }) => {
         throw new Error('AUTH_INVALID');
       }
       
-      if (hasError) {
-        console.error('Erros encontrados durante o processamento:', errorMessage);
-        throw new Error(errorMessage);
+      if (hasError && successCount === 0) {
+        console.error('Nenhum produto foi processado com sucesso:', errorMessages);
+        throw new Error(errorMessages.join('; '));
       }
       
-      console.log('Todos os produtos processados com sucesso');
+      if (hasError && successCount > 0) {
+        console.warn(`Processamento parcial: ${successCount}/${productIds.length} produtos atualizados`);
+        // Don't throw error if some products succeeded
+      }
+      
+      console.log(`Processamento concluído: ${successCount}/${productIds.length} produtos atualizados com sucesso`);
     } catch (error) {
       console.error('Erro no handleApplyToMultipleProducts:', error);
       throw error;
