@@ -42,7 +42,7 @@ serve(async (req) => {
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authentication': `bearer ${accessToken}`,
         'User-Agent': 'DescricaoPro comercial@weethub.com',
         'Content-Type': 'application/json',
         'Accept': 'application/json',

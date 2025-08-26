@@ -100,7 +100,7 @@ serve(async (req) => {
       const storeInfoResponse = await fetch(`https://api.tiendanube.com/v1/${data.user_id}/store`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${data.access_token}`,
+          'Authentication': `bearer ${data.access_token}`,
           'User-Agent': 'DescricaoPro comercial@weethub.com',
           'Content-Type': 'application/json',
         },
