@@ -8,7 +8,7 @@ import { NuvemshopProduct } from '../types';
 export const useProductDescriptionSaver = (accessToken?: string, userId?: string | number) => {
   const [isSaving, setIsSaving] = useState(false);
   const { description, getHtmlOutput } = useEditorStore();
-  const { updateProductDescription } = useNuvemshopProducts(accessToken, userId);
+  const { updateProductDescription, validateCredentials } = useNuvemshopProducts(accessToken, userId);
   const { toast } = useToast();
 
   const handleSaveToNuvemshop = async (product: NuvemshopProduct, validateFirst: boolean = true) => {
@@ -26,7 +26,6 @@ export const useProductDescriptionSaver = (accessToken?: string, userId?: string
 
       // Validate credentials first if requested
       if (validateFirst && accessToken && userId) {
-        const { validateCredentials } = useNuvemshopProducts(accessToken, userId);
         const validation = await validateCredentials();
         if (!validation.ok) {
           if (validation.kind === 'AUTH_INVALID') {
