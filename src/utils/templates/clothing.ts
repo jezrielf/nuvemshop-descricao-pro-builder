@@ -23,8 +23,8 @@ export const fashionTemplates: Template[] = [
           border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Elegância Atemporal',
-        subheading: 'Nova coleção de roupas premium com design exclusivo e materiais sustentáveis',
-        buttonText: 'Ver Coleção',
+        subheading: 'Nova coleção de roupas premium com design exclusivo e materiais sustentáveis que redefinem o conceito de luxo moderno',
+        buttonText: 'Explorar Coleção',
         buttonUrl: '#'
       },
       {
@@ -136,12 +136,14 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#f5f5f5',
-          margin: '0'
+          padding: '80px 40px',
+          background: 'linear-gradient(135deg, hsl(220, 13%, 96%) 0%, hsl(220, 13%, 94%) 100%)',
+          margin: '60px 0',
+          borderRadius: '16px',
+          border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Tradição Artesanal em Cada Peça',
-        content: '<p style="font-size: 16px; line-height: 1.8; color: #555;">Nossas peças são confeccionadas por artesãos altamente qualificados que dominam técnicas tradicionais passadas por gerações. Cada item recebe atenção meticulosa, com costuras feitas à mão e acabamentos precisos que só anos de experiência podem proporcionar.</p><p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 20px;">Este compromisso com a excelência artesanal se traduz em peças de qualidade incomparável que mantêm sua forma e beleza mesmo após anos de uso.</p>',
+        content: '<p style="font-size: 18px; line-height: 1.8; color: hsl(220, 9%, 35%); margin-bottom: 24px;">Nossas peças são confeccionadas por artesãos altamente qualificados que dominam técnicas tradicionais passadas por gerações. Cada item recebe atenção meticulosa, com costuras feitas à mão e acabamentos precisos que só anos de experiência podem proporcionar.</p><p style="font-size: 18px; line-height: 1.8; color: hsl(220, 9%, 35%);">Este compromisso com a excelência artesanal se traduz em peças de qualidade incomparável que mantêm sua forma e beleza mesmo após anos de uso.</p>',
         image: {
           src: 'https://images.unsplash.com/photo-1591382386627-349b692688ff',
           alt: 'Artesão trabalhando em peça de roupa',
@@ -155,9 +157,12 @@ export const fashionTemplates: Template[] = [
         columns: '4',
         layout: 'vertical',
         style: {
-          padding: '80px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0'
+          padding: '100px 40px',
+          backgroundColor: 'hsl(0, 0%, 100%)',
+          margin: '60px 0',
+          borderRadius: '20px',
+          boxShadow: '0 16px 64px hsl(220, 13%, 69% / 0.1)',
+          border: '1px solid hsl(220, 13%, 91%)'
         },
         heading: 'Características Exclusivas',
         features: [
@@ -190,9 +195,11 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#f8f9fa',
-          margin: '0'
+          padding: '80px 40px',
+          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 13%, 95%) 100%)',
+          margin: '60px 0',
+          borderRadius: '16px',
+          border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Especificações do Tecido',
         specs: [
@@ -211,13 +218,16 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '0',
-          backgroundColor: '#ffffff',
-          margin: '0'
+          padding: '60px 20px',
+          backgroundColor: 'hsl(0, 0%, 100%)',
+          margin: '40px 0',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px hsl(220, 13%, 69% / 0.08)',
+          border: '1px solid hsl(220, 13%, 91%)'
         },
         src: 'https://images.unsplash.com/photo-1604176424472-9d7e12de566c',
-        alt: 'Modelo apresentando item da coleção completa',
-        caption: 'Novo lançamento - Disponível em todas as lojas'
+        alt: 'Modelo apresentando item da coleção completa de luxo',
+        caption: 'Nova coleção exclusiva - Disponível nas melhores lojas'
       },
       {
         id: 'faq-1',
@@ -226,9 +236,12 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '80px 20px',
-          backgroundColor: '#ffffff',
-          margin: '20px 0'
+          padding: '80px 40px',
+          backgroundColor: 'hsl(0, 0%, 100%)',
+          margin: '60px 0',
+          borderRadius: '16px',
+          boxShadow: '0 12px 48px hsl(220, 13%, 69% / 0.12)',
+          border: '1px solid hsl(220, 13%, 91%)'
         },
         heading: 'Perguntas Frequentes',
         questions: [
@@ -253,14 +266,16 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '80px 20px',
-          backgroundColor: '#000000',
-          color: '#ffffff',
-          margin: '0',
-          textAlign: 'center'
+          padding: '100px 40px',
+          background: 'linear-gradient(135deg, hsl(220, 9%, 6%) 0%, hsl(220, 9%, 12%) 100%)',
+          color: 'hsl(0, 0%, 100%)',
+          margin: '60px 0',
+          textAlign: 'center',
+          borderRadius: '20px',
+          boxShadow: '0 20px 80px hsl(220, 9%, 3% / 0.4)'
         },
-        heading: 'Eleve seu Guarda-Roupa',
-        content: 'Descubra a coleção completa em nossas lojas ou faça sua compra online com frete grátis',
+        heading: 'Eleve Seu Estilo ao Próximo Nível',
+        content: 'Descubra a coleção completa em nossas boutiques exclusivas ou faça sua compra online com entrega premium gratuita',
         buttonText: 'Comprar Agora',
         buttonUrl: '#'
       }
