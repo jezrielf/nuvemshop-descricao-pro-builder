@@ -15,10 +15,12 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#f5f5f5',
-          padding: '80px 20px',
-          borderRadius: '0px',
-          textAlign: 'center'
+          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 9%, 93%) 100%)',
+          padding: '100px 40px',
+          borderRadius: '24px',
+          textAlign: 'center',
+          boxShadow: '0 20px 64px hsl(220, 13%, 69% / 0.15)',
+          border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Elegância Atemporal',
         subheading: 'Nova coleção de roupas premium com design exclusivo e materiais sustentáveis',
@@ -32,8 +34,11 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: '3',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff'
+          padding: '80px 40px',
+          backgroundColor: 'hsl(0, 0%, 100%)',
+          borderRadius: '16px',
+          margin: '40px 0',
+          boxShadow: '0 8px 32px hsl(220, 13%, 69% / 0.08)'
         },
         heading: '',
         images: [
@@ -61,12 +66,15 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff',
-          margin: '40px 0',
-          textAlign: 'center'
+          padding: '80px 40px',
+          background: 'linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(220, 13%, 98%) 100%)',
+          margin: '60px 0',
+          textAlign: 'center',
+          borderRadius: '20px',
+          border: '1px solid hsl(220, 13%, 91%)',
+          boxShadow: '0 12px 48px hsl(220, 13%, 69% / 0.12)'
         },
-        content: '<h2 style="font-size: 32px; font-weight: 300; color: #333; margin-bottom: 30px;">A Arte da Alta Costura</h2><p style="font-size: 18px; line-height: 1.8; color: #555; max-width: 800px; margin: 0 auto;">Nossa nova coleção celebra a elegância atemporal através de peças cuidadosamente desenhadas e confeccionadas com os mais finos materiais. Cada item representa a perfeita harmonia entre estilo contemporâneo e técnicas tradicionais de costura.</p>'
+        content: '<h2 style="font-size: 42px; font-weight: 600; color: hsl(220, 9%, 15%); margin-bottom: 32px; line-height: 1.2;">A Arte da Alta Costura</h2><p style="font-size: 20px; line-height: 1.7; color: hsl(220, 9%, 35%); max-width: 900px; margin: 0 auto;">Nossa nova coleção celebra a elegância atemporal através de peças cuidadosamente desenhadas e confeccionadas com os mais finos materiais. Cada item representa a perfeita harmonia entre estilo contemporâneo e técnicas tradicionais de costura.</p>'
       },
       {
         id: 'imageText-1',
@@ -75,12 +83,14 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#f8f9fa',
-          margin: '0'
+          padding: '80px 40px',
+          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 13%, 95%) 100%)',
+          margin: '60px 0',
+          borderRadius: '16px',
+          border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Tecidos Exclusivos',
-        content: '<p style="font-size: 16px; line-height: 1.8; color: #555;">Selecionamos cuidadosamente os melhores tecidos do mundo para criar peças que não apenas parecem premium, mas também proporcionam conforto e durabilidade excepcionais. Do algodão egípcio à seda italiana, cada material é escolhido pela sua qualidade superior e características únicas.</p><p style="font-size: 16px; line-height: 1.8; color: #555; margin-top: 20px;">Nossa dedicação à excelência se estende a cada detalhe, desde os botões até as costuras, garantindo que cada peça mantenha sua beleza por anos.</p>',
+        content: '<p style="font-size: 18px; line-height: 1.8; color: hsl(220, 9%, 35%); margin-bottom: 24px;">Selecionamos cuidadosamente os melhores tecidos do mundo para criar peças que não apenas parecem premium, mas também proporcionam conforto e durabilidade excepcionais. Do algodão egípcio à seda italiana, cada material é escolhido pela sua qualidade superior e características únicas.</p><p style="font-size: 18px; line-height: 1.8; color: hsl(220, 9%, 35%);">Nossa dedicação à excelência se estende a cada detalhe, desde os botões até as costuras, garantindo que cada peça mantenha sua beleza por anos.</p>',
         image: {
           src: 'https://images.unsplash.com/photo-1464699511458-87e156ad3a97',
           alt: 'Tecido premium de alta qualidade',
@@ -93,9 +103,12 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: '3',
         style: {
-          padding: '80px 20px',
-          backgroundColor: '#ffffff',
-          margin: '0'
+          padding: '100px 40px',
+          backgroundColor: 'hsl(0, 0%, 100%)',
+          margin: '60px 0',
+          borderRadius: '20px',
+          boxShadow: '0 16px 64px hsl(220, 13%, 69% / 0.1)',
+          border: '1px solid hsl(220, 13%, 91%)'
         },
         heading: 'Por que Escolher Nossa Marca',
         benefits: [

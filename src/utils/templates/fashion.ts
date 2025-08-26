@@ -17,9 +17,12 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: 'full',
         style: {
-          backgroundColor: '#f5f5f5',
-          padding: '80px 20px',
-          textAlign: 'center'
+          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 9%, 93%) 100%)',
+          padding: '120px 40px',
+          textAlign: 'center',
+          borderRadius: '24px',
+          boxShadow: '0 24px 80px hsl(220, 13%, 69% / 0.18)',
+          border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Elegância Atemporal',
         subheading: 'Nova coleção de roupas premium com design exclusivo e materiais sustentáveis que definem o futuro da moda',
@@ -35,8 +38,11 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: '3',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#ffffff'
+          padding: '80px 40px',
+          backgroundColor: 'hsl(0, 0%, 100%)',
+          borderRadius: '16px',
+          margin: '40px 0',
+          boxShadow: '0 8px 32px hsl(220, 13%, 69% / 0.08)'
         },
         heading: 'Destaques da Nova Coleção',
         images: [
@@ -69,8 +75,11 @@ export const fashionTemplates: Template[] = [
         visible: true,
         columns: '3',
         style: {
-          padding: '60px 20px',
-          backgroundColor: '#f8f9fa'
+          padding: '80px 40px',
+          background: 'linear-gradient(135deg, hsl(220, 13%, 97%) 0%, hsl(220, 13%, 95%) 100%)',
+          borderRadius: '16px',
+          margin: '40px 0',
+          border: '1px solid hsl(220, 13%, 89%)'
         },
         heading: 'Por Que Escolher Nossa Marca',
         benefits: [
