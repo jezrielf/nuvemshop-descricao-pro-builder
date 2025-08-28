@@ -65,13 +65,7 @@ serve(async (req) => {
       throw new Error('Email and password are required');
     }
     
-    console.log('User creation request received for:', email);
-    
-    // Create a Supabase client with the service role key for admin operations
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    console.log('Admin user verified, creating new user:', email);
 
     // Create the user
     console.log('Attempting to create new user:', email);
