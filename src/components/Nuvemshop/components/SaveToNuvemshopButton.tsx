@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Save, RefreshCw, Check } from 'lucide-react';
+import { Save, RefreshCw, Check, Lock } from 'lucide-react';
 import { useNuvemshopAuth } from '../hooks/useNuvemshopAuth';
 import { useProductDescriptionSaver } from '../hooks/useProductDescriptionSaver';
 import { NuvemshopProduct } from '../types';
@@ -9,6 +9,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useEditorStore } from '@/store/editor';
 import { useNimbusUI } from '../NimbusProvider';
 import { NimbusButton } from '../NimbusProvider';
+import { useUsageQuota } from '@/hooks/useUsageQuota';
+import { QuotaLimitDialog } from '@/components/usage/QuotaLimitDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SaveToNuvemshopButtonProps {
   product: NuvemshopProduct;
@@ -24,7 +27,12 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
   const { accessToken, userId } = useNuvemshopAuth();
   const { isSaving, handleSaveToNuvemshop } = useProductDescriptionSaver(accessToken, userId);
   const { useNimbusUI: isNimbusUIActive } = useNimbusUI();
+  const { user } = useAuth();
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showQuotaDialog, setShowQuotaDialog] = useState(false);
+  
+  // Usage quota hook
+  const { count, remaining, reached, isUnlimited, increment } = useUsageQuota('nuvemshop_saves');
   
   // Extract product name for display purposes
   const productName = product.name && typeof product.name === 'object' && product.name.pt 
@@ -41,21 +49,37 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
       return;
     }
     
-    const success = await handleSaveToNuvemshop(product);
+    // Check quota limit for non-unlimited users
+    if (!isUnlimited && reached && user) {
+      setShowQuotaDialog(true);
+      return;
+    }
     
-    if (success) {
-      // Show success state briefly
-      setSaveSuccess(true);
+    try {
+      const success = await handleSaveToNuvemshop(product);
       
-      // Call success callback if provided
-      if (onSaveSuccess) {
-        onSaveSuccess();
+      if (success) {
+        // Increment usage counter only after successful save
+        if (!isUnlimited && user) {
+          await increment();
+        }
+        
+        // Show success state briefly
+        setSaveSuccess(true);
+        
+        // Call success callback if provided
+        if (onSaveSuccess) {
+          onSaveSuccess();
+        }
+        
+        // Reset success state after delay
+        setTimeout(() => {
+          setSaveSuccess(false);
+        }, 2000);
       }
-      
-      // Reset success state after delay
-      setTimeout(() => {
-        setSaveSuccess(false);
-      }, 2000);
+    } catch (error) {
+      // Error handling is already done in handleSaveToNuvemshop
+      console.error('Save error:', error);
     }
   };
   
@@ -88,42 +112,73 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
     );
   }
   
+  // Determine if button should be disabled
+  const isDisabled = isSaving || !description || (!isUnlimited && reached && user);
+  
   // Normal button state
   if (isNimbusUIActive) {
     return (
-      <NimbusButton 
-        variant={isSaving ? "secondary" : "primary"} 
-        size="small" 
-        onClick={handleSave}
-        disabled={isSaving || !description}
-        className="ml-2"
-      >
-        {isSaving ? (
-          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-        ) : (
-          <Save className="h-4 w-4 mr-2" />
-        )}
-        {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}
-      </NimbusButton>
+      <>
+        <NimbusButton 
+          variant={isSaving ? "secondary" : "primary"} 
+          size="small" 
+          onClick={handleSave}
+          disabled={isDisabled}
+          className="ml-2"
+        >
+          {isSaving ? (
+            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+          ) : isDisabled && !isUnlimited && reached ? (
+            <Lock className="h-4 w-4 mr-2" />
+          ) : (
+            <Save className="h-4 w-4 mr-2" />
+          )}
+          {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}
+          {!isUnlimited && user && (
+            <span className="ml-1 text-xs opacity-75">({remaining}/3)</span>
+          )}
+        </NimbusButton>
+        
+        <QuotaLimitDialog
+          open={showQuotaDialog}
+          onOpenChange={setShowQuotaDialog}
+          count={count}
+          limit={3}
+        />
+      </>
     );
   }
   
   return (
-    <Button 
-      variant="outline" 
-      size="sm" 
-      onClick={handleSave}
-      disabled={isSaving || !description}
-      className="ml-2"
-      title={`Salvar descrição para: ${productName}`}
-    >
-      {isSaving ? (
-        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-      ) : (
-        <Save className="h-4 w-4 mr-2" />
-      )}
-      {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}
-    </Button>
+    <>
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={handleSave}
+        disabled={isDisabled}
+        className="ml-2"
+        title={`Salvar descrição para: ${productName}`}
+      >
+        {isSaving ? (
+          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+        ) : isDisabled && !isUnlimited && reached ? (
+          <Lock className="h-4 w-4 mr-2" />
+        ) : (
+          <Save className="h-4 w-4 mr-2" />
+        )}
+        {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}
+        {!isUnlimited && user && (
+          <span className="ml-1 text-xs opacity-75">({remaining}/3)</span>
+        )}
+      </Button>
+      
+      <QuotaLimitDialog
+        open={showQuotaDialog}
+        onOpenChange={setShowQuotaDialog}
+        count={count}
+        limit={3}
+      />
+    </>
   );
 };
 

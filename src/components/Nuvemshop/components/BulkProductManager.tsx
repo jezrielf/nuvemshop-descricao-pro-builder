@@ -7,12 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Package, CheckCircle2, XCircle, AlertCircle, Search, Download, Play, Pause, RotateCcw } from 'lucide-react';
+import { Loader2, Package, CheckCircle2, XCircle, AlertCircle, Search, Download, Play, Pause, RotateCcw, Lock, Crown } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NuvemshopProduct } from '../types';
 import { useToast } from '@/hooks/use-toast';
 import { useBulkProductProcessor } from '../hooks/useBulkProductProcessor';
+import { useUsageQuota } from '@/hooks/useUsageQuota';
+import { QuotaLimitDialog } from '@/components/usage/QuotaLimitDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface BulkProductManagerProps {
   products: NuvemshopProduct[];
@@ -105,7 +108,12 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
   const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set());
   const [concurrencyLimit, setConcurrencyLimit] = useState(3);
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [showQuotaDialog, setShowQuotaDialog] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  
+  // Usage quota hook
+  const { count, remaining, reached, isUnlimited, increment } = useUsageQuota('nuvemshop_saves');
   
   const {
     isProcessing,
@@ -120,7 +128,19 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
     exportResults,
     startProcessing
   } = useBulkProductProcessor({
-    onApplyToProducts,
+    onApplyToProducts: async (productIds, onStatusChange) => {
+      // Wrapper to handle quota increment
+      await onApplyToProducts(productIds, async (productId, status, message) => {
+        if (onStatusChange) {
+          onStatusChange(productId, status, message);
+        }
+        
+        // Increment usage counter on successful save (only for non-unlimited users)
+        if (status === 'success' && !isUnlimited && user) {
+          await increment();
+        }
+      });
+    },
     concurrencyLimit
   });
 
@@ -202,8 +222,37 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
       return;
     }
 
+    // Check quota limits for non-unlimited users
+    if (!isUnlimited && user) {
+      if (reached) {
+        setShowQuotaDialog(true);
+        return;
+      }
+
+      if (selectedProducts.size > remaining) {
+        const confirmMessage = `Você tem ${remaining} salvamento(s) restante(s) no plano gratuito.\n\nDeseja processar apenas os primeiros ${remaining} produto(s) selecionados?`;
+        
+        if (!window.confirm(confirmMessage)) {
+          return;
+        }
+        
+        // Limit selection to remaining quota
+        const limitedProductIds = Array.from(selectedProducts).slice(0, remaining);
+        setSelectedProducts(new Set(limitedProductIds));
+        
+        toast({
+          title: 'Seleção ajustada',
+          description: `Processando apenas ${limitedProductIds.length} produto(s) devido ao limite do plano gratuito.`,
+        });
+        
+        await startProcessing(limitedProductIds);
+        return;
+      }
+    }
+
+    const processingCount = selectedProducts.size;
     const confirmed = window.confirm(
-      `Processar ${selectedProducts.size} produto(s)?\n\nConcorrência: ${concurrencyLimit} produtos simultâneos\nTempo estimado: ${Math.ceil(selectedProducts.size / concurrencyLimit * 2)} segundos`
+      `Processar ${processingCount} produto(s)?\n\nConcorrência: ${concurrencyLimit} produtos simultâneos\nTempo estimado: ${Math.ceil(processingCount / concurrencyLimit * 2)} segundos`
     );
 
     if (!confirmed) return;
@@ -235,6 +284,21 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
         </DialogHeader>
         
         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+          {/* Quota Warning for Non-Premium Users */}
+          {!isUnlimited && user && (
+            <Alert className="border-amber-200 bg-amber-50">
+              <Crown className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800">
+                <strong>Plano gratuito:</strong> {remaining} salvamento(s) restante(s) de 3.
+                {reached && (
+                  <span className="block mt-1 text-sm">
+                    Limite atingido. Assine um plano premium para salvamentos ilimitados.
+                  </span>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Processing Controls */}
           <Card>
             <CardHeader className="pb-3">
@@ -289,11 +353,20 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
               <div className="flex gap-2">
                 <Button 
                   onClick={handleStartProcessing}
-                  disabled={selectedCount === 0 || isProcessing}
+                  disabled={selectedCount === 0 || isProcessing || (!isUnlimited && reached && user)}
                   className="flex-1"
                 >
-                  <Play className="h-4 w-4 mr-2" />
+                  {(!isUnlimited && reached && user) ? (
+                    <Lock className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Play className="h-4 w-4 mr-2" />
+                  )}
                   Processar {selectedCount} produto(s)
+                  {!isUnlimited && user && remaining < selectedCount && (
+                    <span className="ml-1 text-xs opacity-75">
+                      (máx. {remaining})
+                    </span>
+                  )}
                 </Button>
                 
                 {isProcessing && (
@@ -392,6 +465,14 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
             </Button>
           </div>
         </div>
+
+        {/* Quota Limit Dialog */}
+        <QuotaLimitDialog
+          open={showQuotaDialog}
+          onOpenChange={setShowQuotaDialog}
+          count={count}
+          limit={3}
+        />
       </DialogContent>
     </Dialog>
   );

@@ -302,6 +302,33 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_counters: {
+        Row: {
+          count: number
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -359,6 +386,10 @@ export type Database = {
           url: string
         }[]
       }
+      get_usage_counter: {
+        Args: { _key: string }
+        Returns: number
+      }
       get_user_roles: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"][]
@@ -382,6 +413,12 @@ export type Database = {
           user_id: string
         }
         Returns: boolean
+      }
+      increment_usage_counter: {
+        Args: { _key: string }
+        Returns: {
+          count: number
+        }[]
       }
       is_admin: {
         Args: { user_id?: string }
