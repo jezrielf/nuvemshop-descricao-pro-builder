@@ -50,21 +50,21 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Crown className="h-5 w-5 text-amber-500" />
-            <DialogTitle>Limite de salvamentos atingido</DialogTitle>
+            <DialogTitle>Limite de produtos atingido</DialogTitle>
           </div>
           <DialogDescription className="pt-2">
-            Você utilizou todos os <strong>{limit} salvamentos gratuitos</strong> na Nuvemshop.
-            Para continuar salvando descrições, assine um plano premium.
+            Você atualizou {limit} produtos diferentes na Nuvemshop com o plano gratuito.
+            Para continuar atualizando mais produtos, assine um plano premium.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-2 py-4">
           <div className="bg-muted p-3 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              ✅ <strong>Salvamentos utilizados:</strong> {count}/{limit}
+              ✅ <strong>Produtos atualizados:</strong> {count}/{limit}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              🚀 <strong>Com plano premium:</strong> Salvamentos ilimitados
+              🚀 <strong>Com plano premium:</strong> Produtos ilimitados
             </p>
           </div>
         </div>

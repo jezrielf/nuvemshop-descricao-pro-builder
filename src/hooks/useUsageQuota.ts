@@ -8,7 +8,7 @@ interface UseUsageQuotaReturn {
   remaining: number;
   reached: boolean;
   isUnlimited: boolean;
-  increment: () => Promise<boolean>;
+  logProductUpdate: (productId: number, storeId?: number, platform?: string) => Promise<{ success: boolean; wasNew: boolean }>;
   refresh: () => Promise<void>;
   loading: boolean;
 }
@@ -31,10 +31,10 @@ export const useUsageQuota = (
     setLoading(true);
     try {
       if (user) {
-        // Load from Supabase for authenticated users
-        const { data, error } = await supabase.rpc('get_usage_counter', { _key: key });
+        // Load from Supabase for authenticated users (distinct product count)
+        const { data, error } = await supabase.rpc('get_product_updates_count', { _key: key });
         if (error) {
-          console.error('Error loading usage counter:', error);
+          console.error('Error loading product updates count:', error);
           setCount(0);
         } else {
           setCount(data || 0);
@@ -52,28 +52,43 @@ export const useUsageQuota = (
     }
   }, [user, key]);
 
-  const increment = useCallback(async (): Promise<boolean> => {
+  const logProductUpdate = useCallback(async (
+    productId: number, 
+    storeId: number = 0, 
+    platform: string = 'nuvemshop'
+  ): Promise<{ success: boolean; wasNew: boolean }> => {
     try {
       if (user) {
-        // Increment in Supabase for authenticated users
-        const { data, error } = await supabase.rpc('increment_usage_counter', { _key: key });
+        // Log product update in Supabase for authenticated users
+        const { data, error } = await supabase.rpc('log_product_update', { 
+          _key: key, 
+          _product_id: productId,
+          _store_id: storeId,
+          _platform: platform
+        });
+        
         if (error) {
-          console.error('Error incrementing usage counter:', error);
-          return false;
+          console.error('Error logging product update:', error);
+          return { success: false, wasNew: false };
         }
-        const newCount = data?.[0]?.count || count + 1;
-        setCount(newCount);
-        return true;
+        
+        const result = data?.[0];
+        if (result) {
+          setCount(result.total_count);
+          return { success: true, wasNew: result.inserted };
+        }
+        
+        return { success: false, wasNew: false };
       } else {
-        // Increment in localStorage for anonymous users
+        // For anonymous users, increment in localStorage (simplified counting)
         const newCount = count + 1;
         setCount(newCount);
         localStorage.setItem(getStorageKey(), newCount.toString());
-        return true;
+        return { success: true, wasNew: true };
       }
     } catch (error) {
-      console.error('Error incrementing usage count:', error);
-      return false;
+      console.error('Error logging product update:', error);
+      return { success: false, wasNew: false };
     }
   }, [user, key, count]);
 
@@ -90,7 +105,7 @@ export const useUsageQuota = (
     remaining,
     reached,
     isUnlimited,
-    increment,
+    logProductUpdate,
     refresh,
     loading
   };

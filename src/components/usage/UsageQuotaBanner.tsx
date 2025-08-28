@@ -26,8 +26,8 @@ export const UsageQuotaBanner: React.FC = () => {
       <Crown className="h-4 w-4 text-amber-600" />
       <AlertDescription className="flex items-center justify-between">
         <span className="text-amber-800">
-          <strong>Plano gratuito:</strong> {count}/3 salvamentos na Nuvemshop utilizados.
-          {remaining > 0 ? ` Restam ${remaining}.` : ' Limite atingido.'}
+          <strong>Plano gratuito:</strong> {count}/3 produtos atualizados na Nuvemshop.
+          {remaining > 0 ? ` Restam ${remaining} produtos.` : ' Limite atingido.'}
         </span>
         <Button
           onClick={handleUpgrade}

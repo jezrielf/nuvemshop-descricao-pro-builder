@@ -31,8 +31,8 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showQuotaDialog, setShowQuotaDialog] = useState(false);
   
-  // Usage quota hook
-  const { count, remaining, reached, isUnlimited, increment } = useUsageQuota('nuvemshop_saves');
+  // Usage quota hook for distinct products
+  const { count, remaining, reached, isUnlimited, logProductUpdate } = useUsageQuota('nuvemshop_saves');
   
   // Extract product name for display purposes
   const productName = product.name && typeof product.name === 'object' && product.name.pt 
@@ -59,9 +59,23 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
       const success = await handleSaveToNuvemshop(product);
       
       if (success) {
-        // Increment usage counter only after successful save
+        // Log product update (only counts if it's a new product for this user)
         if (!isUnlimited && !!user) {
-          await increment();
+          const updateResult = await logProductUpdate(product.id, product.store_id || 0);
+          if (!updateResult.success) {
+            console.error('Failed to log product update');
+          }
+          // If reached limit after this update, show dialog
+          if (updateResult.wasNew && count + 1 >= 3) {
+            // Small delay to let the user see the success state
+            setTimeout(() => {
+              toast({
+                title: 'Limite atingido!',
+                description: 'Você atingiu o limite de 3 produtos gratuitos. Assine para atualizar produtos ilimitados.',
+                variant: 'default'
+              });
+            }, 1000);
+          }
         }
         
         // Show success state briefly

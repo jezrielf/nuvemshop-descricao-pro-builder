@@ -329,6 +329,36 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_product_updates: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          platform: string
+          product_id: number
+          store_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          platform?: string
+          product_id: number
+          store_id?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          platform?: string
+          product_id?: number
+          store_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -376,6 +406,17 @@ export type Database = {
           url: string
           user_id: string
         }[]
+      }
+      get_product_updates: {
+        Args: { _key: string }
+        Returns: {
+          product_id: number
+          store_id: number
+        }[]
+      }
+      get_product_updates_count: {
+        Args: { _key: string }
+        Returns: number
       }
       get_store_for_api_call: {
         Args: { store_uuid: string }
@@ -427,6 +468,18 @@ export type Database = {
       is_current_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      log_product_update: {
+        Args: {
+          _key: string
+          _platform?: string
+          _product_id: number
+          _store_id?: number
+        }
+        Returns: {
+          inserted: boolean
+          total_count: number
+        }[]
       }
     }
     Enums: {

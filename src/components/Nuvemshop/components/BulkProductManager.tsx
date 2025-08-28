@@ -112,8 +112,8 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
   const { toast } = useToast();
   const { user } = useAuth();
   
-  // Usage quota hook
-  const { count, remaining, reached, isUnlimited, increment } = useUsageQuota('nuvemshop_saves');
+  // Usage quota hook for distinct products
+  const { count, remaining, reached, isUnlimited, logProductUpdate } = useUsageQuota('nuvemshop_saves');
   
   const {
     isProcessing,
@@ -129,15 +129,15 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
     startProcessing
   } = useBulkProductProcessor({
     onApplyToProducts: async (productIds, onStatusChange) => {
-      // Wrapper to handle quota increment
+      // Wrapper to handle quota logging for distinct products
       await onApplyToProducts(productIds, async (productId, status, message) => {
         if (onStatusChange) {
           onStatusChange(productId, status, message);
         }
         
-        // Increment usage counter on successful save (only for non-unlimited users)
+        // Log product update on successful save (only for non-unlimited users)
         if (status === 'success' && !isUnlimited && !!user) {
-          await increment();
+          await logProductUpdate(productId, 0); // store_id defaults to 0
         }
       });
     },
@@ -230,7 +230,7 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
       }
 
       if (selectedProducts.size > remaining) {
-        const confirmMessage = `Você tem ${remaining} salvamento(s) restante(s) no plano gratuito.\n\nDeseja processar apenas os primeiros ${remaining} produto(s) selecionados?`;
+        const confirmMessage = `Você pode atualizar apenas ${remaining} produto(s) diferente(s) com o plano gratuito.\n\nDeseja processar apenas os primeiros ${remaining} produto(s) selecionados?`;
         
         if (!window.confirm(confirmMessage)) {
           return;
@@ -289,10 +289,10 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
             <Alert className="border-amber-200 bg-amber-50">
               <Crown className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800">
-                <strong>Plano gratuito:</strong> {remaining} salvamento(s) restante(s) de 3.
+                <strong>Plano gratuito:</strong> {remaining} produto(s) restante(s) de 3 para atualizar.
                 {reached && (
                   <span className="block mt-1 text-sm">
-                    Limite atingido. Assine um plano premium para salvamentos ilimitados.
+                    Limite atingido. Assine um plano premium para produtos ilimitados.
                   </span>
                 )}
               </AlertDescription>
