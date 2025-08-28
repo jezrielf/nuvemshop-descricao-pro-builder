@@ -5,6 +5,7 @@ export interface NuvemshopProduct {
   sku: string | null;
   price: string | number;
   description?: string | { pt?: string; [key: string]: string | undefined };
+  store_id?: number;
   variants?: Array<{
     id: number;
     sku: string | null;
