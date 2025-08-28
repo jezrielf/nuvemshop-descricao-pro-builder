@@ -353,16 +353,16 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
               <div className="flex gap-2">
                 <Button 
                   onClick={handleStartProcessing}
-                  disabled={selectedCount === 0 || isProcessing || (!isUnlimited && reached && user)}
+                  disabled={selectedCount === 0 || isProcessing || (!isUnlimited && reached && !!user)}
                   className="flex-1"
                 >
-                  {(!isUnlimited && reached && user) ? (
+                  {(!isUnlimited && reached && !!user) ? (
                     <Lock className="h-4 w-4 mr-2" />
                   ) : (
                     <Play className="h-4 w-4 mr-2" />
                   )}
                   Processar {selectedCount} produto(s)
-                  {!isUnlimited && user && remaining < selectedCount && (
+                  {!isUnlimited && !!user && remaining < selectedCount && (
                     <span className="ml-1 text-xs opacity-75">
                       (máx. {remaining})
                     </span>
