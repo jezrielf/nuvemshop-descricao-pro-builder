@@ -136,7 +136,7 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
         }
         
         // Increment usage counter on successful save (only for non-unlimited users)
-        if (status === 'success' && !isUnlimited && user) {
+        if (status === 'success' && !isUnlimited && !!user) {
           await increment();
         }
       });
@@ -223,7 +223,7 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
     }
 
     // Check quota limits for non-unlimited users
-    if (!isUnlimited && user) {
+    if (!isUnlimited && !!user) {
       if (reached) {
         setShowQuotaDialog(true);
         return;
@@ -285,7 +285,7 @@ const BulkProductManager: React.FC<BulkProductManagerProps> = ({
         
         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
           {/* Quota Warning for Non-Premium Users */}
-          {!isUnlimited && user && (
+          {!isUnlimited && !!user && (
             <Alert className="border-amber-200 bg-amber-50">
               <Crown className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800">

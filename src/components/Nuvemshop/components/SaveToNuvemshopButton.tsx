@@ -50,7 +50,7 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
     }
     
     // Check quota limit for non-unlimited users
-    if (!isUnlimited && reached && user) {
+    if (!isUnlimited && reached && !!user) {
       setShowQuotaDialog(true);
       return;
     }
@@ -60,7 +60,7 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
       
       if (success) {
         // Increment usage counter only after successful save
-        if (!isUnlimited && user) {
+        if (!isUnlimited && !!user) {
           await increment();
         }
         
@@ -113,7 +113,7 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
   }
   
   // Determine if button should be disabled
-  const isDisabled = isSaving || !description || (!isUnlimited && reached && user);
+  const isDisabled = isSaving || !description || (!isUnlimited && reached && !!user);
   
   // Normal button state
   if (isNimbusUIActive) {
@@ -134,7 +134,7 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
             <Save className="h-4 w-4 mr-2" />
           )}
           {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}
-          {!isUnlimited && user && (
+          {!isUnlimited && !!user && (
             <span className="ml-1 text-xs opacity-75">({remaining}/3)</span>
           )}
         </NimbusButton>
@@ -167,7 +167,7 @@ export const SaveToNuvemshopButton: React.FC<SaveToNuvemshopButtonProps> = ({
           <Save className="h-4 w-4 mr-2" />
         )}
         {isSaving ? 'Salvando...' : 'Salvar na Nuvemshop'}
-        {!isUnlimited && user && (
+        {!isUnlimited && !!user && (
           <span className="ml-1 text-xs opacity-75">({remaining}/3)</span>
         )}
       </Button>
