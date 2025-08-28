@@ -1,13 +1,18 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Template, Block } from '@/types/editor';
 import { TemplateBuilderHeader } from './TemplateBuilderHeader';
 import { BlockLibrary } from './BlockLibrary';
+import { OutlinePanel } from './OutlinePanel';
 import { TemplateCanvas } from './TemplateCanvas';
 import { BlockPropertiesPanel } from './BlockPropertiesPanel';
+import { TemplateSEOPanel } from './seo/TemplateSEOPanel';
 import { generateUniqueId } from '@/utils/idGenerator';
 import { useToast } from '@/hooks/use-toast';
+import { useUndoRedo } from './hooks/useUndoRedo';
+import { templateBuilderLogger } from '@/utils/logger';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TemplateBuilderLayoutProps {
   template: Template | null;
@@ -22,6 +27,10 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
 }) => {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState<'mobile' | 'tablet' | 'laptop' | 'full'>('full');
+  const [leftPanelTab, setLeftPanelTab] = useState<'library' | 'outline'>('library');
+  const [rightPanelTab, setRightPanelTab] = useState<'properties' | 'seo'>('properties');
+  const [showSEOPanel, setShowSEOPanel] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -32,6 +41,29 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
     category: 'other',
     blocks: []
   };
+
+  // Initialize undo/redo system
+  const {
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    pushToHistory,
+    reset
+  } = useUndoRedo(currentTemplate, onTemplateChange);
+
+  // Update history when template changes from outside
+  useEffect(() => {
+    if (template) {
+      reset(template);
+    }
+  }, [template?.id, reset]);
+
+  // Handle template changes with history tracking
+  const handleTemplateChange = useCallback((updatedTemplate: Template) => {
+    onTemplateChange(updatedTemplate);
+    pushToHistory(updatedTemplate);
+  }, [onTemplateChange, pushToHistory]);
 
   const handleAddBlock = (blockType: string) => {
     const baseBlock = {
@@ -156,8 +188,10 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
       blocks: [...currentTemplate.blocks, newBlock]
     };
 
-    onTemplateChange(updatedTemplate);
+    handleTemplateChange(updatedTemplate);
     setSelectedBlockId(newBlock.id);
+    
+    templateBuilderLogger.blockAdded(blockType, newBlock.id);
     
     toast({
       title: 'Bloco adicionado',
@@ -165,7 +199,7 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
     });
   };
 
-  const handleBlockUpdate = (blockId: string, updates: Partial<Block>) => {
+  const handleBlockUpdate = useCallback((blockId: string, updates: Partial<Block>) => {
     const updatedBlocks = currentTemplate.blocks.map(block => 
       block.id === blockId ? { ...block, ...updates } : block
     );
@@ -175,10 +209,11 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
       blocks: updatedBlocks
     };
 
-    onTemplateChange(updatedTemplate);
-  };
+    handleTemplateChange(updatedTemplate);
+    templateBuilderLogger.blockUpdated(blockId, updates);
+  }, [currentTemplate, handleTemplateChange]);
 
-  const handleBlockDelete = (blockId: string) => {
+  const handleBlockDelete = useCallback((blockId: string) => {
     const updatedBlocks = currentTemplate.blocks.filter(block => block.id !== blockId);
     
     const updatedTemplate = {
@@ -186,19 +221,21 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
       blocks: updatedBlocks
     };
 
-    onTemplateChange(updatedTemplate);
+    handleTemplateChange(updatedTemplate);
     
     if (selectedBlockId === blockId) {
       setSelectedBlockId(null);
     }
 
+    templateBuilderLogger.blockDeleted(blockId);
+
     toast({
       title: 'Bloco removido',
       description: 'O bloco foi removido do template'
     });
-  };
+  }, [currentTemplate, selectedBlockId, handleTemplateChange, toast]);
 
-  const handleBlockReorder = (dragIndex: number, hoverIndex: number) => {
+  const handleBlockReorder = useCallback((dragIndex: number, hoverIndex: number) => {
     const draggedBlock = currentTemplate.blocks[dragIndex];
     const updatedBlocks = [...currentTemplate.blocks];
     updatedBlocks.splice(dragIndex, 1);
@@ -209,7 +246,95 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
       blocks: updatedBlocks
     };
 
-    onTemplateChange(updatedTemplate);
+    handleTemplateChange(updatedTemplate);
+    templateBuilderLogger.blockReordered(dragIndex, hoverIndex);
+  }, [currentTemplate, handleTemplateChange]);
+
+  // Handle block duplication
+  const handleBlockDuplicate = useCallback((blockId: string) => {
+    const blockToDuplicate = currentTemplate.blocks.find(block => block.id === blockId);
+    if (!blockToDuplicate) return;
+
+    const duplicatedBlock = {
+      ...blockToDuplicate,
+      id: generateUniqueId(),
+      title: `${blockToDuplicate.title || blockToDuplicate.type} (Cópia)`
+    };
+
+    const blockIndex = currentTemplate.blocks.findIndex(block => block.id === blockId);
+    const updatedBlocks = [...currentTemplate.blocks];
+    updatedBlocks.splice(blockIndex + 1, 0, duplicatedBlock);
+
+    const updatedTemplate = {
+      ...currentTemplate,
+      blocks: updatedBlocks
+    };
+
+    handleTemplateChange(updatedTemplate);
+    setSelectedBlockId(duplicatedBlock.id);
+
+    toast({
+      title: 'Bloco duplicado',
+      description: 'O bloco foi duplicado com sucesso'
+    });
+  }, [currentTemplate, handleTemplateChange, toast]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if focus is in an input field
+      if ((e.target as HTMLElement)?.tagName === 'INPUT' || 
+          (e.target as HTMLElement)?.tagName === 'TEXTAREA' ||
+          (e.target as HTMLElement)?.contentEditable === 'true') {
+        return;
+      }
+
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+
+      if (isCtrlOrCmd && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+        templateBuilderLogger.undoAction();
+      } else if (isCtrlOrCmd && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        redo();
+        templateBuilderLogger.redoAction();
+      } else if (isCtrlOrCmd && e.key === 's') {
+        e.preventDefault();
+        // Save action handled by header
+      } else if ((e.key === 'Delete' || e.key === 'Backspace') && selectedBlockId) {
+        e.preventDefault();
+        handleBlockDelete(selectedBlockId);
+      } else if (isCtrlOrCmd && e.key === 'd' && selectedBlockId) {
+        e.preventDefault();
+        handleBlockDuplicate(selectedBlockId);
+      } else if (isCtrlOrCmd && e.key === 'ArrowUp' && selectedBlockId) {
+        e.preventDefault();
+        const currentIndex = currentTemplate.blocks.findIndex(block => block.id === selectedBlockId);
+        if (currentIndex > 0) {
+          handleBlockReorder(currentIndex, currentIndex - 1);
+        }
+      } else if (isCtrlOrCmd && e.key === 'ArrowDown' && selectedBlockId) {
+        e.preventDefault();
+        const currentIndex = currentTemplate.blocks.findIndex(block => block.id === selectedBlockId);
+        if (currentIndex < currentTemplate.blocks.length - 1) {
+          handleBlockReorder(currentIndex, currentIndex + 1);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo, selectedBlockId, handleBlockDelete, handleBlockDuplicate, handleBlockReorder, currentTemplate.blocks]);
+
+  // Viewport width styles
+  const getCanvasMaxWidth = () => {
+    switch (viewportWidth) {
+      case 'mobile': return '375px';
+      case 'tablet': return '768px';
+      case 'laptop': return '1024px';
+      default: return '100%';
+    }
   };
 
   const selectedBlock = selectedBlockId 
@@ -221,41 +346,109 @@ export const TemplateBuilderLayout: React.FC<TemplateBuilderLayoutProps> = ({
       <div className="flex flex-col h-full">
         <TemplateBuilderHeader 
           template={currentTemplate}
-          onTemplateUpdate={onTemplateChange}
+          onTemplateUpdate={handleTemplateChange}
           isNewTemplate={isNewTemplate}
           previewMode={previewMode}
           onPreviewToggle={() => setPreviewMode(!previewMode)}
+          viewportWidth={viewportWidth}
+          onViewportChange={setViewportWidth}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          onUndo={undo}
+          onRedo={redo}
+          showSEOPanel={showSEOPanel}
+          onToggleSEO={() => setShowSEOPanel(!showSEOPanel)}
         />
         
         <div className="flex flex-1 overflow-hidden">
-          {/* Block Library */}
+          {/* Left Panel - Library/Outline */}
           {!previewMode && (
             <div className="w-64 border-r border-border bg-background flex-shrink-0">
-              <BlockLibrary onAddBlock={handleAddBlock} />
+              <Tabs value={leftPanelTab} onValueChange={(value) => setLeftPanelTab(value as any)}>
+                <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
+                  <TabsTrigger value="library">Biblioteca</TabsTrigger>
+                  <TabsTrigger value="outline">Estrutura</TabsTrigger>
+                </TabsList>
+                <TabsContent value="library" className="mt-0">
+                  <BlockLibrary onAddBlock={handleAddBlock} />
+                </TabsContent>
+                <TabsContent value="outline" className="mt-0">
+                  <OutlinePanel
+                    template={currentTemplate}
+                    selectedBlockId={selectedBlockId}
+                    onBlockSelect={setSelectedBlockId}
+                    onBlockUpdate={handleBlockUpdate}
+                    onBlockDelete={handleBlockDelete}
+                    onBlockReorder={handleBlockReorder}
+                    onBlockDuplicate={handleBlockDuplicate}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
           )}
           
           {/* Template Canvas */}
-          <div className="flex-1 overflow-auto">
-            <TemplateCanvas
-              ref={canvasRef}
-              template={currentTemplate}
-              selectedBlockId={selectedBlockId}
-              onBlockSelect={setSelectedBlockId}
-              onBlockUpdate={handleBlockUpdate}
-              onBlockDelete={handleBlockDelete}
-              onBlockReorder={handleBlockReorder}
-              previewMode={previewMode}
-            />
+          <div className="flex-1 overflow-auto" style={{
+            background: previewMode && viewportWidth !== 'full' 
+              ? 'linear-gradient(45deg, #f1f5f9 25%, transparent 25%), linear-gradient(-45deg, #f1f5f9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f1f5f9 75%), linear-gradient(-45deg, transparent 75%, #f1f5f9 75%)'
+              : undefined,
+            backgroundSize: previewMode && viewportWidth !== 'full' ? '20px 20px' : undefined,
+            backgroundPosition: previewMode && viewportWidth !== 'full' ? '0 0, 0 10px, 10px -10px, -10px 0px' : undefined
+          }}>
+            <div 
+              className="mx-auto"
+              style={{ 
+                maxWidth: previewMode ? getCanvasMaxWidth() : '100%',
+                transition: 'max-width 0.3s ease'
+              }}
+            >
+              <TemplateCanvas
+                ref={canvasRef}
+                template={currentTemplate}
+                selectedBlockId={selectedBlockId}
+                onBlockSelect={setSelectedBlockId}
+                onBlockUpdate={handleBlockUpdate}
+                onBlockDelete={handleBlockDelete}
+                onBlockReorder={handleBlockReorder}
+                previewMode={previewMode}
+              />
+            </div>
           </div>
           
-          {/* Properties Panel */}
-          {!previewMode && selectedBlock && (
+          {/* Right Panel - Properties/SEO */}
+          {!previewMode && (selectedBlock || showSEOPanel) && (
             <div className="w-80 border-l border-border bg-background flex-shrink-0">
-              <BlockPropertiesPanel
-                block={selectedBlock}
-                onBlockUpdate={(updates) => handleBlockUpdate(selectedBlock.id, updates)}
-              />
+              {showSEOPanel ? (
+                <TemplateSEOPanel 
+                  template={currentTemplate}
+                  onQuickFix={(action, data) => {
+                    // Handle SEO quick fixes
+                    console.log('SEO Quick Fix:', action, data);
+                  }}
+                />
+              ) : selectedBlock ? (
+                <Tabs value={rightPanelTab} onValueChange={(value) => setRightPanelTab(value as any)}>
+                  <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
+                    <TabsTrigger value="properties">Propriedades</TabsTrigger>
+                    <TabsTrigger value="seo">SEO</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="properties" className="mt-0">
+                    <BlockPropertiesPanel
+                      block={selectedBlock}
+                      onBlockUpdate={(updates) => handleBlockUpdate(selectedBlock.id, updates)}
+                    />
+                  </TabsContent>
+                  <TabsContent value="seo" className="mt-0">
+                    <TemplateSEOPanel 
+                      template={currentTemplate}
+                      onQuickFix={(action, data) => {
+                        // Handle SEO quick fixes
+                        console.log('SEO Quick Fix:', action, data);
+                      }}
+                    />
+                  </TabsContent>
+                </Tabs>
+              ) : null}
             </div>
           )}
         </div>

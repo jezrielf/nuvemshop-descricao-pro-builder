@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Eye, EyeOff, Download, Upload, Copy } from 'lucide-react';
+import { ArrowLeft, Save, Eye, EyeOff, Download, Upload, Copy, Undo, Redo, Smartphone, Tablet, Laptop, Monitor, Palette, BarChart3, HelpCircle } from 'lucide-react';
 import { Template, ProductCategory } from '@/types/editor';
 import { useTemplateStore } from '@/store/templates';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +15,14 @@ interface TemplateBuilderHeaderProps {
   isNewTemplate: boolean;
   previewMode: boolean;
   onPreviewToggle: () => void;
+  viewportWidth: 'mobile' | 'tablet' | 'laptop' | 'full';
+  onViewportChange: (width: 'mobile' | 'tablet' | 'laptop' | 'full') => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  showSEOPanel: boolean;
+  onToggleSEO: () => void;
 }
 
 const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
@@ -36,13 +44,31 @@ export const TemplateBuilderHeader: React.FC<TemplateBuilderHeaderProps> = ({
   onTemplateUpdate,
   isNewTemplate,
   previewMode,
-  onPreviewToggle
+  onPreviewToggle,
+  viewportWidth,
+  onViewportChange,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+  showSEOPanel,
+  onToggleSEO
 }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const navigate = useNavigate();
   const { createTemplate, updateTemplate } = useTemplateStore();
   const { toast } = useToast();
+
+  const getViewportIcon = () => {
+    switch (viewportWidth) {
+      case 'mobile': return Smartphone;
+      case 'tablet': return Tablet;
+      case 'laptop': return Laptop;
+      default: return Monitor;
+    }
+  };
 
   const handleSave = async () => {
     if (!template.name.trim()) {
@@ -169,6 +195,77 @@ export const TemplateBuilderHeader: React.FC<TemplateBuilderHeaderProps> = ({
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Undo/Redo */}
+            <div className="flex items-center border rounded-md">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onUndo}
+                disabled={!canUndo}
+                className="h-8 px-2 border-r rounded-r-none"
+                title="Desfazer (Ctrl+Z)"
+              >
+                <Undo className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onRedo}
+                disabled={!canRedo}
+                className="h-8 px-2 rounded-l-none"
+                title="Refazer (Ctrl+Shift+Z)"
+              >
+                <Redo className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Viewport Width Selector */}
+            {previewMode && (
+              <div className="flex items-center border rounded-md">
+                {(['mobile', 'tablet', 'laptop', 'full'] as const).map((size) => {
+                  const Icon = size === 'mobile' ? Smartphone : 
+                             size === 'tablet' ? Tablet :
+                             size === 'laptop' ? Laptop : Monitor;
+                  const label = size === 'mobile' ? '375px' :
+                              size === 'tablet' ? '768px' :
+                              size === 'laptop' ? '1024px' : '100%';
+                  
+                  return (
+                    <Button
+                      key={size}
+                      variant={viewportWidth === size ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => onViewportChange(size)}
+                      className="h-8 px-2"
+                      title={label}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleSEO}
+              className={`flex items-center gap-2 ${showSEOPanel ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <BarChart3 className="h-4 w-4" />
+              SEO
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowShortcuts(!showShortcuts)}
+              className="flex items-center gap-2"
+              title="Atalhos de teclado"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </Button>
+            
             <Button
               variant="outline"
               size="sm"
@@ -220,6 +317,51 @@ export const TemplateBuilderHeader: React.FC<TemplateBuilderHeaderProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Keyboard shortcuts tooltip */}
+      {showShortcuts && (
+        <div className="absolute top-full right-6 mt-2 bg-background border border-border rounded-lg shadow-lg p-4 z-50 w-80">
+          <h4 className="font-semibold mb-3">Atalhos de Teclado</h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Desfazer</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+Z</kbd>
+            </div>
+            <div className="flex justify-between">
+              <span>Refazer</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+Shift+Z</kbd>
+            </div>
+            <div className="flex justify-between">
+              <span>Duplicar bloco</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+D</kbd>
+            </div>
+            <div className="flex justify-between">
+              <span>Excluir bloco</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Delete</kbd>
+            </div>
+            <div className="flex justify-between">
+              <span>Mover bloco para cima</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+↑</kbd>
+            </div>
+            <div className="flex justify-between">
+              <span>Mover bloco para baixo</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+↓</kbd>
+            </div>
+            <div className="flex justify-between">
+              <span>Salvar</span>
+              <kbd className="px-2 py-1 bg-muted rounded text-xs">Ctrl+S</kbd>
+            </div>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="mt-3 w-full"
+            onClick={() => setShowShortcuts(false)}
+          >
+            Fechar
+          </Button>
+        </div>
+      )}
       
       <ImportTemplateDialog
         open={showImportDialog}

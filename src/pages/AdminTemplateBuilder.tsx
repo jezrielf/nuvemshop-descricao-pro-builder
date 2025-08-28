@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TemplateBuilderLayout } from '@/components/admin/templates/builder/TemplateBuilderLayout';
 import { useToast } from '@/hooks/use-toast';
 import { Template } from '@/types/editor';
+import GlobalErrorBoundary from '@/components/common/GlobalErrorBoundary';
+
+// Lazy load the heavy components
+const TemplateBuilderLayout = lazy(() => 
+  import('@/components/admin/templates/builder/TemplateBuilderLayout').then(module => ({
+    default: module.TemplateBuilderLayout
+  }))
+);
 
 const AdminTemplateBuilder: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,13 +47,24 @@ const AdminTemplateBuilder: React.FC = () => {
   }
   
   return (
-    <div className="h-screen flex flex-col">
-      <TemplateBuilderLayout 
-        template={template}
-        onTemplateChange={setTemplate}
-        isNewTemplate={!templateId || templateId === 'new'}
-      />
-    </div>
+    <GlobalErrorBoundary>
+      <div className="h-screen flex flex-col">
+        <Suspense fallback={
+          <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-sm text-muted-foreground">Carregando editor...</p>
+            </div>
+          </div>
+        }>
+          <TemplateBuilderLayout 
+            template={template}
+            onTemplateChange={setTemplate}
+            isNewTemplate={!templateId || templateId === 'new'}
+          />
+        </Suspense>
+      </div>
+    </GlobalErrorBoundary>
   );
 };
 
