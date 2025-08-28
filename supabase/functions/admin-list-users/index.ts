@@ -14,19 +14,51 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Listing all users');
-    
-    // Create a Supabase client with the service role key for admin operations
+    // Verify admin authorization
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Check if user is admin
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.role?.includes('admin')) {
+      return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    console.log('Admin user verified, listing all users');
 
     // Get users from auth.users
     const { data, error } = await supabaseAdmin.auth.admin.listUsers();
