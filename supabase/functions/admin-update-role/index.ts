@@ -98,7 +98,7 @@ serve(async (req) => {
     }
 
     // After update, fetch the updated profile to return
-    const { data: profile, error: fetchError } = await supabaseAdmin
+    const { data: updatedProfile, error: fetchError } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -110,11 +110,11 @@ serve(async (req) => {
     }
 
     console.log('User role updated successfully for user:', userId);
-    console.log('Updated profile:', profile);
+    console.log('Updated profile:', updatedProfile);
 
     return new Response(
       JSON.stringify({ 
-        data: profile, 
+        data: updatedProfile, 
         error: null 
       }),
       { 
